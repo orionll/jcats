@@ -17,9 +17,6 @@ final class ListBuilderGenerator implements Generator {
 			private List<A> tail;
 			private boolean exported;
 
-			public ListBuilder() {
-			}
-
 			public ListBuilder<A> append(final A value) {
 				if (exported) {
 					copy();

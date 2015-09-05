@@ -4,6 +4,7 @@ final class Constants {
 	val public static JCATS = "jcats"
 	val public static FUNCTION = "jcats.function"
 	val public static COLLECTION = "jcats.collection"
+	val public static SIZED = "jcats.collection.Sized"
 	val public static MAX_ARITY = 5
 	val public static EFFECT = "jcats.function.Effect"
 	val public static F = "jcats.function.F"

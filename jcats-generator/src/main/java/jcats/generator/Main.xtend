@@ -4,9 +4,14 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.util.List
+import jcats.generator.collection.ArrayBuilderGenerator
+import jcats.generator.collection.ArrayGenerator
+import jcats.generator.collection.ArrayIteratorGenerator
+import jcats.generator.collection.ArrayWrapperGenerator
 import jcats.generator.collection.ListBuilderGenerator
 import jcats.generator.collection.ListGenerator
 import jcats.generator.collection.ListIteratorGenerator
+import jcats.generator.collection.SizedGenerator
 import jcats.generator.collection.VNGenerators
 import jcats.generator.function.F0Generator
 import jcats.generator.function.FGenerator
@@ -56,9 +61,14 @@ class Main {
 			new FGenerator,
 			new F0Generator,
 			new FsGenerator,
+			new SizedGenerator,
 			new ListGenerator,
 			new ListBuilderGenerator,
-			new ListIteratorGenerator
+			new ListIteratorGenerator,
+			new ArrayGenerator,
+			new ArrayBuilderGenerator,
+			new ArrayWrapperGenerator,
+			new ArrayIteratorGenerator
 		],
 			FNGenerators.generators,
 			PNGenerators.generators,

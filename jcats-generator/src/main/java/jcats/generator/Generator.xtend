@@ -26,4 +26,20 @@ interface Generator {
 			return StreamSupport.stream(spliterator(), true);
 		}
 	'''}
+
+	def static toString(String type) { '''
+		@Override
+		public String toString() {
+			final StringBuilder builder = new StringBuilder("«type»(");
+			final Iterator<A> iterator = iterator();
+			while (iterator.hasNext()) {
+				builder.append(iterator.next());
+				if (iterator.hasNext()) {
+					builder.append(", ");
+				}
+			}
+			builder.append(")");
+			return builder.toString();
+		}
+	'''}
 }

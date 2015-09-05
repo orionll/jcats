@@ -14,11 +14,12 @@ final class OptionGenerator implements Generator {
 		import java.util.function.Predicate;
 
 		import «Constants.F»;
+		import «Constants.SIZED»;
 
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
 
-		public final class Option<A> implements Iterable<A>, Serializable {
+		public final class Option<A> implements Iterable<A>, Sized, Serializable {
 			private final static Option NONE = new Option(null);
 
 			private final A value;
@@ -27,10 +28,12 @@ final class OptionGenerator implements Generator {
 				this.value = value;
 			}
 
+			@Override
 			public boolean isEmpty() {
 				return (value == null);
 			}
 
+			@Override
 			public boolean isNotEmpty() {
 				return (value != null);
 			}
@@ -62,8 +65,9 @@ final class OptionGenerator implements Generator {
 				return isEmpty() ? other : this;
 			}
 
+			@Override
 			public int size() {
-				return isEmpty() ? 1 : 0;
+				return isEmpty() ? 0 : 1;
 			}
 
 			public <B> Option<B> map(final F<A, B> f) {
