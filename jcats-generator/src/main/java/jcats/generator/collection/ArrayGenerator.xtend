@@ -23,6 +23,7 @@ final class ArrayGenerator implements Generator {
 		import «Constants.F»;
 
 		import static java.util.Collections.emptyIterator;
+		import static java.util.Collections.unmodifiableList;
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
 
@@ -150,7 +151,7 @@ final class ArrayGenerator implements Generator {
 						while (iterator.hasNext()) {
 							builder.append(iterator.next());
 						}
-						return builder.toArray();
+						return builder.build();
 					} else {
 						return this;
 					}
@@ -176,7 +177,7 @@ final class ArrayGenerator implements Generator {
 						while (iterator.hasNext()) {
 							builder.append(iterator.next());
 						}
-						return builder.toArray().concat(this);
+						return builder.build().concat(this);
 					} else {
 						return this;
 					}
@@ -184,19 +185,60 @@ final class ArrayGenerator implements Generator {
 			}
 
 			public <B> Array<B> map(final F<A, B> f) {
-				return null;
+				requireNonNull(f);
+				if (isEmpty()) {
+					return emptyArray();
+				} else if (f == F.id()) {
+					return (Array<B>) this;
+				} else {
+					final Object[] newArray = new Object[array.length];
+					for (int i = 0; i < array.length; i++) {
+						newArray[i] = requireNonNull(f.apply(get(i)));
+					}
+					return new Array<>(newArray);
+				}
 			}
 
 			public <B> Array<B> flatMap(final F<A, Array<B>> f) {
-				return null;
+				requireNonNull(f);
+				if (isEmpty()) {
+					return emptyArray();
+				} else {
+					final ArrayBuilder<B> builder = new ArrayBuilder<>();
+					for (final Object value : array) {
+						builder.appendArray(f.apply((A) value).array);
+					}
+					return builder.build();
+				}
 			}
 
 			public Array<A> filter(final Predicate<A> predicate) {
-				return null;
+				requireNonNull(predicate);
+				if (isEmpty()) {
+					return emptyArray();
+				} else {
+					final ArrayBuilder<A> builder = new ArrayBuilder<>();
+					for (final Object value : array) {
+						if (predicate.test((A) value)) {
+							builder.append((A) value);
+						}
+					}
+					return builder.build();
+				}
 			}
 
 			public Array<A> take(final int n) {
-				return null;
+				if (isEmpty() || n <= 0) {
+					return emptyArray();
+				} else if (n >= array.length) {
+					return this;
+				} else {
+					return new Array<>(Arrays.copyOf(array, n));
+				}
+			}
+
+			public java.util.List<A> asList() {
+				return unmodifiableList((java.util.List<A>) Arrays.asList(array));
 			}
 
 			public static <A> Array<A> emptyArray() {
@@ -268,7 +310,7 @@ final class ArrayGenerator implements Generator {
 						while (iterator.hasNext()) {
 							builder.append(iterator.next());
 						}
-						return builder.toArray();
+						return builder.build();
 					} else {
 						return emptyArray();
 					}
@@ -282,7 +324,7 @@ final class ArrayGenerator implements Generator {
 
 			@Override
 			public Spliterator<A> spliterator() {
-				return isEmpty() ? emptySpliterator() : Spliterators.spliterator(array, Spliterator.IMMUTABLE);
+				return isEmpty() ? emptySpliterator() : Spliterators.spliterator(array,  Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 
 			«stream»

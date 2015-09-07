@@ -11,7 +11,6 @@ final class ArrayBuilderGenerator implements Generator {
 
 		import java.util.Arrays;
 		import java.util.Collection;
-		import java.util.Iterator;
 
 		import static «Constants.ARRAY».emptyArray;
 
@@ -128,7 +127,7 @@ final class ArrayBuilderGenerator implements Generator {
 				return size;
 			}
 
-			public Array<A> toArray() {
+			public Array<A> build() {
 				if (size == 0) {
 					return emptyArray();
 				} else if (size < array.length) {

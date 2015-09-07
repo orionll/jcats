@@ -34,7 +34,7 @@ final class ListBuilderGenerator implements Generator {
 				return this;
 			}
 
-			public ListBuilder<A> appendList(List<A> list) {
+			ListBuilder<A> appendList(List<A> list) {
 				while (list.isNotEmpty()) {
 					append(list.head);
 					list = list.tail;
@@ -53,7 +53,7 @@ final class ListBuilderGenerator implements Generator {
 				return start.isEmpty();
 			}
 
-			public List<A> toList() {
+			public List<A> build() {
 				exported = !start.isEmpty();
 				return start;
 			}
@@ -67,7 +67,7 @@ final class ListBuilderGenerator implements Generator {
 					}
 
 					tail.tail = list;
-					return toList();
+					return build();
 				}
 			}
 

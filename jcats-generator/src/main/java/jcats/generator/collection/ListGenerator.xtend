@@ -75,7 +75,7 @@ final class ListGenerator implements Generator {
 				final ListBuilder<A> builder = new ListBuilder<>();
 				builder.appendList(this);
 				builder.append(value);
-				return builder.toList();
+				return builder.build();
 			}
 
 			/**
@@ -104,7 +104,7 @@ final class ListGenerator implements Generator {
 					final ListBuilder<A> builder = new ListBuilder<>();
 					builder.appendList(this);
 					builder.appendAll(suffix);
-					return builder.toList();
+					return builder.build();
 				}
 			}
 
@@ -133,7 +133,7 @@ final class ListGenerator implements Generator {
 						builder.append(f.apply(list.head));
 						list = list.tail;
 					}
-					return builder.toList();
+					return builder.build();
 				}
 			}
 
@@ -148,7 +148,7 @@ final class ListGenerator implements Generator {
 						builder.appendList(f.apply(list.head));
 						list = list.tail;
 					}
-					return builder.toList();
+					return builder.build();
 				}
 			}
 
@@ -165,7 +165,7 @@ final class ListGenerator implements Generator {
 						}
 						list = list.tail;
 					}
-					return builder.toList();
+					return builder.build();
 				}
 			}
 
@@ -181,7 +181,7 @@ final class ListGenerator implements Generator {
 						list = list.tail;
 						i++;
 					}
-					return builder.toList();
+					return builder.build();
 				}
 			}
 
@@ -220,12 +220,12 @@ final class ListGenerator implements Generator {
 					for (int i = 0; i < str.length(); i++) {
 						builder.append(str.charAt(i));
 					}
-					return builder.toList();
+					return builder.build();
 				}
 			}
 
 			public static <A> List<A> iterableToList(final Iterable<A> values) {
-				return new ListBuilder<A>().appendAll(values).toList();
+				return new ListBuilder<A>().appendAll(values).build();
 			}
 
 			@Override
@@ -235,12 +235,14 @@ final class ListGenerator implements Generator {
 
 			@Override
 			public Spliterator<A> spliterator() {
-				return isEmpty() ? emptySpliterator() : spliteratorUnknownSize(iterator(), Spliterator.IMMUTABLE);
+				return isEmpty() ? emptySpliterator() : spliteratorUnknownSize(iterator(),  Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 
 			«stream»
 
 			«parallelStream»
+
+			«toString("List")»
 		}
 	''' }
 }
