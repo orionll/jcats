@@ -7,7 +7,6 @@ import java.util.List
 import jcats.generator.collection.ArrayBuilderGenerator
 import jcats.generator.collection.ArrayGenerator
 import jcats.generator.collection.ArrayIteratorGenerator
-import jcats.generator.collection.ArrayWrapperGenerator
 import jcats.generator.collection.ListBuilderGenerator
 import jcats.generator.collection.ListGenerator
 import jcats.generator.collection.ListIteratorGenerator
@@ -67,7 +66,6 @@ class Main {
 			new ListIteratorGenerator,
 			new ArrayGenerator,
 			new ArrayBuilderGenerator,
-			new ArrayWrapperGenerator,
 			new ArrayIteratorGenerator
 		],
 			FNGenerators.generators,

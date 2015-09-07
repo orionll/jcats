@@ -111,42 +111,76 @@ final class ArrayGenerator implements Generator {
 				}
 			}
 
-			public Array<A> appendAll(final Iterable<A> suffix) {
-				if (suffix instanceof Array) {
-					return concat((Array<A>) suffix);
-				} else if (suffix instanceof Collection) {
-					final Collection<A> col = (Collection<A>) suffix;
-					if (isEmpty() && col.isEmpty()) {
-						return emptyArray();
-					} else {
-						return appendSized(suffix, col.size());
-					}
-				} else if (suffix instanceof Sized) {
-					final Sized sized = (Sized) suffix;
-					if (isEmpty() && sized.isEmpty()) {
-						return emptyArray();
-					} else {
-						return appendSized(suffix, sized.size());
-					}
-				} else {
-					final ArrayBuilder<A> builder = new ArrayBuilder<>();
-					builder.appendArray(this);
-					builder.appendAll(suffix);
-					return builder.toArray();
+			private static <A> void fillArray(final Object[] array, final int startIndex, final Iterable<A> iterable) {
+				int i = startIndex;
+				for (final A value : iterable) {
+					array[i++] = requireNonNull(value);
 				}
 			}
 
 			private Array<A> appendSized(final Iterable<A> suffix, final int suffixSize) {
 				final Object[] result = Arrays.copyOf(array, array.length + suffixSize);
-				int i = array.length;
-				for (final A a : suffix) {
-					result[i++] = requireNonNull(a);
-				}
+				fillArray(result, array.length, suffix);
 				return new Array<>(result);
 			}
 
+			private Array<A> prependSized(final Iterable<A> prefix, final int prefixSize) {
+				final Object[] result = new Object[prefixSize + array.length];
+				fillArray(result, 0, prefix);
+				System.arraycopy(array, 0, result, prefixSize, array.length);
+				return new Array<>(result);
+			}
+
+			/**
+			 * O(this.size + suffix.size)
+			 */
+			public Array<A> appendAll(final Iterable<A> suffix) {
+				if (suffix instanceof Array) {
+					return concat((Array<A>) suffix);
+				} else if (suffix instanceof Collection) {
+					final Collection<A> col = (Collection<A>) suffix;
+					return (isEmpty() && col.isEmpty()) ? emptyArray() : appendSized(suffix, col.size());
+				} else if (suffix instanceof Sized) {
+					final Sized sized = (Sized) suffix;
+					return (isEmpty() && sized.isEmpty()) ? emptyArray() : appendSized(suffix, sized.size());
+				} else {
+					final Iterator<A> iterator = suffix.iterator();
+					if (iterator.hasNext()) {
+						final ArrayBuilder<A> builder = new ArrayBuilder<>(array);
+						while (iterator.hasNext()) {
+							builder.append(iterator.next());
+						}
+						return builder.toArray();
+					} else {
+						return this;
+					}
+				}
+			}
+
+			/**
+			 * O(prefix.size + this.size)
+			 */
 			public Array<A> prependAll(final Iterable<A> prefix) {
-				return null;
+				if (prefix instanceof Array) {
+					return ((Array<A>) prefix).concat(this);
+				} else if (prefix instanceof Collection) {
+					final Collection<A> col = (Collection<A>) prefix;
+					return (isEmpty() && col.isEmpty()) ? emptyArray() : prependSized(prefix, col.size());
+				} else if (prefix instanceof Sized) {
+					final Sized sized = (Sized) prefix;
+					return (isEmpty() && sized.isEmpty()) ? emptyArray() : prependSized(prefix, sized.size());
+				} else {
+					final Iterator<A> iterator = prefix.iterator();
+					if (iterator.hasNext()) {
+						final ArrayBuilder<A> builder = new ArrayBuilder<>();
+						while (iterator.hasNext()) {
+							builder.append(iterator.next());
+						}
+						return builder.toArray().concat(this);
+					} else {
+						return this;
+					}
+				}
 			}
 
 			public <B> Array<B> map(final F<A, B> f) {
@@ -212,8 +246,33 @@ final class ArrayGenerator implements Generator {
 				}
 			}
 
-			public static <A> Array<A> iterableToArray(final Iterable<A> values) {
-				return null;
+			private static <A> Array<A> sizedToArray(final Iterable<A> iterable, final int iterableSize) {
+				final Object[] array = new Object[iterableSize];
+				fillArray(array, 0, iterable);
+				return new Array<>(array);
+			}
+
+			public static <A> Array<A> iterableToArray(final Iterable<A> iterable) {
+				if (iterable instanceof Array) {
+					return (Array<A>) iterable;
+				} else if (iterable instanceof Collection) {
+					final Collection<A> col = (Collection<A>) iterable;
+					return col.isEmpty() ? emptyArray() : sizedToArray(iterable, col.size());
+				} else if (iterable instanceof Sized) {
+					final Sized sized = (Sized) iterable;
+					return sized.isEmpty() ? emptyArray() : sizedToArray(iterable, sized.size());
+				} else {
+					final Iterator<A> iterator = iterable.iterator();
+					if (iterator.hasNext()) {
+						final ArrayBuilder<A> builder = new ArrayBuilder<>();
+						while (iterator.hasNext()) {
+							builder.append(iterator.next());
+						}
+						return builder.toArray();
+					} else {
+						return emptyArray();
+					}
+				}
 			}
 
 			@Override
@@ -229,6 +288,8 @@ final class ArrayGenerator implements Generator {
 			«stream»
 
 			«parallelStream»
+
+			«toString("Array")»
 		}
 	''' }
 }
