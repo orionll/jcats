@@ -27,6 +27,7 @@ final class ListGenerator implements Generator {
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
 		import static java.util.Spliterators.spliteratorUnknownSize;
+		import static «Constants.SIZE».preciseSize;
 
 		public final class List<A> implements Iterable<A>, Sized, Serializable {
 			private static final List NIL = new List(null, null);
@@ -41,10 +42,10 @@ final class ListGenerator implements Generator {
 
 			@Override
 			public PreciseSize size() {
-				return Size.preciseSize(preciseSize());
+				return preciseSize(length());
 			}
 		
-			public int preciseSize() {
+			public int length() {
 				throw new UnsupportedOperationException("Not implemented");
 			}
 

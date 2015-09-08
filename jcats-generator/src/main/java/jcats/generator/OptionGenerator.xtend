@@ -17,6 +17,7 @@ final class OptionGenerator implements Generator {
 
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.SIZE».preciseSize;
 
 		public final class Option<A> implements Iterable<A>, Sized, Serializable {
 			private final static Option NONE = new Option(null);
@@ -29,10 +30,10 @@ final class OptionGenerator implements Generator {
 
 			@Override
 			public PreciseSize size() {
-				return Size.preciseSize(preciseSize());
+				return preciseSize(length());
 			}
 
-			public int preciseSize() {
+			public int length() {
 				return isEmpty() ? 0 : 1;
 			}
 

@@ -28,6 +28,7 @@ final class ArrayGenerator implements Generator {
 		import static java.util.Collections.unmodifiableList;
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
+		import static «Constants.SIZE».preciseSize;
 
 		public final class Array<A> implements Iterable<A>, Sized, Serializable {
 			private static final Array EMPTY = new Array(new Object[0]);
@@ -40,13 +41,13 @@ final class ArrayGenerator implements Generator {
 
 			@Override
 			public PreciseSize size() {
-				return Size.preciseSize(array.length);
+				return preciseSize(array.length);
 			}
 
 			/**
 			 * O(1)
 			 */
-			public int preciseSize() {
+			public int length() {
 				return array.length;
 			}
 
@@ -154,7 +155,7 @@ final class ArrayGenerator implements Generator {
 					final Collection<A> col = (Collection<A>) suffix;
 					return col.isEmpty() ? this : appendSized(suffix, col.size());
 				} else if (suffix instanceof Sized) {
-					return ((Sized) suffix).size().match(precise -> appendSized(suffix, precise.size()),
+					return ((Sized) suffix).size().match(precise -> appendSized(suffix, precise.length()),
 							() -> { throw new IllegalArgumentException("Cannot append infinite iterable to array"); });
 				} else {
 					final Iterator<A> iterator = suffix.iterator();
@@ -180,7 +181,7 @@ final class ArrayGenerator implements Generator {
 					final Collection<A> col = (Collection<A>) prefix;
 					return col.isEmpty() ? this : prependSized(prefix, col.size());
 				} else if (prefix instanceof Sized) {
-					return ((Sized) prefix).size().match(precise -> prependSized(prefix, precise.size()),
+					return ((Sized) prefix).size().match(precise -> prependSized(prefix, precise.length()),
 							() -> { throw new IllegalArgumentException("Cannot prepend infinite iterable to array"); });
 				} else {
 					final Iterator<A> iterator = prefix.iterator();
@@ -313,7 +314,7 @@ final class ArrayGenerator implements Generator {
 					final Collection<A> col = (Collection<A>) iterable;
 					return col.isEmpty() ? emptyArray() : sizedToArray(iterable, col.size());
 				} else if (iterable instanceof Sized) {
-					return ((Sized) iterable).size().match(precise -> sizedToArray(iterable, precise.size()),
+					return ((Sized) iterable).size().match(precise -> sizedToArray(iterable, precise.length()),
 							() -> { throw new IllegalArgumentException("Cannot convert infinite iterable to array"); });
 				} else {
 					final Iterator<A> iterator = iterable.iterator();

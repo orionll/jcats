@@ -18,6 +18,14 @@ final class SizeGenerator implements Generator {
 
 			Size() {}
 
+			public final boolean isPrecise() {
+				return (this instanceof PreciseSize);
+			}
+
+			public abstract boolean mayBeFinite();
+
+			public abstract boolean mayBeInfinite();
+
 			public <A> A match(final F<PreciseSize, A> precise, final F0<A> infinite) {
 				if (this instanceof PreciseSize) {
 					return precise.apply((PreciseSize) this);
@@ -26,13 +34,13 @@ final class SizeGenerator implements Generator {
 				}
 			}
 
-			public static PreciseSize preciseSize(final int size) {
-				if (size < 0) {
-					throw new IllegalArgumentException("Negative size: " + size);
-				} else if (size == 0) {
+			public static PreciseSize preciseSize(final int length) {
+				if (length < 0) {
+					throw new IllegalArgumentException("Negative size: " + length);
+				} else if (length == 0) {
 					return EMPTY;
 				} else {
-					return new PreciseSize(size);
+					return new PreciseSize(length);
 				}
 			}
 
@@ -50,27 +58,35 @@ final class PreciseSizeGenerator implements Generator {
 		package «Constants.JCATS»;
 
 		public final class PreciseSize extends Size {
-			private final int size;
+			private final int length;
 
-			PreciseSize(final int size) {
-				this.size = size;
+			PreciseSize(final int length) {
+				this.length = length;
 			}
 
-			public int size() {
-				return size;
+			public int length() {
+				return length;
+			}
+
+			public final boolean mayBeFinite() {
+				return true;
+			}
+
+			public final boolean mayBeInfinite() {
+				return false;
 			}
 
 			public boolean isEmpty() {
-				return (size == 0);
+				return (length == 0);
 			}
 
 			public boolean isNotEmpty() {
-				return (size != 0);
+				return (length != 0);
 			}
 
 			@Override
 			public String toString() {
-				return Integer.toString(size);
+				return Integer.toString(length);
 			}
 		}
 	''' }
@@ -83,6 +99,16 @@ final class InfiniteSizeGenerator implements Generator {
 		package «Constants.JCATS»;
 
 		public final class InfiniteSize extends Size {
+			InfiniteSize() {}
+
+			public final boolean mayBeFinite() {
+				return false;
+			}
+
+			public final boolean mayBeInfinite() {
+				return true;
+			}
+
 			@Override
 			public String toString() {
 				return "<infinite>";

@@ -22,11 +22,11 @@ final class ArrayBuilderGenerator implements Generator {
 
 		public final class ArrayBuilder<A> {
 			private Object[] array;
-			private int size;
+			private int length;
 
 			public ArrayBuilder(final int initialCapacity) {
 				array = new Object[initialCapacity];
-				size = 0;
+				length = 0;
 			}
 
 			public ArrayBuilder() {
@@ -35,7 +35,7 @@ final class ArrayBuilderGenerator implements Generator {
 
 			ArrayBuilder(final Object[] values) {
 				array = values;
-				size = values.length;
+				length = values.length;
 			}
 
 			private int expandedCapacity(final int minCapacity) {
@@ -61,19 +61,19 @@ final class ArrayBuilderGenerator implements Generator {
 			}
 
 			ArrayBuilder<A> appendArray(final Object[] values) {
-				ensureCapacity(size + values.length);
-				System.arraycopy(values, 0, array, size, values.length);
-				size += values.length;
+				ensureCapacity(length + values.length);
+				System.arraycopy(values, 0, array, length, values.length);
+				length += values.length;
 				return this;
 			}
 
-			private ArrayBuilder<A> appendSized(final Iterable<A> iterable, final int iterableSize) {
-				if (iterableSize == 0) {
+			private ArrayBuilder<A> appendSized(final Iterable<A> iterable, final int iterableLength) {
+				if (iterableLength == 0) {
 					return this;
 				} else {
-					ensureCapacity(size + iterableSize);
+					ensureCapacity(length + iterableLength);
 					for (final A value : iterable) {
-						array[size++] = requireNonNull(value);
+						array[length++] = requireNonNull(value);
 					}
 					return this;
 				}
@@ -84,8 +84,8 @@ final class ArrayBuilderGenerator implements Generator {
 			 */
 			public ArrayBuilder<A> append(final A value) {
 				requireNonNull(value);
-				ensureCapacity(size + 1);
-				array[size++] = value;
+				ensureCapacity(length + 1);
+				array[length++] = value;
 				return this;
 			}
 
@@ -114,7 +114,7 @@ final class ArrayBuilderGenerator implements Generator {
 						return appendSized(iterable, col.size());
 					}
 				} else if (iterable instanceof Sized) {
-					return ((Sized) iterable).size().match(precise -> appendSized(iterable, precise.size()),
+					return ((Sized) iterable).size().match(precise -> appendSized(iterable, precise.length()),
 							() -> { throw new IllegalArgumentException("Cannot append infinite iterable to array build"); });
 				} else {
 					for (final A value : iterable) {
@@ -126,18 +126,18 @@ final class ArrayBuilderGenerator implements Generator {
 			}
 
 			public boolean isEmpty() {
-				return (size == 0);
+				return (length == 0);
 			}
 
-			public int size() {
-				return size;
+			public int length() {
+				return length;
 			}
 
 			public Array<A> build() {
-				if (size == 0) {
+				if (length == 0) {
 					return emptyArray();
-				} else if (size < array.length) {
-					return new Array<>(Arrays.copyOf(array, size));
+				} else if (length < array.length) {
+					return new Array<>(Arrays.copyOf(array, length));
 				} else {
 					return new Array<>(array);
 				}
@@ -146,9 +146,9 @@ final class ArrayBuilderGenerator implements Generator {
 			@Override
 			public String toString() {
 				final StringBuilder builder = new StringBuilder("ArrayBuilder(");
-				for (int i = 0; i < size; i++) {
+				for (int i = 0; i < length; i++) {
 					builder.append(array[i]);
-					if (i < size - 1) {
+					if (i < length - 1) {
 						builder.append(", ");
 					}
 				}
