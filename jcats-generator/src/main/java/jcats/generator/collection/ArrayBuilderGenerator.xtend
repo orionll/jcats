@@ -12,6 +12,10 @@ final class ArrayBuilderGenerator implements Generator {
 		import java.util.Arrays;
 		import java.util.Collection;
 
+		import «Constants.PRECISE_SIZE»;
+		import «Constants.SIZE»;
+		import «Constants.SIZED»;
+
 		import static «Constants.ARRAY».emptyArray;
 
 		import static java.util.Objects.requireNonNull;
@@ -64,11 +68,15 @@ final class ArrayBuilderGenerator implements Generator {
 			}
 
 			private ArrayBuilder<A> appendSized(final Iterable<A> iterable, final int iterableSize) {
-				ensureCapacity(size + iterableSize);
-				for (final A value : iterable) {
-					array[size++] = requireNonNull(value);
+				if (iterableSize == 0) {
+					return this;
+				} else {
+					ensureCapacity(size + iterableSize);
+					for (final A value : iterable) {
+						array[size++] = requireNonNull(value);
+					}
+					return this;
 				}
-				return this;
 			}
 
 			/**
@@ -106,10 +114,8 @@ final class ArrayBuilderGenerator implements Generator {
 						return appendSized(iterable, col.size());
 					}
 				} else if (iterable instanceof Sized) {
-					final Sized sized = (Sized) iterable;
-					if (sized.isNotEmpty()) {
-						return appendSized(iterable, sized.size());
-					}
+					return ((Sized) iterable).size().match(precise -> appendSized(iterable, precise.size()),
+							() -> { throw new IllegalArgumentException("Cannot append infinite iterable to array build"); });
 				} else {
 					for (final A value : iterable) {
 						append(value);

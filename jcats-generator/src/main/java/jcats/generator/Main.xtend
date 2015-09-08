@@ -10,7 +10,6 @@ import jcats.generator.collection.ArrayIteratorGenerator
 import jcats.generator.collection.ListBuilderGenerator
 import jcats.generator.collection.ListGenerator
 import jcats.generator.collection.ListIteratorGenerator
-import jcats.generator.collection.SizedGenerator
 import jcats.generator.collection.VNGenerators
 import jcats.generator.function.F0Generator
 import jcats.generator.function.FGenerator
@@ -61,6 +60,9 @@ class Main {
 			new F0Generator,
 			new FsGenerator,
 			new SizedGenerator,
+			new SizeGenerator,
+			new PreciseSizeGenerator,
+			new InfiniteSizeGenerator,
 			new ListGenerator,
 			new ListBuilderGenerator,
 			new ListIteratorGenerator,

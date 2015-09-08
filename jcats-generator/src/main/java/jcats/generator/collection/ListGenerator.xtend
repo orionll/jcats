@@ -19,13 +19,16 @@ final class ListGenerator implements Generator {
 		import java.util.stream.StreamSupport;
 
 		import «Constants.F»;
+		import «Constants.PRECISE_SIZE»;
+		import «Constants.SIZE»;
+		import «Constants.SIZED»;
 
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
 		import static java.util.Spliterators.spliteratorUnknownSize;
 
-		public final class List<A> implements Iterable<A>, Serializable {
+		public final class List<A> implements Iterable<A>, Sized, Serializable {
 			private static final List NIL = new List(null, null);
 
 			final A head;
@@ -34,6 +37,15 @@ final class ListGenerator implements Generator {
 			private List(final A head, final List<A> tail) {
 				this.head = head;
 				this.tail = tail;
+			}
+
+			@Override
+			public PreciseSize size() {
+				return Size.preciseSize(preciseSize());
+			}
+		
+			public int preciseSize() {
+				throw new UnsupportedOperationException("Not implemented");
 			}
 
 			/**
