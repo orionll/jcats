@@ -105,7 +105,7 @@ final class VNGenerators {
 						}
 
 					«ENDIF»
-					public P«arity»<«(1 .. arity).map["A"].join(", ")»> toP«arity»() {
+					public P«arity»<«(1 .. arity).map["A"].join(", ")»> toP() {
 						return p«arity»(«(1 .. arity).map["a" + it].join(", ")»);
 					}
 
