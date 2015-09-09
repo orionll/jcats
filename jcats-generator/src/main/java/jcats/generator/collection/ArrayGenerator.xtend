@@ -80,7 +80,7 @@ final class ArrayGenerator implements Generator {
 			}
 
 			/**
-			 * O(this.size)
+			 * O(size)
 			 */
 			public Array<A> prepend(final A value) {
 				requireNonNull(value);
@@ -91,7 +91,7 @@ final class ArrayGenerator implements Generator {
 			}
 
 			/**
-			 * O(this.size)
+			 * O(size)
 			 */
 			public Array<A> append(final A value) {
 				requireNonNull(value);

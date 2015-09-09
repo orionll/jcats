@@ -1,5 +1,7 @@
 package jcats.generator
 
+import static extension java.lang.Character.toLowerCase
+
 interface Generator {
 	def String className()
 	def String sourceCode()
@@ -42,4 +44,50 @@ interface Generator {
 			return builder.toString();
 		}
 	'''}
+
+	def static zip(String type) { '''
+		/**
+		 * O(max(this.size, that.size))
+		 */
+		public <B> «type»<P2<A, B>> zip(final «type»<B> that) {
+			return zip2(this, that);
+		}
+	'''}
+
+	def static zipWith(String type) { '''
+		/**
+		 * O(max(this.size, that.size))
+		 */
+		public <B, C> «type»<C> zipWith(final «type»<B> that, final F2<A, B, C> f) {
+			return zipWith2(this, that, f);
+		}
+	'''}
+
+	def static zipN(String type) { '''
+		«FOR arity : 2 .. Constants.MAX_ARITY»
+			/**
+			 * O(max(«(1 .. arity).map['''«type.firstToLowerCase»«it».size'''].join(", ")»))
+			 */
+			public static <«(1 .. arity).map["A" + it].join(", ")»> «type»<P«arity»<«(1 .. arity).map["A" + it].join(", ")»>> zip«arity»(«(1 .. arity).map['''final «type»<A«it»> «type.firstToLowerCase»«it»'''].join(", ")») {
+				return zipWith«arity»(«(1 .. arity).map[type.firstToLowerCase + it].join(", ")», P«arity»::p«arity»);
+			}
+
+		«ENDFOR»
+	'''}
+
+	def static zipWithN(String type, (int) => String body) { '''
+		«FOR arity : 2 .. Constants.MAX_ARITY»
+			/**
+			 * O(max(«(1 .. arity).map['''«type.firstToLowerCase»«it».size'''].join(", ")»))
+			 */
+			public static <«(1 .. arity).map["A" + it + ", "].join»B> «type»<B> zipWith«arity»(«(1 .. arity).map['''final «type»<A«it»> «type.firstToLowerCase»«it»'''].join(", ")», final F«arity»<«(1 .. arity).map["A" + it + ", "].join»B> f) {
+				«body.apply(arity)»
+			}
+
+		«ENDFOR»
+	'''}
+
+	def static firstToLowerCase(String str) {
+		if (str.empty) str else str.toCharArray.head.toLowerCase + str.toCharArray.tail.join
+	}
 }

@@ -19,14 +19,20 @@ final class ListGenerator implements Generator {
 		import java.util.stream.StreamSupport;
 
 		import «Constants.F»;
+		«FOR arity : 2 .. Constants.MAX_ARITY»
+			import «Constants.F»«arity»;
+		«ENDFOR»
+		«FOR arity : 2 .. Constants.MAX_ARITY»
+			import «Constants.P»«arity»;
+		«ENDFOR»
 		import «Constants.PRECISE_SIZE»;
-		import «Constants.SIZE»;
 		import «Constants.SIZED»;
 
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
 		import static java.util.Spliterators.spliteratorUnknownSize;
+		import static «Constants.P2».p2;
 		import static «Constants.SIZE».preciseSize;
 
 		public final class List<A> implements Iterable<A>, Sized, Serializable {
@@ -44,7 +50,7 @@ final class ListGenerator implements Generator {
 			public PreciseSize size() {
 				return preciseSize(length());
 			}
-		
+
 			public int length() {
 				throw new UnsupportedOperationException("Not implemented");
 			}
@@ -77,12 +83,23 @@ final class ListGenerator implements Generator {
 			/**
 			 * O(1)
 			 */
+			public List<A> tail() {
+				if (isEmpty()) {
+					throw new NoSuchElementException();
+				} else {
+					return tail;
+				}
+			}
+
+			/**
+			 * O(1)
+			 */
 			public List<A> prepend(final A value) {
 				return new List<>(requireNonNull(value), this);
 			}
 
 			/**
-			 * O(this.size)
+			 * O(size)
 			 */
 			public List<A> append(final A value) {
 				final ListBuilder<A> builder = new ListBuilder<>();
@@ -92,7 +109,7 @@ final class ListGenerator implements Generator {
 			}
 
 			/**
-			 * O(this.size)
+			 * O(size)
 			 */
 			public List<A> concat(final List<A> suffix) {
 				requireNonNull(suffix);
@@ -131,7 +148,7 @@ final class ListGenerator implements Generator {
 			}
 
 			/**
-			 * O(this.size)
+			 * O(size)
 			 */
 			public <B> List<B> map(final F<A, B> f) {
 				requireNonNull(f);
@@ -251,6 +268,51 @@ final class ListGenerator implements Generator {
 				return isEmpty() ? emptySpliterator() : spliteratorUnknownSize(iterator(),  Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 
+			«zip("List")»
+
+			«zipWith("List")»
+
+			/**
+		 	 * O(size)
+		 	 */
+			public List<P2<A, Integer>> zipWithIndex() {
+				if (isEmpty()) {
+					return nil();
+				} else {
+					final ListBuilder<P2<A, Integer>> builder = new ListBuilder<>();
+					List<A> list = this;
+					int index = 0;
+					while (!list.isEmpty()) {
+						builder.append(p2(list.head(), index));
+						list = list.tail;
+						if (index == Integer.MAX_VALUE && !list.isEmpty()) {
+							throw new IndexOutOfBoundsException("Index overflow");
+						}
+						index++;
+					}
+					return builder.build();
+				}
+			}
+
+			«zipN("List")»
+			«zipWithN("List")[arity | '''
+				requireNonNull(f);
+				if («(1 .. arity).map["list" + it + ".isEmpty()"].join(" || ")») {
+					return nil();
+				} else {
+					«FOR i : 1 .. arity»
+						List<A«i»> i«i» = list«i»;
+					«ENDFOR»
+					final ListBuilder<B> builder = new ListBuilder<>();
+					while («(1 .. arity).map["!i" + it + ".isEmpty()"].join(" && ")») {
+						builder.append(f.apply(«(1 .. arity).map["i" + it + ".head"].join(", ")»));
+						«FOR i : 1 .. arity»
+							i«i» = i«i».tail;
+						«ENDFOR»
+					}
+					return builder.build();
+				}
+			''']»
 			«stream»
 
 			«parallelStream»
