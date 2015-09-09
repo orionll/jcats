@@ -22,6 +22,7 @@ final class ListGenerator implements Generator {
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.F»«arity»;
 		«ENDFOR»
+		import «Constants.OPTION»;
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.P»«arity»;
 		«ENDFOR»
@@ -32,6 +33,8 @@ final class ListGenerator implements Generator {
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
 		import static java.util.Spliterators.spliteratorUnknownSize;
+		import static «Constants.OPTION».none;
+		import static «Constants.OPTION».some;
 		import static «Constants.P2».p2;
 		import static «Constants.SIZE».preciseSize;
 
@@ -51,8 +54,20 @@ final class ListGenerator implements Generator {
 				return preciseSize(length());
 			}
 
+			/**
+			 * O(size)
+			 */
 			public int length() {
-				throw new UnsupportedOperationException("Not implemented");
+				int len = 0;
+				List<A> list = this;
+				while (list.isNotEmpty()) {
+					if (len == Integer.MAX_VALUE) {
+						throw new IndexOutOfBoundsException("Size overflow");
+					}
+					list = list.tail;
+					len++;
+				}
+				return len;
 			}
 
 			/**
@@ -89,6 +104,13 @@ final class ListGenerator implements Generator {
 				} else {
 					return tail;
 				}
+			}
+
+			/**
+			 * O(1)
+			 */
+			public Option<A> headOption() {
+				return isEmpty() ? none() : some(head);
 			}
 
 			/**
@@ -273,8 +295,8 @@ final class ListGenerator implements Generator {
 			«zipWith("List")»
 
 			/**
-		 	 * O(size)
-		 	 */
+			 * O(size)
+			 */
 			public List<P2<A, Integer>> zipWithIndex() {
 				if (isEmpty()) {
 					return nil();

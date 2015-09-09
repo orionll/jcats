@@ -20,14 +20,22 @@ final class ArrayGenerator implements Generator {
 		import java.util.stream.StreamSupport;
 
 		import «Constants.F»;
+		«FOR arity : 2 .. Constants.MAX_ARITY»
+			import «Constants.F»«arity»;
+		«ENDFOR»
+		«FOR arity : 2 .. Constants.MAX_ARITY»
+			import «Constants.P»«arity»;
+		«ENDFOR»
 		import «Constants.PRECISE_SIZE»;
 		import «Constants.SIZE»;
 		import «Constants.SIZED»;
 
+		import static java.lang.Math.min;
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Collections.unmodifiableList;
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
+		import static «Constants.P2».p2;
 		import static «Constants.SIZE».preciseSize;
 
 		public final class Array<A> implements Iterable<A>, Sized, Serializable {
@@ -337,9 +345,42 @@ final class ArrayGenerator implements Generator {
 
 			@Override
 			public Spliterator<A> spliterator() {
-				return isEmpty() ? emptySpliterator() : Spliterators.spliterator(array,  Spliterator.ORDERED | Spliterator.IMMUTABLE);
+				return isEmpty() ? emptySpliterator() : Spliterators.spliterator(array, Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 
+			«zip("Array")»
+
+			«zipWith("Array")»
+
+			/**
+			 * O(size)
+			 */
+			public Array<P2<A, Integer>> zipWithIndex() {
+				if (isEmpty()) {
+					return emptyArray();
+				} else {
+					final Object[] result = new Object[array.length];
+					for (int i = 0; i < array.length; i++) {
+						result[i] = p2(array[i], i);
+					}
+					return new Array<>(result);
+				}
+			}
+
+			«zipN("Array")»
+			«zipWithN("Array")[arity | '''
+				requireNonNull(f);
+				if («(1 .. arity).map["array" + it + ".isEmpty()"].join(" || ")») {
+					return emptyArray();
+				} else {
+					final int length = «(1 ..< arity).map['''min(array«it».array.length'''].join(", ")», array«arity».array.length«(1 ..< arity).map[")"].join»;
+					final Object[] array = new Object[length];
+					for (int i = 0; i < length; i++) {
+						array[i] = requireNonNull(f.apply(«(1 .. arity).map['''array«it».get(i)'''].join(", ")»));
+					}
+					return new Array<>(array);
+				}
+			''']»
 			«stream»
 
 			«parallelStream»

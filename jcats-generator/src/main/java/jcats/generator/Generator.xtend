@@ -47,7 +47,7 @@ interface Generator {
 
 	def static zip(String type) { '''
 		/**
-		 * O(max(this.size, that.size))
+		 * O(min(this.size, that.size))
 		 */
 		public <B> «type»<P2<A, B>> zip(final «type»<B> that) {
 			return zip2(this, that);
@@ -56,7 +56,7 @@ interface Generator {
 
 	def static zipWith(String type) { '''
 		/**
-		 * O(max(this.size, that.size))
+		 * O(min(this.size, that.size))
 		 */
 		public <B, C> «type»<C> zipWith(final «type»<B> that, final F2<A, B, C> f) {
 			return zipWith2(this, that, f);
@@ -66,7 +66,7 @@ interface Generator {
 	def static zipN(String type) { '''
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			/**
-			 * O(max(«(1 .. arity).map['''«type.firstToLowerCase»«it».size'''].join(", ")»))
+			 * O(min(«(1 .. arity).map['''«type.firstToLowerCase»«it».size'''].join(", ")»))
 			 */
 			public static <«(1 .. arity).map["A" + it].join(", ")»> «type»<P«arity»<«(1 .. arity).map["A" + it].join(", ")»>> zip«arity»(«(1 .. arity).map['''final «type»<A«it»> «type.firstToLowerCase»«it»'''].join(", ")») {
 				return zipWith«arity»(«(1 .. arity).map[type.firstToLowerCase + it].join(", ")», P«arity»::p«arity»);
@@ -78,7 +78,7 @@ interface Generator {
 	def static zipWithN(String type, (int) => String body) { '''
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			/**
-			 * O(max(«(1 .. arity).map['''«type.firstToLowerCase»«it».size'''].join(", ")»))
+			 * O(min(«(1 .. arity).map['''«type.firstToLowerCase»«it».size'''].join(", ")»))
 			 */
 			public static <«(1 .. arity).map["A" + it + ", "].join»B> «type»<B> zipWith«arity»(«(1 .. arity).map['''final «type»<A«it»> «type.firstToLowerCase»«it»'''].join(", ")», final F«arity»<«(1 .. arity).map["A" + it + ", "].join»B> f) {
 				«body.apply(arity)»
