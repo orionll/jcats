@@ -26,8 +26,6 @@ final class ListGenerator implements Generator {
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.P»«arity»;
 		«ENDFOR»
-		import «Constants.PRECISE_SIZE»;
-		import «Constants.SIZED»;
 
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
@@ -36,9 +34,8 @@ final class ListGenerator implements Generator {
 		import static «Constants.OPTION».none;
 		import static «Constants.OPTION».some;
 		import static «Constants.P2».p2;
-		import static «Constants.SIZE».preciseSize;
 
-		public final class List<A> implements Iterable<A>, Sized, Serializable {
+		public final class List<A> implements Iterable<A>, Serializable {
 			private static final List NIL = new List(null, null);
 
 			final A head;
@@ -47,11 +44,6 @@ final class ListGenerator implements Generator {
 			private List(final A head, final List<A> tail) {
 				this.head = head;
 				this.tail = tail;
-			}
-
-			@Override
-			public PreciseSize size() {
-				return preciseSize(length());
 			}
 
 			/**

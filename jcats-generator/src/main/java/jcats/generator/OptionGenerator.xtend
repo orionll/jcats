@@ -17,20 +17,14 @@ final class OptionGenerator implements Generator {
 
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
-		import static «Constants.SIZE».preciseSize;
 
-		public final class Option<A> implements Iterable<A>, Sized, Serializable {
-			private final static Option NONE = new Option(null);
+		public final class Option<A> implements Iterable<A>, Serializable {
+			private static final Option NONE = new Option(null);
 
 			private final A value;
 
 			private Option(final A value) {
 				this.value = value;
-			}
-
-			@Override
-			public PreciseSize size() {
-				return preciseSize(length());
 			}
 
 			public int length() {

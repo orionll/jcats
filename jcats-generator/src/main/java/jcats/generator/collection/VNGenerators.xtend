@@ -36,7 +36,7 @@ final class VNGenerators {
 				import static «Constants.P»«arity».p«arity»;
 				import static «Constants.PRECISE_SIZE».preciseSize;
 
-				public final class V«arity»<A> implements Serializable, Sized, Indexed<A>, Iterable<A> {
+				public final class V«arity»<A> implements Iterable<A>, Sized, Indexed<A>, Serializable {
 					private static final PreciseSize SIZE = preciseSize(«arity»);
 
 					private final A «(1 .. arity).map["a" + it].join(", ")»;
