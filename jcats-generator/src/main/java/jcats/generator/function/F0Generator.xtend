@@ -42,6 +42,8 @@ final class F0Generator implements Generator {
 				requireNonNull(s);
 				return () -> requireNonNull(s.get());
 			}
+
+			«widen("F0", true)»
 		}
 	''' }
 }

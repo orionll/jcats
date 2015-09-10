@@ -90,4 +90,23 @@ interface Generator {
 	def static firstToLowerCase(String str) {
 		if (str.empty) str else str.toCharArray.head.toLowerCase + str.toCharArray.tail.join
 	}
+
+	def static widen(String type) { widen(type, false) }
+
+	def static widen(String type, boolean isInterface) { '''
+		«if (isInterface) "" else "public "»static <B, A extends B> «type»<B> widen«type»(final «type»<A> «type.firstToLowerCase») {
+			return («type»)«type.firstToLowerCase»;
+		}
+	'''}
+
+	def static widen(String type, int typeParams) { widen(type, typeParams, false) }
+
+	def static widen(String type, int typeParams, boolean isInterface) {
+		val leftParams = (1 .. typeParams-1).map["A" + (if (typeParams == 2) "" else it) + ", "].join
+		'''
+		«if (isInterface) "" else "public "»static <«leftParams»C, B extends C> «type»<«leftParams»C> widen«type»(final «type»<«leftParams»B> «type.firstToLowerCase») {
+			return («type»)«type.firstToLowerCase»;
+		}
+		'''
+	}
 }

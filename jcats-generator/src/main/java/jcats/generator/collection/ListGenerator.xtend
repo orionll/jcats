@@ -290,6 +290,12 @@ final class ListGenerator implements Generator {
 				return isEmpty() ? emptySpliterator() : spliteratorUnknownSize(iterator(),  Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 
+			«stream»
+
+			«parallelStream»
+
+			«toString("List")»
+
 			«zip("List")»
 
 			«zipWith("List")»
@@ -335,11 +341,7 @@ final class ListGenerator implements Generator {
 					return builder.build();
 				}
 			''']»
-			«stream»
-
-			«parallelStream»
-
-			«toString("List")»
+			«widen("List")»
 		}
 	''' }
 }

@@ -109,6 +109,8 @@ final class FNGenerators {
 							};
 						}
 					«ENDIF»
+
+					«widen("F" + arity, arity + 1, true)»
 				}
 			''' }		
 			

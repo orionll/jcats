@@ -71,6 +71,8 @@ final class FGenerator implements Generator {
 					return requireNonNull(f.apply(a));
 				};
 			}
+
+			«widen("F", 2, true)»
 		}
 	''' }
 }

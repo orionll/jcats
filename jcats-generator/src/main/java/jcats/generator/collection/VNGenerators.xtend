@@ -149,6 +149,8 @@ final class VNGenerators {
 					public static <A> V«arity»<A> p«arity»ToV«arity»(final P«arity»<«(1 .. arity).map["A"].join(", ")»> p«arity») {
 						return new V«arity»<>(«(1 .. arity).map["p" + arity + ".get" + it + "()"].join(", ")»);
 					}
+
+					«widen("V" + arity)»
 				}
 			''' }
 		}

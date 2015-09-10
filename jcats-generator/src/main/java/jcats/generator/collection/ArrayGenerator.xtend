@@ -90,6 +90,16 @@ final class ArrayGenerator implements Generator {
 			/**
 			 * O(size)
 			 */
+			public Array<A> set(final int index, final A value) {
+				requireNonNull(value);
+				final Object[] result = array.clone();
+				result[index] = value;
+				return new Array<>(result);
+			}
+
+			/**
+			 * O(size)
+			 */
 			public Array<A> prepend(final A value) {
 				requireNonNull(value);
 				final Object[] newArray = new Object[array.length + 1];
@@ -348,6 +358,12 @@ final class ArrayGenerator implements Generator {
 				return isEmpty() ? emptySpliterator() : Spliterators.spliterator(array, Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 
+			«stream»
+
+			«parallelStream»
+
+			«toString("Array")»
+
 			«zip("Array")»
 
 			«zipWith("Array")»
@@ -381,11 +397,7 @@ final class ArrayGenerator implements Generator {
 					return new Array<>(array);
 				}
 			''']»
-			«stream»
-
-			«parallelStream»
-
-			«toString("Array")»
+			«widen("Array")»
 		}
 	''' }
 }
