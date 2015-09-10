@@ -13,6 +13,7 @@ final class ArrayGenerator implements Generator {
 		import java.util.Arrays;
 		import java.util.Collection;
 		import java.util.Iterator;
+		import java.util.NoSuchElementException;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.function.Predicate;
@@ -399,6 +400,29 @@ final class ArrayGenerator implements Generator {
 				}
 			''']»
 			«widen("Array")»
+		}
+
+		final class ArrayIterator<A> implements Iterator<A> {
+			private int i;
+			private final Object[] array;
+
+			ArrayIterator(final Object[] array) {
+				this.array = array;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (i != array.length);
+			}
+
+			@Override
+			public A next() {
+				if (i >= array.length) {
+					throw new NoSuchElementException();
+				} else {
+					return (A) array[i++];
+				}
+			}
 		}
 	''' }
 }

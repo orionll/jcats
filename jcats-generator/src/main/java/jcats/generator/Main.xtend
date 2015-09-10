@@ -6,10 +6,8 @@ import java.nio.file.Path
 import java.util.List
 import jcats.generator.collection.ArrayBuilderGenerator
 import jcats.generator.collection.ArrayGenerator
-import jcats.generator.collection.ArrayIteratorGenerator
 import jcats.generator.collection.ListBuilderGenerator
 import jcats.generator.collection.ListGenerator
-import jcats.generator.collection.ListIteratorGenerator
 import jcats.generator.collection.VNGenerators
 import jcats.generator.function.F0Generator
 import jcats.generator.function.FGenerator
@@ -66,10 +64,8 @@ class Main {
 			new InfiniteSizeGenerator,
 			new ListGenerator,
 			new ListBuilderGenerator,
-			new ListIteratorGenerator,
 			new ArrayGenerator,
-			new ArrayBuilderGenerator,
-			new ArrayIteratorGenerator
+			new ArrayBuilderGenerator
 		],
 			FNGenerators.generators,
 			PNGenerators.generators,

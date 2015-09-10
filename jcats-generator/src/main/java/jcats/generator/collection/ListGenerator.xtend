@@ -335,5 +335,29 @@ final class ListGenerator implements Generator {
 			''']»
 			«widen("List")»
 		}
+
+		final class ListIterator<A> implements Iterator<A> {
+			private List<A> list;
+
+			ListIterator(final List<A> list) {
+				this.list = list;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return list.isNotEmpty();
+			}
+
+			@Override
+			public A next() {
+				if (list.isEmpty()) {
+					throw new NoSuchElementException();
+				} else {
+					final A result = list.head;
+					list = list.tail;
+					return result;
+				}
+			}
+		}
 	''' }
 }
