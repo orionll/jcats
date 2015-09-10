@@ -23,7 +23,10 @@ final class VNGenerators {
 				import java.util.stream.Stream;
 				import java.util.stream.StreamSupport;
 
+				import «Constants.INDEXED»;
 				import «Constants.P»«arity»;
+				import «Constants.PRECISE_SIZE»;
+				import «Constants.SIZED»;
 				import «Constants.F»;
 				import «Constants.F»«arity»;
 
@@ -31,8 +34,11 @@ final class VNGenerators {
 				import static java.util.Objects.requireNonNull;
 				
 				import static «Constants.P»«arity».p«arity»;
+				import static «Constants.PRECISE_SIZE».preciseSize;
 
-				public final class V«arity»<A> implements Serializable, Iterable<A> {
+				public final class V«arity»<A> implements Serializable, Sized, Indexed<A>, Iterable<A> {
+					private static final PreciseSize SIZE = preciseSize(«arity»);
+
 					private final A «(1 .. arity).map["a" + it].join(", ")»;
 
 					private V«arity»(«(1 .. arity).map["final A a" + it].join(", ")») {
@@ -41,12 +47,18 @@ final class VNGenerators {
 						«ENDFOR»
 					}
 
+					@Override
+					public PreciseSize size() {
+						return SIZE;
+					}
+
 					«FOR i : 1 .. arity»
 						public A get«i»() {
 							return a«i»;
 						}
 
 					«ENDFOR»
+					@Override
 					public A get(final int index) {
 						switch (index) {
 							«FOR i : 1 .. arity»

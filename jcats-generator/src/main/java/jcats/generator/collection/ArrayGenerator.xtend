@@ -23,11 +23,11 @@ final class ArrayGenerator implements Generator {
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.F»«arity»;
 		«ENDFOR»
+		import «Constants.INDEXED»;
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.P»«arity»;
 		«ENDFOR»
 		import «Constants.PRECISE_SIZE»;
-		import «Constants.SIZE»;
 		import «Constants.SIZED»;
 
 		import static java.lang.Math.min;
@@ -38,7 +38,7 @@ final class ArrayGenerator implements Generator {
 		import static «Constants.P2».p2;
 		import static «Constants.SIZE».preciseSize;
 
-		public final class Array<A> implements Iterable<A>, Sized, Serializable {
+		public final class Array<A> implements Iterable<A>, Sized, Indexed<A>, Serializable {
 			private static final Array EMPTY = new Array(new Object[0]);
 
 			final Object[] array;
@@ -83,6 +83,7 @@ final class ArrayGenerator implements Generator {
 			/**
 			 * O(1)
 			 */
+			@Override
 			public A get(final int index) {
 				return (A) array[index];
 			}

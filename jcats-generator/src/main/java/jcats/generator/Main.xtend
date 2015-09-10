@@ -61,6 +61,7 @@ class Main {
 			new FsGenerator,
 			new SizedGenerator,
 			new SizeGenerator,
+			new IndexedGenerator,
 			new PreciseSizeGenerator,
 			new InfiniteSizeGenerator,
 			new ListGenerator,
