@@ -162,7 +162,7 @@ final class VNGenerators {
 						return new V«arity»<>(«(1 .. arity).map["p" + arity + ".get" + it + "()"].join(", ")»);
 					}
 
-					«widen("V" + arity)»
+					«cast("V" + arity, #["A"], #[], #["A"])»
 				}
 			''' }
 		}

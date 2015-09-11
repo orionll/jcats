@@ -1,5 +1,6 @@
 package jcats.generator.function
 
+import com.google.common.collect.Iterables
 import java.util.List
 import jcats.generator.Constants
 import jcats.generator.Generator
@@ -119,7 +120,7 @@ final class FNGenerators {
 						}
 					«ENDIF»
 
-					«widen("F" + arity, arity + 1, true)»
+					«cast("F" + arity, Iterables.concat((1 .. arity).map["A" + it], #["B"]), (1 .. arity).map["A" + it], #["B"], true)»
 				}
 			''' }
 

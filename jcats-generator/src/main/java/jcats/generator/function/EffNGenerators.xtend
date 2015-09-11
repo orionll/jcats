@@ -43,8 +43,11 @@ final class EffNGenerators {
 								apply(a1, a2);
 							};
 						}
+
 					«ENDIF»
+					«cast("Eff" + arity, (1 .. arity).map["A" + it], (1 .. arity).map["A" + it], #[], true)»
 				}
+
 			''' }		
 		}
 	}

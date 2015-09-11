@@ -91,30 +91,35 @@ interface Generator {
 		if (str.empty) str else str.toCharArray.head.toLowerCase + str.toCharArray.tail.join
 	}
 
-	def static widen(String type) { widen(type, false) }
+	def static cast(String type, Iterable<String> typeParams, Iterable<String> contravariantTypeParams, Iterable<String> covariantTypeParams) {
+		cast(type, typeParams, contravariantTypeParams, covariantTypeParams, false)
+	}
 
-	def static widen(String type, boolean isInterface) { '''
-		«if (isInterface) "" else "public "»static <B, A extends B> «type»<B> widen«type»(final «type»<A> «type.firstToLowerCase») {
-			return («type»)«type.firstToLowerCase»;
+	def static cast(String type, Iterable<String> typeParams, Iterable<String> contravariantTypeParams, Iterable<String> covariantTypeParams, boolean isInterface) {
+		val argumentType = '''«type»<«typeParams.join(", ")»>'''
+		val returnType = '''«type»<«typeParams.map[it + "X"].join(", ")»>'''
+
+		val methodParams = new StringBuilder
+		if (!contravariantTypeParams.empty) {
+			methodParams.append(contravariantTypeParams.join(", "))
+			methodParams.append(", ")
+			methodParams.append(contravariantTypeParams.map[it + "X extends " + it].join(", "))
+			if (!covariantTypeParams.empty) {
+				methodParams.append(", ")
+			}
 		}
-	'''}
+		if (!covariantTypeParams.empty) {
+			methodParams.append(covariantTypeParams.map[it + "X"].join(", "))
+			methodParams.append(", ")
+			methodParams.append(covariantTypeParams.map[it + " extends " + it + "X"].join(", "))
+		}
 
-	def static widen(String type, int typeParams) { widen(type, typeParams, false) }
+		val modifier = if (isInterface) "static" else "public static"
 
-	def static widen(String type, int typeParams, boolean isInterface) {
-		val leftParams = (1 .. typeParams-1).map["A" + (if (typeParams == 2) "" else it) + ", "].join
 		'''
-		«if (isInterface) "" else "public "»static <«leftParams»C, B extends C> «type»<«leftParams»C> widen«type»(final «type»<«leftParams»B> «type.firstToLowerCase») {
-			return («type»)«type.firstToLowerCase»;
+		«modifier» <«methodParams»> «returnType» cast«type»(final «argumentType» «type.firstToLowerCase») {
+			return («type»)requireNonNull(«type.firstToLowerCase»);
 		}
 		'''
 	}
-
-	def static narrow(String type) { narrow(type, false) }
-
-	def static narrow(String type, boolean isInterface) { '''
-		«if (isInterface) "default" else "public "» <B extends A> «type»<B> narrow() {
-			return («type»)this;
-		}
-	'''}
 }

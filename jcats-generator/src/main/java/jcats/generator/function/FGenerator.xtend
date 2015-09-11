@@ -76,7 +76,7 @@ final class FGenerator implements Generator {
 				};
 			}
 
-			«widen("F", 2, true)»
+			«cast("F", #["A", "B"], #["A"], #["B"], true)»
 		}
 	''' }
 }

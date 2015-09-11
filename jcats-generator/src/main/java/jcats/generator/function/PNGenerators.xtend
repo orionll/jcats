@@ -74,6 +74,8 @@ final class PNGenerators {
 					public String toString() {
 						return "(" + «(1 .. arity).map["a" + it].join(''' + ", " + ''')» + ")";
 					}
+
+					«cast("P" + arity, (1 .. arity).map["A" + it], #[], (1 .. arity).map["A" + it])»
 				}
 			''' }		
 		}

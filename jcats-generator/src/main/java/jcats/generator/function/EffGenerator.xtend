@@ -35,7 +35,7 @@ final class EffGenerator implements Generator {
 				return (A a) -> c.accept(requireNonNull(a));
 			}
 
-			«narrow("Eff", true)»
+			«cast("Eff", #["A"], #["A"], #[], true)»
 		}
 	''' }
 }

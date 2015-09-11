@@ -333,7 +333,7 @@ final class ListGenerator implements Generator {
 					return builder.build();
 				}
 			''']»
-			«widen("List")»
+			«cast("List", #["A"], #[], #["A"])»
 		}
 
 		final class ListIterator<A> implements Iterator<A> {

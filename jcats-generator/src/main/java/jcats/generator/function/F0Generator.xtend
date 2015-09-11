@@ -43,7 +43,7 @@ final class F0Generator implements Generator {
 				return () -> requireNonNull(s.get());
 			}
 
-			«widen("F0", true)»
+			«cast("F0", #["A"], #[], #["A"])»
 		}
 	''' }
 }

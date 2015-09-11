@@ -123,6 +123,8 @@ final class OptionGenerator implements Generator {
 			public static <A> Option<A> optionalToOption(final Optional<A> optional) {
 				return optional.isPresent() ? some(optional.get()) : none();
 			}
+
+			«cast("Option", #["A"], #[], #["A"])»
 		}
 	''' }
 }

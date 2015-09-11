@@ -399,7 +399,7 @@ final class ArrayGenerator implements Generator {
 					return new Array<>(array);
 				}
 			''']»
-			«widen("Array")»
+			«cast("Array", #["A"], #[], #["A"])»
 		}
 
 		final class ArrayIterator<A> implements Iterator<A> {
