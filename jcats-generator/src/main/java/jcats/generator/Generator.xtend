@@ -109,4 +109,12 @@ interface Generator {
 		}
 		'''
 	}
+
+	def static narrow(String type) { narrow(type, false) }
+
+	def static narrow(String type, boolean isInterface) { '''
+		«if (isInterface) "default" else "public "» <B extends A> «type»<B> narrow() {
+			return («type»)this;
+		}
+	'''}
 }

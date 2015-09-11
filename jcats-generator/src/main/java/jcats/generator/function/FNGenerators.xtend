@@ -24,7 +24,7 @@ final class FNGenerators {
 
 				@FunctionalInterface
 				public interface F«arity»<«(1 .. arity).map["A" + it + ", "].join»B> {
-					B apply(«(1 .. arity).map["A" + it + " a" + it].join(", ")»);
+					B apply(«(1 .. arity).map["final A" + it + " a" + it].join(", ")»);
 
 					default <C> F«arity»<«(1 .. arity).map["A" + it + ", "].join»C> map(final F<B, C> f) {
 						requireNonNull(f);
@@ -90,6 +90,15 @@ final class FNGenerators {
 							return requireNonNull(f.apply(b).apply(«(1 .. arity).map["a" + it].join(", ")»));
 						};
 					}
+
+					default Eff«arity»<«(1 .. arity).map["A" + it].join(", ")»> toEff() {
+						return («(1 .. arity).map["a" + it].join(", ")») -> {
+							«FOR i : 1 .. arity»
+								requireNonNull(a«i»);
+							«ENDFOR»
+							apply(«(1 .. arity).map["a" + it].join(", ")»);
+						};
+					}
 					«IF arity == 2»
 
 						default BiFunction<A1, A2, B> toBiFunction() {
@@ -112,8 +121,8 @@ final class FNGenerators {
 
 					«widen("F" + arity, arity + 1, true)»
 				}
-			''' }		
-			
+			''' }
+
 			private def String curryReturnType(int index, int arity) {
 				val lastFunctionArity = arity - index
 				val lastFunctionType = if (lastFunctionArity == 1) "F" else ("F" + lastFunctionArity)
@@ -123,7 +132,7 @@ final class FNGenerators {
 					retType = "F<A" + (i + 1) + ", " + retType + ">"
 				}
 				retType
-			}	
+			}
 		}
 	}
 }

@@ -9,6 +9,8 @@ import jcats.generator.collection.ArrayGenerator
 import jcats.generator.collection.ListBuilderGenerator
 import jcats.generator.collection.ListGenerator
 import jcats.generator.collection.VNGenerators
+import jcats.generator.function.EffGenerator
+import jcats.generator.function.EffNGenerators
 import jcats.generator.function.F0Generator
 import jcats.generator.function.FGenerator
 import jcats.generator.function.FNGenerators
@@ -57,6 +59,7 @@ class Main {
 			new FGenerator,
 			new F0Generator,
 			new FsGenerator,
+			new EffGenerator,
 			new SizedGenerator,
 			new SizeGenerator,
 			new IndexedGenerator,
@@ -68,6 +71,7 @@ class Main {
 			new ArrayBuilderGenerator
 		],
 			FNGenerators.generators,
+			EffNGenerators.generators,
 			PNGenerators.generators,
 			VNGenerators.generators
 		].flatten.toList
