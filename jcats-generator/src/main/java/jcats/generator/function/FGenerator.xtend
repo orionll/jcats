@@ -1,9 +1,9 @@
 package jcats.generator.function
 
-import jcats.generator.Generator
 import jcats.generator.Constants
+import jcats.generator.InterfaceGenerator
 
-final class FGenerator implements Generator {
+final class FGenerator implements InterfaceGenerator {
 	override className() { Constants.F }
 
 	override sourceCode() { '''
@@ -76,7 +76,7 @@ final class FGenerator implements Generator {
 				};
 			}
 
-			«cast("F", #["A", "B"], #["A"], #["B"], true)»
+			«cast(#["A", "B"], #["A"], #["B"], true)»
 		}
 	''' }
 }

@@ -1,6 +1,6 @@
 package jcats.generator
 
-final class OptionGenerator implements Generator {
+final class OptionGenerator implements ClassGenerator {
 	override className() { Constants.OPTION }
 
 	override sourceCode() { '''
@@ -124,7 +124,7 @@ final class OptionGenerator implements Generator {
 				return optional.isPresent() ? some(optional.get()) : none();
 			}
 
-			«cast("Option", #["A"], #[], #["A"])»
+			«cast(#["A"], #[], #["A"])»
 		}
 	''' }
 }

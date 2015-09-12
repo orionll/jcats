@@ -4,10 +4,12 @@ import static extension java.lang.Character.toLowerCase
 
 interface Generator {
 	def String className()
-	def String sourceCode()
+	def String name() { className.substring(className.lastIndexOf('.') + 1) }
 	
 	val public static PRIMITIVES = #["int", "long", "boolean", "double", "float", "short", "byte"]
-	
+
+	def String sourceCode()
+
 	def static boxedName(String primitive) {
 		if (primitive == "int") "Integer"
 		else Character.toUpperCase(primitive.toCharArray.head) + primitive.toCharArray.tail.join
@@ -29,10 +31,10 @@ interface Generator {
 		}
 	'''}
 
-	def static toString(String type) { '''
+	def toStr() { '''
 		@Override
 		public String toString() {
-			final StringBuilder builder = new StringBuilder("«type»(");
+			final StringBuilder builder = new StringBuilder("«name»(");
 			final Iterator<A> iterator = iterator();
 			while (iterator.hasNext()) {
 				builder.append(iterator.next());
@@ -45,42 +47,48 @@ interface Generator {
 		}
 	'''}
 
-	def static zip(String type) { '''
-		/**
-		 * O(min(this.size, that.size))
-		 */
-		public <B> «type»<P2<A, B>> zip(final «type»<B> that) {
-			return zip2«type»s(this, that);
+	def join() { '''
+		«staticModifier» <A> «name» join(final «name»<«name»<A>> «name.firstToLowerCase») {
+			return «name.firstToLowerCase».flatMap(id());
 		}
 	'''}
 
-	def static zipWith(String type) { '''
+	def zip() { '''
 		/**
 		 * O(min(this.size, that.size))
 		 */
-		public <B, C> «type»<C> zipWith(final «type»<B> that, final F2<A, B, C> f) {
-			return zip2«type»sWith(this, that, f);
+		public <B> «name»<P2<A, B>> zip(final «name»<B> that) {
+			return zip2«name»s(this, that);
 		}
 	'''}
 
-	def static zipN(String type) { '''
+	def zipWith() { '''
+		/**
+		 * O(min(this.size, that.size))
+		 */
+		public <B, C> «name»<C> zipWith(final «name»<B> that, final F2<A, B, C> f) {
+			return zip2«name»sWith(this, that, f);
+		}
+	'''}
+
+	def zipN() { '''
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			/**
-			 * O(min(«(1 .. arity).map['''«type.firstToLowerCase»«it».size'''].join(", ")»))
+			 * O(min(«(1 .. arity).map['''«name.firstToLowerCase»«it».size'''].join(", ")»))
 			 */
-			public static <«(1 .. arity).map["A" + it].join(", ")»> «type»<P«arity»<«(1 .. arity).map["A" + it].join(", ")»>> zip«arity»«type»s(«(1 .. arity).map['''final «type»<A«it»> «type.firstToLowerCase»«it»'''].join(", ")») {
-				return zip«arity»«type»sWith(«(1 .. arity).map[type.firstToLowerCase + it].join(", ")», P«arity»::p«arity»);
+			public static <«(1 .. arity).map["A" + it].join(", ")»> «name»<P«arity»<«(1 .. arity).map["A" + it].join(", ")»>> zip«arity»«name»s(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")») {
+				return zip«arity»«name»sWith(«(1 .. arity).map[name.firstToLowerCase + it].join(", ")», P«arity»::p«arity»);
 			}
 
 		«ENDFOR»
 	'''}
 
-	def static zipWithN(String type, (int) => String body) { '''
+	def zipWithN((int) => String body) { '''
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			/**
-			 * O(min(«(1 .. arity).map['''«type.firstToLowerCase»«it».size'''].join(", ")»))
+			 * O(min(«(1 .. arity).map['''«name.firstToLowerCase»«it».size'''].join(", ")»))
 			 */
-			public static <«(1 .. arity).map["A" + it + ", "].join»B> «type»<B> zip«arity»«type»sWith(«(1 .. arity).map['''final «type»<A«it»> «type.firstToLowerCase»«it»'''].join(", ")», final F«arity»<«(1 .. arity).map["A" + it + ", "].join»B> f) {
+			public static <«(1 .. arity).map["A" + it + ", "].join»B> «name»<B> zip«arity»«name»sWith(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")», final F«arity»<«(1 .. arity).map["A" + it + ", "].join»B> f) {
 				«body.apply(arity)»
 			}
 
@@ -91,13 +99,13 @@ interface Generator {
 		if (str.empty) str else str.toCharArray.head.toLowerCase + str.toCharArray.tail.join
 	}
 
-	def static cast(String type, Iterable<String> typeParams, Iterable<String> contravariantTypeParams, Iterable<String> covariantTypeParams) {
-		cast(type, typeParams, contravariantTypeParams, covariantTypeParams, false)
+	def cast(Iterable<String> typeParams, Iterable<String> contravariantTypeParams, Iterable<String> covariantTypeParams) {
+		cast(typeParams, contravariantTypeParams, covariantTypeParams, false)
 	}
 
-	def static cast(String type, Iterable<String> typeParams, Iterable<String> contravariantTypeParams, Iterable<String> covariantTypeParams, boolean isInterface) {
-		val argumentType = '''«type»<«typeParams.join(", ")»>'''
-		val returnType = '''«type»<«typeParams.map[it + "X"].join(", ")»>'''
+	def cast(Iterable<String> typeParams, Iterable<String> contravariantTypeParams, Iterable<String> covariantTypeParams, boolean isInterface) {
+		val argumentType = '''«name»<«typeParams.join(", ")»>'''
+		val returnType = '''«name»<«typeParams.map[it + "X"].join(", ")»>'''
 
 		val methodParams = new StringBuilder
 		if (!contravariantTypeParams.empty) {
@@ -114,12 +122,20 @@ interface Generator {
 			methodParams.append(covariantTypeParams.map[it + " extends " + it + "X"].join(", "))
 		}
 
-		val modifier = if (isInterface) "static" else "public static"
-
 		'''
-		«modifier» <«methodParams»> «returnType» cast«type»(final «argumentType» «type.firstToLowerCase») {
-			return («type»)requireNonNull(«type.firstToLowerCase»);
+		«staticModifier» <«methodParams»> «returnType» cast«name»(final «argumentType» «name.firstToLowerCase») {
+			return («name»)requireNonNull(«name.firstToLowerCase»);
 		}
 		'''
 	}
+
+	def staticModifier() {
+		if (this instanceof InterfaceGenerator) "static" else "public static"
+	}
+}
+
+interface InterfaceGenerator extends Generator {
+}
+
+interface ClassGenerator extends Generator {
 }

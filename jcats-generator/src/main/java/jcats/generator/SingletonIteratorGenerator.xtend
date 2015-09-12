@@ -1,6 +1,6 @@
 package jcats.generator
 
-final class SingletonIteratorGenerator implements Generator {
+final class SingletonIteratorGenerator implements ClassGenerator {
 	override className() { Constants.JCATS + ".SingletonIterator" }
 	
 	override sourceCode() { '''

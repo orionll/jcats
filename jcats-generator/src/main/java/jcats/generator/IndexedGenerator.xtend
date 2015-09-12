@@ -1,9 +1,6 @@
 package jcats.generator
 
-import jcats.generator.Constants
-import jcats.generator.Generator
-
-final class IndexedGenerator implements Generator {
+final class IndexedGenerator implements InterfaceGenerator {
 	override className() { Constants.INDEXED }
 	
 	override sourceCode() { '''

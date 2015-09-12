@@ -1,9 +1,9 @@
 package jcats.generator.collection
 
+import jcats.generator.ClassGenerator
 import jcats.generator.Constants
-import jcats.generator.Generator
 
-final class ArrayBuilderGenerator implements Generator {
+final class ArrayBuilderGenerator implements ClassGenerator {
 	override className() { Constants.ARRAY + "Builder" }
 	
 	override sourceCode() { '''

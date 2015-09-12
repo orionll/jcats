@@ -1,6 +1,7 @@
 package jcats.generator.function
 
 import java.util.List
+import jcats.generator.ClassGenerator
 import jcats.generator.Constants
 import jcats.generator.Generator
 
@@ -10,7 +11,7 @@ final class PNGenerators {
 	}
 
 	private def static Generator generator(int arity) {
-		new Generator {
+		new ClassGenerator {
 			override className() { Constants.P + arity }
 
 			override sourceCode() { '''
@@ -75,7 +76,7 @@ final class PNGenerators {
 						return "(" + «(1 .. arity).map["a" + it].join(''' + ", " + ''')» + ")";
 					}
 
-					«cast("P" + arity, (1 .. arity).map["A" + it], #[], (1 .. arity).map["A" + it])»
+					«cast((1 .. arity).map["A" + it], #[], (1 .. arity).map["A" + it])»
 				}
 			''' }		
 		}

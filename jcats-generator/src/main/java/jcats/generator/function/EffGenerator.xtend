@@ -1,9 +1,9 @@
 package jcats.generator.function
 
-import jcats.generator.Generator
 import jcats.generator.Constants
+import jcats.generator.InterfaceGenerator
 
-final class EffGenerator implements Generator {
+final class EffGenerator implements InterfaceGenerator {
 	override className() { Constants.EFF }
 	
 	override sourceCode() { '''
@@ -35,7 +35,7 @@ final class EffGenerator implements Generator {
 				return (A a) -> c.accept(requireNonNull(a));
 			}
 
-			«cast("Eff", #["A"], #["A"], #[], true)»
+			«cast(#["A"], #["A"], #[], true)»
 		}
 	''' }
 }

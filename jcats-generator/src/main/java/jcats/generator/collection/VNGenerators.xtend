@@ -1,6 +1,7 @@
 package jcats.generator.collection
 
 import java.util.List
+import jcats.generator.ClassGenerator
 import jcats.generator.Constants
 import jcats.generator.Generator
 
@@ -10,7 +11,7 @@ final class VNGenerators {
 	}
 
 	private def static Generator generator(int arity) {
-		new Generator {
+		new ClassGenerator {
 			override className() { Constants.V + arity }
 
 			override sourceCode() { '''
@@ -162,7 +163,7 @@ final class VNGenerators {
 						return new V«arity»<>(«(1 .. arity).map["p" + arity + ".get" + it + "()"].join(", ")»);
 					}
 
-					«cast("V" + arity, #["A"], #[], #["A"])»
+					«cast(#["A"], #[], #["A"])»
 				}
 			''' }
 		}

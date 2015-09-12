@@ -1,9 +1,9 @@
 package jcats.generator.collection
 
+import jcats.generator.ClassGenerator
 import jcats.generator.Constants
-import jcats.generator.Generator
 
-final class ArrayGenerator implements Generator {
+final class ArrayGenerator implements ClassGenerator {
 	override className() { Constants.ARRAY }
 
 	override sourceCode() { '''
@@ -364,11 +364,11 @@ final class ArrayGenerator implements Generator {
 
 			«parallelStream»
 
-			«toString("Array")»
+			«toStr»
 
-			«zip("Array")»
+			«zip»
 
-			«zipWith("Array")»
+			«zipWith»
 
 			/**
 			 * O(size)
@@ -385,8 +385,8 @@ final class ArrayGenerator implements Generator {
 				}
 			}
 
-			«zipN("Array")»
-			«zipWithN("Array")[arity | '''
+			«zipN»
+			«zipWithN[arity | '''
 				requireNonNull(f);
 				if («(1 .. arity).map["array" + it + ".isEmpty()"].join(" || ")») {
 					return emptyArray();
@@ -399,7 +399,7 @@ final class ArrayGenerator implements Generator {
 					return new Array<>(array);
 				}
 			''']»
-			«cast("Array", #["A"], #[], #["A"])»
+			«cast(#["A"], #[], #["A"])»
 		}
 
 		final class ArrayIterator<A> implements Iterator<A> {

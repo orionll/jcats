@@ -1,9 +1,6 @@
 package jcats.generator
 
-import jcats.generator.Constants
-import jcats.generator.Generator
-
-final class SizeGenerator implements Generator {
+final class SizeGenerator implements ClassGenerator {
 	override className() { Constants.SIZE }
 
 	override sourceCode() { '''
@@ -51,7 +48,7 @@ final class SizeGenerator implements Generator {
 	''' }
 }
 
-final class PreciseSizeGenerator implements Generator {
+final class PreciseSizeGenerator implements ClassGenerator {
 	override className() { Constants.PRECISE_SIZE }
 	
 	override sourceCode() { '''
@@ -92,7 +89,7 @@ final class PreciseSizeGenerator implements Generator {
 	''' }
 }
 
-final class InfiniteSizeGenerator implements Generator {
+final class InfiniteSizeGenerator implements ClassGenerator {
 	override className() { Constants.INFINITE_SIZE }
 
 	override sourceCode() { '''

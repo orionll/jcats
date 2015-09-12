@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables
 import java.util.List
 import jcats.generator.Constants
 import jcats.generator.Generator
+import jcats.generator.InterfaceGenerator
 
 final class FNGenerators {
 	def static List<Generator> generators() {
@@ -11,7 +12,7 @@ final class FNGenerators {
 	}
 
 	private def static Generator generator(int arity) {
-		new Generator {
+		new InterfaceGenerator {
 			override className() { Constants.F + arity }
 
 			override sourceCode() { '''
@@ -120,7 +121,7 @@ final class FNGenerators {
 						}
 					«ENDIF»
 
-					«cast("F" + arity, Iterables.concat((1 .. arity).map["A" + it], #["B"]), (1 .. arity).map["A" + it], #["B"], true)»
+					«cast(Iterables.concat((1 .. arity).map["A" + it], #["B"]), (1 .. arity).map["A" + it], #["B"], true)»
 				}
 			''' }
 

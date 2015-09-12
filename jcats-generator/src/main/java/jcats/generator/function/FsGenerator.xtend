@@ -1,9 +1,9 @@
 package jcats.generator.function
 
-import jcats.generator.Generator
+import jcats.generator.ClassGenerator
 import jcats.generator.Constants
 
-final class FsGenerator implements Generator {
+final class FsGenerator implements ClassGenerator {
 	override className() { Constants.F + "s" }
 	
 	override sourceCode() { '''

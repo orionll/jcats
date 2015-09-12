@@ -3,6 +3,7 @@ package jcats.generator.function
 import java.util.List
 import jcats.generator.Constants
 import jcats.generator.Generator
+import jcats.generator.InterfaceGenerator
 
 final class EffNGenerators {
 	def static List<Generator> generators() {
@@ -10,7 +11,7 @@ final class EffNGenerators {
 	}
 
 	private def static Generator generator(int arity) {
-		new Generator {
+		new InterfaceGenerator {
 			override className() { Constants.EFF + arity }
 
 			override sourceCode() { '''
@@ -45,7 +46,7 @@ final class EffNGenerators {
 						}
 
 					«ENDIF»
-					«cast("Eff" + arity, (1 .. arity).map["A" + it], (1 .. arity).map["A" + it], #[], true)»
+					«cast((1 .. arity).map["A" + it], (1 .. arity).map["A" + it], #[], true)»
 				}
 
 			''' }		
