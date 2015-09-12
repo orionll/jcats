@@ -31,6 +31,7 @@ final class ListGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
 		import static java.util.Spliterators.spliteratorUnknownSize;
+		import static «Constants.F».id;
 		import static «Constants.OPTION».none;
 		import static «Constants.OPTION».some;
 		import static «Constants.P2».p2;
@@ -271,6 +272,8 @@ final class ListGenerator implements ClassGenerator {
 			public static <A> List<A> iterableToList(final Iterable<A> values) {
 				return new ListBuilder<A>().appendAll(values).build();
 			}
+
+			«join»
 
 			@Override
 			public Iterator<A> iterator() {

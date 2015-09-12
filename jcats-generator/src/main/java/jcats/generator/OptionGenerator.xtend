@@ -17,6 +17,7 @@ final class OptionGenerator implements ClassGenerator {
 
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.F».id;
 
 		public final class Option<A> implements Iterable<A>, Serializable {
 			private static final Option NONE = new Option(null);
@@ -123,6 +124,8 @@ final class OptionGenerator implements ClassGenerator {
 			public static <A> Option<A> optionalToOption(final Optional<A> optional) {
 				return optional.isPresent() ? some(optional.get()) : none();
 			}
+
+			«join»
 
 			«cast(#["A"], #[], #["A"])»
 		}

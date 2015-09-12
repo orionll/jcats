@@ -36,6 +36,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import static java.util.Collections.unmodifiableList;
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
+		import static «Constants.F».id;
 		import static «Constants.P2».p2;
 		import static «Constants.SIZE».preciseSize;
 
@@ -349,6 +350,8 @@ final class ArrayGenerator implements ClassGenerator {
 					}
 				}
 			}
+
+			«join»
 
 			@Override
 			public Iterator<A> iterator() {
