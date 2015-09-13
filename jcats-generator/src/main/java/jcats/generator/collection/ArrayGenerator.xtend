@@ -271,6 +271,16 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
+			public boolean contains(final A value) {
+				requireNonNull(value);
+				for (final Object a : array) {
+					if (a.equals(value)) {
+						return true;
+					}
+				}
+				return false;
+			}
+
 			public java.util.List<A> asList() {
 				return unmodifiableList((java.util.List<A>) Arrays.asList(array));
 			}

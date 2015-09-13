@@ -25,15 +25,21 @@ final class VNGenerators {
 				import java.util.stream.StreamSupport;
 
 				import «Constants.INDEXED»;
-				import «Constants.P»«arity»;
+				«FOR arity : 2 .. Constants.MAX_ARITY»
+					import «Constants.P»«arity»;
+				«ENDFOR»
 				import «Constants.PRECISE_SIZE»;
 				import «Constants.SIZED»;
 				import «Constants.F»;
-				import «Constants.F»«arity»;
+				«FOR arity : 2 .. Constants.MAX_ARITY»
+					import «Constants.F»«arity»;
+				«ENDFOR»
 
 				import static java.util.Arrays.asList;
 				import static java.util.Objects.requireNonNull;
-				
+				«IF arity > 2»
+					import static «Constants.P2».p2;
+				«ENDIF»
 				import static «Constants.P»«arity».p«arity»;
 				import static «Constants.PRECISE_SIZE».preciseSize;
 
@@ -118,6 +124,16 @@ final class VNGenerators {
 						}
 
 					«ENDIF»
+					public boolean contains(final A value) {
+						requireNonNull(value);
+						«FOR i : 1 .. arity»
+							if (a«i».equals(value)) {
+								return true;
+							}
+						«ENDFOR»
+						return false;
+					}
+
 					public P«arity»<«(1 .. arity).map["A"].join(", ")»> toP() {
 						return p«arity»(«(1 .. arity).map["a" + it].join(", ")»);
 					}
@@ -147,6 +163,14 @@ final class VNGenerators {
 
 					«parallelStream»
 
+					«zip(false)»
+
+					«zipWith(false)»
+
+					public V«arity»<P2<A, Integer>> zipWithIndex() {
+						return new V«arity»<>(«(1 .. arity).map["p2(a" + it + ", " + (it-1) + ")"].join(", ")»);
+					}
+
 					@Override
 					public String toString() {
 						return "V«arity»(" + «(1 .. arity).map["a" + it].join(''' + ", " + ''')» + ")";
@@ -163,6 +187,13 @@ final class VNGenerators {
 						return new V«arity»<>(«(1 .. arity).map["p" + arity + ".get" + it + "()"].join(", ")»);
 					}
 
+					«zipN(false)»
+					«zipWithN(false)[i | '''
+						«FOR j : 1 .. arity»
+							final B b«j» = requireNonNull(f.apply(«(1 .. i).map['''v«it».a«j»'''].join(", ")»));
+						«ENDFOR»
+						return new V«arity»<>(«(1 .. arity).map["b" + it].join(", ")»);
+					''']»
 					«cast(#["A"], #[], #["A"])»
 				}
 			''' }

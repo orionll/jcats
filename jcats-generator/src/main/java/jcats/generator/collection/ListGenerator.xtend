@@ -174,7 +174,7 @@ final class ListGenerator implements ClassGenerator {
 				} else {
 					final ListBuilder<B> builder = new ListBuilder<>();
 					List<A> list = this;
-					while (!list.isEmpty()) {
+					while (list.isNotEmpty()) {
 						builder.append(f.apply(list.head));
 						list = list.tail;
 					}
@@ -189,7 +189,7 @@ final class ListGenerator implements ClassGenerator {
 				} else {
 					final ListBuilder<B> builder = new ListBuilder<>();
 					List<A> list = this;
-					while (!list.isEmpty()) {
+					while (list.isNotEmpty()) {
 						builder.appendList(f.apply(list.head));
 						list = list.tail;
 					}
@@ -204,7 +204,7 @@ final class ListGenerator implements ClassGenerator {
 				} else {
 					final ListBuilder<A> builder = new ListBuilder<>();
 					List<A> list = this;
-					while (!list.isEmpty()) {
+					while (list.isNotEmpty()) {
 						if (predicate.test(list.head)) {
 							builder.append(list.head);
 						}
@@ -228,6 +228,18 @@ final class ListGenerator implements ClassGenerator {
 					}
 					return builder.build();
 				}
+			}
+
+			public boolean contains(final A value) {
+				requireNonNull(value);
+				List<A> list = this;
+				while (list.isNotEmpty()) {
+					if (list.head.equals(value)) {
+						return true;
+					}
+					list = list.tail;
+				}
+				return false;
 			}
 
 			public static <A> List<A> nil() {
@@ -305,7 +317,7 @@ final class ListGenerator implements ClassGenerator {
 					final ListBuilder<P2<A, Integer>> builder = new ListBuilder<>();
 					List<A> list = this;
 					int index = 0;
-					while (!list.isEmpty()) {
+					while (list.isNotEmpty()) {
 						builder.append(p2(list.head(), index));
 						list = list.tail;
 						if (index == Integer.MAX_VALUE && !list.isEmpty()) {

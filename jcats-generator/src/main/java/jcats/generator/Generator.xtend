@@ -53,41 +53,57 @@ interface Generator {
 		}
 	'''}
 
-	def zip() { '''
-		/**
-		 * O(min(this.size, that.size))
-		 */
+	def zip() { zip(true) }
+
+	def zip(boolean javadocComplexity) { '''
+		«IF javadocComplexity»
+			/**
+			 * O(min(this.size, that.size))
+			 */
+		«ENDIF»
 		public <B> «name»<P2<A, B>> zip(final «name»<B> that) {
 			return zip2«name»s(this, that);
 		}
 	'''}
 
-	def zipWith() { '''
-		/**
-		 * O(min(this.size, that.size))
-		 */
+	def zipWith() { zipWith(true) }
+
+	def zipWith(boolean javadocComplexity) { '''
+		«IF javadocComplexity»
+			/**
+			 * O(min(this.size, that.size))
+			 */
+		«ENDIF»
 		public <B, C> «name»<C> zipWith(final «name»<B> that, final F2<A, B, C> f) {
 			return zip2«name»sWith(this, that, f);
 		}
 	'''}
 
-	def zipN() { '''
+	def zipN() { zipN(true) }
+
+	def zipN(boolean javadocComplexity) { '''
 		«FOR arity : 2 .. Constants.MAX_ARITY»
-			/**
-			 * O(min(«(1 .. arity).map['''«name.firstToLowerCase»«it».size'''].join(", ")»))
-			 */
+			«IF javadocComplexity»
+				/**
+				 * O(min(«(1 .. arity).map['''«name.firstToLowerCase»«it».size'''].join(", ")»))
+				 */
+			«ENDIF»
 			public static <«(1 .. arity).map["A" + it].join(", ")»> «name»<P«arity»<«(1 .. arity).map["A" + it].join(", ")»>> zip«arity»«name»s(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")») {
 				return zip«arity»«name»sWith(«(1 .. arity).map[name.firstToLowerCase + it].join(", ")», P«arity»::p«arity»);
 			}
 
 		«ENDFOR»
 	'''}
+	
+	def zipWithN((int) => String body) { zipWithN(true, body) }
 
-	def zipWithN((int) => String body) { '''
+	def zipWithN(boolean javadocComplexity, (int) => String body) { '''
 		«FOR arity : 2 .. Constants.MAX_ARITY»
-			/**
-			 * O(min(«(1 .. arity).map['''«name.firstToLowerCase»«it».size'''].join(", ")»))
-			 */
+			«IF javadocComplexity»
+				/**
+				 * O(min(«(1 .. arity).map['''«name.firstToLowerCase»«it».size'''].join(", ")»))
+				 */
+			«ENDIF»
 			public static <«(1 .. arity).map["A" + it + ", "].join»B> «name»<B> zip«arity»«name»sWith(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")», final F«arity»<«(1 .. arity).map["A" + it + ", "].join»B> f) {
 				«body.apply(arity)»
 			}
@@ -96,7 +112,14 @@ interface Generator {
 	'''}
 
 	def static firstToLowerCase(String str) {
-		if (str.empty) str else str.toCharArray.head.toLowerCase + str.toCharArray.tail.join
+		if (str.empty) {
+			str
+		} else if (str.matches("V\\d")) {
+			// Avoid names like v42, v35, ...
+			"v"
+		} else {
+			str.toCharArray.head.toLowerCase + str.toCharArray.tail.join
+		}
 	}
 
 	def cast(Iterable<String> typeParams, Iterable<String> contravariantTypeParams, Iterable<String> covariantTypeParams) {
