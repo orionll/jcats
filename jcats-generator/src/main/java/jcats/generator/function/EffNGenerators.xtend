@@ -46,7 +46,7 @@ final class EffNGenerators {
 						}
 
 					«ENDIF»
-					«cast((1 .. arity).map["A" + it], (1 .. arity).map["A" + it], #[], true)»
+					«cast((1 .. arity).map["A" + it], (1 .. arity).map["A" + it], #[])»
 				}
 
 			''' }		

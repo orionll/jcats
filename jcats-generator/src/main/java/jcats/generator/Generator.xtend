@@ -47,8 +47,10 @@ interface Generator {
 		}
 	'''}
 
-	def join() { '''
-		«staticModifier» <A> «name» join(final «name»<«name»<A>> «name.firstToLowerCase») {
+	def join() { joinMultiple(#[], "A") }
+
+	def joinMultiple(Iterable<String> typeParams, String typeParam) { '''
+		«staticModifier» <«typeParams.map[it + ", "].join»«typeParam»> «name»<«typeParams.map[it + ", "].join»«typeParam»> join(final «name»<«typeParams.map[it + ", "].join»«name»<«typeParams.map[it + ", "].join»«typeParam»>> «name.firstToLowerCase») {
 			return «name.firstToLowerCase».flatMap(id());
 		}
 	'''}
@@ -123,10 +125,6 @@ interface Generator {
 	}
 
 	def cast(Iterable<String> typeParams, Iterable<String> contravariantTypeParams, Iterable<String> covariantTypeParams) {
-		cast(typeParams, contravariantTypeParams, covariantTypeParams, false)
-	}
-
-	def cast(Iterable<String> typeParams, Iterable<String> contravariantTypeParams, Iterable<String> covariantTypeParams, boolean isInterface) {
 		val argumentType = '''«name»<«typeParams.join(", ")»>'''
 		val returnType = '''«name»<«typeParams.map[it + "X"].join(", ")»>'''
 

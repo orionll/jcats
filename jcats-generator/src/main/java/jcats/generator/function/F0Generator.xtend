@@ -54,7 +54,7 @@ final class F0Generator implements InterfaceGenerator {
 				return () -> requireNonNull(s.get());
 			}
 
-			«cast(#["A"], #[], #["A"], true)»
+			«cast(#["A"], #[], #["A"])»
 		}
 	''' }
 }

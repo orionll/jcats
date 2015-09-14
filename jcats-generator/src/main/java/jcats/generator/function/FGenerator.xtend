@@ -12,6 +12,7 @@ final class FGenerator implements InterfaceGenerator {
 		import java.util.function.Function;
 		
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.F».id;
 
 		@FunctionalInterface
 		public interface F<A, B> {
@@ -67,7 +68,9 @@ final class FGenerator implements InterfaceGenerator {
 			static <A, B> F<A, B> lazyConst(final F0<B> b) {
 				return b.toConstF();
 			}
-		
+
+			«joinMultiple(#["A"], "B")»
+
 			static <A, B> F<A, B> functionToF(final Function<A, B> f) {
 				requireNonNull(f);
 				return a -> {
@@ -76,7 +79,7 @@ final class FGenerator implements InterfaceGenerator {
 				};
 			}
 
-			«cast(#["A", "B"], #["A"], #["B"], true)»
+			«cast(#["A", "B"], #["A"], #["B"])»
 		}
 	''' }
 }

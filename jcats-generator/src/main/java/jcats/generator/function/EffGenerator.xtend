@@ -35,7 +35,7 @@ final class EffGenerator implements InterfaceGenerator {
 				return (A a) -> c.accept(requireNonNull(a));
 			}
 
-			«cast(#["A"], #["A"], #[], true)»
+			«cast(#["A"], #["A"], #[])»
 		}
 	''' }
 }

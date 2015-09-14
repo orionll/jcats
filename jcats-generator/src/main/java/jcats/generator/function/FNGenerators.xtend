@@ -23,6 +23,7 @@ final class FNGenerators {
 
 				«ENDIF»
 				import static java.util.Objects.requireNonNull;
+				import static «Constants.F».id;
 
 				@FunctionalInterface
 				public interface F«arity»<«(1 .. arity).map["A" + it + ", "].join»B> {
@@ -110,6 +111,10 @@ final class FNGenerators {
 								return requireNonNull(apply(a1, a2));
 							};
 						}
+					«ENDIF»
+
+					«joinMultiple((1 .. arity).map["A" + it], "B")»
+					«IF arity == 2»
 
 						static <A1, A2, B> F2<A1, A2, B> biFunctionToF2(final BiFunction<A1, A2, B> f) {
 							requireNonNull(f);
@@ -121,7 +126,7 @@ final class FNGenerators {
 						}
 					«ENDIF»
 
-					«cast(Iterables.concat((1 .. arity).map["A" + it], #["B"]), (1 .. arity).map["A" + it], #["B"], true)»
+					«cast(Iterables.concat((1 .. arity).map["A" + it], #["B"]), (1 .. arity).map["A" + it], #["B"])»
 				}
 			''' }
 
