@@ -64,7 +64,7 @@ interface Generator {
 			 */
 		«ENDIF»
 		public <B> «name»<P2<A, B>> zip(final «name»<B> that) {
-			return zip2«name»s(this, that);
+			return zip2(this, that);
 		}
 	'''}
 
@@ -77,7 +77,7 @@ interface Generator {
 			 */
 		«ENDIF»
 		public <B, C> «name»<C> zipWith(final «name»<B> that, final F2<A, B, C> f) {
-			return zip2«name»sWith(this, that, f);
+			return zipWith2(this, that, f);
 		}
 	'''}
 
@@ -90,8 +90,8 @@ interface Generator {
 				 * O(min(«(1 .. arity).map['''«name.firstToLowerCase»«it».size'''].join(", ")»))
 				 */
 			«ENDIF»
-			public static <«(1 .. arity).map["A" + it].join(", ")»> «name»<P«arity»<«(1 .. arity).map["A" + it].join(", ")»>> zip«arity»«name»s(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")») {
-				return zip«arity»«name»sWith(«(1 .. arity).map[name.firstToLowerCase + it].join(", ")», P«arity»::p«arity»);
+			public static <«(1 .. arity).map["A" + it].join(", ")»> «name»<P«arity»<«(1 .. arity).map["A" + it].join(", ")»>> zip«arity»(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")») {
+				return zipWith«arity»(«(1 .. arity).map[name.firstToLowerCase + it].join(", ")», P«arity»::p«arity»);
 			}
 
 		«ENDFOR»
@@ -106,7 +106,7 @@ interface Generator {
 				 * O(min(«(1 .. arity).map['''«name.firstToLowerCase»«it».size'''].join(", ")»))
 				 */
 			«ENDIF»
-			public static <«(1 .. arity).map["A" + it + ", "].join»B> «name»<B> zip«arity»«name»sWith(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")», final F«arity»<«(1 .. arity).map["A" + it + ", "].join»B> f) {
+			public static <«(1 .. arity).map["A" + it + ", "].join»B> «name»<B> zipWith«arity»(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")», final F«arity»<«(1 .. arity).map["A" + it + ", "].join»B> f) {
 				«body.apply(arity)»
 			}
 
