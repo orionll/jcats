@@ -55,6 +55,7 @@ class Main {
 	private def static List<Generator> allGenerators() {
 		#[#[
 			new OptionGenerator,
+			new EitherGenerator,
 			new SingletonIteratorGenerator,
 			new FGenerator,
 			new F0Generator,
