@@ -48,7 +48,7 @@ final class OptionGenerator implements ClassGenerator {
 				}
 			}
 
-			public Option<A> set(final A value) {
+			public <B> Option<B> set(final B value) {
 				requireNonNull(value);
 				return isEmpty() ? none() : some(value);
 			}

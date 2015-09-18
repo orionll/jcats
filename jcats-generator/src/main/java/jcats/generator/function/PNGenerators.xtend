@@ -41,8 +41,8 @@ final class PNGenerators {
 
 					«ENDFOR»
 					«FOR i : 1 .. arity»
-						public P«arity»<«(1 .. arity).map["A" + it].join(", ")»> set«i»(final A«i» a«i») {
-							return new P«arity»<>(«(1 .. arity).map[if (it == i) '''requireNonNull(a«i»)''' else "a" + it].join(", ")»);
+						public <B> P«arity»<«(1 .. arity).map[if (it == i) "B" else "A" + it].join(", ")»> set«i»(final B value) {
+							return new P«arity»<>(«(1 .. arity).map[if (it == i) '''requireNonNull(value)''' else "a" + it].join(", ")»);
 						}
 
 					«ENDFOR»
@@ -61,6 +61,10 @@ final class PNGenerators {
 					«IF arity == 2»
 						public P2<A2, A1> flip() {
 							return new P2<>(a2, a1);
+						}
+
+						public <B1, B2> P2<B1, B2> biMap(final F<A1, B1> f1, final F<A2, B2> f2) {
+							return p2(f1.apply(a1), f2.apply(a2));
 						}
 
 					«ENDIF»

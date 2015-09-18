@@ -36,6 +36,17 @@ final class FGenerator implements InterfaceGenerator {
 				};
 			}
 
+			default <C, D> F<C, D> diMap(final F<C, A> f, final F<B, D> g) {
+				requireNonNull(f);
+				requireNonNull(g);
+				return c -> {
+					requireNonNull(c);
+					final A a = requireNonNull(f.apply(c));
+					final B b = requireNonNull(apply(a));
+					return requireNonNull(g.apply(b));
+				};
+			}
+
 			default <C> F<A, C> flatMap(final F<B, F<A, C>> f) {
 				requireNonNull(f);
 				return a -> {
