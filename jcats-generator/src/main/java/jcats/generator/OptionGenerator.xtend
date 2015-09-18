@@ -54,12 +54,8 @@ final class OptionGenerator implements ClassGenerator {
 			}
 
 			public A getOr(final A other) {
+				requireNonNull(other);
 				return isEmpty() ? other : value;
-			}
-
-			@Deprecated
-			public A getOrNull() {
-				return value;
 			}
 
 			public Option<A> or(final Option<A> other) {
