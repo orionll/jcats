@@ -144,7 +144,7 @@ interface Generator {
 		}
 
 		'''
-		«staticModifier» <«methodParams»> «returnType» cast«name»(final «argumentType» «name.firstToLowerCase») {
+		«staticModifier» <«methodParams»> «returnType» cast(final «argumentType» «name.firstToLowerCase») {
 			return («name»)requireNonNull(«name.firstToLowerCase»);
 		}
 		'''
