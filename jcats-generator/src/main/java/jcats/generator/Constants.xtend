@@ -22,5 +22,6 @@ final class Constants {
 	val public static UNIT = "jcats.Unit"
 	val public static LIST = "jcats.collection.List"
 	val public static ARRAY = "jcats.collection.Array"
+	val public static SEQ = "jcats.collection.Seq"
 	val public static V = "jcats.collection.V"
 }
