@@ -14,6 +14,12 @@ final class OptionGenerator implements ClassGenerator {
 		import java.util.function.Predicate;
 
 		import «Constants.F»;
+		«FOR arity : 2 .. Constants.MAX_ARITY»
+			import «Constants.F»«arity»;
+		«ENDFOR»
+		«FOR arity : 2 .. Constants.MAX_ARITY»
+			import «Constants.P»«arity»;
+		«ENDFOR»
 
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
@@ -121,6 +127,15 @@ final class OptionGenerator implements ClassGenerator {
 				return optional.isPresent() ? some(optional.get()) : none();
 			}
 
+			«applyN»
+			«applyWithN[arity | '''
+				requireNonNull(f);
+				if («(1 .. arity).map["option" + it + ".isEmpty()"].join(" || ")») {
+					return none();
+				} else {
+					return some(f.apply(«(1 .. arity).map['''option«it».value'''].join(", ")»));
+				}
+			''']»
 			«join»
 
 			«cast(#["A"], #[], #["A"])»

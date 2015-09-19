@@ -10,6 +10,9 @@ final class F0Generator implements InterfaceGenerator {
 		package «Constants.FUNCTION»;
 
 		import java.util.function.Supplier;
+		«FOR arity : 2 .. Constants.MAX_ARITY»
+			import «Constants.P»«arity»;
+		«ENDFOR»
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.F».id;
@@ -54,6 +57,16 @@ final class F0Generator implements InterfaceGenerator {
 				return () -> requireNonNull(s.get());
 			}
 
+			«applyN»
+			«applyWithN[arity | '''
+				requireNonNull(f);
+				return () -> {
+					«FOR i : 1 .. arity»
+						final A«i» a«i» = requireNonNull(f«i».apply());
+					«ENDFOR»
+					return requireNonNull(f.apply(«(1 .. arity).map["a" + it].join(", ")»));
+				};
+			''']»
 			«cast(#["A"], #[], #["A"])»
 		}
 	''' }

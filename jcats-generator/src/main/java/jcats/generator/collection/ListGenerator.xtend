@@ -348,6 +348,23 @@ final class ListGenerator implements ClassGenerator {
 					return builder.build();
 				}
 			''']»
+			«applyN»
+			«applyWithN[arity | '''
+				requireNonNull(f);
+				if («(1 .. arity).map["list" + it + ".isEmpty()"].join(" || ")») {
+					return nil();
+				} else {
+					final ListBuilder<B> builder = new ListBuilder<>();
+					«FOR i : 1 .. arity»
+						«(1 ..< i).map["\t"].join»for (final A«i» a«i» : list«i») {
+					«ENDFOR»
+						«(1 ..< arity).map["\t"].join»builder.append(requireNonNull(f.apply(«(1 .. arity).map["a" + it].join(", ")»)));
+					«FOR i : 1 .. arity»
+						«(1 ..< arity - i + 1).map["\t"].join»}
+					«ENDFOR»
+					return builder.build();
+				}
+			''']»
 			«cast(#["A"], #[], #["A"])»
 		}
 

@@ -412,6 +412,34 @@ final class ArrayGenerator implements ClassGenerator {
 					return new Array<>(array);
 				}
 			''']»
+			«applyN»
+			«applyWithN[arity | '''
+				requireNonNull(f);
+				if («(1 .. arity).map["array" + it + ".isEmpty()"].join(" || ")») {
+					return emptyArray();
+				} else {
+					«FOR i : 1 .. arity»
+						final Object[] arr«i» = array«i».array;
+					«ENDFOR»
+					final long size1 = arr1.length;
+					«FOR i : 2 .. arity»
+						final long size«i» = size«i-1» * arr«i».length;
+						if (size«i» != (int) size«i») {
+							throw new IndexOutOfBoundsException("Size overflow");
+						}
+					«ENDFOR»
+					final Object[] array = new Object[(int) size«arity»];
+					int i = 0;
+					«FOR i : 1 .. arity»
+						«(1 ..< i).map["\t"].join»for (final Object a«i» : arr«i») {
+					«ENDFOR»
+						«(1 ..< arity).map["\t"].join»array[i++] = requireNonNull(f.apply(«(1 .. arity).map['''(A«it») a«it»'''].join(", ")»));
+					«FOR i : 1 .. arity»
+						«(1 ..< arity - i + 1).map["\t"].join»}
+					«ENDFOR»
+					return new Array<>(array);
+				}
+			''']»
 			«cast(#["A"], #[], #["A"])»
 		}
 
