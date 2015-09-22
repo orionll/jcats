@@ -67,6 +67,8 @@ class Main {
 			new IndexedGenerator,
 			new PreciseSizeGenerator,
 			new InfiniteSizeGenerator,
+			new OrderGenerator,
+			new OrdGenerator,
 			new ListGenerator,
 			new ListBuilderGenerator,
 			new ArrayGenerator,

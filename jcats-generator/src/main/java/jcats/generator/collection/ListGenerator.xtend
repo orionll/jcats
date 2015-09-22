@@ -23,6 +23,7 @@ final class ListGenerator implements ClassGenerator {
 			import «Constants.F»«arity»;
 		«ENDFOR»
 		import «Constants.OPTION»;
+		import «Constants.ORD»;
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.P»«arity»;
 		«ENDFOR»
@@ -240,6 +241,10 @@ final class ListGenerator implements ClassGenerator {
 					list = list.tail;
 				}
 				return false;
+			}
+
+			public List<A> sortBy(final Ord<A> ord) {
+				throw new UnsupportedOperationException("List.sortBy");
 			}
 
 			public static <A> List<A> nil() {

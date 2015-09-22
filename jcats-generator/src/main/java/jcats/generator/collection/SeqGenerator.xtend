@@ -388,7 +388,7 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public Seq<A> append(final A value) {
-				Objects.requireNonNull(value);
+				requireNonNull(value);
 
 				final Object[][] node2 = node3[node3.length - 1];
 				final Object[] node1 = node2[node2.length - 1];
