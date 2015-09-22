@@ -101,6 +101,8 @@ final class OrdGenerator implements ClassGenerator {
 			static <A extends Comparable<A>> Ord<A> ord() {
 				return Order.ORD;
 			}
+
+			«cast(#["A"], #["A"], #[])»
 		}
 	''' }
 }
