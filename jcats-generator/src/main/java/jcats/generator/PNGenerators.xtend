@@ -1,4 +1,4 @@
-package jcats.generator.function
+package jcats.generator
 
 import java.util.List
 import jcats.generator.ClassGenerator

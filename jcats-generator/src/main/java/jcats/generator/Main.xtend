@@ -17,7 +17,6 @@ import jcats.generator.function.F0Generator
 import jcats.generator.function.FGenerator
 import jcats.generator.function.FNGenerators
 import jcats.generator.function.FsGenerator
-import jcats.generator.function.PNGenerators
 
 import static extension java.nio.file.Files.*
 
