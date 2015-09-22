@@ -10,6 +10,7 @@ import jcats.generator.collection.ListBuilderGenerator
 import jcats.generator.collection.ListGenerator
 import jcats.generator.collection.SeqGenerator
 import jcats.generator.collection.VNGenerators
+import jcats.generator.function.Eff0Generator
 import jcats.generator.function.EffGenerator
 import jcats.generator.function.EffNGenerators
 import jcats.generator.function.F0Generator
@@ -62,6 +63,7 @@ class Main {
 			new F0Generator,
 			new FsGenerator,
 			new EffGenerator,
+			new Eff0Generator,
 			new SizedGenerator,
 			new SizeGenerator,
 			new IndexedGenerator,
