@@ -175,14 +175,14 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public Seq<A> append(final A value) {
 				requireNonNull(value);
-				if (node1.length < 1 << 5) {
-					final Object[] newNode1 = Arrays.copyOf(node1, node1.length + 1);
-					newNode1[node1.length] = value;
-					return new Seq1<>(newNode1);
-				} else {
+				if (node1.length == 1 << 5) {
 					final Object[] newNode1 = { value };
 					final Object[][] newNode2 = { node1, newNode1 };
 					return new Seq2<>(newNode2, 0, (1 << 5) + 1);
+				} else {
+					final Object[] newNode1 = Arrays.copyOf(node1, node1.length + 1);
+					newNode1[node1.length] = value;
+					return new Seq1<>(newNode1);
 				}
 			}
 		}
