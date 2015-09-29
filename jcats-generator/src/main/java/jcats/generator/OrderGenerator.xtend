@@ -25,10 +25,12 @@ final class OrderGenerator implements ClassGenerator {
 			GT;
 
 			public Order reverse() {
-				switch (this) {
-					case LT: return GT;
-					case GT: return LT;
-					default: return EQ;
+				if (this == LT) {
+					return GT;
+				} else if (this == GT) {
+					return LT;
+				} else {
+					return EQ;
 				}
 			}
 
