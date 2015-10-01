@@ -201,36 +201,44 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public A get(final int index) {
-				if (index < init.length) {
-					return (A) init[index];
-				} else if (index >= length - tail.length) {
-					return (A) tail[index + tail.length - length];
-				} else {
-					final int idx = index + startIndex;
-					return (A) node2[index2(idx) - 1][index1(idx)];
+				try {
+					if (index < init.length) {
+						return (A) init[index];
+					} else if (index >= length - tail.length) {
+						return (A) tail[index + tail.length - length];
+					} else {
+						final int idx = index + startIndex;
+						return (A) node2[index2(idx) - 1][index1(idx)];
+					}
+				} catch (final ArrayIndexOutOfBoundsException __) {
+					throw new IndexOutOfBoundsException(Integer.toString(index));
 				}
 			}
 
 			@Override
 			public Seq<A> set(final int index, final A value) {
 				requireNonNull(value);
-				if (index < init.length) {
-					final Object[] newInit = init.clone();
-					newInit[index] = value;
-					return new Seq2<>(node2, newInit, tail, startIndex, length);
-				} else if (index >= length - tail.length) {
-					final Object[] newTail = tail.clone();
-					newTail[index + tail.length - length] = value;
-					return new Seq2<>(node2, init, newTail, startIndex, length);
-				} else {
-					final Object[][] newNode2 = node2.clone();
-					final int idx = index + startIndex;
-					final int index2 = index2(idx) - 1;
-					final Object[] newNode1 = newNode2[index2].clone();
-					final int index1 = index1(idx);
-					newNode2[index2] = newNode1;
-					newNode1[index1] = value;
-					return new Seq2<>(newNode2, init, tail, startIndex, length);
+				try {
+					if (index < init.length) {
+						final Object[] newInit = init.clone();
+						newInit[index] = value;
+						return new Seq2<>(node2, newInit, tail, startIndex, length);
+					} else if (index >= length - tail.length) {
+						final Object[] newTail = tail.clone();
+						newTail[index + tail.length - length] = value;
+						return new Seq2<>(node2, init, newTail, startIndex, length);
+					} else {
+						final Object[][] newNode2 = node2.clone();
+						final int idx = index + startIndex;
+						final int index2 = index2(idx) - 1;
+						final Object[] newNode1 = newNode2[index2].clone();
+						final int index1 = index1(idx);
+						newNode2[index2] = newNode1;
+						newNode1[index1] = value;
+						return new Seq2<>(newNode2, init, tail, startIndex, length);
+					}
+				} catch (final ArrayIndexOutOfBoundsException __) {
+					throw new IndexOutOfBoundsException(Integer.toString(index));
 				}
 			}
 
@@ -316,43 +324,51 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public A get(final int index) {
-				if (index < init.length) {
-					return (A) init[index];
-				} else if (index >= length - tail.length) {
-					return (A) tail[index + tail.length - length];
-				} else {
-					final int idx = index + startIndex;
-					final int index3 = index3(idx);
-					final Object[][] node2 = node3[index3];
-					final int index2 = index2(idx, index3, node2);
-					final Object[] node1 = node2[index2];
-					final int index1 = index1(idx);
-					return (A) node1[index1];
+				try {
+					if (index < init.length) {
+						return (A) init[index];
+					} else if (index >= length - tail.length) {
+						return (A) tail[index + tail.length - length];
+					} else {
+						final int idx = index + startIndex;
+						final int index3 = index3(idx);
+						final Object[][] node2 = node3[index3];
+						final int index2 = index2(idx, index3, node2);
+						final Object[] node1 = node2[index2];
+						final int index1 = index1(idx);
+						return (A) node1[index1];
+					}
+				} catch (final ArrayIndexOutOfBoundsException __) {
+					throw new IndexOutOfBoundsException(Integer.toString(index));
 				}
 			}
 
 			@Override
 			public Seq<A> set(final int index, final A value) {
-				if (index < init.length) {
-					final Object[] newInit = init.clone();
-					newInit[index] = value;
-					return new Seq3<>(node3, newInit, tail, startIndex, length);
-				} else if (index >= length - tail.length) {
-					final Object[] newTail = tail.clone();
-					newTail[index + tail.length - length] = value;
-					return new Seq3<>(node3, init, newTail, startIndex, length);
-				} else {
-					final Object[][][] newNode3 = node3.clone();
-					final int idx = index + startIndex;
-					final int index3 = index3(idx);
-					final Object[][] newNode2 = newNode3[index3].clone();
-					final int index2 = index2(idx, index3, newNode2);
-					final Object[] newNode1 = newNode2[index2].clone();
-					final int index1 = index1(idx);
-					newNode3[index3] = newNode2;
-					newNode2[index2] = newNode1;
-					newNode1[index1] = value;
-					return new Seq3<>(newNode3, init, tail, startIndex, length);
+				try {
+					if (index < init.length) {
+						final Object[] newInit = init.clone();
+						newInit[index] = value;
+						return new Seq3<>(node3, newInit, tail, startIndex, length);
+					} else if (index >= length - tail.length) {
+						final Object[] newTail = tail.clone();
+						newTail[index + tail.length - length] = value;
+						return new Seq3<>(node3, init, newTail, startIndex, length);
+					} else {
+						final Object[][][] newNode3 = node3.clone();
+						final int idx = index + startIndex;
+						final int index3 = index3(idx);
+						final Object[][] newNode2 = newNode3[index3].clone();
+						final int index2 = index2(idx, index3, newNode2);
+						final Object[] newNode1 = newNode2[index2].clone();
+						final int index1 = index1(idx);
+						newNode3[index3] = newNode2;
+						newNode2[index2] = newNode1;
+						newNode1[index1] = value;
+						return new Seq3<>(newNode3, init, tail, startIndex, length);
+					}
+				} catch (final ArrayIndexOutOfBoundsException __) {
+					throw new IndexOutOfBoundsException(Integer.toString(index));
 				}
 			}
 
@@ -479,49 +495,57 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public A get(final int index) {
-				if (index < init.length) {
-					return (A) init[index];
-				} else if (index >= length - tail.length) {
-					return (A) tail[index + tail.length - length];
-				} else {
-					final int idx = index + startIndex;
-					final int index4 = index4(idx);
-					final Object[][][] node3 = node4[index4];
-					final int index3 = index3(idx, index4, node3);
-					final Object[][] node2 = node3[index3];
-					final int index2 = index2(idx, index3, index4, node2);
-					final Object[] node1 = node2[index2];
-					final int index1 = index1(idx);
-					return (A) node1[index1];
+				try {
+					if (index < init.length) {
+						return (A) init[index];
+					} else if (index >= length - tail.length) {
+						return (A) tail[index + tail.length - length];
+					} else {
+						final int idx = index + startIndex;
+						final int index4 = index4(idx);
+						final Object[][][] node3 = node4[index4];
+						final int index3 = index3(idx, index4, node3);
+						final Object[][] node2 = node3[index3];
+						final int index2 = index2(idx, index3, index4, node2);
+						final Object[] node1 = node2[index2];
+						final int index1 = index1(idx);
+						return (A) node1[index1];
+					}
+				} catch (final ArrayIndexOutOfBoundsException __) {
+					throw new IndexOutOfBoundsException(Integer.toString(index));
 				}
 			}
 
 			@Override
 			public Seq<A> set(final int index, final A value) {
 				requireNonNull(value);
-				if (index < init.length) {
-					final Object[] newInit = init.clone();
-					newInit[index] = value;
-					return new Seq4<>(node4, newInit, tail, startIndex, length);
-				} else if (index >= length - tail.length) {
-					final Object[] newTail = tail.clone();
-					newTail[index + tail.length - length] = value;
-					return new Seq4<>(node4, init, newTail, startIndex, length);
-				} else {
-					final int idx = index + startIndex;
-					final Object[][][][] newNode4 = node4.clone();
-					final int index4 = index4(idx);
-					final Object[][][] newNode3 = newNode4[index4].clone();
-					final int index3 = index3(idx, index4, newNode3);
-					final Object[][] newNode2 = newNode3[index3].clone();
-					final int index2 = index2(idx, index3, index4, newNode2);
-					final Object[] newNode1 = newNode2[index2].clone();
-					final int index1 = index1(idx);
-					newNode4[index4] = newNode3;
-					newNode3[index3] = newNode2;
-					newNode2[index2] = newNode1;
-					newNode1[index1] = value;
-					return new Seq4<>(newNode4, init, tail, startIndex, length);
+				try {
+					if (index < init.length) {
+						final Object[] newInit = init.clone();
+						newInit[index] = value;
+						return new Seq4<>(node4, newInit, tail, startIndex, length);
+					} else if (index >= length - tail.length) {
+						final Object[] newTail = tail.clone();
+						newTail[index + tail.length - length] = value;
+						return new Seq4<>(node4, init, newTail, startIndex, length);
+					} else {
+						final int idx = index + startIndex;
+						final Object[][][][] newNode4 = node4.clone();
+						final int index4 = index4(idx);
+						final Object[][][] newNode3 = newNode4[index4].clone();
+						final int index3 = index3(idx, index4, newNode3);
+						final Object[][] newNode2 = newNode3[index3].clone();
+						final int index2 = index2(idx, index3, index4, newNode2);
+						final Object[] newNode1 = newNode2[index2].clone();
+						final int index1 = index1(idx);
+						newNode4[index4] = newNode3;
+						newNode3[index3] = newNode2;
+						newNode2[index2] = newNode1;
+						newNode1[index1] = value;
+						return new Seq4<>(newNode4, init, tail, startIndex, length);
+					}
+				} catch (final ArrayIndexOutOfBoundsException __) {
+					throw new IndexOutOfBoundsException(Integer.toString(index));
 				}
 			}
 
@@ -694,54 +718,62 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public A get(final int index) {
-				if (index < init.length) {
-					return (A) init[index];
-				} else if (index >= length - tail.length) {
-					return (A) tail[index + tail.length - length];
-				} else {
-					final int idx = index + startIndex;
-					final int index5 = index5(idx);
-					final Object[][][][] node4 = node5[index5];
-					final int index4 = index4(idx, index5, node4);
-					final Object[][][] node3 = node4[index4];
-					final int index3 = index3(idx, index4, index5, node3);
-					final Object[][] node2 = node3[index3];
-					final int index2 = index2(idx, index3, index4, index5, node2);
-					final Object[] node1 = node2[index2];
-					final int index1 = index1(idx);
-					return (A) node1[index1];
+				try {
+					if (index < init.length) {
+						return (A) init[index];
+					} else if (index >= length - tail.length) {
+						return (A) tail[index + tail.length - length];
+					} else {
+						final int idx = index + startIndex;
+						final int index5 = index5(idx);
+						final Object[][][][] node4 = node5[index5];
+						final int index4 = index4(idx, index5, node4);
+						final Object[][][] node3 = node4[index4];
+						final int index3 = index3(idx, index4, index5, node3);
+						final Object[][] node2 = node3[index3];
+						final int index2 = index2(idx, index3, index4, index5, node2);
+						final Object[] node1 = node2[index2];
+						final int index1 = index1(idx);
+						return (A) node1[index1];
+					}
+				} catch (final ArrayIndexOutOfBoundsException __) {
+					throw new IndexOutOfBoundsException(Integer.toString(index));
 				}
 			}
 
 			@Override
 			public Seq<A> set(final int index, final A value) {
 				requireNonNull(value);
-				if (index < init.length) {
-					final Object[] newInit = init.clone();
-					newInit[index] = value;
-					return new Seq5<>(node5, newInit, tail, startIndex, length);
-				} else if (index >= length - tail.length) {
-					final Object[] newTail = tail.clone();
-					newTail[index + tail.length - length] = value;
-					return new Seq5<>(node5, init, newTail, startIndex, length);
-				} else {
-					final int idx = index + startIndex;
-					final Object[][][][][] newNode5 = node5.clone();
-					final int index5 = index5(idx);
-					final Object[][][][] newNode4 = newNode5[index5].clone();
-					final int index4 = index4(idx, index5, newNode4);
-					final Object[][][] newNode3 = newNode4[index4].clone();
-					final int index3 = index3(idx, index4, index5, newNode3);
-					final Object[][] newNode2 = newNode3[index3].clone();
-					final int index2 = index2(idx, index3, index4, index5, newNode2);
-					final Object[] newNode1 = newNode2[index2].clone();
-					final int index1 = index1(idx);
-					newNode5[index5] = newNode4;
-					newNode4[index4] = newNode3;
-					newNode3[index3] = newNode2;
-					newNode2[index2] = newNode1;
-					newNode1[index1] = value;
-					return new Seq5<>(newNode5, init, tail, startIndex, length);
+				try {
+					if (index < init.length) {
+						final Object[] newInit = init.clone();
+						newInit[index] = value;
+						return new Seq5<>(node5, newInit, tail, startIndex, length);
+					} else if (index >= length - tail.length) {
+						final Object[] newTail = tail.clone();
+						newTail[index + tail.length - length] = value;
+						return new Seq5<>(node5, init, newTail, startIndex, length);
+					} else {
+						final int idx = index + startIndex;
+						final Object[][][][][] newNode5 = node5.clone();
+						final int index5 = index5(idx);
+						final Object[][][][] newNode4 = newNode5[index5].clone();
+						final int index4 = index4(idx, index5, newNode4);
+						final Object[][][] newNode3 = newNode4[index4].clone();
+						final int index3 = index3(idx, index4, index5, newNode3);
+						final Object[][] newNode2 = newNode3[index3].clone();
+						final int index2 = index2(idx, index3, index4, index5, newNode2);
+						final Object[] newNode1 = newNode2[index2].clone();
+						final int index1 = index1(idx);
+						newNode5[index5] = newNode4;
+						newNode4[index4] = newNode3;
+						newNode3[index3] = newNode2;
+						newNode2[index2] = newNode1;
+						newNode1[index1] = value;
+						return new Seq5<>(newNode5, init, tail, startIndex, length);
+					}
+				} catch (final ArrayIndexOutOfBoundsException __) {
+					throw new IndexOutOfBoundsException(Integer.toString(index));
 				}
 			}
 
@@ -968,59 +1000,67 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public A get(final int index) {
-				if (index < init.length) {
-					return (A) init[index];
-				} else if (index >= length - tail.length) {
-					return (A) tail[index + tail.length - length];
-				} else {
-					final int idx = index + startIndex;
-					final int index6 = index6(idx);
-					final Object[][][][][] node5 = node6[index6];
-					final int index5 = index5(idx, index6, node5);
-					final Object[][][][] node4 = node5[index5];
-					final int index4 = index4(idx, index5, index6, node4);
-					final Object[][][] node3 = node4[index4];
-					final int index3 = index3(idx, index4, index5, index6, node3);
-					final Object[][] node2 = node3[index3];
-					final int index2 = index2(idx, index3, index4, index5, index6, node2);
-					final Object[] node1 = node2[index2];
-					final int index1 = index1(idx);
-					return (A) node1[index1];
+				try {
+					if (index < init.length) {
+						return (A) init[index];
+					} else if (index >= length - tail.length) {
+						return (A) tail[index + tail.length - length];
+					} else {
+						final int idx = index + startIndex;
+						final int index6 = index6(idx);
+						final Object[][][][][] node5 = node6[index6];
+						final int index5 = index5(idx, index6, node5);
+						final Object[][][][] node4 = node5[index5];
+						final int index4 = index4(idx, index5, index6, node4);
+						final Object[][][] node3 = node4[index4];
+						final int index3 = index3(idx, index4, index5, index6, node3);
+						final Object[][] node2 = node3[index3];
+						final int index2 = index2(idx, index3, index4, index5, index6, node2);
+						final Object[] node1 = node2[index2];
+						final int index1 = index1(idx);
+						return (A) node1[index1];
+					}
+				} catch (final ArrayIndexOutOfBoundsException __) {
+					throw new IndexOutOfBoundsException(Integer.toString(index));
 				}
 			}
 
 			@Override
 			public Seq<A> set(final int index, final A value) {
 				requireNonNull(value);
-				if (index < init.length) {
-					final Object[] newInit = init.clone();
-					newInit[index] = value;
-					return new Seq6<>(node6, newInit, tail, startIndex, length);
-				} else if (index >= length - tail.length) {
-					final Object[] newTail = tail.clone();
-					newTail[index + tail.length - length] = value;
-					return new Seq6<>(node6, init, newTail, startIndex, length);
-				} else {
-					final int idx = index + startIndex;
-					final Object[][][][][][] newNode6 = node6.clone();
-					final int index6 = index6(idx);
-					final Object[][][][][] newNode5 = newNode6[index6].clone();
-					final int index5 = index5(idx, index6, newNode5);
-					final Object[][][][] newNode4 = newNode5[index5].clone();
-					final int index4 = index4(idx, index5, index6, newNode4);
-					final Object[][][] newNode3 = newNode4[index4].clone();
-					final int index3 = index3(idx, index4, index5, index6, newNode3);
-					final Object[][] newNode2 = newNode3[index3].clone();
-					final int index2 = index2(idx, index3, index4, index5, index6, newNode2);
-					final Object[] newNode1 = newNode2[index2].clone();
-					final int index1 = index1(idx);
-					newNode6[index6] = newNode5;
-					newNode5[index5] = newNode4;
-					newNode4[index4] = newNode3;
-					newNode3[index3] = newNode2;
-					newNode2[index2] = newNode1;
-					newNode1[index1] = value;
-					return new Seq6<>(newNode6, init, tail, startIndex, length);
+				try {
+					if (index < init.length) {
+						final Object[] newInit = init.clone();
+						newInit[index] = value;
+						return new Seq6<>(node6, newInit, tail, startIndex, length);
+					} else if (index >= length - tail.length) {
+						final Object[] newTail = tail.clone();
+						newTail[index + tail.length - length] = value;
+						return new Seq6<>(node6, init, newTail, startIndex, length);
+					} else {
+						final int idx = index + startIndex;
+						final Object[][][][][][] newNode6 = node6.clone();
+						final int index6 = index6(idx);
+						final Object[][][][][] newNode5 = newNode6[index6].clone();
+						final int index5 = index5(idx, index6, newNode5);
+						final Object[][][][] newNode4 = newNode5[index5].clone();
+						final int index4 = index4(idx, index5, index6, newNode4);
+						final Object[][][] newNode3 = newNode4[index4].clone();
+						final int index3 = index3(idx, index4, index5, index6, newNode3);
+						final Object[][] newNode2 = newNode3[index3].clone();
+						final int index2 = index2(idx, index3, index4, index5, index6, newNode2);
+						final Object[] newNode1 = newNode2[index2].clone();
+						final int index1 = index1(idx);
+						newNode6[index6] = newNode5;
+						newNode5[index5] = newNode4;
+						newNode4[index4] = newNode3;
+						newNode3[index3] = newNode2;
+						newNode2[index2] = newNode1;
+						newNode1[index1] = value;
+						return new Seq6<>(newNode6, init, tail, startIndex, length);
+					}
+				} catch (final ArrayIndexOutOfBoundsException __) {
+					throw new IndexOutOfBoundsException(Integer.toString(index));
 				}
 			}
 
