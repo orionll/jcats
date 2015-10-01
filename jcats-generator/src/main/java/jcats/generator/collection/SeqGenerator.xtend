@@ -10,7 +10,6 @@ final class SeqGenerator implements ClassGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.io.Serializable;
-		import java.util.Arrays;
 		import java.util.Collection;
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
@@ -154,9 +153,9 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public Seq<A> prepend(final A value) {
 				requireNonNull(value);
-				if (node1.length == 1 << 5) {
+				if (node1.length == 32) {
 					final Object[] init = { value };
-					return new Seq2<>(Seq2.EMPTY_NODE2, init, node1, (1 << 5) - 1, (1 << 5) + 1);
+					return new Seq2<>(Seq2.EMPTY_NODE2, init, node1, 31, 33);
 				} else {
 					final Object[] newNode1 = new Object[node1.length + 1];
 					System.arraycopy(node1, 0, newNode1, 1, node1.length);
@@ -168,11 +167,12 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public Seq<A> append(final A value) {
 				requireNonNull(value);
-				if (node1.length == 1 << 5) {
+				if (node1.length == 32) {
 					final Object[] tail = { value };
-					return new Seq2<>(Seq2.EMPTY_NODE2, node1, tail, 0, (1 << 5) + 1);
+					return new Seq2<>(Seq2.EMPTY_NODE2, node1, tail, 0, 33);
 				} else {
-					final Object[] newNode1 = Arrays.copyOf(node1, node1.length + 1);
+					final Object[] newNode1 = new Object[node1.length + 1];
+					System.arraycopy(node1, 0, newNode1, 0, node1.length);
 					newNode1[node1.length] = value;
 					return new Seq1<>(newNode1);
 				}
@@ -237,11 +237,11 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public Seq<A> prepend(final A value) {
 				requireNonNull(value);
-				if (init.length == 1 << 5) {
-					if (node2.length == (1 << 5) - 2) {
+				if (init.length == 32) {
+					if (node2.length == 30) {
 						final Object[] newInit = { value };
-						final Object[][] newNode2 = new Object[(1 << 5) - 1][];
-						System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 2);
+						final Object[][] newNode2 = new Object[31][];
+						System.arraycopy(node2, 0, newNode2, 1, 30);
 						newNode2[0] = init;
 						final Object[][][] newNode3 = { EMPTY_NODE2, newNode2 };
 						if (startIndex != 0) {
@@ -253,7 +253,7 @@ final class SeqGenerator implements ClassGenerator {
 						final Object[][] newNode2 = new Object[node2.length + 1][];
 						System.arraycopy(node2, 0, newNode2, 1, node2.length);
 						newNode2[0] = init;
-						return new Seq2<>(newNode2, newInit, tail, (1 << 5) - 1, length + 1);
+						return new Seq2<>(newNode2, newInit, tail, 31, length + 1);
 					}
 				} else {
 					final Object[] newInit = new Object[init.length + 1];
@@ -266,21 +266,24 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public Seq<A> append(final A value) {
 				requireNonNull(value);
-				if (tail.length == 1 << 5) {
-					if (node2.length == (1 << 5) - 2) {
+				if (tail.length == 32) {
+					if (node2.length == 30) {
 						final Object[] newTail = { value };
-						final Object[][] newNode2 = Arrays.copyOf(node2, (1 << 5) - 1);
-						newNode2[(1 << 5) - 2] = tail;
+						final Object[][] newNode2 = new Object[31][];
+						System.arraycopy(node2, 0, newNode2, 0, 30);
+						newNode2[30] = tail;
 						final Object[][][] newNode3 = { newNode2, EMPTY_NODE2 };
 						return new Seq3<>(newNode3, init, newTail, startIndex, length + 1);
 					} else {
 						final Object[] newTail = { value };
-						final Object[][] newNode2 = Arrays.copyOf(node2, node2.length + 1);
+						final Object[][] newNode2 = new Object[node2.length + 1][];
+						System.arraycopy(node2, 0, newNode2, 0, node2.length);
 						newNode2[node2.length] = tail;
 						return new Seq2<>(newNode2, init, newTail, startIndex, length + 1);
 					}
 				} else {
-					final Object[] newTail = Arrays.copyOf(tail, tail.length + 1);
+					final Object[] newTail = new Object[tail.length + 1];
+					System.arraycopy(tail, 0, newTail, 0, tail.length);
 					newTail[tail.length] = value;
 					return new Seq2<>(node2, init, newTail, startIndex, length + 1);
 				}
@@ -308,7 +311,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			private static int index2(final int idx, final int index3, final Object[][] node2) {
-				return (index3 == 0) ? index2(idx) + node2.length - (1 << 5) : index2(idx);
+				return (index3 == 0) ? index2(idx) + node2.length - 32 : index2(idx);
 			}
 
 			@Override
@@ -356,13 +359,13 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public Seq<A> prepend(final A value) {
 				requireNonNull(value);
-				if (init.length == 1 << 5) {
+				if (init.length == 32) {
 					final Object[][] node2 = node3[0];
-					if (node2.length == (1 << 5) - 1) {
-						if (node3.length == 1 << 5) {
+					if (node2.length == 31) {
+						if (node3.length == 32) {
 							final Object[] newInit = { value };
-							final Object[][] newNode2 = new Object[1 << 5][];
-							System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 1);
+							final Object[][] newNode2 = new Object[32][];
+							System.arraycopy(node2, 0, newNode2, 1, 31);
 							newNode2[0] = init;
 							final Object[][][] newNode3 = node3.clone();
 							newNode3[0] = newNode2;
@@ -373,8 +376,8 @@ final class SeqGenerator implements ClassGenerator {
 							return new Seq4<>(newNode4, newInit, tail, (1 << 15) - 1, length + 1);
 						} else {
 							final Object[] newInit = { value };
-							final Object[][] newNode2 = new Object[1 << 5][];
-							System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 1);
+							final Object[][] newNode2 = new Object[32][];
+							System.arraycopy(node2, 0, newNode2, 1, 31);
 							newNode2[0] = init;
 							final Object[][][] newNode3 = new Object[node3.length + 1][][];
 							System.arraycopy(node3, 1, newNode3, 2, node3.length - 1);
@@ -405,23 +408,23 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public Seq<A> append(final A value) {
 				requireNonNull(value);
-				if (tail.length == 1 << 5) {
+				if (tail.length == 32) {
 					final Object[][] node2 = node3[node3.length - 1];
-					if (node2.length == (1 << 5) - 1) {
-						if (node3.length == 1 << 5) {
+					if (node2.length == 31) {
+						if (node3.length == 32) {
 							final Object[] newTail = { value };
-							final Object[][] newNode2 = new Object[1 << 5][];
-							System.arraycopy(node2, 0, newNode2, 0, (1 << 5) - 1);
-							newNode2[(1 << 5) - 1] = tail;
+							final Object[][] newNode2 = new Object[32][];
+							System.arraycopy(node2, 0, newNode2, 0, 31);
+							newNode2[31] = tail;
 							final Object[][][] newNode3 = node3.clone();
-							newNode3[(1 << 5) - 1] = newNode2;
+							newNode3[31] = newNode2;
 							final Object[][][][] newNode4 = { newNode3, { EMPTY_NODE2 } };
 							return new Seq4<>(newNode4, init, newTail, startIndex, length + 1);
 						} else {
 							final Object[] newTail = { value };
-							final Object[][] newNode2 = new Object[1 << 5][];
-							System.arraycopy(node2, 0, newNode2, 0, (1 << 5) - 1);
-							newNode2[(1 << 5) - 1] = tail;
+							final Object[][] newNode2 = new Object[32][];
+							System.arraycopy(node2, 0, newNode2, 0, 31);
+							newNode2[31] = tail;
 							final Object[][][] newNode3 = new Object[node3.length + 1][][];
 							System.arraycopy(node3, 0, newNode3, 0, node3.length - 1);
 							newNode3[node3.length - 1] = newNode2;
@@ -467,11 +470,11 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			private static int index2(final int idx, final int index3, final int index4, final Object[][] node2) {
-				return (index4 == 0 && index3 == 0) ? index2(idx) + node2.length - (1 << 5) : index2(idx);
+				return (index4 == 0 && index3 == 0) ? index2(idx) + node2.length - 32 : index2(idx);
 			}
 
 			private static int index3(final int idx, final int index4, final Object[][][] node3) {
-				return (index4 == 0) ? index3(idx) + node3.length - (1 << 5) : index3(idx);
+				return (index4 == 0) ? index3(idx) + node3.length - 32 : index3(idx);
 			}
 
 			@Override
@@ -525,15 +528,15 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public Seq<A> prepend(final A value) {
 				requireNonNull(value);
-				if (init.length == 1 << 5) {
+				if (init.length == 32) {
 					final Object[][][] node3 = node4[0];
 					final Object[][] node2 = node3[0];
-					if (node2.length == (1 << 5) - 1) {
-						if (node3.length == 1 << 5) {
-							if (node4.length == 1 << 5) {
+					if (node2.length == 31) {
+						if (node3.length == 32) {
+							if (node4.length == 32) {
 								final Object[] newInit = { value };
-								final Object[][] newNode2 = new Object[1 << 5][];
-								System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 1);
+								final Object[][] newNode2 = new Object[32][];
+								System.arraycopy(node2, 0, newNode2, 1, 31);
 								newNode2[0] = init;
 								final Object[][][] newNode3 = node3.clone();
 								newNode3[0] = newNode2;
@@ -546,8 +549,8 @@ final class SeqGenerator implements ClassGenerator {
 								return new Seq5<>(newNode5, newInit, tail, (1 << 20) - 1, length + 1);
 							} else {
 								final Object[] newInit = { value };
-								final Object[][] newNode2 = new Object[1 << 5][];
-								System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 1);
+								final Object[][] newNode2 = new Object[32][];
+								System.arraycopy(node2, 0, newNode2, 1, 31);
 								newNode2[0] = init;
 								final Object[][][] newNode3 = node3.clone();
 								newNode3[0] = newNode2;
@@ -562,8 +565,8 @@ final class SeqGenerator implements ClassGenerator {
 							}
 						} else {
 							final Object[] newInit = { value };
-							final Object[][] newNode2 = new Object[1 << 5][];
-							System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 1);
+							final Object[][] newNode2 = new Object[32][];
+							System.arraycopy(node2, 0, newNode2, 1, 31);
 							newNode2[0] = init;
 							final Object[][][] newNode3 = new Object[node3.length + 1][][];
 							System.arraycopy(node3, 1, newNode3, 2, node3.length - 1);
@@ -595,27 +598,27 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public Seq<A> append(final A value) {
 				requireNonNull(value);
-				if (tail.length == 1 << 5) {
+				if (tail.length == 32) {
 					final Object[][][] node3 = node4[node4.length - 1];
 					final Object[][] node2 = node3[node3.length - 1];
-					if (node2.length == (1 << 5) - 1) {
-						if (node3.length == 1 << 5) {
-							if (node4.length == 1 << 5) {
+					if (node2.length == 31) {
+						if (node3.length == 32) {
+							if (node4.length == 32) {
 								final Object[] newTail = { value };
-								final Object[][] newNode2 = new Object[1 << 5][];
-								System.arraycopy(node2, 0, newNode2, 0, (1 << 5) - 1);
-								newNode2[(1 << 5) - 1] = tail;
+								final Object[][] newNode2 = new Object[32][];
+								System.arraycopy(node2, 0, newNode2, 0, 31);
+								newNode2[31] = tail;
 								final Object[][][] newNode3 = node3.clone();
-								newNode3[(1 << 5) - 1] = newNode2;
+								newNode3[31] = newNode2;
 								final Object[][][][] newNode4 = node4.clone();
-								newNode4[(1 << 5) - 1] = newNode3;
+								newNode4[31] = newNode3;
 								final Object[][][][][] newNode5 = { newNode4, { { EMPTY_NODE2 } } };
 								return new Seq5<>(newNode5, init, newTail, startIndex, length + 1);
 							} else {
 								final Object[] newTail = { value };
-								final Object[][] newNode2 = new Object[1 << 5][];
-								System.arraycopy(node2, 0, newNode2, 0, (1 << 5) - 1);
-								newNode2[(1 << 5) - 1] = tail;
+								final Object[][] newNode2 = new Object[32][];
+								System.arraycopy(node2, 0, newNode2, 0, 31);
+								newNode2[31] = tail;
 								final Object[][][] newNode3 = node3.clone();
 								newNode3[node3.length - 1] = newNode2;
 								final Object[][][][] newNode4 = new Object[node4.length + 1][][][];
@@ -626,9 +629,9 @@ final class SeqGenerator implements ClassGenerator {
 							}
 						} else {
 							final Object[] newTail = { value };
-							final Object[][] newNode2 = new Object[1 << 5][];
-							System.arraycopy(node2, 0, newNode2, 0, (1 << 5) - 1);
-							newNode2[(1 << 5) - 1] = tail;
+							final Object[][] newNode2 = new Object[32][];
+							System.arraycopy(node2, 0, newNode2, 0, 31);
+							newNode2[31] = tail;
 							final Object[][][] newNode3 = new Object[node3.length + 1][][];
 							System.arraycopy(node3, 0, newNode3, 0, node3.length - 1);
 							newNode3[node3.length - 1] = newNode2;
@@ -678,15 +681,15 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			private static int index2(final int idx, final int index3, final int index4, final int index5, final Object[][] node2) {
-				return (index5 == 0 && index4 == 0 && index3 == 0) ? index2(idx) + node2.length - (1 << 5) : index2(idx);
+				return (index5 == 0 && index4 == 0 && index3 == 0) ? index2(idx) + node2.length - 32 : index2(idx);
 			}
 
 			private static int index3(final int idx, final int index4, final int index5, final Object[][][] node3) {
-				return (index5 == 0 && index4 == 0) ? index3(idx) + node3.length - (1 << 5) : index3(idx);
+				return (index5 == 0 && index4 == 0) ? index3(idx) + node3.length - 32 : index3(idx);
 			}
 
 			private static int index4(final int idx, final int index5, final Object[][][][] node4) {
-				return (index5 == 0) ? index4(idx) + node4.length - (1 << 5) : index4(idx);
+				return (index5 == 0) ? index4(idx) + node4.length - 32 : index4(idx);
 			}
 
 			@Override
@@ -745,17 +748,17 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public Seq<A> prepend(final A value) {
 				requireNonNull(value);
-				if (init.length == 1 << 5) {
+				if (init.length == 32) {
 					final Object[][][][] node4 = node5[0];
 					final Object[][][] node3 = node4[0];
 					final Object[][] node2 = node3[0];
-					if (node2.length == (1 << 5) - 1) {
-						if (node3.length == 1 << 5) {
-							if (node4.length == 1 << 5) {
-								if (node5.length == 1 << 5) {
+					if (node2.length == 31) {
+						if (node3.length == 32) {
+							if (node4.length == 32) {
+								if (node5.length == 32) {
 									final Object[] newInit = { value };
-									final Object[][] newNode2 = new Object[1 << 5][];
-									System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 1);
+									final Object[][] newNode2 = new Object[32][];
+									System.arraycopy(node2, 0, newNode2, 1, 31);
 									newNode2[0] = init;
 									final Object[][][] newNode3 = node3.clone();
 									newNode3[0] = newNode2;
@@ -770,8 +773,8 @@ final class SeqGenerator implements ClassGenerator {
 									return new Seq6<>(newNode6, newInit, tail, (1 << 25) - 1, length + 1);
 								} else {
 									final Object[] newInit = { value };
-									final Object[][] newNode2 = new Object[1 << 5][];
-									System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 1);
+									final Object[][] newNode2 = new Object[32][];
+									System.arraycopy(node2, 0, newNode2, 1, 31);
 									newNode2[0] = init;
 									final Object[][][] newNode3 = node3.clone();
 									newNode3[0] = newNode2;
@@ -788,8 +791,8 @@ final class SeqGenerator implements ClassGenerator {
 								}
 							} else {
 								final Object[] newInit = { value };
-								final Object[][] newNode2 = new Object[1 << 5][];
-								System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 1);
+								final Object[][] newNode2 = new Object[32][];
+								System.arraycopy(node2, 0, newNode2, 1, 31);
 								newNode2[0] = init;
 								final Object[][][] newNode3 = node3.clone();
 								newNode3[0] = newNode2;
@@ -803,8 +806,8 @@ final class SeqGenerator implements ClassGenerator {
 							}
 						} else {
 							final Object[] newInit = { value };
-							final Object[][] newNode2 = new Object[1 << 5][];
-							System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 1);
+							final Object[][] newNode2 = new Object[32][];
+							System.arraycopy(node2, 0, newNode2, 1, 31);
 							newNode2[0] = init;
 							final Object[][][] newNode3 = new Object[node3.length + 1][][];
 							System.arraycopy(node3, 1, newNode3, 2, node3.length - 1);
@@ -840,31 +843,31 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public Seq<A> append(final A value) {
 				requireNonNull(value);
-				if (tail.length == 1 << 5) {
+				if (tail.length == 32) {
 					final Object[][][][] node4 = node5[node5.length - 1];
 					final Object[][][] node3 = node4[node4.length - 1];
 					final Object[][] node2 = node3[node3.length - 1];
-					if (node2.length == (1 << 5) - 1) {
-						if (node3.length == 1 << 5) {
-							if (node4.length == 1 << 5) {
-								if (node5.length == 1 << 5) {
+					if (node2.length == 31) {
+						if (node3.length == 32) {
+							if (node4.length == 32) {
+								if (node5.length == 32) {
 									final Object[] newTail = { value };
-									final Object[][] newNode2 = new Object[1 << 5][];
-									System.arraycopy(node2, 0, newNode2, 0, (1 << 5) - 1);
-									newNode2[(1 << 5) - 1] = tail;
+									final Object[][] newNode2 = new Object[32][];
+									System.arraycopy(node2, 0, newNode2, 0, 31);
+									newNode2[31] = tail;
 									final Object[][][] newNode3 = node3.clone();
-									newNode3[(1 << 5) - 1] = newNode2;
+									newNode3[31] = newNode2;
 									final Object[][][][] newNode4 = node4.clone();
-									newNode4[(1 << 5) - 1] = newNode3;
+									newNode4[31] = newNode3;
 									final Object[][][][][] newNode5 = node5.clone();
-									newNode5[(1 << 5) - 1] = newNode4;
+									newNode5[31] = newNode4;
 									final Object[][][][][][] newNode6 = { newNode5, { { { EMPTY_NODE2 } } } };
 									return new Seq6<>(newNode6, init, newTail, startIndex, length + 1);
 								} else {
 									final Object[] newTail = { value };
-									final Object[][] newNode2 = new Object[1 << 5][];
-									System.arraycopy(node2, 0, newNode2, 0, (1 << 5) - 1);
-									newNode2[(1 << 5) - 1] = tail;
+									final Object[][] newNode2 = new Object[32][];
+									System.arraycopy(node2, 0, newNode2, 0, 31);
+									newNode2[31] = tail;
 									final Object[][][] newNode3 = node3.clone();
 									newNode3[node3.length - 1] = newNode2;
 									final Object[][][][] newNode4 = node4.clone();
@@ -877,9 +880,9 @@ final class SeqGenerator implements ClassGenerator {
 								}
 							} else {
 								final Object[] newTail = { value };
-								final Object[][] newNode2 = new Object[1 << 5][];
-								System.arraycopy(node2, 0, newNode2, 0, (1 << 5) - 1);
-								newNode2[(1 << 5) - 1] = tail;
+								final Object[][] newNode2 = new Object[32][];
+								System.arraycopy(node2, 0, newNode2, 0, 31);
+								newNode2[31] = tail;
 								final Object[][][] newNode3 = node3.clone();
 								newNode3[node3.length - 1] = newNode2;
 								final Object[][][][] newNode4 = new Object[node4.length + 1][][][];
@@ -892,9 +895,9 @@ final class SeqGenerator implements ClassGenerator {
 							}
 						} else {
 							final Object[] newTail = { value };
-							final Object[][] newNode2 = new Object[1 << 5][];
-							System.arraycopy(node2, 0, newNode2, 0, (1 << 5) - 1);
-							newNode2[(1 << 5) - 1] = tail;
+							final Object[][] newNode2 = new Object[32][];
+							System.arraycopy(node2, 0, newNode2, 0, 31);
+							newNode2[31] = tail;
 							final Object[][][] newNode3 = new Object[node3.length + 1][][];
 							System.arraycopy(node3, 0, newNode3, 0, node3.length - 1);
 							newNode3[node3.length - 1] = newNode2;
@@ -948,19 +951,19 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			private static int index2(final int idx, final int index3, final int index4, final int index5, final int index6, final Object[][] node2) {
-				return (index6 == 0 && index5 == 0 && index4 == 0 && index3 == 0) ? index2(idx) + node2.length - (1 << 5) : index2(idx);
+				return (index6 == 0 && index5 == 0 && index4 == 0 && index3 == 0) ? index2(idx) + node2.length - 32 : index2(idx);
 			}
 
 			private static int index3(final int idx, final int index4, final int index5, final int index6, final Object[][][] node3) {
-				return (index6 == 0 && index5 == 0 && index4 == 0) ? index3(idx) + node3.length - (1 << 5) : index3(idx);
+				return (index6 == 0 && index5 == 0 && index4 == 0) ? index3(idx) + node3.length - 32 : index3(idx);
 			}
 
 			private static int index4(final int idx, final int index5, final int index6, final Object[][][][] node4) {
-				return (index6 == 0 && index5 == 0) ? index4(idx) + node4.length - (1 << 5) : index4(idx);
+				return (index6 == 0 && index5 == 0) ? index4(idx) + node4.length - 32 : index4(idx);
 			}
 
 			private static int index5(final int idx, final int index6, final Object[][][][][] node5) {
-				return (index6 == 0) ? index5(idx) + node5.length - (1 << 5) : index5(idx);
+				return (index6 == 0) ? index5(idx) + node5.length - 32 : index5(idx);
 			}
 
 			@Override
@@ -1024,21 +1027,21 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public Seq<A> prepend(final A value) {
 				requireNonNull(value);
-				if (init.length == 1 << 5) {
+				if (init.length == 32) {
 					final Object[][][][][] node5 = node6[0];
 					final Object[][][][] node4 = node5[0];
 					final Object[][][] node3 = node4[0];
 					final Object[][] node2 = node3[0];
-					if (node2.length == (1 << 5) - 1) {
-						if (node3.length == 1 << 5) {
-							if (node4.length == 1 << 5) {
-								if (node5.length == 1 << 5) {
-									if (node6.length == 1 << 5) {
+					if (node2.length == 31) {
+						if (node3.length == 32) {
+							if (node4.length == 32) {
+								if (node5.length == 32) {
+									if (node6.length == 32) {
 										throw new IndexOutOfBoundsException("Seq size limit exceeded");
 									} else {
 										final Object[] newInit = { value };
-										final Object[][] newNode2 = new Object[1 << 5][];
-										System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 1);
+										final Object[][] newNode2 = new Object[32][];
+										System.arraycopy(node2, 0, newNode2, 1, 31);
 										newNode2[0] = init;
 										final Object[][][] newNode3 = node3.clone();
 										newNode3[0] = newNode2;
@@ -1057,8 +1060,8 @@ final class SeqGenerator implements ClassGenerator {
 									}
 								} else {
 									final Object[] newInit = { value };
-									final Object[][] newNode2 = new Object[1 << 5][];
-									System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 1);
+									final Object[][] newNode2 = new Object[32][];
+									System.arraycopy(node2, 0, newNode2, 1, 31);
 									newNode2[0] = init;
 									final Object[][][] newNode3 = node3.clone();
 									newNode3[0] = newNode2;
@@ -1074,8 +1077,8 @@ final class SeqGenerator implements ClassGenerator {
 								}
 							} else {
 								final Object[] newInit = { value };
-								final Object[][] newNode2 = new Object[1 << 5][];
-								System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 1);
+								final Object[][] newNode2 = new Object[32][];
+								System.arraycopy(node2, 0, newNode2, 1, 31);
 								newNode2[0] = init;
 								final Object[][][] newNode3 = node3.clone();
 								newNode3[0] = newNode2;
@@ -1091,8 +1094,8 @@ final class SeqGenerator implements ClassGenerator {
 							}
 						} else {
 							final Object[] newInit = { value };
-							final Object[][] newNode2 = new Object[1 << 5][];
-							System.arraycopy(node2, 0, newNode2, 1, (1 << 5) - 1);
+							final Object[][] newNode2 = new Object[32][];
+							System.arraycopy(node2, 0, newNode2, 1, 31);
 							newNode2[0] = init;
 							final Object[][][] newNode3 = new Object[node3.length + 1][][];
 							System.arraycopy(node3, 1, newNode3, 2, node3.length - 1);
@@ -1132,22 +1135,22 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public Seq<A> append(final A value) {
 				requireNonNull(value);
-				if (tail.length == 1 << 5) {
+				if (tail.length == 32) {
 					final Object[][][][][] node5 = node6[node6.length - 1];
 					final Object[][][][] node4 = node5[node5.length - 1];
 					final Object[][][] node3 = node4[node4.length - 1];
 					final Object[][] node2 = node3[node3.length - 1];
-					if (node2.length == (1 << 5) - 1) {
-						if (node3.length == 1 << 5) {
-							if (node4.length == 1 << 5) {
-								if (node5.length == 1 << 5) {
-									if (node6.length == 1 << 5) {
+					if (node2.length == 31) {
+						if (node3.length == 32) {
+							if (node4.length == 32) {
+								if (node5.length == 32) {
+									if (node6.length == 32) {
 										throw new IndexOutOfBoundsException("Seq size limit exceeded");
 									} else {
 										final Object[] newTail = { value };
-										final Object[][] newNode2 = new Object[1 << 5][];
-										System.arraycopy(node2, 0, newNode2, 0, (1 << 5) - 1);
-										newNode2[(1 << 5) - 1] = tail;
+										final Object[][] newNode2 = new Object[32][];
+										System.arraycopy(node2, 0, newNode2, 0, 31);
+										newNode2[31] = tail;
 										final Object[][][] newNode3 = node3.clone();
 										newNode3[node3.length - 1] = newNode2;
 										final Object[][][][] newNode4 = node4.clone();
@@ -1162,9 +1165,9 @@ final class SeqGenerator implements ClassGenerator {
 									}
 								} else {
 									final Object[] newTail = { value };
-									final Object[][] newNode2 = new Object[1 << 5][];
-									System.arraycopy(node2, 0, newNode2, 0, (1 << 5) - 1);
-									newNode2[(1 << 5) - 1] = tail;
+									final Object[][] newNode2 = new Object[32][];
+									System.arraycopy(node2, 0, newNode2, 0, 31);
+									newNode2[31] = tail;
 									final Object[][][] newNode3 = node3.clone();
 									newNode3[node3.length - 1] = newNode2;
 									final Object[][][][] newNode4 = node4.clone();
@@ -1179,9 +1182,9 @@ final class SeqGenerator implements ClassGenerator {
 								}
 							} else {
 								final Object[] newTail = { value };
-								final Object[][] newNode2 = new Object[1 << 5][];
-								System.arraycopy(node2, 0, newNode2, 0, (1 << 5) - 1);
-								newNode2[(1 << 5) - 1] = tail;
+								final Object[][] newNode2 = new Object[32][];
+								System.arraycopy(node2, 0, newNode2, 0, 31);
+								newNode2[31] = tail;
 								final Object[][][] newNode3 = node3.clone();
 								newNode3[node3.length - 1] = newNode2;
 								final Object[][][][] newNode4 = new Object[node4.length + 1][][][];
@@ -1196,9 +1199,9 @@ final class SeqGenerator implements ClassGenerator {
 							}
 						} else {
 							final Object[] newTail = { value };
-							final Object[][] newNode2 = new Object[1 << 5][];
-							System.arraycopy(node2, 0, newNode2, 0, (1 << 5) - 1);
-							newNode2[(1 << 5) - 1] = tail;
+							final Object[][] newNode2 = new Object[32][];
+							System.arraycopy(node2, 0, newNode2, 0, 31);
+							newNode2[31] = tail;
 							final Object[][][] newNode3 = new Object[node3.length + 1][][];
 							System.arraycopy(node3, 0, newNode3, 0, node3.length - 1);
 							newNode3[node3.length - 1] = newNode2;
