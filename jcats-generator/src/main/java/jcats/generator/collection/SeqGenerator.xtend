@@ -57,6 +57,10 @@ final class SeqGenerator implements ClassGenerator {
 
 			public abstract int length();
 
+			public abstract A head();
+
+			public abstract A last();
+
 			public abstract Seq<A> set(final int index, final A value);
 
 			public abstract Seq<A> prepend(final A value);
@@ -104,6 +108,16 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public A head() {
+				throw new NoSuchElementException();
+			}
+
+			@Override
+			public A last() {
+				throw new NoSuchElementException();
+			}
+
+			@Override
 			public A get(final int index) {
 				throw new IndexOutOfBoundsException(Integer.toString(index));
 			}
@@ -135,6 +149,16 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public int length() {
 				return node1.length;
+			}
+
+			@Override
+			public A head() {
+				return (A) node1[0];
+			}
+
+			@Override
+			public A last() {
+				return (A) node1[node1.length - 1];
 			}
 
 			@Override
@@ -197,6 +221,16 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public int length() {
 				return length;
+			}
+
+			@Override
+			public A head() {
+				return (A) init[0];
+			}
+
+			@Override
+			public A last() {
+				return (A) tail[tail.length - 1];
 			}
 
 			@Override
@@ -316,6 +350,16 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public int length() {
 				return length;
+			}
+
+			@Override
+			public A head() {
+				return (A) init[0];
+			}
+
+			@Override
+			public A last() {
+				return (A) tail[tail.length - 1];
 			}
 
 			private static int index2(final int idx, final int index3, final Object[][] node2) {
@@ -483,6 +527,16 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public int length() {
 				return length;
+			}
+
+			@Override
+			public A head() {
+				return (A) init[0];
+			}
+
+			@Override
+			public A last() {
+				return (A) tail[tail.length - 1];
 			}
 
 			private static int index2(final int idx, final int index3, final int index4, final Object[][] node2) {
@@ -702,6 +756,16 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public int length() {
 				return length;
+			}
+
+			@Override
+			public A head() {
+				return (A) init[0];
+			}
+
+			@Override
+			public A last() {
+				return (A) tail[tail.length - 1];
 			}
 
 			private static int index2(final int idx, final int index3, final int index4, final int index5, final Object[][] node2) {
@@ -980,6 +1044,16 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public int length() {
 				return length;
+			}
+
+			@Override
+			public A head() {
+				return (A) init[0];
+			}
+
+			@Override
+			public A last() {
+				return (A) tail[tail.length - 1];
 			}
 
 			private static int index2(final int idx, final int index3, final int index4, final int index5, final int index6, final Object[][] node2) {

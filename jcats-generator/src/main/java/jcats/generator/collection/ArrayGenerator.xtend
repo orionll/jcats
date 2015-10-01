@@ -85,6 +85,13 @@ final class ArrayGenerator implements ClassGenerator {
 			/**
 			 * O(1)
 			 */
+			public A last() {
+				return get(array.length - 1);
+			}
+
+			/**
+			 * O(1)
+			 */
 			@Override
 			public A get(final int index) {
 				return (A) array[index];
