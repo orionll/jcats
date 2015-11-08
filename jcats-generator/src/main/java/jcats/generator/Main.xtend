@@ -6,8 +6,8 @@ import java.nio.file.Path
 import java.util.List
 import jcats.generator.collection.ArrayBuilderGenerator
 import jcats.generator.collection.ArrayGenerator
-import jcats.generator.collection.ListBuilderGenerator
-import jcats.generator.collection.ListGenerator
+import jcats.generator.collection.StackBuilderGenerator
+import jcats.generator.collection.StackGenerator
 import jcats.generator.collection.SeqGenerator
 import jcats.generator.collection.VNGenerators
 import jcats.generator.function.Eff0Generator
@@ -70,8 +70,8 @@ class Main {
 			new InfiniteSizeGenerator,
 			new OrderGenerator,
 			new OrdGenerator,
-			new ListGenerator,
-			new ListBuilderGenerator,
+			new StackGenerator,
+			new StackBuilderGenerator,
 			new ArrayGenerator,
 			new ArrayBuilderGenerator,
 			new SeqGenerator

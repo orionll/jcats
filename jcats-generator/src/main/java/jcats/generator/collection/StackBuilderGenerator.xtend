@@ -3,26 +3,26 @@ package jcats.generator.collection
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
 
-final class ListBuilderGenerator implements ClassGenerator {
-	override className() { Constants.LIST + "Builder" }
+final class StackBuilderGenerator implements ClassGenerator {
+	override className() { Constants.STACK + "Builder" }
 	
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		import static «Constants.LIST».nil;
-		import static «Constants.LIST».singleList;
+		import static «Constants.STACK».nil;
+		import static «Constants.STACK».singleStack;
 
-		public final class ListBuilder<A> {
-			private List<A> start = nil();
-			private List<A> tail;
+		public final class StackBuilder<A> {
+			private Stack<A> start = nil();
+			private Stack<A> tail;
 			private boolean exported;
 
-			public ListBuilder<A> append(final A value) {
+			public StackBuilder<A> append(final A value) {
 				if (exported) {
 					copy();
 				}
 
-				final List<A> t = singleList(value);
+				final Stack<A> t = singleStack(value);
 
 				if (tail == null) {
 					start = t;
@@ -34,15 +34,15 @@ final class ListBuilderGenerator implements ClassGenerator {
 				return this;
 			}
 
-			ListBuilder<A> appendList(List<A> list) {
-				while (list.isNotEmpty()) {
-					append(list.head);
-					list = list.tail;
+			StackBuilder<A> appendStack(Stack<A> stack) {
+				while (stack.isNotEmpty()) {
+					append(stack.head);
+					stack = stack.tail;
 				}
 				return this;
 			}
 
-			public ListBuilder<A> appendAll(final Iterable<A> iterable) {
+			public StackBuilder<A> appendAll(final Iterable<A> iterable) {
 				for (final A value : iterable) {
 					append(value);
 				}
@@ -53,27 +53,27 @@ final class ListBuilderGenerator implements ClassGenerator {
 				return start.isEmpty();
 			}
 
-			public List<A> build() {
+			public Stack<A> build() {
 				exported = !start.isEmpty();
 				return start;
 			}
 
-			public List<A> prependToList(final List<A> list) {
+			public Stack<A> prependToStack(final Stack<A> stack) {
 				if (isEmpty()) {
-					return list;
+					return stack;
 				} else {
 					if (exported) {
 						copy();
 					}
 
-					tail.tail = list;
+					tail.tail = stack;
 					return build();
 				}
 			}
 
 			private void copy() {
-				List<A> s = start;
-				final List<A> t = tail;
+				Stack<A> s = start;
+				final Stack<A> t = tail;
 				start = nil();
 				tail = null;
 				exported = false;

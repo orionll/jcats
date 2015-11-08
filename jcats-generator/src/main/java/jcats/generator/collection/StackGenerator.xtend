@@ -3,8 +3,8 @@ package jcats.generator.collection
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
 
-final class ListGenerator implements ClassGenerator {
-	override className() { Constants.LIST }
+final class StackGenerator implements ClassGenerator {
+	override className() { Constants.STACK }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -37,13 +37,13 @@ final class ListGenerator implements ClassGenerator {
 		import static «Constants.OPTION».some;
 		import static «Constants.P2».p2;
 
-		public final class List<A> implements Iterable<A>, Serializable {
-			private static final List NIL = new List(null, null);
+		public final class Stack<A> implements Iterable<A>, Serializable {
+			private static final Stack NIL = new Stack(null, null);
 
 			final A head;
-			List<A> tail;
+			Stack<A> tail;
 
-			private List(final A head, final List<A> tail) {
+			private Stack(final A head, final Stack<A> tail) {
 				this.head = head;
 				this.tail = tail;
 			}
@@ -53,12 +53,12 @@ final class ListGenerator implements ClassGenerator {
 			 */
 			public int length() {
 				int len = 0;
-				List<A> list = this;
-				while (list.isNotEmpty()) {
+				Stack<A> stack = this;
+				while (stack.isNotEmpty()) {
 					if (len == Integer.MAX_VALUE) {
 						throw new IndexOutOfBoundsException("Size overflow");
 					}
-					list = list.tail;
+					stack = stack.tail;
 					len++;
 				}
 				return len;
@@ -92,7 +92,7 @@ final class ListGenerator implements ClassGenerator {
 			/**
 			 * O(1)
 			 */
-			public List<A> tail() {
+			public Stack<A> tail() {
 				if (isEmpty()) {
 					throw new NoSuchElementException();
 				} else {
@@ -110,16 +110,16 @@ final class ListGenerator implements ClassGenerator {
 			/**
 			 * O(1)
 			 */
-			public List<A> prepend(final A value) {
-				return new List<>(requireNonNull(value), this);
+			public Stack<A> prepend(final A value) {
+				return new Stack<>(requireNonNull(value), this);
 			}
 
 			/**
 			 * O(size)
 			 */
-			public List<A> append(final A value) {
-				final ListBuilder<A> builder = new ListBuilder<>();
-				builder.appendList(this);
+			public Stack<A> append(final A value) {
+				final StackBuilder<A> builder = new StackBuilder<>();
+				builder.appendStack(this);
 				builder.append(value);
 				return builder.build();
 			}
@@ -127,28 +127,28 @@ final class ListGenerator implements ClassGenerator {
 			/**
 			 * O(size)
 			 */
-			public List<A> concat(final List<A> suffix) {
+			public Stack<A> concat(final Stack<A> suffix) {
 				requireNonNull(suffix);
 				if (isEmpty()) {
 					return suffix;
 				} else if (suffix.isEmpty()) {
 					return this;
 				} else {
-					final ListBuilder<A> builder = new ListBuilder<>();
-					builder.appendList(this);
-					return builder.prependToList(suffix);
+					final StackBuilder<A> builder = new StackBuilder<>();
+					builder.appendStack(this);
+					return builder.prependToStack(suffix);
 				}
 			}
 
 			/**
 			 * O(this.size + suffix.size)
 			 */
-			public List<A> appendAll(final Iterable<A> suffix) {
-				if (suffix instanceof List) {
-					return concat((List<A>) suffix);
+			public Stack<A> appendAll(final Iterable<A> suffix) {
+				if (suffix instanceof Stack) {
+					return concat((Stack<A>) suffix);
 				} else {
-					final ListBuilder<A> builder = new ListBuilder<>();
-					builder.appendList(this);
+					final StackBuilder<A> builder = new StackBuilder<>();
+					builder.appendStack(this);
 					builder.appendAll(suffix);
 					return builder.build();
 				}
@@ -157,74 +157,74 @@ final class ListGenerator implements ClassGenerator {
 			/**
 			 * O(prefix.size)
 			 */
-			public List<A> prependAll(final Iterable<A> prefix) {
-				final ListBuilder<A> builder = new ListBuilder<>();
+			public Stack<A> prependAll(final Iterable<A> prefix) {
+				final StackBuilder<A> builder = new StackBuilder<>();
 				builder.appendAll(prefix);
-				return builder.prependToList(this);
+				return builder.prependToStack(this);
 			}
 
 			/**
 			 * O(size)
 			 */
-			public <B> List<B> map(final F<A, B> f) {
+			public <B> Stack<B> map(final F<A, B> f) {
 				requireNonNull(f);
 				if (isEmpty()) {
 					return nil();
 				} else if (f == F.id()) {
-					return (List<B>) this;
+					return (Stack<B>) this;
 				} else {
-					final ListBuilder<B> builder = new ListBuilder<>();
-					List<A> list = this;
-					while (list.isNotEmpty()) {
-						builder.append(f.apply(list.head));
-						list = list.tail;
+					final StackBuilder<B> builder = new StackBuilder<>();
+					Stack<A> stack = this;
+					while (stack.isNotEmpty()) {
+						builder.append(f.apply(stack.head));
+						stack = stack.tail;
 					}
 					return builder.build();
 				}
 			}
 
-			public <B> List<B> flatMap(final F<A, List<B>> f) {
+			public <B> Stack<B> flatMap(final F<A, Stack<B>> f) {
 				requireNonNull(f);
 				if (isEmpty()) {
 					return nil();
 				} else {
-					final ListBuilder<B> builder = new ListBuilder<>();
-					List<A> list = this;
-					while (list.isNotEmpty()) {
-						builder.appendList(f.apply(list.head));
-						list = list.tail;
+					final StackBuilder<B> builder = new StackBuilder<>();
+					Stack<A> stack = this;
+					while (stack.isNotEmpty()) {
+						builder.appendStack(f.apply(stack.head));
+						stack = stack.tail;
 					}
 					return builder.build();
 				}
 			}
 
-			public List<A> filter(final Predicate<A> predicate) {
+			public Stack<A> filter(final Predicate<A> predicate) {
 				requireNonNull(predicate);
 				if (isEmpty()) {
 					return nil();
 				} else {
-					final ListBuilder<A> builder = new ListBuilder<>();
-					List<A> list = this;
-					while (list.isNotEmpty()) {
-						if (predicate.test(list.head)) {
-							builder.append(list.head);
+					final StackBuilder<A> builder = new StackBuilder<>();
+					Stack<A> stack = this;
+					while (stack.isNotEmpty()) {
+						if (predicate.test(stack.head)) {
+							builder.append(stack.head);
 						}
-						list = list.tail;
+						stack = stack.tail;
 					}
 					return builder.build();
 				}
 			}
 
-			public List<A> take(final int n) {
+			public Stack<A> take(final int n) {
 				if (isEmpty() || n <= 0) {
 					return nil();
 				} else {
-					final ListBuilder<A> builder = new ListBuilder<>();
-					List<A> list = this;
+					final StackBuilder<A> builder = new StackBuilder<>();
+					Stack<A> stack = this;
 					int i = 0;
-					while (!list.isEmpty() && i < n) {
-						builder.append(list.head);
-						list = list.tail;
+					while (!stack.isEmpty() && i < n) {
+						builder.append(stack.head);
+						stack = stack.tail;
 						i++;
 					}
 					return builder.build();
@@ -233,52 +233,52 @@ final class ListGenerator implements ClassGenerator {
 
 			public boolean contains(final A value) {
 				requireNonNull(value);
-				List<A> list = this;
-				while (list.isNotEmpty()) {
-					if (list.head.equals(value)) {
+				Stack<A> stack = this;
+				while (stack.isNotEmpty()) {
+					if (stack.head.equals(value)) {
 						return true;
 					}
-					list = list.tail;
+					stack = stack.tail;
 				}
 				return false;
 			}
 
-			public List<A> sortBy(final Ord<A> ord) {
-				throw new UnsupportedOperationException("List.sortBy");
+			public Stack<A> sortBy(final Ord<A> ord) {
+				throw new UnsupportedOperationException("Stack.sortBy");
 			}
 
-			public static <A> List<A> nil() {
+			public static <A> Stack<A> nil() {
 				return NIL;
 			}
 
-			public static <A> List<A> singleList(final A value) {
-				return new List<>(requireNonNull(value), nil());
+			public static <A> Stack<A> singleStack(final A value) {
+				return new Stack<>(requireNonNull(value), nil());
 			}
 
 			@SafeVarargs
-			public static <A> List<A> list(final A... values) {
-				List<A> list = nil();
+			public static <A> Stack<A> stack(final A... values) {
+				Stack<A> stack = nil();
 				for (int i = values.length - 1; i >= 0; i--) {
-					list = new List<>(requireNonNull(values[i]), list);
+					stack = new Stack<>(requireNonNull(values[i]), stack);
 				}
-				return list;
+				return stack;
 			}
 
 			«FOR primitive : PRIMITIVES»
-				public static List<«primitive.boxedName»> «primitive.shortName»List(final «primitive»... values) {
-					List<«primitive.boxedName»> list = nil();
+				public static Stack<«primitive.boxedName»> «primitive.shortName»Stack(final «primitive»... values) {
+					Stack<«primitive.boxedName»> stack = nil();
 					for (int i = values.length - 1; i >= 0; i--) {
-						list = new List<>(values[i], list);
+						stack = new Stack<>(values[i], stack);
 					}
-					return list;
+					return stack;
 				}
 
 			«ENDFOR»
-			public static List<Character> stringToCharList(final String str) {
+			public static Stack<Character> stringToCharStack(final String str) {
 				if (str.isEmpty()) {
 					return nil();
 				} else {
-					final ListBuilder<Character> builder = new ListBuilder<>();
+					final StackBuilder<Character> builder = new StackBuilder<>();
 					for (int i = 0; i < str.length(); i++) {
 						builder.append(str.charAt(i));
 					}
@@ -286,15 +286,15 @@ final class ListGenerator implements ClassGenerator {
 				}
 			}
 
-			public static <A> List<A> iterableToList(final Iterable<A> values) {
-				return new ListBuilder<A>().appendAll(values).build();
+			public static <A> Stack<A> iterableToStack(final Iterable<A> values) {
+				return new StackBuilder<A>().appendAll(values).build();
 			}
 
 			«join»
 
 			@Override
 			public Iterator<A> iterator() {
-				return isEmpty() ? emptyIterator() : new ListIterator<>(this);
+				return isEmpty() ? emptyIterator() : new StackIterator<>(this);
 			}
 
 			@Override
@@ -315,17 +315,17 @@ final class ListGenerator implements ClassGenerator {
 			/**
 			 * O(size)
 			 */
-			public List<P2<A, Integer>> zipWithIndex() {
+			public Stack<P2<A, Integer>> zipWithIndex() {
 				if (isEmpty()) {
 					return nil();
 				} else {
-					final ListBuilder<P2<A, Integer>> builder = new ListBuilder<>();
-					List<A> list = this;
+					final StackBuilder<P2<A, Integer>> builder = new StackBuilder<>();
+					Stack<A> stack = this;
 					int index = 0;
-					while (list.isNotEmpty()) {
-						builder.append(p2(list.head(), index));
-						list = list.tail;
-						if (index == Integer.MAX_VALUE && !list.isEmpty()) {
+					while (stack.isNotEmpty()) {
+						builder.append(p2(stack.head(), index));
+						stack = stack.tail;
+						if (index == Integer.MAX_VALUE && !stack.isEmpty()) {
 							throw new IndexOutOfBoundsException("Index overflow");
 						}
 						index++;
@@ -337,13 +337,13 @@ final class ListGenerator implements ClassGenerator {
 			«zipN»
 			«zipWithN[arity | '''
 				requireNonNull(f);
-				if («(1 .. arity).map["list" + it + ".isEmpty()"].join(" || ")») {
+				if («(1 .. arity).map["stack" + it + ".isEmpty()"].join(" || ")») {
 					return nil();
 				} else {
 					«FOR i : 1 .. arity»
-						List<A«i»> i«i» = list«i»;
+						Stack<A«i»> i«i» = stack«i»;
 					«ENDFOR»
-					final ListBuilder<B> builder = new ListBuilder<>();
+					final StackBuilder<B> builder = new StackBuilder<>();
 					while («(1 .. arity).map["!i" + it + ".isEmpty()"].join(" && ")») {
 						builder.append(f.apply(«(1 .. arity).map["i" + it + ".head"].join(", ")»));
 						«FOR i : 1 .. arity»
@@ -356,12 +356,12 @@ final class ListGenerator implements ClassGenerator {
 			«applyN»
 			«applyWithN[arity | '''
 				requireNonNull(f);
-				if («(1 .. arity).map["list" + it + ".isEmpty()"].join(" || ")») {
+				if («(1 .. arity).map["stack" + it + ".isEmpty()"].join(" || ")») {
 					return nil();
 				} else {
-					final ListBuilder<B> builder = new ListBuilder<>();
+					final StackBuilder<B> builder = new StackBuilder<>();
 					«FOR i : 1 .. arity»
-						«(1 ..< i).map["\t"].join»for (final A«i» a«i» : list«i») {
+						«(1 ..< i).map["\t"].join»for (final A«i» a«i» : stack«i») {
 					«ENDFOR»
 						«(1 ..< arity).map["\t"].join»builder.append(requireNonNull(f.apply(«(1 .. arity).map["a" + it].join(", ")»)));
 					«FOR i : 1 .. arity»
@@ -373,25 +373,25 @@ final class ListGenerator implements ClassGenerator {
 			«cast(#["A"], #[], #["A"])»
 		}
 
-		final class ListIterator<A> implements Iterator<A> {
-			private List<A> list;
+		final class StackIterator<A> implements Iterator<A> {
+			private Stack<A> stack;
 
-			ListIterator(final List<A> list) {
-				this.list = list;
+			StackIterator(final Stack<A> stack) {
+				this.stack = stack;
 			}
 
 			@Override
 			public boolean hasNext() {
-				return list.isNotEmpty();
+				return stack.isNotEmpty();
 			}
 
 			@Override
 			public A next() {
-				if (list.isEmpty()) {
+				if (stack.isEmpty()) {
 					throw new NoSuchElementException();
 				} else {
-					final A result = list.head;
-					list = list.tail;
+					final A result = stack.head;
+					stack = stack.tail;
 					return result;
 				}
 			}
