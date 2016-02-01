@@ -12,6 +12,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import java.io.Serializable;
 		import java.util.Arrays;
 		import java.util.Collection;
+		import java.util.Collections;
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
 		import java.util.Spliterator;
@@ -222,6 +223,16 @@ final class ArrayGenerator implements ClassGenerator {
 					} else {
 						return this;
 					}
+				}
+			}
+
+			public Array<A> reverse() {
+				if (isEmpty() || array.length == 1) {
+					return this;
+				} else {
+					final Object[] newArray = array.clone();
+					Collections.reverse(Arrays.asList(newArray));
+					return new Array<>(newArray);
 				}
 			}
 
