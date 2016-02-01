@@ -353,8 +353,8 @@ final class StackGenerator implements ClassGenerator {
 					return builder.build();
 				}
 			''']»
-			«applyN»
-			«applyWithN[arity | '''
+			«productN»
+			«productWithN[arity | '''
 				requireNonNull(f);
 				if («(1 .. arity).map["stack" + it + ".isEmpty()"].join(" || ")») {
 					return nil();

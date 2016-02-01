@@ -57,8 +57,8 @@ final class F0Generator implements InterfaceGenerator {
 				return () -> requireNonNull(s.get());
 			}
 
-			«applyN»
-			«applyWithN[arity | '''
+			«productN»
+			«productWithN[arity | '''
 				requireNonNull(f);
 				return () -> {
 					«FOR i : 1 .. arity»

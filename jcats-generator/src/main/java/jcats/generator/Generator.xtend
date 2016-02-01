@@ -113,18 +113,18 @@ interface Generator {
 		«ENDFOR»
 	'''}
 
-	def applyN() { '''
+	def productN() { '''
 		«FOR arity : 2 .. Constants.MAX_ARITY»
-			«staticModifier» <«(1 .. arity).map["A" + it].join(", ")»> «name»<P«arity»<«(1 .. arity).map["A" + it].join(", ")»>> apply«arity»(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")») {
-				return applyWith«arity»(«(1 .. arity).map[name.firstToLowerCase + it].join(", ")», P«arity»::p«arity»);
+			«staticModifier» <«(1 .. arity).map["A" + it].join(", ")»> «name»<P«arity»<«(1 .. arity).map["A" + it].join(", ")»>> product«arity»(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")») {
+				return productWith«arity»(«(1 .. arity).map[name.firstToLowerCase + it].join(", ")», P«arity»::p«arity»);
 			}
 
 		«ENDFOR»
 	'''}
 
-	def applyWithN((int) => String body) { '''
+	def productWithN((int) => String body) { '''
 		«FOR arity : 2 .. Constants.MAX_ARITY»
-			«staticModifier» <«(1 .. arity).map["A" + it + ", "].join»B> «name»<B> applyWith«arity»(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")», final F«arity»<«(1 .. arity).map["A" + it + ", "].join»B> f) {
+			«staticModifier» <«(1 .. arity).map["A" + it + ", "].join»B> «name»<B> productWith«arity»(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")», final F«arity»<«(1 .. arity).map["A" + it + ", "].join»B> f) {
 				«body.apply(arity)»
 			}
 

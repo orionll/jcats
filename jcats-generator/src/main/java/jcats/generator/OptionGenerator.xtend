@@ -127,8 +127,8 @@ final class OptionGenerator implements ClassGenerator {
 				return optional.isPresent() ? some(optional.get()) : none();
 			}
 
-			«applyN»
-			«applyWithN[arity | '''
+			«productN»
+			«productWithN[arity | '''
 				requireNonNull(f);
 				if («(1 .. arity).map["option" + it + ".isEmpty()"].join(" || ")») {
 					return none();

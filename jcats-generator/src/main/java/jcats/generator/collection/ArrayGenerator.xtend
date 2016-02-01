@@ -419,8 +419,8 @@ final class ArrayGenerator implements ClassGenerator {
 					return new Array<>(array);
 				}
 			''']»
-			«applyN»
-			«applyWithN[arity | '''
+			«productN»
+			«productWithN[arity | '''
 				requireNonNull(f);
 				if («(1 .. arity).map["array" + it + ".isEmpty()"].join(" || ")») {
 					return emptyArray();
