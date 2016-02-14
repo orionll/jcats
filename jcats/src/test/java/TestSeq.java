@@ -38,6 +38,14 @@ public class TestSeq {
 			for (int j = i; j >= 0; j -= step) {
 				assertElementEquals(seq, j, j % 63);
 			}
+			if (i < (1 << 16) || i % 17 == 0) {
+				int j = 0;
+				for (int e : seq) {
+					assertEquals(j % 63, e);
+					j++;
+				}
+				assertEquals(seq.length(), j);
+			}
 		}
 	}
 
@@ -53,6 +61,14 @@ public class TestSeq {
 			}
 			for (int j = i; j >= 0; j -= step) {
 				assertElementEquals(seq, j, (i - j) % 63);
+			}
+			if (i < (1 << 16) || i % 17 == 0) {
+				int j = 0;
+				for (int e : seq) {
+					assertEquals((i - j) % 63, e);
+					j++;
+				}
+				assertEquals(seq.length(), j);
 			}
 		}
 	}
@@ -74,6 +90,14 @@ public class TestSeq {
 			for (int j = 0; j <= i; j += step) {
 				assertElementEquals(seq, j, j % 61);
 			}
+			if (i < (1 << 16) || i % 19 == 0) {
+				int j = 0;
+				for (int e : seq) {
+					assertEquals(j % 61, e);
+					j++;
+				}
+				assertEquals(seq.length(), j);
+			}
 		}
 	}
 
@@ -93,6 +117,14 @@ public class TestSeq {
 			assertEquals(i + 1, seq.length());
 			for (int j = 0; j <= i; j += step) {
 				assertElementEquals(seq, j, (i - j) % 63);
+			}
+			if (i < (1 << 16) || i % 19 == 0) {
+				int j = 0;
+				for (int e : seq) {
+					assertEquals((i - j) % 63, e);
+					j++;
+				}
+				assertEquals(seq.length(), j);
 			}
 		}
 	}

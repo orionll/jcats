@@ -38,7 +38,7 @@ final class SeqGenerator implements ClassGenerator {
 		import static «Constants.P2».p2;
 		import static «Constants.SIZE».preciseSize;
 
-		public abstract class Seq<A> implements Sized, Indexed<A>, Serializable {
+		public abstract class Seq<A> implements Iterable<A>, Sized, Indexed<A>, Serializable {
 			private static final Seq EMPTY = new Seq0();
 
 			static final Object[][] EMPTY_NODE2 = new Object[0][];
@@ -137,6 +137,11 @@ final class SeqGenerator implements ClassGenerator {
 				final Object[] node1 = { requireNonNull(value) };
 				return new Seq1<>(node1);
 			}
+
+			@Override
+			public Iterator<A> iterator() {
+				return emptyIterator();
+			}
 		}
 
 		final class Seq1<A> extends Seq<A> {
@@ -200,6 +205,11 @@ final class SeqGenerator implements ClassGenerator {
 					newNode1[node1.length] = value;
 					return new Seq1<>(newNode1);
 				}
+			}
+
+			@Override
+			public Iterator<A> iterator() {
+				return new ArrayIterator<>(node1);
 			}
 		}
 
@@ -329,6 +339,11 @@ final class SeqGenerator implements ClassGenerator {
 					newTail[tail.length] = value;
 					return new Seq2<>(node2, init, newTail, startIndex, length + 1);
 				}
+			}
+
+			@Override
+			public Iterator<A> iterator() {
+				return new Seq2Iterator<>(node2, init, tail);
 			}
 		}
 
@@ -506,6 +521,11 @@ final class SeqGenerator implements ClassGenerator {
 					newTail[tail.length] = value;
 					return new Seq3<>(node3, init, newTail, startIndex, length + 1);
 				}
+			}
+
+			@Override
+			public Iterator<A> iterator() {
+				throw new UnsupportedOperationException("Not implemented");
 			}
 		}
 
@@ -735,6 +755,11 @@ final class SeqGenerator implements ClassGenerator {
 					newTail[tail.length] = value;
 					return new Seq4<>(node4, init, newTail, startIndex, length + 1);
 				}
+			}
+
+			@Override
+			public Iterator<A> iterator() {
+				throw new UnsupportedOperationException("Not implemented");
 			}
 		}
 
@@ -1023,6 +1048,11 @@ final class SeqGenerator implements ClassGenerator {
 					newTail[tail.length] = value;
 					return new Seq5<>(node5, init, newTail, startIndex, length + 1);
 				}
+			}
+
+			@Override
+			public Iterator<A> iterator() {
+				throw new UnsupportedOperationException("Not implemented");
 			}
 		}
 
@@ -1348,6 +1378,49 @@ final class SeqGenerator implements ClassGenerator {
 					System.arraycopy(tail, 0, newTail, 0, tail.length);
 					newTail[tail.length] = value;
 					return new Seq6<>(node6, init, newTail, startIndex, length + 1);
+				}
+			}
+
+			@Override
+			public Iterator<A> iterator() {
+				throw new UnsupportedOperationException("Not implemented");
+			}
+		}
+
+		final class Seq2Iterator<A> implements Iterator<A> {
+			private final Object[][] node2;
+			private final Object[] tail;
+
+			private int index2;
+			private int index1;
+			private Object[] node1;
+
+			Seq2Iterator(Object[][] node2, Object[] init, Object[] tail) {
+				this.node2 = node2;
+				this.tail = tail;
+				node1 = init;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (index1 < node1.length || index2 <= node2.length);
+			}
+
+			@Override
+			public A next() {
+				if (index1 < node1.length) {
+					return (A) node1[index1++];
+				} else if (index2 < node2.length) {
+					node1 = node2[index2++];
+					index1 = 1;
+					return (A) node1[0];
+				} else if (index2 == node2.length) {
+					node1 = tail;
+					index2++;
+					index1 = 1;
+					return (A) node1[0];
+				} else {
+					throw new NoSuchElementException();
 				}
 			}
 		}
