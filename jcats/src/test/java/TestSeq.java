@@ -1,5 +1,6 @@
 import static jcats.collection.Seq.emptySeq;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import jcats.collection.Seq;
 import org.junit.Assert;
@@ -41,6 +42,9 @@ public class TestSeq {
 			if (i < (1 << 16) || i % 17 == 0) {
 				int j = 0;
 				for (int e : seq) {
+					if (j == seq.length()) {
+						fail("j == length (" + seq.length() + ")");
+					}
 					assertEquals(j % 63, e);
 					j++;
 				}
@@ -65,6 +69,9 @@ public class TestSeq {
 			if (i < (1 << 16) || i % 17 == 0) {
 				int j = 0;
 				for (int e : seq) {
+					if (j == seq.length()) {
+						fail("j == length (" + seq.length() + ")");
+					}
 					assertEquals((i - j) % 63, e);
 					j++;
 				}
@@ -93,6 +100,9 @@ public class TestSeq {
 			if (i < (1 << 16) || i % 19 == 0) {
 				int j = 0;
 				for (int e : seq) {
+					if (j == seq.length()) {
+						fail("j == length (" + seq.length() + ")");
+					}
 					assertEquals(j % 61, e);
 					j++;
 				}
@@ -121,6 +131,9 @@ public class TestSeq {
 			if (i < (1 << 16) || i % 19 == 0) {
 				int j = 0;
 				for (int e : seq) {
+					if (j == seq.length()) {
+						fail("j == length (" + seq.length() + ")");
+					}
 					assertEquals((i - j) % 63, e);
 					j++;
 				}

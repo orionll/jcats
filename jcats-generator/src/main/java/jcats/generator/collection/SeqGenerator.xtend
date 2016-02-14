@@ -525,7 +525,7 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public Iterator<A> iterator() {
-				throw new UnsupportedOperationException("Not implemented");
+				return new Seq3Iterator<>(node3, init, tail);
 			}
 		}
 
@@ -1417,6 +1417,64 @@ final class SeqGenerator implements ClassGenerator {
 				} else if (index2 == node2.length) {
 					node1 = tail;
 					index2++;
+					index1 = 1;
+					return (A) node1[0];
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+		}
+
+		final class Seq3Iterator<A> implements Iterator<A> {
+			private final Object[][][] node3;
+			private final Object[] tail;
+
+			private int index3;
+			private int index2;
+			private int index1;
+			private Object[][] node2;
+			private Object[] node1;
+
+			Seq3Iterator(final Object[][][] node3, final Object[] init, final Object[] tail) {
+				this.node3 = node3;
+				this.tail = tail;
+				node1 = init;
+			}
+		
+			@Override
+			public boolean hasNext() {
+				return (index1 < node1.length || (node2 != null && index2 < node2.length) || index3 <= node3.length);
+			}
+
+			@Override
+			public A next() {
+				if (index1 < node1.length) {
+					return (A) node1[index1++];
+				} else if (node2 != null && index2 < node2.length) {
+					node1 = node2[index2++];
+					index1 = 1;
+					return (A) node1[0];
+				} else if (index3 < node3.length) {
+					if (node3[index3].length > 0) {
+						node2 = node3[index3++];
+						node1 = node2[0];
+						index2 = 1;
+					} else if (index3 == 0) {
+						node2 = node3[1];
+						node1 = node2[0];
+						index3 += 2;
+						index2 = 1;
+					} else {
+						node2 = null;
+						node1 = tail;
+						index3 += 2;
+					}
+					index1 = 1;
+					return (A) node1[0];
+				} else if (index3 == node3.length) {
+					node2 = null;
+					node1 = tail;
+					index3++;
 					index1 = 1;
 					return (A) node1[0];
 				} else {
