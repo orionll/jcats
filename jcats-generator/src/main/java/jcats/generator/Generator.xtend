@@ -63,7 +63,7 @@ interface Generator {
 			 * O(min(this.size, that.size))
 			 */
 		«ENDIF»
-		public <B> «name»<P2<A, B>> zip(final «name»<B> that) {
+		public <B> «name»<P<A, B>> zip(final «name»<B> that) {
 			return zip2(this, that);
 		}
 	'''}
@@ -90,8 +90,8 @@ interface Generator {
 				 * O(min(«(1 .. arity).map['''«name.firstToLowerCase»«it».size'''].join(", ")»))
 				 */
 			«ENDIF»
-			«staticModifier» <«(1 .. arity).map["A" + it].join(", ")»> «name»<P«arity»<«(1 .. arity).map["A" + it].join(", ")»>> zip«arity»(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")») {
-				return zipWith«arity»(«(1 .. arity).map[name.firstToLowerCase + it].join(", ")», P«arity»::p«arity»);
+			«staticModifier» <«(1 .. arity).map["A" + it].join(", ")»> «name»<«PNGenerators.shortName(arity)»<«(1 .. arity).map["A" + it].join(", ")»>> zip«arity»(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")») {
+				return zipWith«arity»(«(1 .. arity).map[name.firstToLowerCase + it].join(", ")», «PNGenerators.shortName(arity)»::«PNGenerators.shortName(arity).toLowerCase»);
 			}
 
 		«ENDFOR»
@@ -115,8 +115,8 @@ interface Generator {
 
 	def productN() { '''
 		«FOR arity : 2 .. Constants.MAX_ARITY»
-			«staticModifier» <«(1 .. arity).map["A" + it].join(", ")»> «name»<P«arity»<«(1 .. arity).map["A" + it].join(", ")»>> product«arity»(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")») {
-				return productWith«arity»(«(1 .. arity).map[name.firstToLowerCase + it].join(", ")», P«arity»::p«arity»);
+			«staticModifier» <«(1 .. arity).map["A" + it].join(", ")»> «name»<«PNGenerators.shortName(arity)»<«(1 .. arity).map["A" + it].join(", ")»>> product«arity»(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")») {
+				return productWith«arity»(«(1 .. arity).map[name.firstToLowerCase + it].join(", ")», «PNGenerators.shortName(arity)»::«PNGenerators.shortName(arity).toLowerCase»);
 			}
 
 		«ENDFOR»

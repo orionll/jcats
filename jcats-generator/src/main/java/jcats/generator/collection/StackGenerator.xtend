@@ -24,7 +24,8 @@ final class StackGenerator implements ClassGenerator {
 		«ENDFOR»
 		import «Constants.OPTION»;
 		import «Constants.ORD»;
-		«FOR arity : 2 .. Constants.MAX_ARITY»
+		import «Constants.P»;
+		«FOR arity : 3 .. Constants.MAX_ARITY»
 			import «Constants.P»«arity»;
 		«ENDFOR»
 
@@ -35,7 +36,7 @@ final class StackGenerator implements ClassGenerator {
 		import static «Constants.F».id;
 		import static «Constants.OPTION».none;
 		import static «Constants.OPTION».some;
-		import static «Constants.P2».p2;
+		import static «Constants.P».p;
 
 		public final class Stack<A> implements Iterable<A>, Serializable {
 			private static final Stack NIL = new Stack(null, null);
@@ -315,15 +316,15 @@ final class StackGenerator implements ClassGenerator {
 			/**
 			 * O(size)
 			 */
-			public Stack<P2<A, Integer>> zipWithIndex() {
+			public Stack<P<A, Integer>> zipWithIndex() {
 				if (isEmpty()) {
 					return nil();
 				} else {
-					final StackBuilder<P2<A, Integer>> builder = new StackBuilder<>();
+					final StackBuilder<P<A, Integer>> builder = new StackBuilder<>();
 					Stack<A> stack = this;
 					int index = 0;
 					while (stack.isNotEmpty()) {
-						builder.append(p2(stack.head(), index));
+						builder.append(p(stack.head(), index));
 						stack = stack.tail;
 						if (index == Integer.MAX_VALUE && !stack.isEmpty()) {
 							throw new IndexOutOfBoundsException("Index overflow");

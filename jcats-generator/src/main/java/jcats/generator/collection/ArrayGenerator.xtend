@@ -26,7 +26,8 @@ final class ArrayGenerator implements ClassGenerator {
 			import «Constants.F»«arity»;
 		«ENDFOR»
 		import «Constants.INDEXED»;
-		«FOR arity : 2 .. Constants.MAX_ARITY»
+		import «Constants.P»;
+		«FOR arity : 3 .. Constants.MAX_ARITY»
 			import «Constants.P»«arity»;
 		«ENDFOR»
 		import «Constants.PRECISE_SIZE»;
@@ -38,7 +39,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
 		import static «Constants.F».id;
-		import static «Constants.P2».p2;
+		import static «Constants.P».p;
 		import static «Constants.SIZE».preciseSize;
 
 		public final class Array<A> implements Iterable<A>, Sized, Indexed<A>, Serializable {
@@ -404,13 +405,13 @@ final class ArrayGenerator implements ClassGenerator {
 			/**
 			 * O(size)
 			 */
-			public Array<P2<A, Integer>> zipWithIndex() {
+			public Array<P<A, Integer>> zipWithIndex() {
 				if (isEmpty()) {
 					return emptyArray();
 				} else {
 					final Object[] result = new Object[array.length];
 					for (int i = 0; i < array.length; i++) {
-						result[i] = p2(array[i], i);
+						result[i] = p(array[i], i);
 					}
 					return new Array<>(result);
 				}

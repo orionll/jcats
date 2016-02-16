@@ -24,7 +24,8 @@ final class SeqGenerator implements ClassGenerator {
 			import «Constants.F»«arity»;
 		«ENDFOR»
 		import «Constants.INDEXED»;
-		«FOR arity : 2 .. Constants.MAX_ARITY»
+		import «Constants.P»;
+		«FOR arity : 3 .. Constants.MAX_ARITY»
 			import «Constants.P»«arity»;
 		«ENDFOR»
 		import «Constants.PRECISE_SIZE»;
@@ -35,7 +36,7 @@ final class SeqGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
 		import static «Constants.F».id;
-		import static «Constants.P2».p2;
+		import static «Constants.P».p;
 		import static «Constants.SIZE».preciseSize;
 
 		public abstract class Seq<A> implements Iterable<A>, Sized, Indexed<A>, Serializable {
@@ -1440,7 +1441,7 @@ final class SeqGenerator implements ClassGenerator {
 				this.tail = tail;
 				node1 = init;
 			}
-		
+
 			@Override
 			public boolean hasNext() {
 				return (index1 < node1.length || (node2 != null && index2 < node2.length) || index3 <= node3.length);

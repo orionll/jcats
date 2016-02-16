@@ -17,7 +17,8 @@ final class OptionGenerator implements ClassGenerator {
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.F»«arity»;
 		«ENDFOR»
-		«FOR arity : 2 .. Constants.MAX_ARITY»
+		import «Constants.P»;
+		«FOR arity : 3 .. Constants.MAX_ARITY»
 			import «Constants.P»«arity»;
 		«ENDFOR»
 

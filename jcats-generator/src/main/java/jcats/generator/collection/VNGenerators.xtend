@@ -4,6 +4,7 @@ import java.util.List
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
 import jcats.generator.Generator
+import jcats.generator.PNGenerators
 
 final class VNGenerators {
 	def static List<Generator> generators() {
@@ -25,7 +26,8 @@ final class VNGenerators {
 				import java.util.stream.StreamSupport;
 
 				import «Constants.INDEXED»;
-				«FOR arity : 2 .. Constants.MAX_ARITY»
+				import «Constants.P»;
+				«FOR arity : 3 .. Constants.MAX_ARITY»
 					import «Constants.P»«arity»;
 				«ENDFOR»
 				import «Constants.PRECISE_SIZE»;
@@ -37,10 +39,10 @@ final class VNGenerators {
 
 				import static java.util.Arrays.asList;
 				import static java.util.Objects.requireNonNull;
+				import static «Constants.P».p;
 				«IF arity > 2»
-					import static «Constants.P2».p2;
+					import static «Constants.P»«arity».p«arity»;
 				«ENDIF»
-				import static «Constants.P»«arity».p«arity»;
 				import static «Constants.PRECISE_SIZE».preciseSize;
 
 				public final class V«arity»<A> implements Iterable<A>, Sized, Indexed<A>, Serializable {
@@ -134,8 +136,8 @@ final class VNGenerators {
 						return false;
 					}
 
-					public P«arity»<«(1 .. arity).map["A"].join(", ")»> toP() {
-						return p«arity»(«(1 .. arity).map["a" + it].join(", ")»);
+					public «PNGenerators.shortName(arity)»<«(1 .. arity).map["A"].join(", ")»> toP«if (arity == 2) "" else arity»() {
+						return «PNGenerators.shortName(arity).toLowerCase»(«(1 .. arity).map["a" + it].join(", ")»);
 					}
 
 					public ArrayList<A> toArrayList() {
@@ -167,8 +169,8 @@ final class VNGenerators {
 
 					«zipWith(false)»
 
-					public V«arity»<P2<A, Integer>> zipWithIndex() {
-						return new V«arity»<>(«(1 .. arity).map["p2(a" + it + ", " + (it-1) + ")"].join(", ")»);
+					public V«arity»<P<A, Integer>> zipWithIndex() {
+						return new V«arity»<>(«(1 .. arity).map["p(a" + it + ", " + (it-1) + ")"].join(", ")»);
 					}
 
 					@Override
@@ -183,7 +185,7 @@ final class VNGenerators {
 						return new V«arity»<>(«(1 .. arity).map["a" + it].join(", ")»);
 					}
 
-					public static <A> V«arity»<A> pToV(final P«arity»<«(1 .. arity).map["A"].join(", ")»> p«arity») {
+					public static <A> V«arity»<A> p«if (arity == 2) "" else arity»ToV«if (arity == 2) "" else arity»(final «PNGenerators.shortName(arity)»<«(1 .. arity).map["A"].join(", ")»> p«arity») {
 						return new V«arity»<>(«(1 .. arity).map["p" + arity + ".get" + it + "()"].join(", ")»);
 					}
 

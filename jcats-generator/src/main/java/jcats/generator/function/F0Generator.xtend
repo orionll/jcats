@@ -10,7 +10,8 @@ final class F0Generator implements InterfaceGenerator {
 		package «Constants.FUNCTION»;
 
 		import java.util.function.Supplier;
-		«FOR arity : 2 .. Constants.MAX_ARITY»
+		import «Constants.P»;
+		«FOR arity : 3 .. Constants.MAX_ARITY»
 			import «Constants.P»«arity»;
 		«ENDFOR»
 
