@@ -185,7 +185,7 @@ final class VNGenerators {
 						return new V«arity»<>(«(1 .. arity).map["a" + it].join(", ")»);
 					}
 
-					public static <A> V«arity»<A> p«if (arity == 2) "" else arity»ToV«if (arity == 2) "" else arity»(final «PNGenerators.shortName(arity)»<«(1 .. arity).map["A"].join(", ")»> p«arity») {
+					public static <A> V«arity»<A> p«if (arity == 2) "" else arity»ToV«arity»(final «PNGenerators.shortName(arity)»<«(1 .. arity).map["A"].join(", ")»> p«arity») {
 						return new V«arity»<>(«(1 .. arity).map["p" + arity + ".get" + it + "()"].join(", ")»);
 					}
 
