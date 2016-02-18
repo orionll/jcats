@@ -1053,7 +1053,7 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public Iterator<A> iterator() {
-				throw new UnsupportedOperationException("Not implemented");
+				return new Seq5Iterator<>(node5, init, tail);
 			}
 		}
 
@@ -1456,19 +1456,21 @@ final class SeqGenerator implements ClassGenerator {
 					index1 = 1;
 					return (A) node1[0];
 				} else if (index3 < node3.length) {
-					if (node3[index3].length > 0) {
+					if (node3[index3].length == 0) {
+						if (index3 == 0) {
+							node2 = node3[1];
+							node1 = node2[0];
+							index3 += 2;
+							index2 = 1;
+						} else {
+							node2 = null;
+							node1 = tail;
+							index3 += 2;
+						}
+					} else {
 						node2 = node3[index3++];
 						node1 = node2[0];
 						index2 = 1;
-					} else if (index3 == 0) {
-						node2 = node3[1];
-						node1 = node2[0];
-						index3 += 2;
-						index2 = 1;
-					} else {
-						node2 = null;
-						node1 = tail;
-						index3 += 2;
 					}
 					index1 = 1;
 					return (A) node1[0];
@@ -1517,15 +1519,15 @@ final class SeqGenerator implements ClassGenerator {
 					index1 = 1;
 					return (A) node1[0];
 				} else if (node3 != null && index3 < node3.length) {
-					if (node3[index3].length > 0) {
-						node2 = node3[index3++];
-						node1 = node2[0];
-						index2 = 1;
-					} else {
+					if (node3[index3].length == 0) {
 						node3 = null;
 						node2 = null;
 						node1 = tail;
 						index4 += 2;
+					} else {
+						node2 = node3[index3++];
+						node1 = node2[0];
+						index2 = 1;
 					}
 					index1 = 1;
 					return (A) node1[0];
@@ -1566,6 +1568,134 @@ final class SeqGenerator implements ClassGenerator {
 					node2 = null;
 					node1 = tail;
 					index4++;
+					index1 = 1;
+					return (A) node1[0];
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+		}
+
+		final class Seq5Iterator<A> implements Iterator<A> {
+			private final Object[][][][][] node5;
+			private final Object[] tail;
+
+			private int index5;
+			private int index4;
+			private int index3;
+			private int index2;
+			private int index1;
+			private Object[][][][] node4;
+			private Object[][][] node3;
+			private Object[][] node2;
+			private Object[] node1;
+
+			Seq5Iterator(final Object[][][][][] node5, final Object[] init, final Object[] tail) {
+				this.node5 = node5;
+				this.tail = tail;
+				node1 = init;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (index1 < node1.length || (node2 != null && index2 < node2.length) ||
+						(node3 != null && index3 < node3.length) || (node4 != null && index4 < node4.length) ||
+						index5 <= node5.length);
+			}
+
+			@Override
+			public A next() {
+				if (index1 < node1.length) {
+					return (A) node1[index1++];
+				} else if (node2 != null && index2 < node2.length) {
+					node1 = node2[index2++];
+					index1 = 1;
+					return (A) node1[0];
+				} else if (node3 != null && index3 < node3.length) {
+					if (node3[index3].length == 0) {
+						node4 = null;
+						node3 = null;
+						node2 = null;
+						node1 = tail;
+						index5 += 2;
+					} else {
+						node2 = node3[index3++];
+						node1 = node2[0];
+						index2 = 1;
+					}
+					index1 = 1;
+					return (A) node1[0];
+				} else if (node4 != null && index4 < node4.length) {
+					if (node4[index4][0].length == 0) {
+						node4 = null;
+						node3 = null;
+						node2 = null;
+						node1 = tail;
+						index5 += 2;
+					} else {
+						node3 = node4[index4++];
+						node2 = node3[0];
+						node1 = node2[0];
+						index3 = 1;
+						index2 = 1;
+					}
+					index1 = 1;
+					return (A) node1[0];
+				} else if (index5 < node5.length) {
+					if (node5[index5][0][0].length == 0) {
+						if (node5[index5][0].length == 1) {
+							if (node5[index5].length == 1) {
+								if (index5 == node5.length - 1) {
+									node4 = null;
+									node3 = null;
+									node2 = null;
+									node1 = tail;
+									index5 += 2;
+								} else {
+									index5++;
+									node4 = node5[index5++];
+									node3 = node4[0];
+									node2 = node3[0];
+									node1 = node2[0];
+									index4 = 1;
+									index3 = 1;
+									index2 = 1;
+								}
+							} else {
+								node4 = node5[index5++];
+								node3 = node4[1];
+								node2 = node3[0];
+								node1 = node2[0];
+								index4 = 2;
+								index3 = 1;
+								index2 = 1;
+							}
+						} else {
+							node4 = node5[index5++];
+							node3 = node4[0];
+							node2 = node3[1];
+							node1 = node2[0];
+							index4 = 1;
+							index3 = 2;
+							index2 = 1;
+						}
+					} else {
+						node4 = node5[index5++];
+						node3 = node4[0];
+						node2 = node3[0];
+						node1 = node2[0];
+						index4 = 1;
+						index3 = 1;
+						index2 = 1;
+					}
+					index1 = 1;
+					return (A) node1[0];
+				} else if (index5 == node5.length) {
+					node4 = null;
+					node3 = null;
+					node2 = null;
+					node1 = tail;
+					index5++;
 					index1 = 1;
 					return (A) node1[0];
 				} else {

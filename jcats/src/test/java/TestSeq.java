@@ -6,9 +6,41 @@ import jcats.collection.Seq;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class TestSeq {
 
 	public static final int MAX = (1 << 26) + (1 << 23) + 117;
+
+	private static final int[] ITERATION_INDICES = iterationIndices();
+
+	private static int[] iterationIndices() {
+		List<Integer> list = new ArrayList<>();
+		for (int i = 0; i < 30; i++) {
+			list.add((1 << i) - 1);
+			list.add(1 << i);
+			list.add((1 << i) + 1);
+			for (int j = 1; j < i; j++) {
+				list.add((1 << i) + (1 << j) - 1);
+				list.add((1 << i) + (1 << j));
+				list.add((1 << i) + (1 << j) + 1);
+			}
+		}
+		int[] arr = new int[list.size()];
+		for (int i = 0; i < list.size(); i++) {
+			arr[i] = list.get(i);
+		}
+
+		Arrays.sort(arr);
+
+		return arr;
+	}
+
+	private static boolean shouldIterate(int i) {
+		return Arrays.binarySearch(ITERATION_INDICES, i) >= 0;
+	}
 
 	private static void assertElementEquals(final Seq<Integer> seq, final int index, final int expected) {
 		try {
@@ -39,7 +71,7 @@ public class TestSeq {
 			for (int j = i; j >= 0; j -= step) {
 				assertElementEquals(seq, j, j % 63);
 			}
-			if (i < (1 << 16) || i % 17 == 0) {
+			if (shouldIterate(i)) {
 				int j = 0;
 				for (int e : seq) {
 					if (j == seq.length()) {
@@ -66,7 +98,7 @@ public class TestSeq {
 			for (int j = i; j >= 0; j -= step) {
 				assertElementEquals(seq, j, (i - j) % 63);
 			}
-			if (i < (1 << 16) || i % 17 == 0) {
+			if (shouldIterate(i)) {
 				int j = 0;
 				for (int e : seq) {
 					if (j == seq.length()) {
@@ -97,7 +129,7 @@ public class TestSeq {
 			for (int j = 0; j <= i; j += step) {
 				assertElementEquals(seq, j, j % 61);
 			}
-			if (i < (1 << 16) || i % 19 == 0) {
+			if (shouldIterate(i)) {
 				int j = 0;
 				for (int e : seq) {
 					if (j == seq.length()) {
@@ -128,7 +160,7 @@ public class TestSeq {
 			for (int j = 0; j <= i; j += step) {
 				assertElementEquals(seq, j, (i - j) % 63);
 			}
-			if (i < (1 << 16) || i % 19 == 0) {
+			if (shouldIterate(i)) {
 				int j = 0;
 				for (int e : seq) {
 					if (j == seq.length()) {
