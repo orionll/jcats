@@ -1384,7 +1384,7 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public Iterator<A> iterator() {
-				throw new UnsupportedOperationException("Not implemented");
+				return new Seq6Iterator<>(node6, init, tail);
 			}
 		}
 
@@ -1696,6 +1696,179 @@ final class SeqGenerator implements ClassGenerator {
 					node2 = null;
 					node1 = tail;
 					index5++;
+					index1 = 1;
+					return (A) node1[0];
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+		}
+
+		final class Seq6Iterator<A> implements Iterator<A> {
+			private final Object[][][][][][] node6;
+			private final Object[] tail;
+
+			private int index6;
+			private int index5;
+			private int index4;
+			private int index3;
+			private int index2;
+			private int index1;
+			private Object[][][][][] node5;
+			private Object[][][][] node4;
+			private Object[][][] node3;
+			private Object[][] node2;
+			private Object[] node1;
+
+			Seq6Iterator(final Object[][][][][][] node6, final Object[] init, final Object[] tail) {
+				this.node6 = node6;
+				this.tail = tail;
+				node1 = init;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (index1 < node1.length || (node2 != null && index2 < node2.length) ||
+						(node3 != null && index3 < node3.length) || (node4 != null && index4 < node4.length) ||
+						(node5 != null && index5 < node5.length) || index6 <= node6.length);
+			}
+
+			@Override
+			public A next() {
+				if (index1 < node1.length) {
+					return (A) node1[index1++];
+				} else if (node2 != null && index2 < node2.length) {
+					node1 = node2[index2++];
+					index1 = 1;
+					return (A) node1[0];
+				} else if (node3 != null && index3 < node3.length) {
+					if (node3[index3].length == 0) {
+						node5 = null;
+						node4 = null;
+						node3 = null;
+						node2 = null;
+						node1 = tail;
+						index6 += 2;
+					} else {
+						node2 = node3[index3++];
+						node1 = node2[0];
+						index2 = 1;
+					}
+					index1 = 1;
+					return (A) node1[0];
+				} else if (node4 != null && index4 < node4.length) {
+					if (node4[index4][0].length == 0) {
+						node5 = null;
+						node4 = null;
+						node3 = null;
+						node2 = null;
+						node1 = tail;
+						index6 += 2;
+					} else {
+						node3 = node4[index4++];
+						node2 = node3[0];
+						node1 = node2[0];
+						index3 = 1;
+						index2 = 1;
+					}
+					index1 = 1;
+					return (A) node1[0];
+				} else if (node5 != null && index5 < node5.length) {
+					if (node5[index5][0][0].length == 0) {
+						node5 = null;
+						node4 = null;
+						node3 = null;
+						node2 = null;
+						node1 = tail;
+						index6 += 2;
+					} else {
+						node4 = node5[index5++];
+						node3 = node4[0];
+						node2 = node3[0];
+						node1 = node2[0];
+						index4 = 1;
+						index3 = 1;
+						index2 = 1;
+					}
+					index1 = 1;
+					return (A) node1[0];
+				} else if (index6 < node6.length) {
+					if (node6[index6][0][0][0].length == 0) {
+						if (node6[index6][0][0].length == 1) {
+							if (node6[index6][0].length == 1) {
+								if (node6[index6].length == 1) {
+									if (index6 == node6.length - 1) {
+										node5 = null;
+										node4 = null;
+										node3 = null;
+										node2 = null;
+										node1 = tail;
+										index6 += 2;
+									} else {
+										index6++;
+										node5 = node6[index6++];
+										node4 = node5[0];
+										node3 = node4[0];
+										node2 = node3[0];
+										node1 = node2[0];
+										index5 = 1;
+										index4 = 1;
+										index3 = 1;
+										index2 = 1;
+									}
+								} else {
+									node5 = node6[index6++];
+									node4 = node5[1];
+									node3 = node4[0];
+									node2 = node3[0];
+									node1 = node2[0];
+									index5 = 2;
+									index4 = 1;
+									index3 = 1;
+									index2 = 1;
+								}
+							} else {
+								node5 = node6[index6++];
+								node4 = node5[0];
+								node3 = node4[1];
+								node2 = node3[0];
+								node1 = node2[0];
+								index5 = 1;
+								index4 = 2;
+								index3 = 1;
+								index2 = 1;
+							}
+						} else {
+							node5 = node6[index6++];
+							node4 = node5[0];
+							node3 = node4[0];
+							node2 = node3[1];
+							node1 = node2[0];
+							index5 = 1;
+							index4 = 1;
+							index3 = 2;
+							index2 = 1;
+						}
+					} else {
+						node5 = node6[index6++];
+						node4 = node5[0];
+						node3 = node4[0];
+						node2 = node3[0];
+						node1 = node2[0];
+						index5 = 1;
+						index4 = 1;
+						index3 = 1;
+						index2 = 1;
+					}
+					index1 = 1;
+					return (A) node1[0];
+				} else if (index6 == node6.length) {
+					node5 = null;
+					node4 = null;
+					node3 = null;
+					node2 = null;
+					node1 = tail;
+					index6++;
 					index1 = 1;
 					return (A) node1[0];
 				} else {
