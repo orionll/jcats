@@ -47,25 +47,55 @@ final class SeqGenerator implements ClassGenerator {
 			Seq() {
 			}
 
+			/**
+			 * O(1)
+			 */
 			public final boolean isEmpty() {
 				return (this == Seq.EMPTY);
 			}
 
+			/**
+			 * O(1)
+			 */
 			@Override
 			public final PreciseSize size() {
 				return preciseSize(length());
 			}
 
+			/**
+			 * O(1)
+			 */
 			public abstract int length();
 
+			/**
+			 * O(1)
+			 */
 			public abstract A head();
 
+			/**
+			 * O(1)
+			 */
 			public abstract A last();
+			
+			/**
+			 * O(log(size))
+			 */
+			@Override
+			public abstract A get(final int index);
 
+			/**
+			 * O(log(size))
+			 */
 			public abstract Seq<A> set(final int index, final A value);
 
+			/**
+			 * O(1)
+			 */
 			public abstract Seq<A> prepend(final A value);
 
+			/**
+			 * O(1)
+			 */
 			public abstract Seq<A> append(final A value);
 
 			public static <A> Seq<A> emptySeq() {
@@ -76,6 +106,8 @@ final class SeqGenerator implements ClassGenerator {
 				final Object[] node1 = { requireNonNull(value) };
 				return new Seq1<>(node1);
 			}
+
+			«toStr»
 
 			static int index1(final int index) {
 				return (index & 0x1F);
