@@ -132,6 +132,8 @@ final class SeqGenerator implements ClassGenerator {
 			static int index6(final int index) {
 				return ((index >> 25) & 0x1F);
 			}
+
+			«cast(#["A"], #[], #["A"])»
 		}
 
 		final class Seq0<A> extends Seq<A> {
