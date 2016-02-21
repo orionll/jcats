@@ -244,10 +244,7 @@ final class ArrayGenerator implements ClassGenerator {
 				} else if (f == F.id()) {
 					return (Array<B>) this;
 				} else {
-					final Object[] newArray = new Object[array.length];
-					for (int i = 0; i < array.length; i++) {
-						newArray[i] = requireNonNull(f.apply(get(i)));
-					}
+					final Object[] newArray = mapArray(array, f);
 					return new Array<>(newArray);
 				}
 			}
@@ -311,6 +308,14 @@ final class ArrayGenerator implements ClassGenerator {
 			public static <A> Array<A> singleArray(final A value) {
 				requireNonNull(value);
 				return new Array<>(new Object[] { value });
+			}
+
+			static Object[] mapArray(final Object[] array, final F f) {
+				final Object[] newArray = new Object[array.length];
+				for (int i = 0; i < array.length; i++) {
+					newArray[i] = requireNonNull(f.apply(array[i]));
+				}
+				return newArray;
 			}
 
 			@SafeVarargs
