@@ -47,6 +47,17 @@ interface Generator {
 		}
 	'''}
 
+	def static hashcode() { '''
+		@Override
+		public int hashCode() {
+			int hashCode = 1;
+			for (final A value : this) {
+				hashCode = 31 * hashCode + value.hashCode();
+			}
+			return hashCode;
+		}
+	'''}
+
 	def join() { joinMultiple(#[], "A") }
 
 	def joinMultiple(Iterable<String> typeParams, String typeParam) { '''

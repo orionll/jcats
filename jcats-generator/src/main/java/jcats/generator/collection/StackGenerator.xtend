@@ -307,6 +307,28 @@ final class StackGenerator implements ClassGenerator {
 
 			«parallelStream»
 
+			«hashcode»
+
+			@Override
+			public boolean equals(final Object obj) {
+				if (obj == this) {
+					return true;
+				} else if (obj instanceof Stack<?>) {
+					Stack<?> stack1 = this;
+					Stack<?> stack2 = (Stack<?>) obj;
+					while (stack1.isNotEmpty()) {
+						if (stack2.isEmpty() || !stack1.head.equals(stack2.head)) {
+							return false;
+						}
+						stack1 = stack1.tail;
+						stack2 = stack2.tail;
+					}
+					return stack2.isEmpty();
+				} else {
+					return false;
+				}
+			}
+
 			«toStr»
 
 			«zip»

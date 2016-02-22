@@ -110,6 +110,33 @@ final class SeqGenerator implements ClassGenerator {
 				return new Seq1<>(node1);
 			}
 
+			«hashcode»
+
+			@Override
+			public boolean equals(final Object obj) {
+				if (obj == this) {
+					return true;
+				} else if (obj instanceof Seq<?>) {
+					final Seq<?> seq = (Seq<?>) obj;
+					if (length() == seq.length()) {
+						final Iterator<?> iterator1 = iterator();
+						final Iterator<?> iterator2 = seq.iterator();
+						while (iterator1.hasNext()) {
+							final Object o1 = iterator1.next();
+							final Object o2 = iterator2.next();
+							if (!o1.equals(o2)) {
+								return false;
+							}
+						}
+						return true;
+					} else {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			}
+
 			«toStr»
 
 			static int index1(final int index) {
