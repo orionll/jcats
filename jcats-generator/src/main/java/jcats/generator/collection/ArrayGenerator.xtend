@@ -401,6 +401,22 @@ final class ArrayGenerator implements ClassGenerator {
 
 			«parallelStream»
 
+			@Override
+			public int hashCode() {
+				return Arrays.hashCode(array);
+			}
+
+			@Override
+			public boolean equals(Object obj) {
+				if (obj == this) {
+					return true;
+				} else if (obj instanceof Array<?>) {
+					return Arrays.equals(array, ((Array) obj).array);
+				} else {
+					return false;
+				}
+			}
+
 			«toStr»
 
 			«zip»
