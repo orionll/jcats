@@ -157,6 +157,30 @@ final class VNGenerators {
 					}
 
 					@Override
+					public int hashCode() {
+						int result = 1;
+						«FOR index : 1 .. arity»
+							result = 31 * result + a«index».hashCode();
+						«ENDFOR»
+						return result;
+					}
+
+					@Override
+					public boolean equals(final Object obj) {
+						if (obj == this) {
+							return true;
+						} else if (obj instanceof V«arity»<?>) {
+							final V«arity»<?> v«arity» = (V«arity»<?>) obj;
+							return a1.equals(v«arity».a1)
+								«FOR index : 2 .. arity»
+									&& a«index».equals(v«arity».a«index»)«IF index == arity»;«ENDIF»
+								«ENDFOR»
+						} else {
+							return false;
+						}
+					}
+
+					@Override
 					public Iterator<A> iterator() {
 						return asList(«(1 .. arity).map["a" + it].join(", ")»).iterator();
 					}
