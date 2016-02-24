@@ -10,6 +10,7 @@ final class OptionGenerator implements ClassGenerator {
 		import java.util.ArrayList;
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
+		import java.util.Objects;
 		import java.util.Optional;
 		import java.util.function.Predicate;
 
@@ -99,6 +100,22 @@ final class OptionGenerator implements ClassGenerator {
 
 			public Optional<A> toOptional() {
 				return Optional.ofNullable(value);
+			}
+
+			@Override
+			public int hashCode() {
+				return Objects.hashCode(value);
+			}
+
+			@Override
+			public boolean equals(final Object obj) {
+				if (obj == this) {
+					return true;
+				} else if (obj instanceof Option<?>) {
+					return Objects.equals(value, ((Option<?>) obj).value);
+				} else {
+					return false;
+				}
 			}
 
 			@Override
