@@ -8,6 +8,7 @@ final class EitherGenerator implements ClassGenerator {
 
 		import java.io.Serializable;
 		import java.util.NoSuchElementException;
+		import java.util.Objects;
 
 		import «Constants.F»;
 
@@ -112,6 +113,28 @@ final class EitherGenerator implements ClassGenerator {
 
 			public Option<A> toOption() {
 				return nullableToOption(right);
+			}
+
+			@Override
+			public int hashCode() {
+				return isRight() ? right.hashCode() : ~left.hashCode();
+			}
+
+			@Override
+			public boolean equals(Object obj) {
+				if (obj == this) {
+					return true;
+				} else if (obj instanceof Either<?, ?>) {
+					final Either<?, ?> either = (Either<?, ?>) obj;
+					return Objects.equals(left, either.left) && Objects.equals(right, either.right);
+				} else {
+					return false;
+				}
+			}
+
+			@Override
+			public String toString() {
+				return isLeft() ? "Left(" + left + ")" : "Right(" + right + ")";
 			}
 
 			public static <X, A> Either<X, A> left(final X left) {
