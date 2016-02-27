@@ -82,6 +82,22 @@ final class PreciseSizeGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public int hashCode() {
+				return length;
+			}
+
+			@Override
+			public boolean equals(final Object obj) {
+				if (obj == this) {
+					return true;
+				} else if (obj instanceof PreciseSize) {
+					return length == ((PreciseSize) obj).length;
+				} else {
+					return false;
+				}
+			}
+
+			@Override
 			public String toString() {
 				return Integer.toString(length);
 			}
