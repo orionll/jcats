@@ -103,6 +103,12 @@ final class OptionGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public boolean isEqualTo(final Option<A> other) {
+				requireNonNull(other);
+				return Objects.equals(value, other.value);
+			}
+
+			@Override
 			public int hashCode() {
 				return Objects.hashCode(value);
 			}
