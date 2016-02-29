@@ -7,6 +7,7 @@ final class Constants {
 	val public static SIZE = "jcats.Size"
 	val public static PRECISE_SIZE = "jcats.PreciseSize"
 	val public static INFINITE_SIZE = "jcats.InfiniteSize"
+	val public static EQUATABLE = "jcats.Equatable"
 	val public static INDEXED = "jcats.Indexed"
 	val public static SIZED = "jcats.Sized"
 	val public static MAX_ARITY = 5

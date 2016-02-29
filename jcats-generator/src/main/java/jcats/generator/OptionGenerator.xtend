@@ -27,7 +27,7 @@ final class OptionGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.F».id;
 
-		public final class Option<A> implements Iterable<A>, Serializable {
+		public final class Option<A> implements Equatable<Option<A>>, Iterable<A>, Serializable {
 			private static final Option NONE = new Option(null);
 
 			private final A value;

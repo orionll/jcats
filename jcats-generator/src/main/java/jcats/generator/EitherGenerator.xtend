@@ -16,7 +16,7 @@ final class EitherGenerator implements ClassGenerator {
 		import static «Constants.F».id;
 		import static «Constants.OPTION».nullableToOption;
 
-		public final class Either<X, A> implements Serializable {
+		public final class Either<X, A> implements Equatable<Either<X, A>>, Serializable {
 			private final X left;
 			private final A right;
 

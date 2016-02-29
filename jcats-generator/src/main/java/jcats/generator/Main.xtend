@@ -63,6 +63,7 @@ class Main {
 			new FsGenerator,
 			new EffGenerator,
 			new Eff0Generator,
+			new EquatableGenerator,
 			new SizedGenerator,
 			new SizeGenerator,
 			new IndexedGenerator,
