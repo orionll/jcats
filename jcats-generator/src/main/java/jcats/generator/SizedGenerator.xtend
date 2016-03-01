@@ -8,6 +8,14 @@ final class SizedGenerator implements InterfaceGenerator {
 
 		public interface Sized {
 			Size size();
+
+			default boolean isEmpty() {
+				return size().isEmpty();
+			}
+
+			default boolean isNotEmpty() {
+				return size().isNotEmpty();
+			}
 		}
 	''' }
 }

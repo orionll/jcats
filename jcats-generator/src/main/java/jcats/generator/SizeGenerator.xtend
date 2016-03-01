@@ -23,6 +23,12 @@ final class SizeGenerator implements ClassGenerator {
 
 			public abstract boolean mayBeInfinite();
 
+			public abstract boolean isEmpty();
+
+			public final boolean isNotEmpty() {
+				return !isEmpty();
+			}
+
 			public <A> A match(final F<PreciseSize, A> precise, final F0<A> infinite) {
 				if (this instanceof PreciseSize) {
 					return precise.apply((PreciseSize) this);
@@ -73,12 +79,9 @@ final class PreciseSizeGenerator implements ClassGenerator {
 				return false;
 			}
 
+			@Override
 			public boolean isEmpty() {
 				return (length == 0);
-			}
-
-			public boolean isNotEmpty() {
-				return (length != 0);
 			}
 
 			@Override
@@ -120,6 +123,11 @@ final class InfiniteSizeGenerator implements ClassGenerator {
 
 			public final boolean mayBeInfinite() {
 				return true;
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return false;
 			}
 
 			@Override
