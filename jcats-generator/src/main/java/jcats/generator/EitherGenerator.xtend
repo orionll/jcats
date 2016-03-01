@@ -116,12 +116,6 @@ final class EitherGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public boolean isEqualTo(final Either<X, A> other) {
-				requireNonNull(other);
-				return Objects.equals(left, other.left) && Objects.equals(right, other.right);
-			}
-
-			@Override
 			public int hashCode() {
 				return isRight() ? right.hashCode() : ~left.hashCode();
 			}

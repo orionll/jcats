@@ -6,8 +6,14 @@ final class EquatableGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
+		import static java.util.Objects.requireNonNull;
+
 		public interface Equatable<A> {
-			boolean isEqualTo(final A other);
+
+			default boolean isEqualTo(final A other) {
+				requireNonNull(other);
+				return equals(other);
+			}
 
 			default boolean isNotEqualTo(final A other) {
 				return !isEqualTo(other);

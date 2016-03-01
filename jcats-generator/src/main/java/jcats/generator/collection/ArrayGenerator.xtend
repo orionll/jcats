@@ -403,12 +403,6 @@ final class ArrayGenerator implements ClassGenerator {
 			«parallelStream»
 
 			@Override
-			public boolean isEqualTo(final Array<A> other) {
-				requireNonNull(other);
-				return Arrays.equals(array, other.array);
-			}
-
-			@Override
 			public int hashCode() {
 				return Arrays.hashCode(array);
 			}
