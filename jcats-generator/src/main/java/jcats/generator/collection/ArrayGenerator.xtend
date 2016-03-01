@@ -25,6 +25,7 @@ final class ArrayGenerator implements ClassGenerator {
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.F»«arity»;
 		«ENDFOR»
+		import «Constants.EQUATABLE»;
 		import «Constants.INDEXED»;
 		import «Constants.P»;
 		«FOR arity : 3 .. Constants.MAX_ARITY»
@@ -42,7 +43,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import static «Constants.P».p;
 		import static «Constants.SIZE».preciseSize;
 
-		public final class Array<A> implements Iterable<A>, Sized, Indexed<A>, Serializable {
+		public final class Array<A> implements Iterable<A>, Equatable<Array<A>>, Sized, Indexed<A>, Serializable {
 			private static final Array EMPTY = new Array(new Object[0]);
 
 			final Object[] array;
@@ -400,6 +401,12 @@ final class ArrayGenerator implements ClassGenerator {
 			«stream»
 
 			«parallelStream»
+
+			@Override
+			public boolean isEqualTo(final Array<A> other) {
+				requireNonNull(other);
+				return Arrays.equals(array, other.array);
+			}
 
 			@Override
 			public int hashCode() {

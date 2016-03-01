@@ -23,6 +23,7 @@ final class SeqGenerator implements ClassGenerator {
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.F»«arity»;
 		«ENDFOR»
+		import «Constants.EQUATABLE»;
 		import «Constants.INDEXED»;
 		import «Constants.P»;
 		«FOR arity : 3 .. Constants.MAX_ARITY»
@@ -40,7 +41,7 @@ final class SeqGenerator implements ClassGenerator {
 		import static «Constants.P».p;
 		import static «Constants.SIZE».preciseSize;
 
-		public abstract class Seq<A> implements Iterable<A>, Sized, Indexed<A>, Serializable {
+		public abstract class Seq<A> implements Iterable<A>, Equatable<Seq<A>>, Sized, Indexed<A>, Serializable {
 			private static final Seq EMPTY = new Seq0();
 
 			static final Object[][] EMPTY_NODE2 = new Object[0][];
@@ -110,6 +111,12 @@ final class SeqGenerator implements ClassGenerator {
 				return new Seq1<>(node1);
 			}
 
+			@Override
+			public boolean isEqualTo(final Seq<A> other) {
+				requireNonNull(other);
+				return equal(this, other);
+			}
+
 			«hashcode»
 
 			@Override
@@ -138,6 +145,23 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			«toStr»
+
+			private static boolean equal(final Seq<?> seq1, final Seq<?> seq2) {
+				if (seq1.length() == seq2.length()) {
+					final Iterator<?> iterator1 = seq1.iterator();
+					final Iterator<?> iterator2 = seq2.iterator();
+					while (iterator1.hasNext()) {
+						final Object o1 = iterator1.next();
+						final Object o2 = iterator2.next();
+						if (!o1.equals(o2)) {
+							return false;
+						}
+					}
+					return true;
+				} else {
+					return false;
+				}
+			}
 
 			static int index1(final int index) {
 				return (index & 0x1F);
