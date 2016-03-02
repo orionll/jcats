@@ -25,6 +25,7 @@ final class VNGenerators {
 				import java.util.stream.Stream;
 				import java.util.stream.StreamSupport;
 
+				import «Constants.EQUATABLE»;
 				import «Constants.INDEXED»;
 				import «Constants.P»;
 				«FOR arity : 3 .. Constants.MAX_ARITY»
@@ -45,7 +46,7 @@ final class VNGenerators {
 				«ENDIF»
 				import static «Constants.PRECISE_SIZE».preciseSize;
 
-				public final class V«arity»<A> implements Iterable<A>, Sized, Indexed<A>, Serializable {
+				public final class V«arity»<A> implements Iterable<A>, Equatable<V«arity»<A>>, Sized, Indexed<A>, Serializable {
 					private static final PreciseSize SIZE = preciseSize(«arity»);
 
 					private final A «(1 .. arity).map["a" + it].join(", ")»;

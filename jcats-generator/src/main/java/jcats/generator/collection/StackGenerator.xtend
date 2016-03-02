@@ -22,6 +22,7 @@ final class StackGenerator implements ClassGenerator {
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.F»«arity»;
 		«ENDFOR»
+		import «Constants.EQUATABLE»;
 		import «Constants.OPTION»;
 		import «Constants.ORD»;
 		import «Constants.P»;
@@ -38,7 +39,7 @@ final class StackGenerator implements ClassGenerator {
 		import static «Constants.OPTION».some;
 		import static «Constants.P».p;
 
-		public final class Stack<A> implements Iterable<A>, Serializable {
+		public final class Stack<A> implements Iterable<A>, Equatable<Stack<A>>, Serializable {
 			private static final Stack NIL = new Stack(null, null);
 
 			final A head;

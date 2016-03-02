@@ -9,7 +9,7 @@ final class SizeGenerator implements ClassGenerator {
 		import «Constants.F»;
 		import «Constants.F0»;
 
-		public abstract class Size {
+		public abstract class Size implements Equatable<Size> {
 			private static final PreciseSize EMPTY = new PreciseSize(0);
 			private static final InfiniteSize INF = new InfiniteSize();
 

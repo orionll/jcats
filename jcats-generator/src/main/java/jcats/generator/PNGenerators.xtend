@@ -19,6 +19,10 @@ final class PNGenerators {
 		fullName(arity).substring(fullName(arity).lastIndexOf('.') + 1)
 	}
 
+	def static parameters(int arity) {
+		'''<«(1 .. arity).map["A" + it].join(", ")»>'''
+	}
+
 	private def static Generator generator(int arity) {
 		new ClassGenerator {
 			private val shortName = shortName(arity)
@@ -34,7 +38,7 @@ final class PNGenerators {
 
 				import static java.util.Objects.requireNonNull;
 
-				public final class «shortName»<«(1 .. arity).map["A" + it].join(", ")»> implements Serializable {
+				public final class «shortName»«parameters(arity)» implements Equatable<«shortName»«parameters(arity)»>, Serializable {
 					«FOR i : 1 .. arity»
 						private final A«i» a«i»;
 					«ENDFOR»
@@ -79,7 +83,7 @@ final class PNGenerators {
 						}
 
 					«ENDIF»
-					public static <«(1 .. arity).map["A" + it].join(", ")»> «shortName»<«(1 .. arity).map["A" + it].join(", ")»> «shortName.toLowerCase»(«(1 .. arity).map["final A" + it + " a" + it].join(", ")») {
+					public static «parameters(arity)» «shortName»«parameters(arity)» «shortName.toLowerCase»(«(1 .. arity).map["final A" + it + " a" + it].join(", ")») {
 						«FOR i : 1 .. arity»
 							requireNonNull(a«i»);
 						«ENDFOR»

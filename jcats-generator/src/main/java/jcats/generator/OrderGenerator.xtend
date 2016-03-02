@@ -8,7 +8,7 @@ final class OrderGenerator implements ClassGenerator {
 
 		import static java.util.Objects.requireNonNull;
 
-		public enum Order {
+		public enum Order implements Equatable<Order> {
 			/**
 			 * Less than
 			 */
