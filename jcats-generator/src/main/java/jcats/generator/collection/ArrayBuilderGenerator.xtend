@@ -24,12 +24,12 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			private Object[] array;
 			private int length;
 
-			public ArrayBuilder(final int initialCapacity) {
+			ArrayBuilder(final int initialCapacity) {
 				array = new Object[initialCapacity];
 				length = 0;
 			}
 
-			public ArrayBuilder() {
+			ArrayBuilder() {
 				this(10);
 			}
 

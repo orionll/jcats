@@ -395,6 +395,10 @@ final class StackGenerator implements ClassGenerator {
 				}
 			''']»
 			«cast(#["A"], #[], #["A"])»
+
+			public static <A> StackBuilder<A> stackBuilder() {
+				return new StackBuilder<>();
+			}
 		}
 
 		final class StackIterator<A> implements Iterator<A> {

@@ -17,6 +17,8 @@ final class StackBuilderGenerator implements ClassGenerator {
 			private Stack<A> tail;
 			private boolean exported;
 
+			StackBuilder() {}
+
 			public StackBuilder<A> append(final A value) {
 				if (exported) {
 					copy();

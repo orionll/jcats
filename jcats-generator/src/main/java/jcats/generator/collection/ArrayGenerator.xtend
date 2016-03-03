@@ -482,6 +482,14 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			''']»
 			«cast(#["A"], #[], #["A"])»
+
+			public static <A> ArrayBuilder<A> arrayBuilder() {
+				return new ArrayBuilder<>();
+			}
+
+			public static <A> ArrayBuilder<A> arrayBuilderWithCapacity(final int initialCapacity) {
+				return new ArrayBuilder<>(initialCapacity);
+			}
 		}
 
 		final class ArrayIterator<A> implements Iterator<A> {
