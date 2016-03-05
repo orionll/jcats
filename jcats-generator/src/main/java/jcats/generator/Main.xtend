@@ -9,6 +9,7 @@ import jcats.generator.collection.ArrayGenerator
 import jcats.generator.collection.StackBuilderGenerator
 import jcats.generator.collection.StackGenerator
 import jcats.generator.collection.SeqGenerator
+import jcats.generator.collection.SeqBuilderGenerator
 import jcats.generator.collection.VNGenerators
 import jcats.generator.function.Eff0Generator
 import jcats.generator.function.EffGenerator
@@ -75,7 +76,8 @@ class Main {
 			new StackBuilderGenerator,
 			new ArrayGenerator,
 			new ArrayBuilderGenerator,
-			new SeqGenerator
+			new SeqGenerator,
+			new SeqBuilderGenerator
 		],
 			FNGenerators.generators,
 			EffNGenerators.generators,

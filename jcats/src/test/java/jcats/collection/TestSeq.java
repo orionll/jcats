@@ -3,7 +3,6 @@ package jcats.collection;
 import static jcats.collection.Seq.emptySeq;
 import static org.junit.Assert.*;
 
-import jcats.collection.Seq;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,9 +14,9 @@ public class TestSeq {
 
 	public static final int MAX = (1 << 26) + (1 << 23) + 117;
 
-	private static final int[] ITERATION_INDICES = iterationIndices();
+	private static final int[] TEST_INDICES = testIndices();
 
-	private static int[] iterationIndices() {
+	private static int[] testIndices() {
 		List<Integer> list = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
 			list.add((1 << i) - 1);
@@ -39,8 +38,8 @@ public class TestSeq {
 		return arr;
 	}
 
-	private static boolean shouldIterate(int i) {
-		return Arrays.binarySearch(ITERATION_INDICES, i) >= 0;
+	private static boolean isTestIndex(int i) {
+		return Arrays.binarySearch(TEST_INDICES, i) >= 0;
 	}
 
 	private static void assertElementEquals(final Seq<Integer> seq, final int index, final int expected) {
@@ -72,7 +71,7 @@ public class TestSeq {
 			for (int j = i; j >= 0; j -= step) {
 				assertElementEquals(seq, j, j % 63);
 			}
-			if (shouldIterate(i)) {
+			if (isTestIndex(i)) {
 				int j = 0;
 				for (int e : seq) {
 					if (j == seq.length()) {
@@ -99,7 +98,7 @@ public class TestSeq {
 			for (int j = i; j >= 0; j -= step) {
 				assertElementEquals(seq, j, (i - j) % 63);
 			}
-			if (shouldIterate(i)) {
+			if (isTestIndex(i)) {
 				int j = 0;
 				for (int e : seq) {
 					if (j == seq.length()) {
@@ -130,7 +129,7 @@ public class TestSeq {
 			for (int j = 0; j <= i; j += step) {
 				assertElementEquals(seq, j, j % 61);
 			}
-			if (shouldIterate(i)) {
+			if (isTestIndex(i)) {
 				int j = 0;
 				for (int e : seq) {
 					if (j == seq.length()) {
@@ -161,7 +160,7 @@ public class TestSeq {
 			for (int j = 0; j <= i; j += step) {
 				assertElementEquals(seq, j, (i - j) % 63);
 			}
-			if (shouldIterate(i)) {
+			if (isTestIndex(i)) {
 				int j = 0;
 				for (int e : seq) {
 					if (j == seq.length()) {
@@ -218,6 +217,55 @@ public class TestSeq {
 			for (int j = 0; j <= i; j += step) {
 				assertElementEquals(seq, j, j % 61);
 				assertElementEquals(newSeq, j, (j + 1) % 61);
+			}
+		}
+	}
+
+	@Test
+	public void testSeqBuilder() {
+		Seq<Integer> expectedSeq = emptySeq();
+		SeqBuilder<Integer> builder = new SeqBuilder<>();
+		for (int i = 0; i < MAX; i++) {
+			expectedSeq = expectedSeq.append(i + 17);
+			builder.append(i + 17);
+			if (isTestIndex(i)) {
+				Seq<Integer> seq = builder.build();
+				String msg = ("i = " + i);
+				if (expectedSeq instanceof Seq1<?>) {
+					assertArrayEquals(msg, ((Seq1<?>) expectedSeq).node1, ((Seq1<?>) seq).node1);
+				} else if (expectedSeq instanceof Seq2<?>) {
+					assertArrayEquals(msg, ((Seq2<?>) expectedSeq).init, ((Seq2<?>) seq).init);
+					assertArrayEquals(msg, ((Seq2<?>) expectedSeq).node2, ((Seq2<?>) seq).node2);
+					assertArrayEquals(msg, ((Seq2<?>) expectedSeq).tail, ((Seq2<?>) seq).tail);
+					assertEquals(msg, ((Seq2<?>) expectedSeq).startIndex, ((Seq2<?>) seq).startIndex);
+					assertEquals(msg, ((Seq2<?>) expectedSeq).length, ((Seq2<?>) seq).length);
+				} else if (expectedSeq instanceof Seq3<?>) {
+					assertArrayEquals(msg, ((Seq3<?>) expectedSeq).init, ((Seq3<?>) seq).init);
+					assertArrayEquals(msg, ((Seq3<?>) expectedSeq).node3, ((Seq3<?>) seq).node3);
+					assertArrayEquals(msg, ((Seq3<?>) expectedSeq).tail, ((Seq3<?>) seq).tail);
+					assertEquals(msg, ((Seq3<?>) expectedSeq).startIndex, ((Seq3<?>) seq).startIndex);
+					assertEquals(msg, ((Seq3<?>) expectedSeq).length, ((Seq3<?>) seq).length);
+				} else if (expectedSeq instanceof Seq4<?>) {
+					assertArrayEquals(msg, ((Seq4<?>) expectedSeq).init, ((Seq4<?>) seq).init);
+					assertArrayEquals(msg, ((Seq4<?>) expectedSeq).node4, ((Seq4<?>) seq).node4);
+					assertArrayEquals(msg, ((Seq4<?>) expectedSeq).tail, ((Seq4<?>) seq).tail);
+					assertEquals(msg, ((Seq4<?>) expectedSeq).startIndex, ((Seq4<?>) seq).startIndex);
+					assertEquals(msg, ((Seq4<?>) expectedSeq).length, ((Seq4<?>) seq).length);
+				} else if (expectedSeq instanceof Seq5<?>) {
+					assertArrayEquals(msg, ((Seq5<?>) expectedSeq).init, ((Seq5<?>) seq).init);
+					assertArrayEquals(msg, ((Seq5<?>) expectedSeq).node5, ((Seq5<?>) seq).node5);
+					assertArrayEquals(msg, ((Seq5<?>) expectedSeq).tail, ((Seq5<?>) seq).tail);
+					assertEquals(msg, ((Seq5<?>) expectedSeq).startIndex, ((Seq5<?>) seq).startIndex);
+					assertEquals(msg, ((Seq5<?>) expectedSeq).length, ((Seq5<?>) seq).length);
+				} else if (expectedSeq instanceof Seq6<?>) {
+					assertArrayEquals(msg, ((Seq6<?>) expectedSeq).init, ((Seq6<?>) seq).init);
+					assertArrayEquals(msg, ((Seq6<?>) expectedSeq).node6, ((Seq6<?>) seq).node6);
+					assertArrayEquals(msg, ((Seq6<?>) expectedSeq).tail, ((Seq6<?>) seq).tail);
+					assertEquals(msg, ((Seq6<?>) expectedSeq).startIndex, ((Seq6<?>) seq).startIndex);
+					assertEquals(msg, ((Seq6<?>) expectedSeq).length, ((Seq6<?>) seq).length);
+				} else {
+					fail();
+				}
 			}
 		}
 	}

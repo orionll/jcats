@@ -165,6 +165,10 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			«cast(#["A"], #[], #["A"])»
+
+			public static <A> SeqBuilder<A> seqBuilder() {
+				return new SeqBuilder<>();
+			}
 		}
 
 		final class Seq0<A> extends Seq<A> {
@@ -217,7 +221,7 @@ final class SeqGenerator implements ClassGenerator {
 		}
 
 		final class Seq1<A> extends Seq<A> {
-			private final Object[] node1;
+			final Object[] node1;
 
 			Seq1(final Object[] node1) {
 				this.node1 = node1;
@@ -297,11 +301,11 @@ final class SeqGenerator implements ClassGenerator {
 		}
 
 		final class Seq2<A> extends Seq<A> {
-			private final Object[][] node2;
-			private final Object[] init;
-			private final Object[] tail;
-			private final int startIndex;
-			private final int length;
+			final Object[][] node2;
+			final Object[] init;
+			final Object[] tail;
+			final int startIndex;
+			final int length;
 
 			Seq2(final Object[][] node2, final Object[] init, final Object[] tail, final int startIndex, final int length) {
 				this.node2 = node2;
@@ -447,11 +451,11 @@ final class SeqGenerator implements ClassGenerator {
 		}
 
 		final class Seq3<A> extends Seq<A> {
-			private final Object[][][] node3;
-			private final int startIndex;
-			private final Object[] init;
-			private final Object[] tail;
-			private final int length;
+			final Object[][][] node3;
+			final int startIndex;
+			final Object[] init;
+			final Object[] tail;
+			final int length;
 
 			Seq3(final Object[][][] node3, final Object[] init, final Object[] tail, final int startIndex, final int length) {
 				this.node3 = node3;
@@ -650,11 +654,11 @@ final class SeqGenerator implements ClassGenerator {
 		}
 
 		final class Seq4<A> extends Seq<A> {
-			private final Object[][][][] node4;
-			private final Object[] init;
-			private final Object[] tail;
-			private final int startIndex;
-			private final int length;
+			final Object[][][][] node4;
+			final Object[] init;
+			final Object[] tail;
+			final int startIndex;
+			final int length;
 
 			Seq4(final Object[][][][] node4, final Object[] init, final Object[] tail, final int startIndex, final int length) {
 				this.node4 = node4;
@@ -910,11 +914,11 @@ final class SeqGenerator implements ClassGenerator {
 		}
 
 		final class Seq5<A> extends Seq<A> {
-			private final Object[][][][][] node5;
-			private final Object[] init;
-			private final Object[] tail;
-			private final int startIndex;
-			private final int length;
+			final Object[][][][][] node5;
+			final Object[] init;
+			final Object[] tail;
+			final int startIndex;
+			final int length;
 
 			Seq5(final Object[][][][][] node5, final Object[] init, final Object[] tail, final int startIndex, final int length) {
 				this.node5 = node5;
@@ -1234,11 +1238,11 @@ final class SeqGenerator implements ClassGenerator {
 		}
 
 		final class Seq6<A> extends Seq<A> {
-			private final Object[][][][][][] node6;
-			private final Object[] init;
-			private final Object[] tail;
-			private final int startIndex;
-			private final int length;
+			final Object[][][][][][] node6;
+			final Object[] init;
+			final Object[] tail;
+			final int startIndex;
+			final int length;
 
 			Seq6(final Object[][][][][][] node6, final Object[] init, final Object[] tail, final int startIndex, final int length) {
 				this.node6 = node6;
