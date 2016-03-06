@@ -139,6 +139,8 @@ final class SeqGenerator implements ClassGenerator {
 				return new Seq1<>(node1);
 			}
 
+			«join»
+
 			«hashcode»
 
 			@Override
