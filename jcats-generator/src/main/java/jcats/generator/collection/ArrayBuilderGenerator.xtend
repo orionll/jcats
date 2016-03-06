@@ -104,6 +104,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			 * O(iterable.size)
 			 */
 			public ArrayBuilder<A> appendAll(final Iterable<A> iterable) {
+				requireNonNull(iterable);
 				if (iterable instanceof Array) {
 					return appendArray(((Array<A>) iterable).array);
 				}

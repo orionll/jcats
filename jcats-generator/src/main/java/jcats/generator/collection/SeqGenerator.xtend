@@ -102,6 +102,34 @@ final class SeqGenerator implements ClassGenerator {
 
 			public abstract <B> Seq<B> map(final F<A, B> f);
 
+			public <B> Seq<B> flatMap(final F<A, Seq<B>> f) {
+				requireNonNull(f);
+				if (isEmpty()) {
+					return emptySeq();
+				} else {
+					final SeqBuilder<B> builder = new SeqBuilder<>();
+					for (final A value : this) {
+						builder.appendAll(f.apply(value));
+					}
+					return builder.build();
+				}
+			}
+
+			public Seq<A> filter(final Predicate<A> predicate) {
+				requireNonNull(predicate);
+				if (isEmpty()) {
+					return emptySeq();
+				} else {
+					final SeqBuilder<A> builder = new SeqBuilder<>();
+					for (final Object value : this) {
+						if (predicate.test((A) value)) {
+							builder.append((A) value);
+						}
+					}
+					return builder.build();
+				}
+			}
+
 			public static <A> Seq<A> emptySeq() {
 				return Seq.EMPTY;
 			}

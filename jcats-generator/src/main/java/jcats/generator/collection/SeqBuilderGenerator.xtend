@@ -130,6 +130,21 @@ final class SeqBuilderGenerator implements ClassGenerator {
 				return this;
 			}
 
+			public SeqBuilder<A> appendAll(final Iterable<A> iterable) {
+				for (final A value : iterable) {
+					append(value);
+				}
+				return this;
+			}
+
+			public boolean isEmpty() {
+				return (size == 0);
+			}
+
+			public int length() {
+				return size;
+			}
+
 			public Seq<A> build() {
 				if (node1 == null) {
 					return emptySeq();
