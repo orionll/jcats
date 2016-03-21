@@ -3,6 +3,7 @@ package jcats.collection;
 import static jcats.collection.Seq.emptySeq;
 import static org.junit.Assert.*;
 
+import com.google.common.collect.Iterables;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -266,6 +267,20 @@ public class TestSeq {
 				} else {
 					fail();
 				}
+			}
+		}
+	}
+
+	@Test
+	public void testSeqFromArray() {
+		List<Integer> list = new ArrayList<>();
+
+		for (int i = 0; i < MAX; i++) {
+			list.add(i % 63);
+			if (isTestIndex(i)) {
+				Seq<Integer> seq = Seq.seq(list.toArray(new Integer[0]));
+				assertEquals(list.size(), seq.length());
+				assertTrue("Elements not equal for size = " + list.size(), Iterables.elementsEqual(list, seq));
 			}
 		}
 	}

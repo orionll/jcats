@@ -139,6 +139,260 @@ final class SeqGenerator implements ClassGenerator {
 				return new Seq1<>(node1);
 			}
 
+			@SafeVarargs
+			public static <A> Seq<A> seq(final A... values) {
+				if (values.length == 0) {
+					return emptySeq();
+				} else {
+					for (final Object value : values) {
+						requireNonNull(value);
+					}
+					if (values.length <= 32) {
+						return seq1FromArray(values);
+					} else if (values.length <= (1 << 10)) {
+						return seq2FromArray(values);
+					} else if (values.length <= (1 << 15)) {
+						return seq3FromArray(values);
+					} else if (values.length <= (1 << 20)) {
+						return seq4FromArray(values);
+					} else if (values.length <= (1 << 25)) {
+						return seq5FromArray(values);
+					} else if (values.length <= (1 << 30)) {
+						return seq6FromArray(values);
+					} else {
+						throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					}
+				}
+			}
+
+			private static <A> Seq<A> seq1FromArray(final Object[] values) {
+				final Object[] node1 = new Object[values.length];
+				System.arraycopy(values, 0, node1, 0, values.length);
+				return new Seq1<>(node1);
+			}
+
+			private static <A> Seq<A> seq2FromArray(final Object[] values) {
+				final Object[] init = initFromArray(values);
+				if (values.length <= 64) {
+					final Object[] tail = new Object[values.length - 32];
+					System.arraycopy(values, 32, tail, 0, values.length - 32);
+					return new Seq2<>(EMPTY_NODE2, init, tail, 0, values.length);
+				} else {
+					final Object[] tail = tailFromArray(values);
+					final Object[][] node2 = new Object[(values.length - 32 - tail.length) / 32][32];
+					int index = 32;
+					for (final Object[] node1 : node2) {
+						System.arraycopy(values, index, node1, 0, 32);
+						index += 32;
+					}
+					return new Seq2<>(node2, init, tail, 0, values.length);
+				}
+			}
+
+			private static <A> Seq<A> seq3FromArray(final Object[] values) {
+				final Object[] init = initFromArray(values);
+				final Object[] tail = tailFromArray(values);
+				final int size3 = (values.length % (1 << 10) == 0) ? values.length / (1 << 10) : values.length / (1 << 10) + 1;
+				final Object[][][] node3 = new Object[size3][][];
+				int index = 32;
+				for (int index3 = 0; index3 < node3.length; index3++) {
+					final int size2;
+					if (index3 == 0) {
+						size2 = 31;
+					} else if (index3 < node3.length - 1) {
+						size2 = 32;
+					} else {
+						final int totalSize2 = (values.length % (1 << 10) == 0) ? (1 << 10) : values.length % (1 << 10);
+						size2 = (totalSize2 % 32 == 0) ? totalSize2 / 32 - 1 : totalSize2 / 32;
+					}
+					final Object[][] node2 = (size2 == 0) ? EMPTY_NODE2 : new Object[size2][32];
+					node3[index3] = node2;
+					for (final Object[] node1 : node2) {
+						System.arraycopy(values, index, node1, 0, 32);
+						index += 32;
+					}
+				}
+				return new Seq3<>(node3, init, tail, 0, values.length);
+			}
+
+			private static <A> Seq<A> seq4FromArray(final Object[] values) {
+				final Object[] init = initFromArray(values);
+				final Object[] tail = tailFromArray(values);
+				final int size4 = (values.length % (1 << 15) == 0) ? values.length / (1 << 15) : values.length / (1 << 15) + 1;
+				final Object[][][][] node4 = new Object[size4][][][];
+				int index = 32;
+				for (int index4 = 0; index4 < node4.length; index4++) {
+					final int size3;
+					if (index4 == node4.length - 1) {
+						final int totalSize3 = (values.length % (1 << 15) == 0) ? (1 << 15) : values.length % (1 << 15);
+						size3 = (totalSize3 % (1 << 10) == 0) ? totalSize3 / (1 << 10) : totalSize3 / (1 << 10) + 1;
+					} else {
+						size3 = 32;
+					}
+
+					final Object[][][] node3 = new Object[size3][][];
+					node4[index4] = node3;
+
+					for (int index3 = 0; index3 < node3.length; index3++) {
+						final int size2;
+						if (index4 == 0 && index3 == 0) {
+							size2 = 31;
+						} else if (index4 < node4.length - 1 || index3 < node3.length - 1) {
+							size2 = 32;
+						} else {
+							final int totalSize3 = (values.length % (1 << 15) == 0) ? (1 << 15) : values.length % (1 << 15);
+							final int totalSize2 = (totalSize3 % (1 << 10) == 0) ? (1 << 10) : totalSize3 % (1 << 10);
+							size2 = (totalSize2 % 32 == 0) ? totalSize2 / 32 - 1 : totalSize2 / 32;
+						}
+						final Object[][] node2 = (size2 == 0) ? EMPTY_NODE2 : new Object[size2][32];
+						node3[index3] = node2;
+						for (final Object[] node1 : node2) {
+							System.arraycopy(values, index, node1, 0, 32);
+							index += 32;
+						}
+					}
+				}
+				return new Seq4<>(node4, init, tail, 0, values.length);
+			}
+
+			private static <A> Seq<A> seq5FromArray(final Object[] values) {
+				final Object[] init = initFromArray(values);
+				final Object[] tail = tailFromArray(values);
+				final int size5 = (values.length % (1 << 20) == 0) ? values.length / (1 << 20) : values.length / (1 << 20) + 1;
+				final Object[][][][][] node5 = new Object[size5][][][][];
+				int index = 32;
+				for (int index5 = 0; index5 < node5.length; index5++) {
+					final int size4;
+					if (index5 == node5.length - 1) {
+						final int totalSize4 = (values.length % (1 << 20) == 0) ? (1 << 20) : values.length % (1 << 20);
+						size4 = (totalSize4 % (1 << 15) == 0) ? totalSize4 / (1 << 15) : totalSize4 / (1 << 15) + 1;
+					} else {
+						size4 = 32;
+					}
+
+					final Object[][][][] node4 = new Object[size4][][][];
+					node5[index5] = node4;
+
+					for (int index4 = 0; index4 < node4.length; index4++) {
+						final int size3;
+						if (index5 == node5.length - 1 && index4 == node4.length - 1) {
+							final int totalSize4 = (values.length % (1 << 20) == 0) ? (1 << 20) : values.length % (1 << 20);
+							final int totalSize3 = (totalSize4 % (1 << 15) == 0) ? (1 << 15) : totalSize4 % (1 << 15);
+							size3 = (totalSize3 % (1 << 10) == 0) ? totalSize3 / (1 << 10) : totalSize3 / (1 << 10) + 1;
+						} else {
+							size3 = 32;
+						}
+
+						final Object[][][] node3 = new Object[size3][][];
+						node4[index4] = node3;
+
+						for (int index3 = 0; index3 < node3.length; index3++) {
+							final int size2;
+							if (index5 == 0 && index4 == 0 && index3 == 0) {
+								size2 = 31;
+							} else if (index5 < node5.length - 1 || index4 < node4.length - 1 || index3 < node3.length - 1) {
+								size2 = 32;
+							} else {
+								final int totalSize4 = (values.length % (1 << 20) == 0) ? (1 << 20) : values.length % (1 << 20);
+								final int totalSize3 = (totalSize4 % (1 << 15) == 0) ? (1 << 15) : totalSize4 % (1 << 15);
+								final int totalSize2 = (totalSize3 % (1 << 10) == 0) ? (1 << 10) : totalSize3 % (1 << 10);
+								size2 = (totalSize2 % 32 == 0) ? totalSize2 / 32 - 1 : totalSize2 / 32;
+							}
+							final Object[][] node2 = (size2 == 0) ? EMPTY_NODE2 : new Object[size2][32];
+							node3[index3] = node2;
+							for (final Object[] node1 : node2) {
+								System.arraycopy(values, index, node1, 0, 32);
+								index += 32;
+							}
+						}
+					}
+				}
+				return new Seq5<>(node5, init, tail, 0, values.length);
+			}
+
+			private static <A> Seq<A> seq6FromArray(final Object[] values) {
+				final Object[] init = initFromArray(values);
+				final Object[] tail = tailFromArray(values);
+				final int size6 = (values.length % (1 << 25) == 0) ? values.length / (1 << 25) : values.length / (1 << 25) + 1;
+				final Object[][][][][][] node6 = new Object[size6][][][][][];
+				int index = 32;
+				for (int index6 = 0; index6 < node6.length; index6++) {
+					final int size5;
+					if (index6 == node6.length - 1) {
+						final int totalSize5 = (values.length % (1 << 25) == 0) ? (1 << 25) : values.length % (1 << 25);
+						size5 = (totalSize5 % (1 << 20) == 0) ? totalSize5 / (1 << 20) : totalSize5 / (1 << 20) + 1;
+					} else {
+						size5 = 32;
+					}
+
+					final Object[][][][][] node5 = new Object[size5][][][][];
+					node6[index6] = node5;
+
+					for (int index5 = 0; index5 < node5.length; index5++) {
+						final int size4;
+						if (index6 == node6.length - 1 && index5 == node5.length - 1) {
+							final int totalSize5 = (values.length % (1 << 25) == 0) ? (1 << 25) : values.length % (1 << 25);
+							final int totalSize4 = (totalSize5 % (1 << 20) == 0) ? (1 << 20) : totalSize5 % (1 << 20);
+							size4 = (totalSize4 % (1 << 15) == 0) ? totalSize4 / (1 << 15) : totalSize4 / (1 << 15) + 1;
+						} else {
+							size4 = 32;
+						}
+
+						final Object[][][][] node4 = new Object[size4][][][];
+						node5[index5] = node4;
+
+						for (int index4 = 0; index4 < node4.length; index4++) {
+							final int size3;
+							if (index6 == node6.length - 1 && index5 == node5.length - 1 && index4 == node4.length - 1) {
+								final int totalSize5 = (values.length % (1 << 25) == 0) ? (1 << 25) : values.length % (1 << 25);
+								final int totalSize4 = (totalSize5 % (1 << 20) == 0) ? (1 << 20) : totalSize5 % (1 << 20);
+								final int totalSize3 = (totalSize4 % (1 << 15) == 0) ? (1 << 15) : totalSize4 % (1 << 15);
+								size3 = (totalSize3 % (1 << 10) == 0) ? totalSize3 / (1 << 10) : totalSize3 / (1 << 10) + 1;
+							} else {
+								size3 = 32;
+							}
+
+							final Object[][][] node3 = new Object[size3][][];
+							node4[index4] = node3;
+
+							for (int index3 = 0; index3 < node3.length; index3++) {
+								final int size2;
+								if (index6 == 0 && index5 == 0 && index4 == 0 && index3 == 0) {
+									size2 = 31;
+								} else if (index6 < node6.length - 1 || index5 < node5.length - 1 || index4 < node4.length - 1 || index3 < node3.length - 1) {
+									size2 = 32;
+								} else {
+									final int totalSize5 = (values.length % (1 << 25) == 0) ? (1 << 25) : values.length % (1 << 25);
+									final int totalSize4 = (totalSize5 % (1 << 20) == 0) ? (1 << 20) : totalSize5 % (1 << 20);
+									final int totalSize3 = (totalSize4 % (1 << 15) == 0) ? (1 << 15) : totalSize4 % (1 << 15);
+									final int totalSize2 = (totalSize3 % (1 << 10) == 0) ? (1 << 10) : totalSize3 % (1 << 10);
+									size2 = (totalSize2 % 32 == 0) ? totalSize2 / 32 - 1 : totalSize2 / 32;
+								}
+								final Object[][] node2 = (size2 == 0) ? EMPTY_NODE2 : new Object[size2][32];
+								node3[index3] = node2;
+								for (final Object[] node1 : node2) {
+									System.arraycopy(values, index, node1, 0, 32);
+									index += 32;
+								}
+							}
+						}
+					}
+				}
+				return new Seq6<>(node6, init, tail, 0, values.length);
+			}
+
+			private static Object[] initFromArray(final Object[] values) {
+				final Object[] init = new Object[32];
+				System.arraycopy(values, 0, init, 0, 32);
+				return init;
+			}
+
+			private static Object[] tailFromArray(final Object[] values) {
+				final Object[] tail = new Object[((values.length % 32) == 0) ? 32 : values.length % 32];
+				System.arraycopy(values, values.length - tail.length, tail, 0, tail.length);
+				return tail;
+			}
+
 			«join»
 
 			«hashcode»
