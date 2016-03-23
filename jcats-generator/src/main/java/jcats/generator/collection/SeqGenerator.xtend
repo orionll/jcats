@@ -395,6 +395,19 @@ final class SeqGenerator implements ClassGenerator {
 
 			«join»
 
+			@Override
+			public Spliterator<A> spliterator() {
+				return isEmpty() ? emptySpliterator() : Spliterators.spliterator(iterator(), length(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
+			}
+
+			public Stream<A> stream() {
+				return StreamSupport.stream(spliterator(), false);
+			}
+
+			public Stream<A> parallelStream() {
+				return StreamSupport.stream(spliterator(), true);
+			}
+
 			«hashcode»
 
 			@Override
