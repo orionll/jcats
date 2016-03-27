@@ -85,6 +85,11 @@ final class SeqGenerator implements ClassGenerator {
 			public abstract Seq<A> init();
 
 			/**
+			 * O(1)
+			 */
+			public abstract Seq<A> tail();
+
+			/**
 			 * O(log(size))
 			 */
 			@Override
@@ -495,6 +500,11 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public Seq<A> tail() {
+				throw new NoSuchElementException();
+			}
+
+			@Override
 			public A get(final int index) {
 				throw new IndexOutOfBoundsException(Integer.toString(index));
 			}
@@ -556,6 +566,17 @@ final class SeqGenerator implements ClassGenerator {
 				} else {
 					final Object[] newNode1 = new Object[node1.length - 1];
 					System.arraycopy(node1, 0, newNode1, 0, node1.length - 1);
+					return new Seq1<>(newNode1);
+				}
+			}
+
+			@Override
+			public Seq<A> tail() {
+				if (node1.length == 1) {
+					return emptySeq();
+				} else {
+					final Object[] newNode1 = new Object[node1.length - 1];
+					System.arraycopy(node1, 1, newNode1, 0, node1.length - 1);
 					return new Seq1<>(newNode1);
 				}
 			}
@@ -664,6 +685,25 @@ final class SeqGenerator implements ClassGenerator {
 					final Object[] newTail = new Object[tail.length - 1];
 					System.arraycopy(tail, 0, newTail, 0, tail.length - 1);
 					return new Seq2<>(node2, init, newTail, startIndex, length - 1);
+				}
+			}
+
+			@Override
+			public Seq<A> tail() {
+				if (init.length == 1) {
+					if (node2.length == 0) {
+						return new Seq1<>(tail);
+					} else if (node2.length == 1) {
+						return new Seq2<>(EMPTY_NODE2, node2[0], tail, 0, length - 1);
+					} else {
+						final Object[][] newNode2 = new Object[node2.length - 1][];
+						System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+						return new Seq2<>(newNode2, node2[0], tail, 0, length - 1);
+					}
+				} else {
+					final Object[] newInit = new Object[init.length - 1];
+					System.arraycopy(init, 1, newInit, 0, init.length - 1);
+					return new Seq2<>(node2, newInit, tail, startIndex + 1, length - 1);
 				}
 			}
 
@@ -852,6 +892,44 @@ final class SeqGenerator implements ClassGenerator {
 					final Object[] newTail = new Object[tail.length - 1];
 					System.arraycopy(tail, 0, newTail, 0, tail.length - 1);
 					return new Seq3<>(node3, init, newTail, startIndex, length - 1);
+				}
+			}
+
+			@Override
+			public Seq<A> tail() {
+				if (init.length == 1) {
+					final Object[][] firstNode2 = node3[0];
+					if (firstNode2.length == 0) {
+						if (node3.length == 2) {
+							final Object[][] node2 = node3[1];
+							final Object[][] newNode2 = new Object[node2.length - 1][];
+							System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+							return new Seq2<>(newNode2, node2[0], tail, 0, length - 1);
+						} else {
+							final Object[][][] newNode3 = new Object[node3.length - 1][][];
+							System.arraycopy(node3, 2, newNode3, 1, node3.length - 2);
+							final Object[][] node2 = node3[1];
+							final Object[][] newNode2 = new Object[node2.length - 1][];
+							System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+							newNode3[0] = newNode2;
+							return new Seq3<>(newNode3, node2[0], tail, 0, length - 1);
+						}
+					} else {
+						final Object[][][] newNode3 = node3.clone();
+						final Object[][] newNode2;
+						if (firstNode2.length == 1) {
+							newNode2 = EMPTY_NODE2;
+						} else {
+							newNode2 = new Object[firstNode2.length - 1][];
+							System.arraycopy(firstNode2, 1, newNode2, 0, firstNode2.length - 1);
+						}
+						newNode3[0] = newNode2;
+						return new Seq3<>(newNode3, firstNode2[0], tail, startIndex + 1, length - 1);
+					}
+				} else {
+					final Object[] newInit = new Object[init.length - 1];
+					System.arraycopy(init, 1, newInit, 0, init.length - 1);
+					return new Seq3<>(node3, newInit, tail, startIndex + 1, length - 1);
 				}
 			}
 
@@ -1114,6 +1192,65 @@ final class SeqGenerator implements ClassGenerator {
 					final Object[] newTail = new Object[tail.length - 1];
 					System.arraycopy(tail, 0, newTail, 0, tail.length - 1);
 					return new Seq4<>(node4, init, newTail, startIndex, length - 1);
+				}
+			}
+
+			@Override
+			public Seq<A> tail() {
+				if (init.length == 1) {
+					final Object[][][] firstNode3 = node4[0];
+					final Object[][] firstNode2 = firstNode3[0];
+					if (firstNode2.length == 0) {
+						if (firstNode3.length == 1) {
+							if (node4.length == 2) {
+								final Object[][][] node3 = node4[1];
+								final Object[][][] newNode3 = node3.clone();
+								final Object[][] node2 = node3[0];
+								final Object[][] newNode2 = new Object[node2.length - 1][];
+								System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+								newNode3[0] = newNode2;
+								return new Seq3<>(newNode3, node2[0], tail, 0, length - 1);
+							} else{
+								final Object[][][][] newNode4 = new Object[node4.length - 1][][][];
+								System.arraycopy(node4, 2, newNode4, 1, node4.length - 2);
+								final Object[][][] node3 = node4[1];
+								final Object[][][] newNode3 = node3.clone();
+								newNode4[0] = newNode3;
+								final Object[][] node2 = node3[0];
+								final Object[][] newNode2 = new Object[node2.length - 1][];
+								System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+								newNode3[0] = newNode2;
+								return new Seq4<>(newNode4, node2[0], tail, 0, length - 1);
+							}
+						} else {
+							final Object[][][][] newNode4 = node4.clone();
+							final Object[][][] newNode3 = new Object[firstNode3.length - 1][][];
+							System.arraycopy(firstNode3, 2, newNode3, 1, firstNode3.length - 2);
+							newNode4[0] = newNode3;
+							final Object[][] node2 = firstNode3[1];
+							final Object[][] newNode2 = new Object[node2.length - 1][];
+							System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+							newNode3[0] = newNode2;
+							return new Seq4<>(newNode4, node2[0], tail, startIndex + 1, length - 1);
+						}
+					} else {
+						final Object[][][][] newNode4 = node4.clone();
+						final Object[][][] newNode3 = firstNode3.clone();
+						newNode4[0] = newNode3;
+						final Object[][] newNode2;
+						if (firstNode2.length == 1) {
+							newNode2 = EMPTY_NODE2;
+						} else {
+							newNode2 = new Object[firstNode2.length - 1][];
+							System.arraycopy(firstNode2, 1, newNode2, 0, firstNode2.length - 1);
+						}
+						newNode3[0] = newNode2;
+						return new Seq4<>(newNode4, firstNode2[0], tail, startIndex + 1, length - 1);
+					}
+				} else {
+					final Object[] newInit = new Object[init.length - 1];
+					System.arraycopy(init, 1, newInit, 0, init.length - 1);
+					return new Seq4<>(node4, newInit, tail, startIndex + 1, length - 1);
 				}
 			}
 
@@ -1459,6 +1596,91 @@ final class SeqGenerator implements ClassGenerator {
 					final Object[] newTail = new Object[tail.length - 1];
 					System.arraycopy(tail, 0, newTail, 0, tail.length - 1);
 					return new Seq5<>(node5, init, newTail, startIndex, length - 1);
+				}
+			}
+
+			@Override
+			public Seq<A> tail() {
+				if (init.length == 1) {
+					final Object[][][][] firstNode4 = node5[0];
+					final Object[][][] firstNode3 = firstNode4[0];
+					final Object[][] firstNode2 = firstNode3[0];
+					if (firstNode2.length == 0) {
+						if (firstNode3.length == 1) {
+							if (firstNode4.length == 1) {
+								if (node5.length == 2) {
+									final Object[][][][] node4 = node5[1];
+									final Object[][][][] newNode4 = node4.clone();
+									final Object[][][] node3 = node4[0];
+									final Object[][][] newNode3 = node3.clone();
+									newNode4[0] = newNode3;
+									final Object[][] node2 = node3[0];
+									final Object[][] newNode2 = new Object[node2.length - 1][];
+									System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+									newNode3[0] = newNode2;
+									return new Seq4<>(newNode4, node2[0], tail, 0, length - 1);
+								} else {
+									final Object[][][][][] newNode5 = new Object[node5.length - 1][][][][];
+									System.arraycopy(node5, 2, newNode5, 1, node5.length - 2);
+									final Object[][][][] node4 = node5[1];
+									final Object[][][][] newNode4 = node4.clone();
+									newNode5[0] = newNode4;
+									final Object[][][] node3 = node4[0];
+									final Object[][][] newNode3 = node3.clone();
+									newNode4[0] = newNode3;
+									final Object[][] node2 = node3[0];
+									final Object[][] newNode2 = new Object[node2.length - 1][];
+									System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+									newNode3[0] = newNode2;
+									return new Seq5<>(newNode5, node2[0], tail, 0, length - 1);
+								}
+							} else {
+								final Object[][][][][] newNode5 = node5.clone();
+								final Object[][][][] newNode4 = new Object[firstNode4.length - 1][][][];
+								System.arraycopy(firstNode4, 2, newNode4, 1, firstNode4.length - 2);
+								newNode5[0] = newNode4;
+								final Object[][][] node3 = firstNode4[1];
+								final Object[][][] newNode3 = node3.clone();
+								newNode4[0] = newNode3;
+								final Object[][] node2 = node3[0];
+								final Object[][] newNode2 = new Object[node2.length - 1][];
+								System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+								newNode3[0] = newNode2;
+								return new Seq5<>(newNode5, node2[0], tail, startIndex + 1, length - 1);
+							}
+						} else {
+							final Object[][][][][] newNode5 = node5.clone();
+							final Object[][][][] newNode4 = firstNode4.clone();
+							newNode5[0] = newNode4;
+							final Object[][][] newNode3 = new Object[firstNode3.length - 1][][];
+							System.arraycopy(firstNode3, 2, newNode3, 1, firstNode3.length - 2);
+							newNode4[0] = newNode3;
+							final Object[][] node2 = firstNode3[1];
+							final Object[][] newNode2 = new Object[node2.length - 1][];
+							System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+							newNode3[0] = newNode2;
+							return new Seq5<>(newNode5, node2[0], tail, startIndex + 1, length - 1);
+						}
+					} else {
+						final Object[][][][][] newNode5 = node5.clone();
+						final Object[][][][] newNode4 = firstNode4.clone();
+						newNode5[0] = newNode4;
+						final Object[][][] newNode3 = firstNode3.clone();
+						newNode4[0] = newNode3;
+						final Object[][] newNode2;
+						if (firstNode2.length == 1) {
+							newNode2 = EMPTY_NODE2;
+						} else {
+							newNode2 = new Object[firstNode2.length - 1][];
+							System.arraycopy(firstNode2, 1, newNode2, 0, firstNode2.length - 1);
+						}
+						newNode3[0] = newNode2;
+						return new Seq5<>(newNode5, firstNode2[0], tail, startIndex + 1, length - 1);
+					}
+				} else {
+					final Object[] newInit = new Object[init.length - 1];
+					System.arraycopy(init, 1, newInit, 0, init.length - 1);
+					return new Seq5<>(node5, newInit, tail, startIndex + 1, length - 1);
 				}
 			}
 
@@ -1899,6 +2121,122 @@ final class SeqGenerator implements ClassGenerator {
 					final Object[] newTail = new Object[tail.length - 1];
 					System.arraycopy(tail, 0, newTail, 0, tail.length - 1);
 					return new Seq6<>(node6, init, newTail, startIndex, length - 1);
+				}
+			}
+
+			@Override
+			public Seq<A> tail() {
+				if (init.length == 1) {
+					final Object[][][][][] firstNode5 = node6[0];
+					final Object[][][][] firstNode4 = firstNode5[0];
+					final Object[][][] firstNode3 = firstNode4[0];
+					final Object[][] firstNode2 = firstNode3[0];
+					if (firstNode2.length == 0) {
+						if (firstNode3.length == 1) {
+							if (firstNode4.length == 1) {
+								if (firstNode5.length == 1) {
+									if (node6.length == 2) {
+										final Object[][][][][] node5 = node6[1];
+										final Object[][][][][] newNode5 = node5.clone();
+										final Object[][][][] node4 = node5[0];
+										final Object[][][][] newNode4 = node4.clone();
+										newNode5[0] = newNode4;
+										final Object[][][] node3 = node4[0];
+										final Object[][][] newNode3 = node3.clone();
+										newNode4[0] = newNode3;
+										final Object[][] node2 = node3[0];
+										final Object[][] newNode2 = new Object[node2.length - 1][];
+										System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+										newNode3[0] = newNode2;
+										return new Seq5<>(newNode5, node2[0], tail, 0, length - 1);
+									} else {
+										final Object[][][][][][] newNode6 = new Object[node6.length - 1][][][][][];
+										System.arraycopy(node6, 2, newNode6, 1, node6.length - 2);
+										final Object[][][][][] node5 = node6[1];
+										final Object[][][][][] newNode5 = node5.clone();
+										newNode6[0] = newNode5;
+										final Object[][][][] node4 = node5[0];
+										final Object[][][][] newNode4 = node4.clone();
+										newNode5[0] = newNode4;
+										final Object[][][] node3 = node4[0];
+										final Object[][][] newNode3 = node3.clone();
+										newNode4[0] = newNode3;
+										final Object[][] node2 = node3[0];
+										final Object[][] newNode2 = new Object[node2.length - 1][];
+										System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+										newNode3[0] = newNode2;
+										return new Seq6<>(newNode6, node2[0], tail, 0, length - 1);
+									}
+								} else {
+									final Object[][][][][][] newNode6 = node6.clone();
+									final Object[][][][][] newNode5 = new Object[firstNode5.length - 1][][][][];
+									System.arraycopy(firstNode5, 2, newNode5, 1, firstNode5.length - 2);
+									newNode6[0] = newNode5;
+									final Object[][][][] node4 = firstNode5[1];
+									final Object[][][][] newNode4 = node4.clone();
+									newNode5[0] = newNode4;
+									final Object[][][] node3 = node4[0];
+									final Object[][][] newNode3 = node3.clone();
+									newNode4[0] = newNode3;
+									final Object[][] node2 = node3[0];
+									final Object[][] newNode2 = new Object[node2.length - 1][];
+									System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+									newNode3[0] = newNode2;
+									return new Seq6<>(newNode6, node2[0], tail, startIndex + 1, length - 1);
+								}
+							} else {
+								final Object[][][][][][] newNode6 = node6.clone();
+								final Object[][][][][] newNode5 = firstNode5.clone();
+								newNode6[0] = newNode5;
+								final Object[][][][] newNode4 = new Object[firstNode4.length - 1][][][];
+								System.arraycopy(firstNode4, 2, newNode4, 1, firstNode4.length - 2);
+								newNode5[0] = newNode4;
+								final Object[][][] node3 = firstNode4[1];
+								final Object[][][] newNode3 = node3.clone();
+								newNode4[0] = newNode3;
+								final Object[][] node2 = node3[0];
+								final Object[][] newNode2 = new Object[node2.length - 1][];
+								System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+								newNode3[0] = newNode2;
+								return new Seq6<>(newNode6, node2[0], tail, startIndex + 1, length - 1);
+							}
+						} else {
+							final Object[][][][][][] newNode6 = node6.clone();
+							final Object[][][][][] newNode5 = firstNode5.clone();
+							newNode6[0] = newNode5;
+							final Object[][][][] newNode4 = firstNode4.clone();
+							newNode5[0] = newNode4;
+							final Object[][][] newNode3 = new Object[firstNode3.length - 1][][];
+							System.arraycopy(firstNode3, 2, newNode3, 1, firstNode3.length - 2);
+							newNode4[0] = newNode3;
+							final Object[][] node2 = firstNode3[1];
+							final Object[][] newNode2 = new Object[node2.length - 1][];
+							System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
+							newNode3[0] = newNode2;
+							return new Seq6<>(newNode6, node2[0], tail, startIndex + 1, length - 1);
+						}
+					} else {
+						final Object[][][][][][] newNode6 = node6.clone();
+						final Object[][][][][] newNode5 = firstNode5.clone();
+						newNode6[0] = newNode5;
+						final Object[][][][] newNode4 = firstNode4.clone();
+						newNode5[0] = newNode4;
+						final Object[][][] newNode3 = firstNode3.clone();
+						newNode4[0] = newNode3;
+						final Object[][] newNode2;
+						if (firstNode2.length == 1) {
+							newNode2 = EMPTY_NODE2;
+						} else {
+							newNode2 = new Object[firstNode2.length - 1][];
+							System.arraycopy(firstNode2, 1, newNode2, 0, firstNode2.length - 1);
+						}
+						newNode3[0] = newNode2;
+						return new Seq6<>(newNode6, firstNode2[0], tail, startIndex + 1, length - 1);
+					}
+				} else {
+					final Object[] newInit = new Object[init.length - 1];
+					System.arraycopy(init, 1, newInit, 0, init.length - 1);
+					return new Seq6<>(node6, newInit, tail, startIndex + 1, length - 1);
 				}
 			}
 

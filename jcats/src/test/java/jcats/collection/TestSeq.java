@@ -13,7 +13,7 @@ import java.util.List;
 
 public class TestSeq {
 
-	public static final int MAX = (1 << 26) + (1 << 23) + 117;
+	public static final int MAX = (1 << 23) + (1 << 23) + 117;
 
 	private static final int[] TEST_INDICES = testIndices();
 
@@ -53,42 +53,46 @@ public class TestSeq {
 	}
 
 	private static <A> void assertSeqsDeepEqual(final String msg, final Seq<A> expectedSeq, final Seq<A> seq) {
-		if (expectedSeq instanceof Seq0<?>) {
-			assertTrue(Seq.emptySeq() == seq);
-		} else if (expectedSeq instanceof Seq1<?>) {
-			assertArrayEquals(msg, ((Seq1<?>) expectedSeq).node1, ((Seq1<?>) seq).node1);
-		} else if (expectedSeq instanceof Seq2<?>) {
-			assertArrayEquals(msg, ((Seq2<?>) expectedSeq).init, ((Seq2<?>) seq).init);
-			assertArrayEquals(msg, ((Seq2<?>) expectedSeq).node2, ((Seq2<?>) seq).node2);
-			assertArrayEquals(msg, ((Seq2<?>) expectedSeq).tail, ((Seq2<?>) seq).tail);
-			assertEquals(msg, ((Seq2<?>) expectedSeq).startIndex, ((Seq2<?>) seq).startIndex);
-			assertEquals(msg, ((Seq2<?>) expectedSeq).length, ((Seq2<?>) seq).length);
-		} else if (expectedSeq instanceof Seq3<?>) {
-			assertArrayEquals(msg, ((Seq3<?>) expectedSeq).init, ((Seq3<?>) seq).init);
-			assertArrayEquals(msg, ((Seq3<?>) expectedSeq).node3, ((Seq3<?>) seq).node3);
-			assertArrayEquals(msg, ((Seq3<?>) expectedSeq).tail, ((Seq3<?>) seq).tail);
-			assertEquals(msg, ((Seq3<?>) expectedSeq).startIndex, ((Seq3<?>) seq).startIndex);
-			assertEquals(msg, ((Seq3<?>) expectedSeq).length, ((Seq3<?>) seq).length);
-		} else if (expectedSeq instanceof Seq4<?>) {
-			assertArrayEquals(msg, ((Seq4<?>) expectedSeq).init, ((Seq4<?>) seq).init);
-			assertArrayEquals(msg, ((Seq4<?>) expectedSeq).node4, ((Seq4<?>) seq).node4);
-			assertArrayEquals(msg, ((Seq4<?>) expectedSeq).tail, ((Seq4<?>) seq).tail);
-			assertEquals(msg, ((Seq4<?>) expectedSeq).startIndex, ((Seq4<?>) seq).startIndex);
-			assertEquals(msg, ((Seq4<?>) expectedSeq).length, ((Seq4<?>) seq).length);
-		} else if (expectedSeq instanceof Seq5<?>) {
-			assertArrayEquals(msg, ((Seq5<?>) expectedSeq).init, ((Seq5<?>) seq).init);
-			assertArrayEquals(msg, ((Seq5<?>) expectedSeq).node5, ((Seq5<?>) seq).node5);
-			assertArrayEquals(msg, ((Seq5<?>) expectedSeq).tail, ((Seq5<?>) seq).tail);
-			assertEquals(msg, ((Seq5<?>) expectedSeq).startIndex, ((Seq5<?>) seq).startIndex);
-			assertEquals(msg, ((Seq5<?>) expectedSeq).length, ((Seq5<?>) seq).length);
-		} else if (expectedSeq instanceof Seq6<?>) {
-			assertArrayEquals(msg, ((Seq6<?>) expectedSeq).init, ((Seq6<?>) seq).init);
-			assertArrayEquals(msg, ((Seq6<?>) expectedSeq).node6, ((Seq6<?>) seq).node6);
-			assertArrayEquals(msg, ((Seq6<?>) expectedSeq).tail, ((Seq6<?>) seq).tail);
-			assertEquals(msg, ((Seq6<?>) expectedSeq).startIndex, ((Seq6<?>) seq).startIndex);
-			assertEquals(msg, ((Seq6<?>) expectedSeq).length, ((Seq6<?>) seq).length);
-		} else {
-			fail();
+		try {
+			if (expectedSeq instanceof Seq0<?>) {
+				assertTrue(Seq.emptySeq() == seq);
+			} else if (expectedSeq instanceof Seq1<?>) {
+				assertArrayEquals(msg, ((Seq1<?>) expectedSeq).node1, ((Seq1<?>) seq).node1);
+			} else if (expectedSeq instanceof Seq2<?>) {
+				assertArrayEquals(msg, ((Seq2<?>) expectedSeq).init, ((Seq2<?>) seq).init);
+				assertArrayEquals(msg, ((Seq2<?>) expectedSeq).node2, ((Seq2<?>) seq).node2);
+				assertArrayEquals(msg, ((Seq2<?>) expectedSeq).tail, ((Seq2<?>) seq).tail);
+				assertEquals(msg, ((Seq2<?>) expectedSeq).startIndex, ((Seq2<?>) seq).startIndex);
+				assertEquals(msg, ((Seq2<?>) expectedSeq).length, ((Seq2<?>) seq).length);
+			} else if (expectedSeq instanceof Seq3<?>) {
+				assertArrayEquals(msg, ((Seq3<?>) expectedSeq).init, ((Seq3<?>) seq).init);
+				assertArrayEquals(msg, ((Seq3<?>) expectedSeq).node3, ((Seq3<?>) seq).node3);
+				assertArrayEquals(msg, ((Seq3<?>) expectedSeq).tail, ((Seq3<?>) seq).tail);
+				assertEquals(msg, ((Seq3<?>) expectedSeq).startIndex, ((Seq3<?>) seq).startIndex);
+				assertEquals(msg, ((Seq3<?>) expectedSeq).length, ((Seq3<?>) seq).length);
+			} else if (expectedSeq instanceof Seq4<?>) {
+				assertArrayEquals(msg, ((Seq4<?>) expectedSeq).init, ((Seq4<?>) seq).init);
+				assertArrayEquals(msg, ((Seq4<?>) expectedSeq).node4, ((Seq4<?>) seq).node4);
+				assertArrayEquals(msg, ((Seq4<?>) expectedSeq).tail, ((Seq4<?>) seq).tail);
+				assertEquals(msg, ((Seq4<?>) expectedSeq).startIndex, ((Seq4<?>) seq).startIndex);
+				assertEquals(msg, ((Seq4<?>) expectedSeq).length, ((Seq4<?>) seq).length);
+			} else if (expectedSeq instanceof Seq5<?>) {
+				assertArrayEquals(msg, ((Seq5<?>) expectedSeq).init, ((Seq5<?>) seq).init);
+				assertArrayEquals(msg, ((Seq5<?>) expectedSeq).node5, ((Seq5<?>) seq).node5);
+				assertArrayEquals(msg, ((Seq5<?>) expectedSeq).tail, ((Seq5<?>) seq).tail);
+				assertEquals(msg, ((Seq5<?>) expectedSeq).startIndex, ((Seq5<?>) seq).startIndex);
+				assertEquals(msg, ((Seq5<?>) expectedSeq).length, ((Seq5<?>) seq).length);
+			} else if (expectedSeq instanceof Seq6<?>) {
+				assertArrayEquals(msg, ((Seq6<?>) expectedSeq).init, ((Seq6<?>) seq).init);
+				assertArrayEquals(msg, ((Seq6<?>) expectedSeq).node6, ((Seq6<?>) seq).node6);
+				assertArrayEquals(msg, ((Seq6<?>) expectedSeq).tail, ((Seq6<?>) seq).tail);
+				assertEquals(msg, ((Seq6<?>) expectedSeq).startIndex, ((Seq6<?>) seq).startIndex);
+				assertEquals(msg, ((Seq6<?>) expectedSeq).length, ((Seq6<?>) seq).length);
+			} else {
+				fail();
+			}
+		} catch (ClassCastException ex) {
+			fail(msg + ": " + ex.getMessage());
 		}
 	}
 
@@ -267,8 +271,8 @@ public class TestSeq {
 		Seq<Integer> expectedSeq = emptySeq();
 		SeqBuilder<Integer> builder = new SeqBuilder<>();
 		for (int i = 0; i < MAX; i++) {
-			expectedSeq = expectedSeq.append(i + 17);
-			builder.append(i + 17);
+			expectedSeq = expectedSeq.append(i % 61);
+			builder.append(i % 61);
 			if (isTestIndex(i)) {
 				assertSeqsDeepEqual("Seq is not equal to expected seq (size = " + expectedSeq.size() + ")", expectedSeq, builder.build());
 			}
@@ -297,8 +301,8 @@ public class TestSeq {
 				seq = seq.prepend(-1);
 				continue;
 			}
-			Seq<Integer> newSeq = seq.append(i);
-			if (isTestIndex(i)) {
+			Seq<Integer> newSeq = seq.append(i % 63);
+			if (isTestIndex(i + 31)) {
 				assertSeqsDeepEqual("Init is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.init());
 			}
 			seq = newSeq;
@@ -306,9 +310,34 @@ public class TestSeq {
 
 		seq = Seq.emptySeq();
 		for (int i = 0; i < MAX; i++) {
-			Seq<Integer> newSeq = seq.append(i);
+			Seq<Integer> newSeq = seq.append(i % 61);
 			if (isTestIndex(i)) {
 				assertSeqsDeepEqual("Init is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.init());
+			}
+			seq = newSeq;
+		}
+	}
+
+	@Test
+	public void testTail() {
+		Seq<Integer> seq = Seq.emptySeq();
+		for (int i = 0; i < MAX; i++) {
+			if (i == 40) {
+				seq = seq.append(-1);
+				continue;
+			}
+			Seq<Integer> newSeq = seq.prepend(i % 63);
+			if (isTestIndex(i + 31)) {
+				assertSeqsDeepEqual("Tail is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.tail());
+			}
+			seq = newSeq;
+		}
+
+		seq = Seq.emptySeq();
+		for (int i = 0; i < MAX; i++) {
+			Seq<Integer> newSeq = seq.prepend(i % 61);
+			if (isTestIndex(i)) {
+				assertSeqsDeepEqual("Tail is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.tail());
 			}
 			seq = newSeq;
 		}
