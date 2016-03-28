@@ -7,14 +7,14 @@ final class SizedGenerator implements InterfaceGenerator {
 		package «Constants.JCATS»;
 
 		public interface Sized {
-			Size size();
+			int size();
 
 			default boolean isEmpty() {
-				return size().isEmpty();
+				return size() == 0;
 			}
 
 			default boolean isNotEmpty() {
-				return size().isNotEmpty();
+				return size() != 0;
 			}
 		}
 	''' }

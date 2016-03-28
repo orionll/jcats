@@ -31,7 +31,6 @@ final class VNGenerators {
 				«FOR arity : 3 .. Constants.MAX_ARITY»
 					import «Constants.P»«arity»;
 				«ENDFOR»
-				import «Constants.PRECISE_SIZE»;
 				import «Constants.SIZED»;
 				import «Constants.F»;
 				«FOR arity : 2 .. Constants.MAX_ARITY»
@@ -44,11 +43,8 @@ final class VNGenerators {
 				«IF arity > 2»
 					import static «Constants.P»«arity».p«arity»;
 				«ENDIF»
-				import static «Constants.PRECISE_SIZE».preciseSize;
 
 				public final class V«arity»<A> implements Iterable<A>, Equatable<V«arity»<A>>, Sized, Indexed<A>, Serializable {
-					private static final PreciseSize SIZE = preciseSize(«arity»);
-
 					private final A «(1 .. arity).map["a" + it].join(", ")»;
 
 					private V«arity»(«(1 .. arity).map["final A a" + it].join(", ")») {
@@ -58,8 +54,8 @@ final class VNGenerators {
 					}
 
 					@Override
-					public PreciseSize size() {
-						return SIZE;
+					public int size() {
+						return «arity»;
 					}
 
 					«FOR i : 1 .. arity»

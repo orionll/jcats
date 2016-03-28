@@ -29,7 +29,6 @@ final class SeqGenerator implements ClassGenerator {
 		«FOR arity : 3 .. Constants.MAX_ARITY»
 			import «Constants.P»«arity»;
 		«ENDFOR»
-		import «Constants.PRECISE_SIZE»;
 		import «Constants.SIZED»;
 
 		import static java.util.Collections.emptyIterator;
@@ -39,7 +38,6 @@ final class SeqGenerator implements ClassGenerator {
 		import static jcats.collection.Array.mapArray;
 		import static «Constants.F».id;
 		import static «Constants.P».p;
-		import static «Constants.SIZE».preciseSize;
 
 		public abstract class Seq<A> implements Iterable<A>, Equatable<Seq<A>>, Sized, Indexed<A>, Serializable {
 			private static final Seq EMPTY = new Seq0();
@@ -52,22 +50,8 @@ final class SeqGenerator implements ClassGenerator {
 			/**
 			 * O(1)
 			 */
-			public final boolean isEmpty() {
-				return (this == Seq.EMPTY);
-			}
-
-			/**
-			 * O(1)
-			 */
 			@Override
-			public final PreciseSize size() {
-				return preciseSize(length());
-			}
-
-			/**
-			 * O(1)
-			 */
-			public abstract int length();
+			public abstract int size();
 
 			/**
 			 * O(1)
@@ -407,7 +391,7 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public Spliterator<A> spliterator() {
-				return isEmpty() ? emptySpliterator() : Spliterators.spliterator(iterator(), length(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
+				return isEmpty() ? emptySpliterator() : Spliterators.spliterator(iterator(), size(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 
 			public Stream<A> stream() {
@@ -426,7 +410,7 @@ final class SeqGenerator implements ClassGenerator {
 					return true;
 				} else if (obj instanceof Seq<?>) {
 					final Seq<?> seq = (Seq<?>) obj;
-					if (length() == seq.length()) {
+					if (size() == seq.size()) {
 						final Iterator<?> iterator1 = iterator();
 						final Iterator<?> iterator2 = seq.iterator();
 						while (iterator1.hasNext()) {
@@ -480,7 +464,7 @@ final class SeqGenerator implements ClassGenerator {
 
 		final class Seq0<A> extends Seq<A> {
 			@Override
-			public int length() {
+			public int size() {
 				return 0;
 			}
 
@@ -545,7 +529,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public int length() {
+			public int size() {
 				return node1.length;
 			}
 
@@ -655,7 +639,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public int length() {
+			public int size() {
 				return length;
 			}
 
@@ -843,7 +827,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public int length() {
+			public int size() {
 				return length;
 			}
 
@@ -1122,7 +1106,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public int length() {
+			public int size() {
 				return length;
 			}
 
@@ -1500,7 +1484,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public int length() {
+			public int size() {
 				return length;
 			}
 
@@ -1994,7 +1978,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public int length() {
+			public int size() {
 				return length;
 			}
 

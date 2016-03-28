@@ -31,7 +31,6 @@ final class ArrayGenerator implements ClassGenerator {
 		«FOR arity : 3 .. Constants.MAX_ARITY»
 			import «Constants.P»«arity»;
 		«ENDFOR»
-		import «Constants.PRECISE_SIZE»;
 		import «Constants.SIZED»;
 
 		import static java.lang.Math.min;
@@ -41,7 +40,6 @@ final class ArrayGenerator implements ClassGenerator {
 		import static java.util.Spliterators.emptySpliterator;
 		import static «Constants.F».id;
 		import static «Constants.P».p;
-		import static «Constants.SIZE».preciseSize;
 
 		public final class Array<A> implements Iterable<A>, Equatable<Array<A>>, Sized, Indexed<A>, Serializable {
 			private static final Array EMPTY = new Array(new Object[0]);
@@ -52,30 +50,12 @@ final class ArrayGenerator implements ClassGenerator {
 				this.array = array;
 			}
 
+			/**
+			 * O(1)
+			 */
 			@Override
-			public PreciseSize size() {
-				return preciseSize(array.length);
-			}
-
-			/**
-			 * O(1)
-			 */
-			public int length() {
+			public int size() {
 				return array.length;
-			}
-
-			/**
-			 * O(1)
-			 */
-			public boolean isEmpty() {
-				return (array.length == 0);
-			}
-
-			/**
-			 * O(1)
-			 */
-			public boolean isNotEmpty() {
-				return (array.length != 0);
 			}
 
 			/**
@@ -186,8 +166,7 @@ final class ArrayGenerator implements ClassGenerator {
 					final Collection<A> col = (Collection<A>) suffix;
 					return col.isEmpty() ? this : appendSized(suffix, col.size());
 				} else if (suffix instanceof Sized) {
-					return ((Sized) suffix).size().match(precise -> appendSized(suffix, precise.length()),
-							() -> { throw new IllegalArgumentException("Cannot append infinite iterable to array"); });
+					return appendSized(suffix, ((Sized) suffix).size());
 				} else {
 					final Iterator<A> iterator = suffix.iterator();
 					if (iterator.hasNext()) {
@@ -212,8 +191,7 @@ final class ArrayGenerator implements ClassGenerator {
 					final Collection<A> col = (Collection<A>) prefix;
 					return col.isEmpty() ? this : prependSized(prefix, col.size());
 				} else if (prefix instanceof Sized) {
-					return ((Sized) prefix).size().match(precise -> prependSized(prefix, precise.length()),
-							() -> { throw new IllegalArgumentException("Cannot prepend infinite iterable to array"); });
+					return prependSized(prefix, ((Sized) prefix).size());
 				} else {
 					final Iterator<A> iterator = prefix.iterator();
 					if (iterator.hasNext()) {
@@ -370,8 +348,7 @@ final class ArrayGenerator implements ClassGenerator {
 					final Collection<A> col = (Collection<A>) iterable;
 					return col.isEmpty() ? emptyArray() : sizedToArray(iterable, col.size());
 				} else if (iterable instanceof Sized) {
-					return ((Sized) iterable).size().match(precise -> sizedToArray(iterable, precise.length()),
-							() -> { throw new IllegalArgumentException("Cannot convert infinite iterable to array"); });
+					return sizedToArray(iterable, ((Sized) iterable).size());
 				} else {
 					final Iterator<A> iterator = iterable.iterator();
 					if (iterator.hasNext()) {

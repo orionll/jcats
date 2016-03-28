@@ -62,7 +62,6 @@ public class TestSeq {
 				assertArrayEquals(msg, ((Seq2<?>) expectedSeq).init, ((Seq2<?>) seq).init);
 				assertArrayEquals(msg, ((Seq2<?>) expectedSeq).node2, ((Seq2<?>) seq).node2);
 				assertArrayEquals(msg, ((Seq2<?>) expectedSeq).tail, ((Seq2<?>) seq).tail);
-				assertEquals(msg, ((Seq2<?>) expectedSeq).startIndex, ((Seq2<?>) seq).startIndex);
 				assertEquals(msg, ((Seq2<?>) expectedSeq).length, ((Seq2<?>) seq).length);
 			} else if (expectedSeq instanceof Seq3<?>) {
 				assertArrayEquals(msg, ((Seq3<?>) expectedSeq).init, ((Seq3<?>) seq).init);
@@ -107,7 +106,7 @@ public class TestSeq {
 		for (int i = 0; i < MAX; i++) {
 			final int step = step(i);
 			seq = seq.append(i % 63);
-			assertEquals(i + 1, seq.length());
+			assertEquals(i + 1, seq.size());
 			assertEquals(0, seq.head().intValue());
 			assertEquals(i % 63, seq.last().intValue());
 			for (int j = 0; j <= i; j += step) {
@@ -119,13 +118,13 @@ public class TestSeq {
 			if (isTestIndex(i)) {
 				int j = 0;
 				for (int e : seq) {
-					if (j == seq.length()) {
-						fail("j == length (" + seq.length() + ")");
+					if (j == seq.size()) {
+						fail("j == length (" + seq.size() + ")");
 					}
 					assertEquals(j % 63, e);
 					j++;
 				}
-				assertEquals(seq.length(), j);
+				assertEquals(seq.size(), j);
 			}
 		}
 	}
@@ -136,7 +135,7 @@ public class TestSeq {
 		for (int i = 0; i < MAX; i++) {
 			final int step = step(i);
 			seq = seq.prepend(i % 63);
-			assertEquals(i + 1, seq.length());
+			assertEquals(i + 1, seq.size());
 			for (int j = 0; j <= i; j += step) {
 				assertElementEquals(seq, j, (i - j) % 63);
 			}
@@ -146,13 +145,13 @@ public class TestSeq {
 			if (isTestIndex(i)) {
 				int j = 0;
 				for (int e : seq) {
-					if (j == seq.length()) {
-						fail("j == length (" + seq.length() + ")");
+					if (j == seq.size()) {
+						fail("j == length (" + seq.size() + ")");
 					}
 					assertEquals((i - j) % 63, e);
 					j++;
 				}
-				assertEquals(seq.length(), j);
+				assertEquals(seq.size(), j);
 			}
 		}
 	}
@@ -165,25 +164,25 @@ public class TestSeq {
 		}
 
 		seq = seq.prepend(0);
-		assertEquals(40, seq.length());
+		assertEquals(40, seq.size());
 
 		for (int i = 40; i < MAX; i++) {
 			final int step = step(i);
 			seq = seq.append(i % 61);
-			assertEquals(i + 1, seq.length());
+			assertEquals(i + 1, seq.size());
 			for (int j = 0; j <= i; j += step) {
 				assertElementEquals(seq, j, j % 61);
 			}
 			if (isTestIndex(i)) {
 				int j = 0;
 				for (int e : seq) {
-					if (j == seq.length()) {
-						fail("j == length (" + seq.length() + ")");
+					if (j == seq.size()) {
+						fail("j == length (" + seq.size() + ")");
 					}
 					assertEquals(j % 61, e);
 					j++;
 				}
-				assertEquals(seq.length(), j);
+				assertEquals(seq.size(), j);
 			}
 		}
 	}
@@ -196,25 +195,25 @@ public class TestSeq {
 		}
 
 		seq = seq.append(0);
-		assertEquals(40, seq.length());
+		assertEquals(40, seq.size());
 
 		for (int i = 40; i < MAX; i++) {
 			final int step = step(i);
 			seq = seq.prepend(i % 63);
-			assertEquals(i + 1, seq.length());
+			assertEquals(i + 1, seq.size());
 			for (int j = 0; j <= i; j += step) {
 				assertElementEquals(seq, j, (i - j) % 63);
 			}
 			if (isTestIndex(i)) {
 				int j = 0;
 				for (int e : seq) {
-					if (j == seq.length()) {
-						fail("j == length (" + seq.length() + ")");
+					if (j == seq.size()) {
+						fail("j == length (" + seq.size() + ")");
 					}
 					assertEquals((i - j) % 63, e);
 					j++;
 				}
-				assertEquals(seq.length(), j);
+				assertEquals(seq.size(), j);
 			}
 		}
 	}
@@ -287,7 +286,7 @@ public class TestSeq {
 			list.add(i % 63);
 			if (isTestIndex(i)) {
 				Seq<Integer> seq = Seq.seq(list.toArray(new Integer[0]));
-				assertEquals(list.size(), seq.length());
+				assertEquals(list.size(), seq.size());
 				assertTrue("Elements not equal for size = " + list.size(), Iterables.elementsEqual(list, seq));
 			}
 		}

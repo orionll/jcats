@@ -53,7 +53,7 @@ final class StackGenerator implements ClassGenerator {
 			/**
 			 * O(size)
 			 */
-			public int length() {
+			public int size() {
 				int len = 0;
 				Stack<A> stack = this;
 				while (stack.isNotEmpty()) {

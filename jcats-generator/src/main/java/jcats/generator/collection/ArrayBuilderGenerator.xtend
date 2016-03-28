@@ -12,8 +12,6 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 		import java.util.Arrays;
 		import java.util.Collection;
 
-		import «Constants.PRECISE_SIZE»;
-		import «Constants.SIZE»;
 		import «Constants.SIZED»;
 
 		import static «Constants.ARRAY».emptyArray;
@@ -115,8 +113,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 						return appendSized(iterable, col.size());
 					}
 				} else if (iterable instanceof Sized) {
-					return ((Sized) iterable).size().match(precise -> appendSized(iterable, precise.length()),
-							() -> { throw new IllegalArgumentException("Cannot append infinite iterable to array build"); });
+					return appendSized(iterable, ((Sized) iterable).size());
 				} else {
 					for (final A value : iterable) {
 						append(value);
