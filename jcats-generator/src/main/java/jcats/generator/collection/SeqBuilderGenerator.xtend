@@ -141,7 +141,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 				return (size == 0);
 			}
 
-			public int length() {
+			public int size() {
 				return size;
 			}
 

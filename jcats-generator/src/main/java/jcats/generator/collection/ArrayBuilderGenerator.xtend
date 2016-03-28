@@ -20,11 +20,11 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 
 		public final class ArrayBuilder<A> {
 			private Object[] array;
-			private int length;
+			private int size;
 
 			ArrayBuilder(final int initialCapacity) {
 				array = new Object[initialCapacity];
-				length = 0;
+				size = 0;
 			}
 
 			ArrayBuilder() {
@@ -33,7 +33,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 
 			ArrayBuilder(final Object[] values) {
 				array = values;
-				length = values.length;
+				size = values.length;
 			}
 
 			private int expandedCapacity(final int minCapacity) {
@@ -59,9 +59,9 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			}
 
 			ArrayBuilder<A> appendArray(final Object[] values) {
-				ensureCapacity(length + values.length);
-				System.arraycopy(values, 0, array, length, values.length);
-				length += values.length;
+				ensureCapacity(size + values.length);
+				System.arraycopy(values, 0, array, size, values.length);
+				size += values.length;
 				return this;
 			}
 
@@ -69,9 +69,9 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				if (iterableLength == 0) {
 					return this;
 				} else {
-					ensureCapacity(length + iterableLength);
+					ensureCapacity(size + iterableLength);
 					for (final A value : iterable) {
-						array[length++] = requireNonNull(value);
+						array[size++] = requireNonNull(value);
 					}
 					return this;
 				}
@@ -82,8 +82,8 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			 */
 			public ArrayBuilder<A> append(final A value) {
 				requireNonNull(value);
-				ensureCapacity(length + 1);
-				array[length++] = value;
+				ensureCapacity(size + 1);
+				array[size++] = value;
 				return this;
 			}
 
@@ -124,18 +124,18 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			}
 
 			public boolean isEmpty() {
-				return (length == 0);
+				return (size == 0);
 			}
 
-			public int length() {
-				return length;
+			public int size() {
+				return size;
 			}
 
 			public Array<A> build() {
-				if (length == 0) {
+				if (size == 0) {
 					return emptyArray();
-				} else if (length < array.length) {
-					return new Array<>(Arrays.copyOf(array, length));
+				} else if (size < array.length) {
+					return new Array<>(Arrays.copyOf(array, size));
 				} else {
 					return new Array<>(array);
 				}
@@ -144,9 +144,9 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			@Override
 			public String toString() {
 				final StringBuilder builder = new StringBuilder("ArrayBuilder(");
-				for (int i = 0; i < length; i++) {
+				for (int i = 0; i < size; i++) {
 					builder.append(array[i]);
-					if (i < length - 1) {
+					if (i < size - 1) {
 						builder.append(", ");
 					}
 				}
