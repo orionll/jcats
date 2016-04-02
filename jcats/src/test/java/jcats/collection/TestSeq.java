@@ -62,31 +62,31 @@ public class TestSeq {
 				assertArrayEquals(msg, ((Seq2<?>) expectedSeq).init, ((Seq2<?>) seq).init);
 				assertArrayEquals(msg, ((Seq2<?>) expectedSeq).node2, ((Seq2<?>) seq).node2);
 				assertArrayEquals(msg, ((Seq2<?>) expectedSeq).tail, ((Seq2<?>) seq).tail);
-				assertEquals(msg, ((Seq2<?>) expectedSeq).length, ((Seq2<?>) seq).length);
+				assertEquals(msg, ((Seq2<?>) expectedSeq).size, ((Seq2<?>) seq).size);
 			} else if (expectedSeq instanceof Seq3<?>) {
 				assertArrayEquals(msg, ((Seq3<?>) expectedSeq).init, ((Seq3<?>) seq).init);
 				assertArrayEquals(msg, ((Seq3<?>) expectedSeq).node3, ((Seq3<?>) seq).node3);
 				assertArrayEquals(msg, ((Seq3<?>) expectedSeq).tail, ((Seq3<?>) seq).tail);
 				assertEquals(msg, ((Seq3<?>) expectedSeq).startIndex, ((Seq3<?>) seq).startIndex);
-				assertEquals(msg, ((Seq3<?>) expectedSeq).length, ((Seq3<?>) seq).length);
+				assertEquals(msg, ((Seq3<?>) expectedSeq).size, ((Seq3<?>) seq).size);
 			} else if (expectedSeq instanceof Seq4<?>) {
 				assertArrayEquals(msg, ((Seq4<?>) expectedSeq).init, ((Seq4<?>) seq).init);
 				assertArrayEquals(msg, ((Seq4<?>) expectedSeq).node4, ((Seq4<?>) seq).node4);
 				assertArrayEquals(msg, ((Seq4<?>) expectedSeq).tail, ((Seq4<?>) seq).tail);
 				assertEquals(msg, ((Seq4<?>) expectedSeq).startIndex, ((Seq4<?>) seq).startIndex);
-				assertEquals(msg, ((Seq4<?>) expectedSeq).length, ((Seq4<?>) seq).length);
+				assertEquals(msg, ((Seq4<?>) expectedSeq).size, ((Seq4<?>) seq).size);
 			} else if (expectedSeq instanceof Seq5<?>) {
 				assertArrayEquals(msg, ((Seq5<?>) expectedSeq).init, ((Seq5<?>) seq).init);
 				assertArrayEquals(msg, ((Seq5<?>) expectedSeq).node5, ((Seq5<?>) seq).node5);
 				assertArrayEquals(msg, ((Seq5<?>) expectedSeq).tail, ((Seq5<?>) seq).tail);
 				assertEquals(msg, ((Seq5<?>) expectedSeq).startIndex, ((Seq5<?>) seq).startIndex);
-				assertEquals(msg, ((Seq5<?>) expectedSeq).length, ((Seq5<?>) seq).length);
+				assertEquals(msg, ((Seq5<?>) expectedSeq).size, ((Seq5<?>) seq).size);
 			} else if (expectedSeq instanceof Seq6<?>) {
 				assertArrayEquals(msg, ((Seq6<?>) expectedSeq).init, ((Seq6<?>) seq).init);
 				assertArrayEquals(msg, ((Seq6<?>) expectedSeq).node6, ((Seq6<?>) seq).node6);
 				assertArrayEquals(msg, ((Seq6<?>) expectedSeq).tail, ((Seq6<?>) seq).tail);
 				assertEquals(msg, ((Seq6<?>) expectedSeq).startIndex, ((Seq6<?>) seq).startIndex);
-				assertEquals(msg, ((Seq6<?>) expectedSeq).length, ((Seq6<?>) seq).length);
+				assertEquals(msg, ((Seq6<?>) expectedSeq).size, ((Seq6<?>) seq).size);
 			} else {
 				fail();
 			}
