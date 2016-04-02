@@ -17,22 +17,27 @@ final class SeqBuilderGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 
 		public final class SeqBuilder<A> {
-			private Object[][][][][][] node6;
-			private Object[][][][][] node5;
-			private Object[][][][] node4;
-			private Object[][][] node3;
-			private Object[][] node2;
-			private Object[] node1;
-			private Object[] init;
-			private int index6;
-			private int index5;
-			private int index4;
-			private int index3;
-			private int index2;
-			private int index1;
-			private int size;
+			Object[][][][][][] node6;
+			Object[][][][][] node5;
+			Object[][][][] node4;
+			Object[][][] node3;
+			Object[][] node2;
+			Object[] node1;
+			Object[] init;
+			int index6;
+			int index5;
+			int index4;
+			int index3;
+			int index2;
+			int index1;
+			int size;
+			int startIndex;
 
 			SeqBuilder() {}
+
+			SeqBuilder(final Seq<A> seq) {
+				seq.initSeqBuilder(this);
+			}
 
 			/**
 			 * O(1)
@@ -151,15 +156,15 @@ final class SeqBuilderGenerator implements ClassGenerator {
 				} else if (node2 == null) {
 					return new Seq1<>(trimmedNode1());
 				} else if (node3 == null) {
-					return new Seq2<>(trimmedNode2(), init, trimmedNode1(), 0, size);
+					return new Seq2<>(trimmedNode2(), init, trimmedNode1(), startIndex, size);
 				} else if (node4 == null) {
-					return new Seq3<>(trimmedNode3(), init, trimmedNode1(), 0, size);
+					return new Seq3<>(trimmedNode3(), init, trimmedNode1(), startIndex, size);
 				} else if (node5 == null) {
-					return new Seq4<>(trimmedNode4(), init, trimmedNode1(), 0, size);
+					return new Seq4<>(trimmedNode4(), init, trimmedNode1(), startIndex, size);
 				} else if (node6 == null) {
-					return new Seq5<>(trimmedNode5(), init, trimmedNode1(), 0, size);
+					return new Seq5<>(trimmedNode5(), init, trimmedNode1(), startIndex, size);
 				} else {
-					return new Seq6<>(trimmedNode6(), init, trimmedNode1(), 0, size);
+					return new Seq6<>(trimmedNode6(), init, trimmedNode1(), startIndex, size);
 				}
 			}
 

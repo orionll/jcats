@@ -13,7 +13,7 @@ import java.util.List;
 
 public class TestSeq {
 
-	public static final int MAX = (1 << 23) + (1 << 23) + 117;
+	public static final int MAX = (1 << 21) + (1 << 19) + 117;
 
 	private static final int[] TEST_INDICES = testIndices();
 
@@ -339,6 +339,32 @@ public class TestSeq {
 				assertSeqsDeepEqual("Tail is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.tail());
 			}
 			seq = newSeq;
+		}
+	}
+
+	@Test
+	public void testConcat() {
+		Seq<Integer> seq = Seq.emptySeq();
+		for (int i = 0; i < MAX; i++) {
+			if (i == 40) {
+				seq = seq.prepend(-1);
+			}
+			if (isTestIndex(i + 31)) {
+				Seq<Integer> concat = seq.concat(Seq.seq(-1));
+				assertSeqsDeepEqual("Concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq.append(-1), concat);
+				assertSeqsDeepEqual("Init of concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq, concat.init());
+			}
+			seq = seq.append(i % 61);
+		}
+
+		seq = Seq.emptySeq();
+		for (int i = 0; i < MAX; i++) {
+			if (isTestIndex(i)) {
+				Seq<Integer> concat = seq.concat(Seq.seq(-1));
+				assertSeqsDeepEqual("Concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq.append(-1), concat);
+				assertSeqsDeepEqual("Init of concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq, concat.init());
+			}
+			seq = seq.append(i % 63);
 		}
 	}
 

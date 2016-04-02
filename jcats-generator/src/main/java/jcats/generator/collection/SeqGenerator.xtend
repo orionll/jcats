@@ -94,6 +94,34 @@ final class SeqGenerator implements ClassGenerator {
 			 */
 			public abstract Seq<A> append(final A value);
 
+			/**
+			 * O(min(this.size, suffix.size))
+			 */
+			public Seq<A> concat(final Seq<A> suffix) {
+				requireNonNull(suffix);
+				final SeqBuilder<A> builder = new SeqBuilder<>(this);
+				builder.appendAll(suffix);
+				return builder.build();
+			}
+
+			public Seq<A> appendAll(final Iterable<A> suffix) {
+				requireNonNull(suffix);
+				if (suffix instanceof Seq<?>) {
+					return concat((Seq<A>) suffix);
+				} else {
+					final Iterator<A> iterator = suffix.iterator();
+					if (iterator.hasNext()) {
+						final SeqBuilder<A> builder = new SeqBuilder<>(this);
+						while (iterator.hasNext()) {
+							builder.append(iterator.next());
+						}
+						return builder.build();
+					} else {
+						return this;
+					}
+				}
+			}
+
 			public abstract <B> Seq<B> map(final F<A, B> f);
 
 			public <B> Seq<B> flatMap(final F<A, Seq<B>> f) {
@@ -387,6 +415,8 @@ final class SeqGenerator implements ClassGenerator {
 				return tail;
 			}
 
+			abstract void initSeqBuilder(final SeqBuilder<A> builder);
+
 			«join»
 
 			@Override
@@ -516,6 +546,10 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
+			void initSeqBuilder(final SeqBuilder<A> builder) {
+			}
+
+			@Override
 			public Iterator<A> iterator() {
 				return emptyIterator();
 			}
@@ -615,6 +649,18 @@ final class SeqGenerator implements ClassGenerator {
 					final Object[] newNode1 = mapArray(node1, f);
 					return new Seq1<>(newNode1);
 				}
+			}
+
+			@Override
+			void initSeqBuilder(final SeqBuilder<A> builder) {
+				if (node1.length == 32) {
+					builder.node1 = node1;
+				} else {
+					builder.node1 = new Object[32];
+					System.arraycopy(node1, 0, builder.node1, 0, node1.length);
+				}
+				builder.index1 = node1.length;
+				builder.size = node1.length;
 			}
 
 			@Override
@@ -803,6 +849,24 @@ final class SeqGenerator implements ClassGenerator {
 					final Object[] newTail = mapArray(tail, f);
 					return new Seq2<>(newNode2, newInit, newTail, startIndex, length);
 				}
+			}
+
+			@Override
+			void initSeqBuilder(final SeqBuilder<A> builder) {
+				builder.init = init;
+				if (tail.length == 32) {
+					builder.node1 = tail;
+				} else {
+					builder.node1 = new Object[32];
+					System.arraycopy(tail, 0, builder.node1, 0, tail.length);
+				}
+				builder.node2 = new Object[31][];
+				System.arraycopy(node2, 0, builder.node2, 0, node2.length);
+				builder.node2[node2.length] = builder.node1;
+				builder.index1 = tail.length;
+				builder.index2 = node2.length + 1;
+				builder.startIndex = startIndex;
+				builder.size = length;
 			}
 
 			@Override
@@ -1082,6 +1146,29 @@ final class SeqGenerator implements ClassGenerator {
 					final Object[] newTail = mapArray(tail, f);
 					return new Seq3<>(newNode3, newInit, newTail, startIndex, length);
 				}
+			}
+
+			@Override
+			void initSeqBuilder(final SeqBuilder<A> builder) {
+				builder.init = init;
+				if (tail.length == 32) {
+					builder.node1 = tail;
+				} else {
+					builder.node1 = new Object[32];
+					System.arraycopy(tail, 0, builder.node1, 0, tail.length);
+				}
+				final Object[][] node2 = node3[node3.length - 1];
+				builder.node2 = new Object[32][];
+				System.arraycopy(node2, 0, builder.node2, 0, node2.length);
+				builder.node2[node2.length] = builder.node1;
+				builder.node3 = new Object[32][][];
+				System.arraycopy(node3, 0, builder.node3, 0, node3.length - 1);
+				builder.node3[node3.length - 1] = builder.node2;
+				builder.index1 = tail.length;
+				builder.index2 = node2.length + 1;
+				builder.index3 = node3.length;
+				builder.startIndex = startIndex;
+				builder.size = length;
 			}
 
 			@Override
@@ -1460,6 +1547,34 @@ final class SeqGenerator implements ClassGenerator {
 					final Object[] newTail = mapArray(tail, f);
 					return new Seq4<>(newNode4, newInit, newTail, startIndex, length);
 				}
+			}
+
+			@Override
+			void initSeqBuilder(final SeqBuilder<A> builder) {
+				builder.init = init;
+				if (tail.length == 32) {
+					builder.node1 = tail;
+				} else {
+					builder.node1 = new Object[32];
+					System.arraycopy(tail, 0, builder.node1, 0, tail.length);
+				}
+				final Object[][][] node3 = node4[node4.length - 1];
+				final Object[][] node2 = node3[node3.length - 1];
+				builder.node2 = new Object[32][];
+				System.arraycopy(node2, 0, builder.node2, 0, node2.length);
+				builder.node2[node2.length] = builder.node1;
+				builder.node3 = new Object[32][][];
+				System.arraycopy(node3, 0, builder.node3, 0, node3.length - 1);
+				builder.node3[node3.length - 1] = builder.node2;
+				builder.node4 = new Object[32][][][];
+				System.arraycopy(node4, 0, builder.node4, 0, node4.length - 1);
+				builder.node4[node4.length - 1] = builder.node3;
+				builder.index1 = tail.length;
+				builder.index2 = node2.length + 1;
+				builder.index3 = node3.length;
+				builder.index4 = node4.length;
+				builder.startIndex = startIndex;
+				builder.size = length;
 			}
 
 			@Override
@@ -1954,6 +2069,39 @@ final class SeqGenerator implements ClassGenerator {
 					final Object[] newTail = mapArray(tail, f);
 					return new Seq5<>(newNode5, newInit, newTail, startIndex, length);
 				}
+			}
+
+			@Override
+			void initSeqBuilder(final SeqBuilder<A> builder) {
+				builder.init = init;
+				if (tail.length == 32) {
+					builder.node1 = tail;
+				} else {
+					builder.node1 = new Object[32];
+					System.arraycopy(tail, 0, builder.node1, 0, tail.length);
+				}
+				final Object[][][][] node4 = node5[node5.length - 1];
+				final Object[][][] node3 = node4[node4.length - 1];
+				final Object[][] node2 = node3[node3.length - 1];
+				builder.node2 = new Object[32][];
+				System.arraycopy(node2, 0, builder.node2, 0, node2.length);
+				builder.node2[node2.length] = builder.node1;
+				builder.node3 = new Object[32][][];
+				System.arraycopy(node3, 0, builder.node3, 0, node3.length - 1);
+				builder.node3[node3.length - 1] = builder.node2;
+				builder.node4 = new Object[32][][][];
+				System.arraycopy(node4, 0, builder.node4, 0, node4.length - 1);
+				builder.node4[node4.length - 1] = builder.node3;
+				builder.node5 = new Object[32][][][][];
+				System.arraycopy(node5, 0, builder.node5, 0, node5.length - 1);
+				builder.node5[node5.length - 1] = builder.node4;
+				builder.index1 = tail.length;
+				builder.index2 = node2.length + 1;
+				builder.index3 = node3.length;
+				builder.index4 = node4.length;
+				builder.index5 = node5.length;
+				builder.startIndex = startIndex;
+				builder.size = length;
 			}
 
 			@Override
@@ -2553,6 +2701,44 @@ final class SeqGenerator implements ClassGenerator {
 					final Object[] newTail = mapArray(tail, f);
 					return new Seq6<>(newNode6, newInit, newTail, startIndex, length);
 				}
+			}
+
+			@Override
+			void initSeqBuilder(final SeqBuilder<A> builder) {
+				builder.init = init;
+				if (tail.length == 32) {
+					builder.node1 = tail;
+				} else {
+					builder.node1 = new Object[32];
+					System.arraycopy(tail, 0, builder.node1, 0, tail.length);
+				}
+				final Object[][][][][] node5 = node6[node6.length - 1];
+				final Object[][][][] node4 = node5[node5.length - 1];
+				final Object[][][] node3 = node4[node4.length - 1];
+				final Object[][] node2 = node3[node3.length - 1];
+				builder.node2 = new Object[32][];
+				System.arraycopy(node2, 0, builder.node2, 0, node2.length);
+				builder.node2[node2.length] = builder.node1;
+				builder.node3 = new Object[32][][];
+				System.arraycopy(node3, 0, builder.node3, 0, node3.length - 1);
+				builder.node3[node3.length - 1] = builder.node2;
+				builder.node4 = new Object[32][][][];
+				System.arraycopy(node4, 0, builder.node4, 0, node4.length - 1);
+				builder.node4[node4.length - 1] = builder.node3;
+				builder.node5 = new Object[32][][][][];
+				System.arraycopy(node5, 0, builder.node5, 0, node5.length - 1);
+				builder.node5[node5.length - 1] = builder.node4;
+				builder.node6 = new Object[32][][][][][];
+				System.arraycopy(node6, 0, builder.node6, 0, node6.length - 1);
+				builder.node6[node6.length - 1] = builder.node5;
+				builder.index1 = tail.length;
+				builder.index2 = node2.length + 1;
+				builder.index3 = node3.length;
+				builder.index4 = node4.length;
+				builder.index5 = node5.length;
+				builder.index6 = node6.length;
+				builder.startIndex = startIndex;
+				builder.size = length;
 			}
 
 			@Override
