@@ -198,7 +198,7 @@ final class SeqGenerator implements ClassGenerator {
 				if (values.length <= 64) {
 					final Object[] tail = new Object[values.length - 32];
 					System.arraycopy(values, 32, tail, 0, values.length - 32);
-					return new Seq2<>(EMPTY_NODE2, init, tail, 0, values.length);
+					return new Seq2<>(EMPTY_NODE2, init, tail, values.length);
 				} else {
 					final Object[] tail = tailFromArray(values);
 					final Object[][] node2 = new Object[(values.length - 32 - tail.length) / 32][32];
@@ -207,7 +207,7 @@ final class SeqGenerator implements ClassGenerator {
 						System.arraycopy(values, index, node1, 0, 32);
 						index += 32;
 					}
-					return new Seq2<>(node2, init, tail, 0, values.length);
+					return new Seq2<>(node2, init, tail, values.length);
 				}
 			}
 
@@ -617,7 +617,7 @@ final class SeqGenerator implements ClassGenerator {
 				requireNonNull(value);
 				if (node1.length == 32) {
 					final Object[] init = { value };
-					return new Seq2<>(Seq2.EMPTY_NODE2, init, node1, 31, 33);
+					return new Seq2<>(Seq2.EMPTY_NODE2, init, node1, 33);
 				} else {
 					final Object[] newNode1 = new Object[node1.length + 1];
 					System.arraycopy(node1, 0, newNode1, 1, node1.length);
@@ -631,7 +631,7 @@ final class SeqGenerator implements ClassGenerator {
 				requireNonNull(value);
 				if (node1.length == 32) {
 					final Object[] tail = { value };
-					return new Seq2<>(Seq2.EMPTY_NODE2, node1, tail, 0, 33);
+					return new Seq2<>(Seq2.EMPTY_NODE2, node1, tail, 33);
 				} else {
 					final Object[] newNode1 = new Object[node1.length + 1];
 					System.arraycopy(node1, 0, newNode1, 0, node1.length);
@@ -673,14 +673,12 @@ final class SeqGenerator implements ClassGenerator {
 			final Object[][] node2;
 			final Object[] init;
 			final Object[] tail;
-			final int startIndex;
 			final int size;
 
-			Seq2(final Object[][] node2, final Object[] init, final Object[] tail, final int startIndex, final int size) {
+			Seq2(final Object[][] node2, final Object[] init, final Object[] tail, final int size) {
 				this.node2 = node2;
 				this.init = init;
 				this.tail = tail;
-				this.startIndex = startIndex;
 				this.size = size;
 			}
 
@@ -705,16 +703,16 @@ final class SeqGenerator implements ClassGenerator {
 					if (node2.length == 0) {
 						return new Seq1<>(init);
 					} else if (node2.length == 1) {
-						return new Seq2<>(EMPTY_NODE2, init, node2[0], startIndex, size - 1);
+						return new Seq2<>(EMPTY_NODE2, init, node2[0], size - 1);
 					} else {
 						final Object[][] newNode2 = new Object[node2.length - 1][];
 						System.arraycopy(node2, 0, newNode2, 0, node2.length - 1);
-						return new Seq2<>(newNode2, init, node2[node2.length - 1], startIndex, size - 1);
+						return new Seq2<>(newNode2, init, node2[node2.length - 1], size - 1);
 					}
 				} else {
 					final Object[] newTail = new Object[tail.length - 1];
 					System.arraycopy(tail, 0, newTail, 0, tail.length - 1);
-					return new Seq2<>(node2, init, newTail, startIndex, size - 1);
+					return new Seq2<>(node2, init, newTail, size - 1);
 				}
 			}
 
@@ -724,16 +722,16 @@ final class SeqGenerator implements ClassGenerator {
 					if (node2.length == 0) {
 						return new Seq1<>(tail);
 					} else if (node2.length == 1) {
-						return new Seq2<>(EMPTY_NODE2, node2[0], tail, 0, size - 1);
+						return new Seq2<>(EMPTY_NODE2, node2[0], tail, size - 1);
 					} else {
 						final Object[][] newNode2 = new Object[node2.length - 1][];
 						System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
-						return new Seq2<>(newNode2, node2[0], tail, 0, size - 1);
+						return new Seq2<>(newNode2, node2[0], tail, size - 1);
 					}
 				} else {
 					final Object[] newInit = new Object[init.length - 1];
 					System.arraycopy(init, 1, newInit, 0, init.length - 1);
-					return new Seq2<>(node2, newInit, tail, startIndex + 1, size - 1);
+					return new Seq2<>(node2, newInit, tail, size - 1);
 				}
 			}
 
@@ -745,7 +743,7 @@ final class SeqGenerator implements ClassGenerator {
 					} else if (index >= size - tail.length) {
 						return (A) tail[index + tail.length - size];
 					} else {
-						final int idx = index + startIndex;
+						final int idx = index + 32 - init.length;
 						return (A) node2[index2(idx) - 1][index1(idx)];
 					}
 				} catch (final ArrayIndexOutOfBoundsException __) {
@@ -760,20 +758,20 @@ final class SeqGenerator implements ClassGenerator {
 					if (index < init.length) {
 						final Object[] newInit = init.clone();
 						newInit[index] = value;
-						return new Seq2<>(node2, newInit, tail, startIndex, size);
+						return new Seq2<>(node2, newInit, tail, size);
 					} else if (index >= size - tail.length) {
 						final Object[] newTail = tail.clone();
 						newTail[index + tail.length - size] = value;
-						return new Seq2<>(node2, init, newTail, startIndex, size);
+						return new Seq2<>(node2, init, newTail, size);
 					} else {
 						final Object[][] newNode2 = node2.clone();
-						final int idx = index + startIndex;
+						final int idx = index + 32 - init.length;
 						final int index2 = index2(idx) - 1;
 						final Object[] newNode1 = newNode2[index2].clone();
 						final int index1 = index1(idx);
 						newNode2[index2] = newNode1;
 						newNode1[index1] = value;
-						return new Seq2<>(newNode2, init, tail, startIndex, size);
+						return new Seq2<>(newNode2, init, tail, size);
 					}
 				} catch (final ArrayIndexOutOfBoundsException __) {
 					throw new IndexOutOfBoundsException(Integer.toString(index));
@@ -790,22 +788,19 @@ final class SeqGenerator implements ClassGenerator {
 						System.arraycopy(node2, 0, newNode2, 1, 30);
 						newNode2[0] = init;
 						final Object[][][] newNode3 = { EMPTY_NODE2, newNode2 };
-						if (startIndex != 0) {
-							throw new IllegalStateException("startIndex != 0");
-						}
 						return new Seq3<>(newNode3, newInit, tail, (1 << 10) - 1, size + 1);
 					} else {
 						final Object[] newInit = { value };
 						final Object[][] newNode2 = new Object[node2.length + 1][];
 						System.arraycopy(node2, 0, newNode2, 1, node2.length);
 						newNode2[0] = init;
-						return new Seq2<>(newNode2, newInit, tail, 31, size + 1);
+						return new Seq2<>(newNode2, newInit, tail, size + 1);
 					}
 				} else {
 					final Object[] newInit = new Object[init.length + 1];
 					System.arraycopy(init, 0, newInit, 1, init.length);
 					newInit[0] = value;
-					return new Seq2<>(node2, newInit, tail, startIndex - 1, size + 1);
+					return new Seq2<>(node2, newInit, tail, size + 1);
 				}
 			}
 
@@ -819,19 +814,19 @@ final class SeqGenerator implements ClassGenerator {
 						System.arraycopy(node2, 0, newNode2, 0, 30);
 						newNode2[30] = tail;
 						final Object[][][] newNode3 = { newNode2, EMPTY_NODE2 };
-						return new Seq3<>(newNode3, init, newTail, startIndex, size + 1);
+						return new Seq3<>(newNode3, init, newTail, 32 - init.length, size + 1);
 					} else {
 						final Object[] newTail = { value };
 						final Object[][] newNode2 = new Object[node2.length + 1][];
 						System.arraycopy(node2, 0, newNode2, 0, node2.length);
 						newNode2[node2.length] = tail;
-						return new Seq2<>(newNode2, init, newTail, startIndex, size + 1);
+						return new Seq2<>(newNode2, init, newTail, size + 1);
 					}
 				} else {
 					final Object[] newTail = new Object[tail.length + 1];
 					System.arraycopy(tail, 0, newTail, 0, tail.length);
 					newTail[tail.length] = value;
-					return new Seq2<>(node2, init, newTail, startIndex, size + 1);
+					return new Seq2<>(node2, init, newTail, size + 1);
 				}
 			}
 
@@ -847,7 +842,7 @@ final class SeqGenerator implements ClassGenerator {
 						newNode2[index2] = mapArray(node2[index2], f);
 					}
 					final Object[] newTail = mapArray(tail, f);
-					return new Seq2<>(newNode2, newInit, newTail, startIndex, size);
+					return new Seq2<>(newNode2, newInit, newTail, size);
 				}
 			}
 
@@ -865,7 +860,7 @@ final class SeqGenerator implements ClassGenerator {
 				builder.node2[node2.length] = builder.node1;
 				builder.index1 = tail.length;
 				builder.index2 = node2.length + 1;
-				builder.startIndex = startIndex;
+				builder.startIndex = 32 - init.length;
 				builder.size = size;
 			}
 
@@ -914,7 +909,7 @@ final class SeqGenerator implements ClassGenerator {
 							final Object[][] node2 = node3[0];
 							final Object[][] newNode2 = new Object[node2.length - 1][];
 							System.arraycopy(node2, 0, newNode2, 0, node2.length - 1);
-							return new Seq2<>(newNode2, init, node2[node2.length - 1], startIndex, size - 1);
+							return new Seq2<>(newNode2, init, node2[node2.length - 1], size - 1);
 						} else {
 							final Object[][][] newNode3 = new Object[node3.length - 1][][];
 							System.arraycopy(node3, 0, newNode3, 0, node3.length - 2);
@@ -952,7 +947,7 @@ final class SeqGenerator implements ClassGenerator {
 							final Object[][] node2 = node3[1];
 							final Object[][] newNode2 = new Object[node2.length - 1][];
 							System.arraycopy(node2, 1, newNode2, 0, node2.length - 1);
-							return new Seq2<>(newNode2, node2[0], tail, 0, size - 1);
+							return new Seq2<>(newNode2, node2[0], tail, size - 1);
 						} else {
 							final Object[][][] newNode3 = new Object[node3.length - 1][][];
 							System.arraycopy(node3, 2, newNode3, 1, node3.length - 2);

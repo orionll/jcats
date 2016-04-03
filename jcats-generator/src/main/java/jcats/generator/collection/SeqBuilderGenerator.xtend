@@ -156,7 +156,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 				} else if (node2 == null) {
 					return new Seq1<>(trimmedNode1());
 				} else if (node3 == null) {
-					return new Seq2<>(trimmedNode2(), init, trimmedNode1(), startIndex, size);
+					return new Seq2<>(trimmedNode2(), init, trimmedNode1(), size);
 				} else if (node4 == null) {
 					return new Seq3<>(trimmedNode3(), init, trimmedNode1(), startIndex, size);
 				} else if (node5 == null) {
