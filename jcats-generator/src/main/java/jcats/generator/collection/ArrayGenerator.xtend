@@ -15,6 +15,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import java.util.Collections;
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
+		import java.util.RandomAccess;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.function.Predicate;
@@ -111,6 +112,13 @@ final class ArrayGenerator implements ClassGenerator {
 				return new Array<>(newArray);
 			}
 
+			static Object[] concatArrays(final Object[] prefix, final Object[] suffix) {
+				final Object[] result = new Object[prefix.length + suffix.length];
+				System.arraycopy(prefix, 0, result, 0, prefix.length);
+				System.arraycopy(suffix, 0, result, prefix.length, suffix.length);
+				return result;
+			}
+
 			/**
 			 * O(this.size + suffix.size)
 			 */
@@ -121,10 +129,7 @@ final class ArrayGenerator implements ClassGenerator {
 				} else if (suffix.isEmpty()) {
 					return this;
 				} else {
-					final Object[] result = new Object[array.length + suffix.array.length];
-					System.arraycopy(array, 0, result, 0, array.length);
-					System.arraycopy(suffix.array, 0, result, array.length, suffix.array.length);
-					return new Array<>(result);
+					return new Array<>(concatArrays(array, suffix.array));
 				}
 			}
 
@@ -162,7 +167,7 @@ final class ArrayGenerator implements ClassGenerator {
 			public Array<A> appendAll(final Iterable<A> suffix) {
 				if (suffix instanceof Array) {
 					return concat((Array<A>) suffix);
-				} else if (suffix instanceof Collection) {
+				} else if (suffix instanceof Collection<?> && suffix instanceof RandomAccess) {
 					final Collection<A> col = (Collection<A>) suffix;
 					return col.isEmpty() ? this : appendSized(suffix, col.size());
 				} else if (suffix instanceof Sized) {
@@ -187,7 +192,7 @@ final class ArrayGenerator implements ClassGenerator {
 			public Array<A> prependAll(final Iterable<A> prefix) {
 				if (prefix instanceof Array) {
 					return ((Array<A>) prefix).concat(this);
-				} else if (prefix instanceof Collection) {
+				} else if (prefix instanceof Collection<?> && prefix instanceof RandomAccess) {
 					final Collection<A> col = (Collection<A>) prefix;
 					return col.isEmpty() ? this : prependSized(prefix, col.size());
 				} else if (prefix instanceof Sized) {
@@ -342,9 +347,10 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			public static <A> Array<A> iterableToArray(final Iterable<A> iterable) {
+				requireNonNull(iterable);
 				if (iterable instanceof Array) {
 					return (Array<A>) iterable;
-				} else if (iterable instanceof Collection) {
+				} else if (iterable instanceof Collection<?>) {
 					final Collection<A> col = (Collection<A>) iterable;
 					return col.isEmpty() ? emptyArray() : sizedToArray(iterable, col.size());
 				} else if (iterable instanceof Sized) {

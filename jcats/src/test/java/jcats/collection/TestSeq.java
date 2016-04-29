@@ -4,11 +4,13 @@ import static jcats.collection.Seq.emptySeq;
 import static org.junit.Assert.*;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class TestSeq {
@@ -29,7 +31,7 @@ public class TestSeq {
 				list.add((1 << i) + (1 << j) + 1);
 			}
 		}
-		int[] arr = new int[list.size()];
+		final int[] arr = new int[list.size()];
 		for (int i = 0; i < list.size(); i++) {
 			arr[i] = list.get(i);
 		}
@@ -90,7 +92,7 @@ public class TestSeq {
 			} else {
 				fail();
 			}
-		} catch (ClassCastException ex) {
+		} catch (final ClassCastException ex) {
 			fail(msg + ": " + ex.getMessage());
 		}
 	}
@@ -117,7 +119,7 @@ public class TestSeq {
 			}
 			if (isTestIndex(i)) {
 				int j = 0;
-				for (int e : seq) {
+				for (final int e : seq) {
 					if (j == seq.size()) {
 						fail("j == length (" + seq.size() + ")");
 					}
@@ -144,7 +146,7 @@ public class TestSeq {
 			}
 			if (isTestIndex(i)) {
 				int j = 0;
-				for (int e : seq) {
+				for (final int e : seq) {
 					if (j == seq.size()) {
 						fail("j == length (" + seq.size() + ")");
 					}
@@ -175,7 +177,7 @@ public class TestSeq {
 			}
 			if (isTestIndex(i)) {
 				int j = 0;
-				for (int e : seq) {
+				for (final int e : seq) {
 					if (j == seq.size()) {
 						fail("j == length (" + seq.size() + ")");
 					}
@@ -206,7 +208,7 @@ public class TestSeq {
 			}
 			if (isTestIndex(i)) {
 				int j = 0;
-				for (int e : seq) {
+				for (final int e : seq) {
 					if (j == seq.size()) {
 						fail("j == length (" + seq.size() + ")");
 					}
@@ -268,7 +270,7 @@ public class TestSeq {
 	@Test
 	public void testSeqBuilder() {
 		Seq<Integer> expectedSeq = emptySeq();
-		SeqBuilder<Integer> builder = new SeqBuilder<>();
+		final SeqBuilder<Integer> builder = new SeqBuilder<>();
 		for (int i = 0; i < MAX; i++) {
 			expectedSeq = expectedSeq.append(i % 61);
 			builder.append(i % 61);
@@ -293,6 +295,21 @@ public class TestSeq {
 	}
 
 	@Test
+	public void testIterableToSeq() {
+		final List<Integer> list = new ArrayList<>();
+
+		for (int i = 0; i < MAX; i++) {
+			if (isTestIndex(i)) {
+				final Seq<Integer> seq = Seq.iterableToSeq(list);
+				assertEquals(list.size(), Iterables.size(seq));
+				assertEquals(list.size(), seq.size());
+				assertTrue("Elements not equal for size = " + list.size(), Iterables.elementsEqual(list, seq));
+			}
+			list.add(i % 63);
+		}
+	}
+
+	@Test
 	public void testInit() {
 		Seq<Integer> seq = Seq.emptySeq();
 		for (int i = 0; i < MAX; i++) {
@@ -300,7 +317,7 @@ public class TestSeq {
 				seq = seq.prepend(-1);
 				continue;
 			}
-			Seq<Integer> newSeq = seq.append(i % 63);
+			final Seq<Integer> newSeq = seq.append(i % 63);
 			if (isTestIndex(i + 31)) {
 				assertSeqsDeepEqual("Init is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.init());
 			}
@@ -309,7 +326,7 @@ public class TestSeq {
 
 		seq = Seq.emptySeq();
 		for (int i = 0; i < MAX; i++) {
-			Seq<Integer> newSeq = seq.append(i % 61);
+			final Seq<Integer> newSeq = seq.append(i % 61);
 			if (isTestIndex(i)) {
 				assertSeqsDeepEqual("Init is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.init());
 			}
@@ -325,7 +342,7 @@ public class TestSeq {
 				seq = seq.append(-1);
 				continue;
 			}
-			Seq<Integer> newSeq = seq.prepend(i % 63);
+			final Seq<Integer> newSeq = seq.prepend(i % 63);
 			if (isTestIndex(i + 31)) {
 				assertSeqsDeepEqual("Tail is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.tail());
 			}
@@ -334,7 +351,7 @@ public class TestSeq {
 
 		seq = Seq.emptySeq();
 		for (int i = 0; i < MAX; i++) {
-			Seq<Integer> newSeq = seq.prepend(i % 61);
+			final Seq<Integer> newSeq = seq.prepend(i % 61);
 			if (isTestIndex(i)) {
 				assertSeqsDeepEqual("Tail is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.tail());
 			}
@@ -353,6 +370,10 @@ public class TestSeq {
 				Seq<Integer> concat = seq.concat(Seq.seq(-1));
 				assertSeqsDeepEqual("Concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq.append(-1), concat);
 				assertSeqsDeepEqual("Init of concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq, concat.init());
+				concat = seq.concat(Seq.seq(-1, -2));
+				assertTrue("Concatenated seq is not equal to expected seq (size = " + seq.size() + ")",
+						Iterables.elementsEqual(Iterables.concat(seq, seq), concat));
+				assertSeqsDeepEqual("Init of concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq, concat.init().init());
 			}
 			seq = seq.append(i % 61);
 		}
@@ -363,8 +384,44 @@ public class TestSeq {
 				Seq<Integer> concat = seq.concat(Seq.seq(-1));
 				assertSeqsDeepEqual("Concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq.append(-1), concat);
 				assertSeqsDeepEqual("Init of concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq, concat.init());
+				concat = seq.concat(Seq.seq(-1, -2));
+				assertTrue("Concatenated seq is not equal to expected seq (size = " + seq.size() + ")", Iterables.elementsEqual(seq.append(-1).append(-2), concat));
+				assertSeqsDeepEqual("Init of concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq, concat.init().init());
 			}
 			seq = seq.append(i % 63);
+		}
+	}
+
+	@Test
+	public void testAppendSized() {
+		for (int size = (1 << 10); size < (1 << 10) + 1; size++) {
+			//if (isTestIndex(size)) {
+				final Integer[] array = new Integer[size];
+				for (int i = 0; i < array.length; i++) {
+					array[i] = i % 63;
+				}
+
+				final Seq<Integer> seq = Seq.seq(array).prepend(-1);
+				//final List<Integer> list = Lists.newArrayList();
+				for (int i = (1 << 10); i < (1 << 10) + 1; i++) {
+					//if (isTestIndex(i)) {
+						final List<Integer> list = Collections.nCopies(i, -4);
+						try {
+							final Seq<Integer> concat = seq.appendAll(list);
+							assertEquals("(seq.size = " + seq.size() + ", list.size = " + list.size() + ")", list.size() + array.length + 1, concat.size());
+							assertEquals("(seq.size = " + seq.size() + ", list.size = " + list.size() + ")", -1, (int) concat.head());
+							if (!list.isEmpty()) {
+								assertEquals("(seq.size = " + seq.size() + ", list.size = " + list.size() + ")", 0, (int) concat.get(1));
+							}
+							assertTrue("Appended seq is not equal to expected seq (seq.size = " + seq.size() + ", list.size = " + list.size() + ")",
+									Iterables.elementsEqual(Iterables.concat(seq, list), concat));
+						} catch (final RuntimeException ex) {
+							throw new AssertionError("Cannot append list of size " + list.size() + " to seq of size " + seq.size() + ": " + ex.getMessage(), ex);
+						}
+					//}
+					// list.add(i % 61);
+				}
+			//}
 		}
 	}
 
