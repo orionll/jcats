@@ -116,7 +116,7 @@ final class SeqGenerator implements ClassGenerator {
 
 			abstract Seq<A> prependSized(final Iterator<A> prefix, final int prefixSize);
 
-			public Seq<A> appendAll(final Iterable<A> suffix) {
+			public final Seq<A> appendAll(final Iterable<A> suffix) {
 				requireNonNull(suffix);
 				if (suffix instanceof Seq<?>) {
 					return concat((Seq<A>) suffix);
@@ -138,7 +138,7 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			public Seq<A> prependAll(final Iterable<A> prefix) {
+			public final Seq<A> prependAll(final Iterable<A> prefix) {
 				requireNonNull(prefix);
 				if (prefix instanceof Seq<?>) {
 					return ((Seq<A>) prefix).concat(this);
@@ -156,9 +156,16 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			public abstract <B> Seq<B> map(final F<A, B> f);
+			public final <B> Seq<B> map(final F<A, B> f) {
+				requireNonNull(f);
+				if (f == F.id()) {
+					return (Seq<B>) this;
+				} else {
+					return sizedToSeq(new MappedIterator<>(iterator(), f), size());
+				}
+			}
 
-			public <B> Seq<B> flatMap(final F<A, Seq<B>> f) {
+			public final <B> Seq<B> flatMap(final F<A, Seq<B>> f) {
 				requireNonNull(f);
 				if (isEmpty()) {
 					return emptySeq();
@@ -171,7 +178,7 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			public Seq<A> filter(final Predicate<A> predicate) {
+			public final Seq<A> filter(final Predicate<A> predicate) {
 				requireNonNull(predicate);
 				if (isEmpty()) {
 					return emptySeq();
@@ -1318,12 +1325,6 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public <B> Seq<B> map(final F<A, B> f) {
-				requireNonNull(f);
-				return emptySeq();
-			}
-
-			@Override
 			void initSeqBuilder(final SeqBuilder<A> builder) {
 			}
 
@@ -1499,17 +1500,6 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			Seq<A> prependSized(final Iterator<A> prefix, final int prefixSize) {
 				throw new UnsupportedOperationException("Not implemented");
-			}
-
-			@Override
-			public <B> Seq<B> map(final F<A, B> f) {
-				requireNonNull(f);
-				if (f == F.id()) {
-					return (Seq<B>) this;
-				} else {
-					final Object[] newNode1 = mapArray(node1, f);
-					return new Seq1<>(newNode1);
-				}
 			}
 
 			@Override
@@ -1860,22 +1850,6 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			Seq<A> prependSized(final Iterator<A> prefix, final int prefixSize) {
 				throw new UnsupportedOperationException("Not implemented");
-			}
-
-			@Override
-			public <B> Seq<B> map(final F<A, B> f) {
-				requireNonNull(f);
-				if (f == F.id()) {
-					return (Seq<B>) this;
-				} else {
-					final Object[] newInit = mapArray(init, f);
-					final Object[][] newNode2 = new Object[node2.length][];
-					for (int index2 = 0; index2 < node2.length; index2++) {
-						newNode2[index2] = mapArray(node2[index2], f);
-					}
-					final Object[] newTail = mapArray(tail, f);
-					return new Seq2<>(newNode2, newInit, newTail, size);
-				}
 			}
 
 			@Override
@@ -2316,27 +2290,6 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			Seq<A> prependSized(final Iterator<A> prefix, final int prefixSize) {
 				throw new UnsupportedOperationException("Not implemented");
-			}
-
-			@Override
-			public <B> Seq<B> map(final F<A, B> f) {
-				requireNonNull(f);
-				if (f == F.id()) {
-					return (Seq<B>) this;
-				} else {
-					final Object[] newInit = mapArray(init, f);
-					final Object[][][] newNode3 = new Object[node3.length][][];
-					for (int index3 = 0; index3 < node3.length; index3++) {
-						final Object[][] node2 = node3[index3];
-						final Object[][] newNode2 = new Object[node2.length][];
-						newNode3[index3] = newNode2;
-						for (int index2 = 0; index2 < node2.length; index2++) {
-							newNode2[index2] = mapArray(node2[index2], f);
-						}
-					}
-					final Object[] newTail = mapArray(tail, f);
-					return new Seq3<>(newNode3, newInit, newTail, startIndex, size);
-				}
 			}
 
 			@Override
@@ -2862,32 +2815,6 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			Seq<A> prependSized(final Iterator<A> prefix, final int prefixSize) {
 				throw new UnsupportedOperationException("Not implemented");
-			}
-
-			@Override
-			public <B> Seq<B> map(final F<A, B> f) {
-				requireNonNull(f);
-				if (f == F.id()) {
-					return (Seq<B>) this;
-				} else {
-					final Object[] newInit = mapArray(init, f);
-					final Object[][][][] newNode4 = new Object[node4.length][][][];
-					for (int index4 = 0; index4 < node4.length; index4++) {
-						final Object[][][] node3 = node4[index4];
-						final Object[][][] newNode3 = new Object[node3.length][][];
-						newNode4[index4] = newNode3;
-						for (int index3 = 0; index3 < node3.length; index3++) {
-							final Object[][] node2 = node3[index3];
-							final Object[][] newNode2 = new Object[node2.length][];
-							newNode3[index3] = newNode2;
-							for (int index2 = 0; index2 < node2.length; index2++) {
-								newNode2[index2] = mapArray(node2[index2], f);
-							}
-						}
-					}
-					final Object[] newTail = mapArray(tail, f);
-					return new Seq4<>(newNode4, newInit, newTail, startIndex, size);
-				}
 			}
 
 			@Override
@@ -3512,37 +3439,6 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			Seq<A> prependSized(final Iterator<A> prefix, final int prefixSize) {
 				throw new UnsupportedOperationException("Not implemented");
-			}
-
-			@Override
-			public <B> Seq<B> map(final F<A, B> f) {
-				requireNonNull(f);
-				if (f == F.id()) {
-					return (Seq<B>) this;
-				} else {
-					final Object[] newInit = mapArray(init, f);
-					final Object[][][][][] newNode5 = new Object[node5.length][][][][];
-					for (int index5 = 0; index5 < node5.length; index5++) {
-						final Object[][][][] node4 = node5[index5];
-						final Object[][][][] newNode4 = new Object[node4.length][][][];
-						newNode5[index5] = newNode4;
-						for (int index4 = 0; index4 < node4.length; index4++) {
-							final Object[][][] node3 = node4[index4];
-							final Object[][][] newNode3 = new Object[node3.length][][];
-							newNode4[index4] = newNode3;
-							for (int index3 = 0; index3 < node3.length; index3++) {
-								final Object[][] node2 = node3[index3];
-								final Object[][] newNode2 = new Object[node2.length][];
-								newNode3[index3] = newNode2;
-								for (int index2 = 0; index2 < node2.length; index2++) {
-									newNode2[index2] = mapArray(node2[index2], f);
-								}
-							}
-						}
-					}
-					final Object[] newTail = mapArray(tail, f);
-					return new Seq5<>(newNode5, newInit, newTail, startIndex, size);
-				}
 			}
 
 			@Override
@@ -4249,42 +4145,6 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			Seq<A> prependSized(final Iterator<A> prefix, final int prefixSize) {
 				throw new UnsupportedOperationException("Not implemented");
-			}
-
-			@Override
-			public <B> Seq<B> map(final F<A, B> f) {
-				requireNonNull(f);
-				if (f == F.id()) {
-					return (Seq<B>) this;
-				} else {
-					final Object[] newInit = mapArray(init, f);
-					final Object[][][][][][] newNode6 = new Object[node6.length][][][][][];
-					for (int index6 = 0; index6 < node6.length; index6++) {
-						final Object[][][][][] node5 = node6[index6];
-						final Object[][][][][] newNode5 = new Object[node5.length][][][][];
-						newNode6[index6] = newNode5;
-						for (int index5 = 0; index5 < node5.length; index5++) {
-							final Object[][][][] node4 = node5[index5];
-							final Object[][][][] newNode4 = new Object[node4.length][][][];
-							newNode5[index5] = newNode4;
-							for (int index4 = 0; index4 < node4.length; index4++) {
-								final Object[][][] node3 = node4[index4];
-								final Object[][][] newNode3 = new Object[node3.length][][];
-								newNode4[index4] = newNode3;
-								for (int index3 = 0; index3 < node3.length; index3++) {
-									final Object[][] node2 = node3[index3];
-									final Object[][] newNode2 = new Object[node2.length][];
-									newNode3[index3] = newNode2;
-									for (int index2 = 0; index2 < node2.length; index2++) {
-										newNode2[index2] = mapArray(node2[index2], f);
-									}
-								}
-							}
-						}
-					}
-					final Object[] newTail = mapArray(tail, f);
-					return new Seq6<>(newNode6, newInit, newTail, startIndex, size);
-				}
 			}
 
 			@Override

@@ -6,6 +6,7 @@ import java.nio.file.Path
 import java.util.List
 import jcats.generator.collection.ArrayBuilderGenerator
 import jcats.generator.collection.ArrayGenerator
+import jcats.generator.collection.CommonGenerator
 import jcats.generator.collection.StackBuilderGenerator
 import jcats.generator.collection.StackGenerator
 import jcats.generator.collection.SeqGenerator
@@ -74,7 +75,8 @@ class Main {
 			new ArrayGenerator,
 			new ArrayBuilderGenerator,
 			new SeqGenerator,
-			new SeqBuilderGenerator
+			new SeqBuilderGenerator,
+			new CommonGenerator
 		],
 			FNGenerators.generators,
 			EffNGenerators.generators,

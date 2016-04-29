@@ -474,28 +474,5 @@ final class ArrayGenerator implements ClassGenerator {
 				return new ArrayBuilder<>(initialCapacity);
 			}
 		}
-
-		final class ArrayIterator<A> implements Iterator<A> {
-			private int i;
-			private final Object[] array;
-
-			ArrayIterator(final Object[] array) {
-				this.array = array;
-			}
-
-			@Override
-			public boolean hasNext() {
-				return (i != array.length);
-			}
-
-			@Override
-			public A next() {
-				if (i >= array.length) {
-					throw new NoSuchElementException();
-				} else {
-					return (A) array[i++];
-				}
-			}
-		}
 	''' }
 }
