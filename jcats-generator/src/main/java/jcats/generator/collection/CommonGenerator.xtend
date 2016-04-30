@@ -11,6 +11,7 @@ final class CommonGenerator implements ClassGenerator {
 
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
+		import java.util.function.IntFunction;
 
 		import jcats.function.F;
 
@@ -56,6 +57,31 @@ final class CommonGenerator implements ClassGenerator {
 			@Override
 			public B next() {
 				return f.apply(requireNonNull(iterator.next()));
+			}
+		}
+
+		final class TableIterator<A> implements Iterator<A> {
+			private final int size;
+			private final IntFunction<A> f;
+			private int i;
+
+			TableIterator(final int size, final IntFunction<A> f) {
+				this.size = size;
+				this.f = f;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return i != size;
+			}
+
+			@Override
+			public A next() {
+				if (i >= size) {
+					throw new NoSuchElementException();
+				} else {
+					return f.apply(i++);
+				}
 			}
 		}
 	''' }

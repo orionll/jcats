@@ -16,11 +16,13 @@ final class SeqGenerator implements ClassGenerator {
 		import java.util.RandomAccess;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
+		import java.util.function.IntFunction;
 		import java.util.function.Predicate;
 		import java.util.stream.Stream;
 		import java.util.stream.StreamSupport;
 
 		import «Constants.F»;
+		import «Constants.F0»;
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.F»«arity»;
 		«ENDFOR»
@@ -225,6 +227,23 @@ final class SeqGenerator implements ClassGenerator {
 					} else {
 						throw new IndexOutOfBoundsException("Seq size limit exceeded");
 					}
+				}
+			}
+
+			public static <A> Seq<A> replicate(final int size, final A value) {
+				return tabulate(size, __ -> value);
+			}
+
+			public static <A> Seq<A> fill(final int size, final F0<A> f) {
+				return tabulate(size, __ -> f.apply());
+			}
+
+			public static <A> Seq<A> tabulate(final int size, final IntFunction<A> f) {
+				requireNonNull(f);
+				if (size <= 0) {
+					return emptySeq();
+				} else {
+					return sizedToSeq(new TableIterator<>(size, f), size);
 				}
 			}
 
