@@ -1453,7 +1453,10 @@ final class SeqGenerator implements ClassGenerator {
 			Seq<A> appendSized(final Iterator<A> suffix, final int suffixSize) {
 				final int size = node1.length + suffixSize;
 				final int maxSize = 32 + suffixSize;
-				if (size <= 32) {
+				if (maxSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (size <= 32) {
 					return appendSizedToSeq1(suffix, size);
 				} else if (maxSize <= (1 << 10)) {
 					return appendSizedToSeq2(suffix, suffixSize, size);
@@ -1704,7 +1707,10 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			Seq<A> appendSized(final Iterator<A> suffix, final int suffixSize) {
-				if (tail.length + suffixSize <= 32) {
+				if (tail.length + suffixSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (tail.length + suffixSize <= 32) {
 					final Object[] newTail = new Object[tail.length + suffixSize];
 					System.arraycopy(tail, 0, newTail, 0, tail.length);
 					fillArray(newTail, tail.length, suffix);
@@ -1712,7 +1718,10 @@ final class SeqGenerator implements ClassGenerator {
 				}
 
 				final int maxSize = size - init.length + 32 + suffixSize;
-				if (maxSize <= (1 << 10)) {
+				if (maxSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (maxSize <= (1 << 10)) {
 					return appendSizedToSeq2(suffix, suffixSize, maxSize);
 				} else if (maxSize <= (1 << 15)) {
 					return appendSizedToSeq3(suffix, suffixSize, maxSize);
@@ -2151,7 +2160,10 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			Seq<A> appendSized(final Iterator<A> suffix, final int suffixSize) {
-				if (tail.length + suffixSize <= 32) {
+				if (tail.length + suffixSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (tail.length + suffixSize <= 32) {
 					final Object[] newTail = new Object[tail.length + suffixSize];
 					System.arraycopy(tail, 0, newTail, 0, tail.length);
 					fillArray(newTail, tail.length, suffix);
@@ -2159,7 +2171,10 @@ final class SeqGenerator implements ClassGenerator {
 				}
 
 				final int maxSize = size - init.length - 32*node3[0].length + (1 << 10) + suffixSize;
-				if (maxSize <= (1 << 15)) {
+				if (maxSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (maxSize <= (1 << 15)) {
 					return appendSizedToSeq3(suffix, suffixSize, maxSize);
 				} else if (maxSize <= (1 << 20)) {
 					return appendSizedToSeq4(suffix, suffixSize, maxSize);
@@ -2690,7 +2705,10 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			Seq<A> appendSized(final Iterator<A> suffix, final int suffixSize) {
-				if (tail.length + suffixSize <= 32) {
+				if (tail.length + suffixSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (tail.length + suffixSize <= 32) {
 					final Object[] newTail = new Object[tail.length + suffixSize];
 					System.arraycopy(tail, 0, newTail, 0, tail.length);
 					fillArray(newTail, tail.length, suffix);
@@ -2698,7 +2716,10 @@ final class SeqGenerator implements ClassGenerator {
 				}
 
 				final int maxSize = size - init.length - 32*node4[0][0].length - (1 << 10)*(node4[0].length - 1) + (1 << 15) + suffixSize;
-				if (maxSize <= (1 << 20)) {
+				if (maxSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (maxSize <= (1 << 20)) {
 					return appendSizedToSeq4(suffix, suffixSize, maxSize);
 				} else if (maxSize <= (1 << 25)) {
 					return appendSizedToSeq5(suffix, suffixSize, maxSize);
@@ -3331,7 +3352,10 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			Seq<A> appendSized(final Iterator<A> suffix, final int suffixSize) {
-				if (tail.length + suffixSize <= 32) {
+				if (tail.length + suffixSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (tail.length + suffixSize <= 32) {
 					final Object[] newTail = new Object[tail.length + suffixSize];
 					System.arraycopy(tail, 0, newTail, 0, tail.length);
 					fillArray(newTail, tail.length, suffix);
@@ -3340,7 +3364,10 @@ final class SeqGenerator implements ClassGenerator {
 
 				final int maxSize = size - init.length - 32*node5[0][0][0].length - (1 << 10)*(node5[0][0].length - 1)
 						- (1 << 15)*(node5[0].length - 1) + (1 << 20) + suffixSize;
-				if (maxSize <= (1 << 25)) {
+				if (maxSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (maxSize <= (1 << 25)) {
 					return appendSizedToSeq5(suffix, suffixSize, maxSize);
 				} else if (maxSize <= (1 << 30)) {
 					return appendSizedToSeq6(suffix, suffixSize, maxSize);
@@ -4060,7 +4087,10 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			Seq<A> appendSized(final Iterator<A> suffix, final int suffixSize) {
-				if (tail.length + suffixSize <= 32) {
+				if (tail.length + suffixSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (tail.length + suffixSize <= 32) {
 					final Object[] newTail = new Object[tail.length + suffixSize];
 					System.arraycopy(tail, 0, newTail, 0, tail.length);
 					fillArray(newTail, tail.length, suffix);
@@ -4069,7 +4099,7 @@ final class SeqGenerator implements ClassGenerator {
 
 				final int maxSize = size - init.length - 32*node6[0][0][0][0].length - (1 << 10)*(node6[0][0][0].length - 1)
 						- (1 << 15)*(node6[0][0].length - 1) - (1 << 20)*(node6[0].length - 1) + (1 << 25) + suffixSize;
-				if (maxSize <= (1 << 30)) {
+				if (maxSize >= 0 && maxSize <= (1 << 30)) {
 					return appendSizedToSeq6(suffix, suffixSize, maxSize);
 				} else {
 					throw new IndexOutOfBoundsException("Seq size limit exceeded");
