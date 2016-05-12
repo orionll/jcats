@@ -11,9 +11,9 @@ final class CommonGenerator implements ClassGenerator {
 
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
-		import java.util.function.IntFunction;
 
-		import jcats.function.F;
+		import «Constants.F»;
+		import «Constants.FUNCTION».IntObjectF;
 
 		import static java.util.Objects.requireNonNull;
 
@@ -62,10 +62,10 @@ final class CommonGenerator implements ClassGenerator {
 
 		final class TableIterator<A> implements Iterator<A> {
 			private final int size;
-			private final IntFunction<A> f;
+			private final IntObjectF<A> f;
 			private int i;
 
-			TableIterator(final int size, final IntFunction<A> f) {
+			TableIterator(final int size, final IntObjectF<A> f) {
 				this.size = size;
 				this.f = f;
 			}

@@ -14,10 +14,10 @@ final class StackGenerator implements ClassGenerator {
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
 		import java.util.Spliterator;
-		import java.util.function.Predicate;
 		import java.util.stream.Stream;
 		import java.util.stream.StreamSupport;
 
+		import «Constants.FUNCTION».BoolF;
 		import «Constants.F»;
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.F»«arity»;
@@ -200,7 +200,7 @@ final class StackGenerator implements ClassGenerator {
 				}
 			}
 
-			public Stack<A> filter(final Predicate<A> predicate) {
+			public Stack<A> filter(final BoolF<A> predicate) {
 				requireNonNull(predicate);
 				if (isEmpty()) {
 					return nil();
@@ -208,7 +208,7 @@ final class StackGenerator implements ClassGenerator {
 					final StackBuilder<A> builder = new StackBuilder<>();
 					Stack<A> stack = this;
 					while (stack.isNotEmpty()) {
-						if (predicate.test(stack.head)) {
+						if (predicate.apply(stack.head)) {
 							builder.append(stack.head);
 						}
 						stack = stack.tail;

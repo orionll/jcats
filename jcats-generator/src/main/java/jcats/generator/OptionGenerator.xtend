@@ -12,8 +12,8 @@ final class OptionGenerator implements ClassGenerator {
 		import java.util.NoSuchElementException;
 		import java.util.Objects;
 		import java.util.Optional;
-		import java.util.function.Predicate;
 
+		import «Constants.FUNCTION».BoolF;
 		import «Constants.F»;
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.F»«arity»;
@@ -80,11 +80,11 @@ final class OptionGenerator implements ClassGenerator {
 				return isEmpty() ? none() : f.apply(value);
 			}
 
-			public Option<A> filter(final Predicate<A> predicate) {
+			public Option<A> filter(final BoolF<A> predicate) {
 				requireNonNull(predicate);
 				if (isEmpty()) {
 					return none();
-				} else if (predicate.test(value)) {
+				} else if (predicate.apply(value)) {
 					return this;
 				} else {
 					return none();

@@ -18,10 +18,10 @@ final class ArrayGenerator implements ClassGenerator {
 		import java.util.RandomAccess;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
-		import java.util.function.Predicate;
 		import java.util.stream.Stream;
 		import java.util.stream.StreamSupport;
 
+		import «Constants.FUNCTION».BoolF;
 		import «Constants.F»;
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.F»«arity»;
@@ -246,14 +246,14 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			public Array<A> filter(final Predicate<A> predicate) {
+			public Array<A> filter(final BoolF<A> predicate) {
 				requireNonNull(predicate);
 				if (isEmpty()) {
 					return emptyArray();
 				} else {
 					final ArrayBuilder<A> builder = new ArrayBuilder<>();
 					for (final Object value : array) {
-						if (predicate.test((A) value)) {
+						if (predicate.apply((A) value)) {
 							builder.append((A) value);
 						}
 					}
