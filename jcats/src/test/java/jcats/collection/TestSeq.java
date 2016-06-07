@@ -367,12 +367,14 @@ public class TestSeq {
 				seq = seq.prepend(-1);
 			}
 			if (isTestIndex(i + 31)) {
-				Seq<Integer> concat = seq.concat(Seq.seq(-1));
+				Seq<Integer> seq2 = Seq.seq(-1);
+				Seq<Integer> concat = seq.concat(seq2);
 				assertSeqsDeepEqual("Concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq.append(-1), concat);
 				assertSeqsDeepEqual("Init of concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq, concat.init());
-				concat = seq.concat(Seq.seq(-1, -2));
+				seq2 = Seq.seq(-1, -2);
+				concat = seq.concat(seq2);
 				assertTrue("Concatenated seq is not equal to expected seq (size = " + seq.size() + ")",
-						Iterables.elementsEqual(Iterables.concat(seq, seq), concat));
+						Iterables.elementsEqual(Iterables.concat(seq, seq2), concat));
 				assertSeqsDeepEqual("Init of concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq, concat.init().init());
 			}
 			seq = seq.append(i % 61);
@@ -422,6 +424,51 @@ public class TestSeq {
 					// list.add(i % 61);
 				}
 			//}
+		}
+	}
+
+	@Test
+	public void testPrependSized() {
+		for (int size = 1; size < (1 << 12); size++) {
+			if (isTestIndex(size)) {
+				final Integer[] array = new Integer[size];
+				for (int i = 0; i < array.length; i++) {
+					array[i] = (i + 1) % 63;
+				}
+
+				Seq<Integer> seq = Seq.seq(array);
+				if (size % 2 == 0) {
+					if (size % 3 == 0) {
+						for (int j = 0; j < 64; j++) {
+							seq = seq.prepend(0);
+						}
+					} else {
+						seq = seq.prepend(0);
+					}
+				}
+				//final List<Integer> list = Lists.newArrayList();
+				for (int i = 0; i < (1 << 12); i++) {
+					if (isTestIndex(i)) {
+						final List<Integer> list = Collections.nCopies(i, -4);
+						try {
+							final Seq<Integer> concat = seq.prependAll(list);
+							assertEquals("(seq.size = " + seq.size() + ", list.size = " + list.size() + ")",
+									list.size() + seq.size() , concat.size());
+							assertEquals("(seq.size = " + seq.size() + ", list.size = " + list.size() + ")",
+									array[array.length - 1] % 63, (int) concat.last());
+							if (concat.size() > 32) {
+								assertEquals("(seq.size = " + seq.size() + ", list.size = " + list.size() + ")",
+										Iterables.get(Iterables.concat(list, seq), 32), concat.get(32));
+							}
+							assertTrue("Prepended seq is not equal to expected seq (seq.size = " + seq.size() + ", list.size = " + list.size() + ")",
+									Iterables.elementsEqual(Iterables.concat(list, seq), concat));
+						} catch (final RuntimeException ex) {
+							throw new AssertionError("Cannot prepend list of size " + list.size() + " to seq of size " + seq.size() + ": " + ex.getMessage(), ex);
+						}
+					}
+					// list.add(i % 61);
+				}
+			}
 		}
 	}
 

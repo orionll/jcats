@@ -123,9 +123,19 @@ final class SeqGenerator implements ClassGenerator {
 				if (suffix instanceof Seq<?>) {
 					return concat((Seq<A>) suffix);
 				} else if (suffix instanceof Collection<?> && suffix instanceof RandomAccess) {
-					return appendSized(suffix.iterator(), ((Collection<A>) suffix).size());
+					final int suffixSize = ((Collection<A>) suffix).size();
+					if (suffixSize == 0) {
+						return this;
+					} else {
+						return appendSized(suffix.iterator(), suffixSize);
+					}
 				} else if (suffix instanceof Sized) {
-					return appendSized(suffix.iterator(), ((Sized) suffix).size());
+					final int suffixSize = ((Sized) suffix).size();
+					if (suffixSize == 0) {
+						return this;
+					} else {
+						return appendSized(suffix.iterator(), suffixSize);
+					}
 				} else {
 					final Iterator<A> iterator = suffix.iterator();
 					if (iterator.hasNext()) {
@@ -145,9 +155,19 @@ final class SeqGenerator implements ClassGenerator {
 				if (prefix instanceof Seq<?>) {
 					return ((Seq<A>) prefix).concat(this);
 				} else if (prefix instanceof Collection<?> && prefix instanceof RandomAccess) {
-					return prependSized(prefix.iterator(), ((Collection<A>) prefix).size());
+					final int prefixSize = ((Collection<A>) prefix).size();
+					if (prefixSize == 0) {
+						return this;
+					} else {
+						return prependSized(prefix.iterator(), prefixSize);
+					}
 				} else if (prefix instanceof Sized) {
-					return prependSized(prefix.iterator(), ((Sized) prefix).size());
+					final int prefixSize = ((Sized) prefix).size();
+					if (prefixSize == 0) {
+						return this;
+					} else {
+						return prependSized(prefix.iterator(), prefixSize);
+					}
 				} else {
 					final Iterator<A> iterator = prefix.iterator();
 					if (iterator.hasNext()) {
@@ -247,100 +267,168 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			static <A> void fillArray(final Object[] array, final int index, final Iterator<A> iterator) {
-				for (int i = index; i < array.length; i++) {
+			static <A> void fillArray(final Object[] array, final int startIndex, final Iterator<A> iterator) {
+				for (int i = startIndex; i < array.length; i++) {
 					array[i] = requireNonNull(iterator.next());
 				}
 			}
 
-			static <A> void fillNode2(final Object[][] node2, final int index2, final Iterator<A> iterator) {
-				for (int i = index2; i < node2.length; i++) {
+			static <A> void fillNode2(final Object[][] node2, final int startIndex2, final int endIndex2, final Iterator<A> iterator) {
+				for (int i = startIndex2; i < endIndex2; i++) {
 					fillArray(node2[i], 0, iterator);
 				}
 			}
 
-			static <A> void fillNode3(final Object[][][] node3, final int index3, final Iterator<A> iterator) {
-				for (int i = index3; i < node3.length; i++) {
-					fillNode2(node3[i], 0, iterator);
+			static <A> void fillNode3(final Object[][][] node3, final int startIndex3, final int endIndex3, final Iterator<A> iterator) {
+				for (int i = startIndex3; i < endIndex3; i++) {
+					fillNode2(node3[i], 0, node3[i].length, iterator);
 				}
 			}
 
-			static <A> void fillNode4(final Object[][][][] node4, final int index4, final Iterator<A> iterator) {
-				for (int i = index4; i < node4.length; i++) {
-					fillNode3(node4[i], 0, iterator);
+			static <A> void fillNode4(final Object[][][][] node4, final int startIndex4, final int endIndex4, final Iterator<A> iterator) {
+				for (int i = startIndex4; i < endIndex4; i++) {
+					fillNode3(node4[i], 0, node4[i].length, iterator);
 				}
 			}
 
-			static <A> void fillNode5(final Object[][][][][] node5, final int index5, final Iterator<A> iterator) {
-				for (int i = index5; i < node5.length; i++) {
-					fillNode4(node5[i], 0, iterator);
+			static <A> void fillNode5(final Object[][][][][] node5, final int startIndex5, final int endIndex5, final Iterator<A> iterator) {
+				for (int i = startIndex5; i < endIndex5; i++) {
+					fillNode4(node5[i], 0, node5[i].length, iterator);
 				}
 			}
 
-			static <A> void fillNode6(final Object[][][][][][] node6, final int index6, final Iterator<A> iterator) {
-				for (int i = index6; i < node6.length; i++) {
-					fillNode5(node6[i], 0, iterator);
+			static <A> void fillNode6(final Object[][][][][][] node6, final int startIndex6, final int endIndex6, final Iterator<A> iterator) {
+				for (int i = startIndex6; i < endIndex6; i++) {
+					fillNode5(node6[i], 0, node6[i].length, iterator);
 				}
 			}
 
-			static <A> Seq1<A> fillSeq1(final Object[] node1, final int index1, final Iterator<A> iterator) {
-				fillArray(node1, index1, iterator);
+			static <A> Seq1<A> fillSeq1(final Object[] node1, final int startIndex1, final Iterator<A> iterator) {
+				fillArray(node1, startIndex1, iterator);
 				return new Seq1<>(node1);
 			}
 
-			static <A> Seq2<A> fillSeq2(final Object[][] node2, final int index2, final Object[] node1, final int index1,
+			static <A> Seq2<A> fillSeq2(final Object[][] node2, final int startIndex2, final Object[] node1, final int startIndex1,
 					final Object[] init, final Object[] tail, final int size, final Iterator<A> iterator) {
-				fillArray(node1, index1, iterator);
-				fillNode2(node2, index2, iterator);
+				fillArray(node1, startIndex1, iterator);
+				fillNode2(node2, startIndex2, node2.length, iterator);
 				fillArray(tail, 0, iterator);
 				return new Seq2<>(node2, init, tail, size);
 			}
 
-			static <A> Seq3<A> fillSeq3(final Object[][][] node3, final int index3, final Object[][] node2, final int index2,
-					final Object[] node1, final int index1, final Object[] init, final Object[] tail, final int startIndex,
+			static <A> Seq3<A> fillSeq3(final Object[][][] node3, final int startIndex3, final Object[][] node2, final int startIndex2,
+					final Object[] node1, final int startIndex1, final Object[] init, final Object[] tail, final int startIndex,
 					final int size, final Iterator<A> iterator) {
-				fillArray(node1, index1, iterator);
-				fillNode2(node2, index2, iterator);
-				fillNode3(node3, index3, iterator);
+				fillArray(node1, startIndex1, iterator);
+				fillNode2(node2, startIndex2, node2.length, iterator);
+				fillNode3(node3, startIndex3, node3.length, iterator);
 				fillArray(tail, 0, iterator);
 				return new Seq3<>(node3, init, tail, startIndex, size);
 			}
 
-			static <A> Seq4<A> fillSeq4(final Object[][][][] node4, final int index4, final Object[][][] node3, final int index3,
-					final Object[][] node2, final int index2,  final Object[] node1, final int index1, final Object[] init,
+			static <A> Seq4<A> fillSeq4(final Object[][][][] node4, final int startIndex4, final Object[][][] node3, final int startIndex3,
+					final Object[][] node2, final int startIndex2,  final Object[] node1, final int startIndex1, final Object[] init,
 					final Object[] tail, final int startIndex,  final int size, final Iterator<A> iterator) {
-				fillArray(node1, index1, iterator);
-				fillNode2(node2, index2, iterator);
-				fillNode3(node3, index3, iterator);
-				fillNode4(node4, index4, iterator);
+				fillArray(node1, startIndex1, iterator);
+				fillNode2(node2, startIndex2, node2.length, iterator);
+				fillNode3(node3, startIndex3, node3.length, iterator);
+				fillNode4(node4, startIndex4, node4.length, iterator);
 				fillArray(tail, 0, iterator);
 				return new Seq4<>(node4, init, tail, startIndex, size);
 			}
 
-			static <A> Seq5<A> fillSeq5(final Object[][][][][] node5, final int index5, final Object[][][][] node4, final int index4,
-					final Object[][][] node3, final int index3, final Object[][] node2, final int index2,
-					final Object[] node1, final int index1, final Object[] init, final Object[] tail, final int startIndex,
+			static <A> Seq5<A> fillSeq5(final Object[][][][][] node5, final int startIndex5, final Object[][][][] node4, final int startIndex4,
+					final Object[][][] node3, final int startIndex3, final Object[][] node2, final int startIndex2,
+					final Object[] node1, final int startIndex1, final Object[] init, final Object[] tail, final int startIndex,
 					final int size, final Iterator<A> iterator) {
-				fillArray(node1, index1, iterator);
-				fillNode2(node2, index2, iterator);
-				fillNode3(node3, index3, iterator);
-				fillNode4(node4, index4, iterator);
-				fillNode5(node5, index5, iterator);
+				fillArray(node1, startIndex1, iterator);
+				fillNode2(node2, startIndex2, node2.length, iterator);
+				fillNode3(node3, startIndex3, node3.length, iterator);
+				fillNode4(node4, startIndex4, node4.length, iterator);
+				fillNode5(node5, startIndex5, node5.length, iterator);
 				fillArray(tail, 0, iterator);
 				return new Seq5<>(node5, init, tail, startIndex, size);
 			}
 
-			static <A> Seq6<A> fillSeq6(final Object[][][][][][] node6, final int index6, final Object[][][][][] node5, final int index5,
-					final Object[][][][] node4, final int index4, final Object[][][] node3, final int index3,
-					final Object[][] node2, final int index2, final Object[] node1, final int index1,
+			static <A> Seq6<A> fillSeq6(final Object[][][][][][] node6, final int startIndex6, final Object[][][][][] node5, final int startIndex5,
+					final Object[][][][] node4, final int startIndex4, final Object[][][] node3, final int startIndex3,
+					final Object[][] node2, final int startIndex2, final Object[] node1, final int startIndex1,
 					final Object[] init, final Object[] tail, final int startIndex, final int size, final Iterator<A> iterator) {
-				fillArray(node1, index1, iterator);
-				fillNode2(node2, index2, iterator);
-				fillNode3(node3, index3, iterator);
-				fillNode4(node4, index4, iterator);
-				fillNode5(node5, index5, iterator);
-				fillNode6(node6, index6, iterator);
+				fillArray(node1, startIndex1, iterator);
+				fillNode2(node2, startIndex2, node2.length, iterator);
+				fillNode3(node3, startIndex3, node3.length, iterator);
+				fillNode4(node4, startIndex4, node4.length, iterator);
+				fillNode5(node5, startIndex5, node5.length, iterator);
+				fillNode6(node6, startIndex6, node6.length, iterator);
 				fillArray(tail, 0, iterator);
+				return new Seq6<>(node6, init, tail, startIndex, size);
+			}
+
+			static <A> void fillArrayFromStart(final Object[] array, final int endIndex, final Iterator<A> iterator) {
+				for (int i = 0; i < endIndex; i++) {
+					array[i] = requireNonNull(iterator.next());
+				}
+			}
+
+			static <A> Seq1<A> fillSeq1FromStart(final Object[] node1, final int endIndex1, final Iterator<A> iterator) {
+				fillArrayFromStart(node1, endIndex1, iterator);
+				return new Seq1<>(node1);
+			}
+
+			static <A> Seq2<A> fillSeq2FromStart(final Object[][] node2, final int fromEndIndex2, final Object[] node1,
+					final int fromEndIndex1, final Object[] init, final Object[] tail, final int size, final Iterator<A> iterator) {
+				fillArray(init, 0, iterator);
+				fillNode2(node2, 0, node2.length - fromEndIndex2, iterator);
+				fillArrayFromStart(node1, node1.length - fromEndIndex1, iterator);
+				return new Seq2<>(node2, init, tail, size);
+			}
+
+			static <A> Seq3<A> fillSeq3FromStart(final Object[][][] node3, final int fromEndIndex3, final Object[][] node2,
+					final int fromEndIndex2, final Object[] node1, final int fromEndIndex1, final Object[] init,
+					final Object[] tail, final int startIndex, final int size, final Iterator<A> iterator) {
+				fillArray(init, 0, iterator);
+				fillNode3(node3, 0, node3.length - fromEndIndex3, iterator);
+				fillNode2(node2, 0, node2.length - fromEndIndex2, iterator);
+				fillArrayFromStart(node1, node1.length - fromEndIndex1, iterator);
+				return new Seq3<>(node3, init, tail, startIndex, size);
+			}
+
+			static <A> Seq4<A> fillSeq4FromStart(final Object[][][][] node4, final int fromEndIndex4, final Object[][][] node3,
+					final int fromEndIndex3, final Object[][] node2, final int fromEndIndex2, final Object[] node1,
+					final int fromEndIndex1, final Object[] init, final Object[] tail, final int startIndex, final int size,
+					final Iterator<A> iterator) {
+				fillArray(init, 0, iterator);
+				fillNode4(node4, 0, node4.length - fromEndIndex4, iterator);
+				fillNode3(node3, 0, node3.length - fromEndIndex3, iterator);
+				fillNode2(node2, 0, node2.length - fromEndIndex2, iterator);
+				fillArrayFromStart(node1, node1.length - fromEndIndex1, iterator);
+				return new Seq4<>(node4, init, tail, startIndex, size);
+			}
+
+			static <A> Seq5<A> fillSeq5FromStart(final Object[][][][][] node5, final int fromEndIndex5, final Object[][][][] node4,
+					final int fromEndIndex4, final Object[][][] node3, final int fromEndIndex3, final Object[][] node2,
+					final int fromEndIndex2, final Object[] node1, final int fromEndIndex1, final Object[] init, final Object[] tail,
+					final int startIndex, final int size, final Iterator<A> iterator) {
+				fillArray(init, 0, iterator);
+				fillNode5(node5, 0, node5.length - fromEndIndex5, iterator);
+				fillNode4(node4, 0, node4.length - fromEndIndex4, iterator);
+				fillNode3(node3, 0, node3.length - fromEndIndex3, iterator);
+				fillNode2(node2, 0, node2.length - fromEndIndex2, iterator);
+				fillArrayFromStart(node1, node1.length - fromEndIndex1, iterator);
+				return new Seq5<>(node5, init, tail, startIndex, size);
+			}
+
+			static <A> Seq6<A> fillSeq6FromStart(final Object[][][][][][] node6, final int fromEndIndex6, final Object[][][][][] node5,
+					final int fromEndIndex5, final Object[][][][] node4, final int fromEndIndex4, final Object[][][] node3,
+					final int fromEndIndex3, final Object[][] node2, final int fromEndIndex2, final Object[] node1, final int fromEndIndex1,
+					final Object[] init, final Object[] tail, final int startIndex, final int size, final Iterator<A> iterator) {
+				fillArray(init, 0, iterator);
+				fillNode6(node6, 0, node6.length - fromEndIndex6, iterator);
+				fillNode5(node5, 0, node5.length - fromEndIndex5, iterator);
+				fillNode4(node4, 0, node4.length - fromEndIndex4, iterator);
+				fillNode3(node3, 0, node3.length - fromEndIndex3, iterator);
+				fillNode2(node2, 0, node2.length - fromEndIndex2, iterator);
+				fillArrayFromStart(node1, node1.length - fromEndIndex1, iterator);
 				return new Seq6<>(node6, init, tail, startIndex, size);
 			}
 
@@ -699,6 +787,183 @@ final class SeqGenerator implements ClassGenerator {
 				return node6;
 			}
 
+			static Object[][][] allocateNode3FromStart(final int fromEndIndex3, final int size) {
+				final int size3 = (size % (1 << 10) == 0) ? size / (1 << 10) : size / (1 << 10) + 1;
+				final Object[][][] node3 = new Object[size3][][];
+				for (int index3 = 0; index3 < size3 - fromEndIndex3; index3++) {
+					final int size2;
+					if (index3 == node3.length - 1) {
+						size2 = 31;
+					} else if (index3 > 0) {
+						size2 = 32;
+					} else {
+						final int totalSize2 = (size % (1 << 10) == 0) ? (1 << 10) : size % (1 << 10);
+						size2 = (totalSize2 % 32 == 0) ? totalSize2 / 32 - 1 : totalSize2 / 32;
+					}
+					node3[index3] = (size2 == 0) ? EMPTY_NODE2 : new Object[size2][32];
+				}
+				return node3;
+			}
+
+			static Object[][][][] allocateNode4FromStart(final int fromEndIndex4, final int size) {
+				final int size4 = (size % (1 << 15) == 0) ? size / (1 << 15) : size / (1 << 15) + 1;
+				final Object[][][][] node4 = new Object[size4][][][];
+				for (int index4 = 0; index4 < size4 - fromEndIndex4; index4++) {
+					final int size3;
+					if (index4 == 0) {
+						final int totalSize3 = (size % (1 << 15) == 0) ? (1 << 15) : size % (1 << 15);
+						size3 = (totalSize3 % (1 << 10) == 0) ? totalSize3 / (1 << 10) : totalSize3 / (1 << 10) + 1;
+					} else {
+						size3 = 32;
+					}
+					final Object[][][] node3 = new Object[size3][][];
+					node4[index4] = node3;
+					for (int index3 = 0; index3 < size3; index3++) {
+						final int size2;
+						if (index4 == node4.length - 1 && index3 == size3 - 1) {
+							size2 = 31;
+						} else if (index4 > 0 || index3 > 0) {
+							size2 = 32;
+						} else {
+							final int totalSize3 = (size % (1 << 15) == 0) ? (1 << 15) : size % (1 << 15);
+							final int totalSize2 = (totalSize3 % (1 << 10) == 0) ? (1 << 10) : totalSize3 % (1 << 10);
+							size2 = (totalSize2 % 32 == 0) ? totalSize2 / 32 - 1 : totalSize2 / 32;
+						}
+						node3[index3] = (size2 == 0) ? EMPTY_NODE2 : new Object[size2][32];
+					}
+				}
+				return node4;
+			}
+
+			static Object[][][][][] allocateNode5FromStart(final int fromEndIndex5, final int size) {
+				final int size5 = (size % (1 << 20) == 0) ? size / (1 << 20) : size / (1 << 20) + 1;
+				final Object[][][][][] node5 = new Object[size5][][][][];
+				for (int index5 = 0; index5 < size5 - fromEndIndex5; index5++) {
+					final int size4;
+					if (index5 == 0) {
+						final int totalSize4 = (size % (1 << 20) == 0) ? (1 << 20) : size % (1 << 20);
+						size4 = (totalSize4 % (1 << 15) == 0) ? totalSize4 / (1 << 15) : totalSize4 / (1 << 15) + 1;
+					} else {
+						size4 = 32;
+					}
+
+					final Object[][][][] node4 = new Object[size4][][][];
+					node5[index5] = node4;
+
+					for (int index4 = 0; index4 < size4; index4++) {
+						final int size3;
+						if (index5 == 0 && index4 == 0) {
+							final int totalSize4 = (size % (1 << 20) == 0) ? (1 << 20) : size % (1 << 20);
+							final int totalSize3 = (totalSize4 % (1 << 15) == 0) ? (1 << 15) : totalSize4 % (1 << 15);
+							size3 = (totalSize3 % (1 << 10) == 0) ? totalSize3 / (1 << 10) : totalSize3 / (1 << 10) + 1;
+						} else {
+							size3 = 32;
+						}
+
+						final Object[][][] node3 = new Object[size3][][];
+						node4[index4] = node3;
+
+						for (int index3 = 0; index3 < size3; index3++) {
+							final int size2;
+							if (index5 == node5.length - 1 && index4 == size4 - 1 && index3 == size3 - 1) {
+								size2 = 31;
+							} else if (index5 > 0 || index4 > 0 || index3 > 0) {
+								size2 = 32;
+							} else {
+								final int totalSize4 = (size % (1 << 20) == 0) ? (1 << 20) : size % (1 << 20);
+								final int totalSize3 = (totalSize4 % (1 << 15) == 0) ? (1 << 15) : totalSize4 % (1 << 15);
+								final int totalSize2 = (totalSize3 % (1 << 10) == 0) ? (1 << 10) : totalSize3 % (1 << 10);
+								size2 = (totalSize2 % 32 == 0) ? totalSize2 / 32 - 1 : totalSize2 / 32;
+							}
+							node3[index3] = (size2 == 0) ? EMPTY_NODE2 : new Object[size2][32];
+						}
+					}
+				}
+				return node5;
+			}
+
+			static Object[][][][][][] allocateNode6FromStart(final int fromEndIndex6, final int size) {
+				final int size6 = (size % (1 << 25) == 0) ? size / (1 << 25) : size / (1 << 25) + 1;
+				final Object[][][][][][] node6 = new Object[size6][][][][][];
+				for (int index6 = 0; index6 < size6 - fromEndIndex6; index6++) {
+					final int size5;
+					if (index6 == 0) {
+						final int totalSize5 = (size % (1 << 25) == 0) ? (1 << 25) : size % (1 << 25);
+						size5 = (totalSize5 % (1 << 20) == 0) ? totalSize5 / (1 << 20) : totalSize5 / (1 << 20) + 1;
+					} else {
+						size5 = 32;
+					}
+
+					final Object[][][][][] node5 = new Object[size5][][][][];
+					node6[index6] = node5;
+
+					for (int index5 = 0; index5 < node5.length; index5++) {
+						final int size4;
+						if (index6 == 0 && index5 == 0) {
+							final int totalSize5 = (size % (1 << 25) == 0) ? (1 << 25) : size % (1 << 25);
+							final int totalSize4 = (totalSize5 % (1 << 20) == 0) ? (1 << 20) : totalSize5 % (1 << 20);
+							size4 = (totalSize4 % (1 << 15) == 0) ? totalSize4 / (1 << 15) : totalSize4 / (1 << 15) + 1;
+						} else {
+							size4 = 32;
+						}
+
+						final Object[][][][] node4 = new Object[size4][][][];
+						node5[index5] = node4;
+
+						for (int index4 = 0; index4 < node4.length; index4++) {
+							final int size3;
+							if (index6 == 0 && index5 == 0 && index4 == 0) {
+								final int totalSize5 = (size % (1 << 25) == 0) ? (1 << 25) : size % (1 << 25);
+								final int totalSize4 = (totalSize5 % (1 << 20) == 0) ? (1 << 20) : totalSize5 % (1 << 20);
+								final int totalSize3 = (totalSize4 % (1 << 15) == 0) ? (1 << 15) : totalSize4 % (1 << 15);
+								size3 = (totalSize3 % (1 << 10) == 0) ? totalSize3 / (1 << 10) : totalSize3 / (1 << 10) + 1;
+							} else {
+								size3 = 32;
+							}
+
+							final Object[][][] node3 = new Object[size3][][];
+							node4[index4] = node3;
+
+							for (int index3 = 0; index3 < node3.length; index3++) {
+								final int size2;
+								if (index6 == node6.length - 1 && index5 == size5 - 1 && index4 == size4 - 1 && index3 == size3 - 1) {
+									size2 = 31;
+								} else if (index6 > 0 || index5 > 0 || index4 > 0 || index3 > 0) {
+									size2 = 32;
+								} else {
+									final int totalSize5 = (size % (1 << 25) == 0) ? (1 << 25) : size % (1 << 25);
+									final int totalSize4 = (totalSize5 % (1 << 20) == 0) ? (1 << 20) : totalSize5 % (1 << 20);
+									final int totalSize3 = (totalSize4 % (1 << 15) == 0) ? (1 << 15) : totalSize4 % (1 << 15);
+									final int totalSize2 = (totalSize3 % (1 << 10) == 0) ? (1 << 10) : totalSize3 % (1 << 10);
+									size2 = (totalSize2 % 32 == 0) ? totalSize2 / 32 - 1 : totalSize2 / 32;
+								}
+								final Object[][] node2 = (size2 == 0) ? EMPTY_NODE2 : new Object[size2][32];
+								node3[index3] = node2;
+							}
+						}
+					}
+				}
+				return node6;
+			}
+
+			static int calculateSeq3StartIndex(final Object[][][] node3, final Object[] init) {
+				return (1 << 10) - 32*node3[0].length - init.length;
+			}
+
+			static int calculateSeq4StartIndex(final Object[][][][] node4, final Object[] init) {
+				return (1 << 15) - 32*node4[0][0].length - (1 << 10)*(node4[0].length - 1) - init.length;
+			}
+
+			static int calculateSeq5StartIndex(final Object[][][][][] node5, final Object[] init) {
+				return (1 << 20) - 32*node5[0][0][0].length - (1 << 10)*(node5[0][0].length - 1) - (1 << 15)*(node5[0].length - 1)
+						- init.length;
+			}
+
+			static int calculateSeq6StartIndex(final Object[][][][][][] node6, final Object[] init) {
+				return (1 << 25) - 32*node6[0][0][0][0].length - (1 << 10)*(node6[0][0][0].length - 1) -
+						(1 << 15)*(node6[0][0].length - 1) - (1 << 20)*(node6[0].length - 1) - init.length;
+			}
+
 			abstract void initSeqBuilder(final SeqBuilder<A> builder);
 
 			«join»
@@ -798,7 +1063,7 @@ final class SeqGenerator implements ClassGenerator {
 			private int index1;
 			private Object[] node1;
 
-			Seq2Iterator(Object[][] node2, Object[] init, Object[] tail) {
+			Seq2Iterator(final Object[][] node2, final Object[] init, final Object[] tail) {
 				this.node2 = node2;
 				this.tail = tail;
 				node1 = init;
@@ -1473,13 +1738,13 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			private Seq<A> appendSizedToSeq1(final Iterator<A> suffix, final int size) {
+			private Seq1<A> appendSizedToSeq1(final Iterator<A> suffix, final int size) {
 				final Object[] newNode1 = new Object[size];
 				System.arraycopy(node1, 0, newNode1, 0, node1.length);
 				return fillSeq1(newNode1, node1.length, suffix);
 			}
 
-			private Seq<A> appendSizedToSeq2(final Iterator<A> suffix, final int suffixSize, final int size) {
+			private Seq2<A> appendSizedToSeq2(final Iterator<A> suffix, final int suffixSize, final int size) {
 				final Object[] newTail = allocateTail(suffixSize);
 				final int size2 = (suffixSize - newTail.length) / 32;
 				final Object[][] newNode2;
@@ -1492,27 +1757,27 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			private Seq<A> appendSizedToSeq3(final Iterator<A> suffix, final int suffixSize, final int size, final int maxSize) {
+			private Seq3<A> appendSizedToSeq3(final Iterator<A> suffix, final int suffixSize, final int size, final int maxSize) {
 				final Object[] newTail = allocateTail(suffixSize);
 				final Object[][][] newNode3 = allocateNode3(0, maxSize);
 				return fillSeq3(newNode3, 1, newNode3[0], 1, newNode3[0][0], 0, node1, newTail, 32 - node1.length, size, suffix);
 			}
 
-			private Seq<A> appendSizedToSeq4(final Iterator<A> suffix, final int suffixSize, final int size, final int maxSize) {
+			private Seq4<A> appendSizedToSeq4(final Iterator<A> suffix, final int suffixSize, final int size, final int maxSize) {
 				final Object[] newTail = allocateTail(suffixSize);
 				final Object[][][][] newNode4 = allocateNode4(0, maxSize);
 				return fillSeq4(newNode4, 1, newNode4[0], 1, newNode4[0][0], 1, newNode4[0][0][0], 0,
 						node1, newTail, 32 - node1.length, size, suffix);
 			}
 
-			private Seq<A> appendSizedToSeq5(final Iterator<A> suffix, final int suffixSize, final int size, final int maxSize) {
+			private Seq5<A> appendSizedToSeq5(final Iterator<A> suffix, final int suffixSize, final int size, final int maxSize) {
 				final Object[] newTail = allocateTail(suffixSize);
 				final Object[][][][][] newNode5 = allocateNode5(0, maxSize);
 				return fillSeq5(newNode5, 1, newNode5[0], 1, newNode5[0][0], 1, newNode5[0][0][0], 1, newNode5[0][0][0][0], 0,
 						node1, newTail, 32 - node1.length, size, suffix);
 			}
 
-			private Seq<A> appendSizedToSeq6(final Iterator<A> suffix, final int suffixSize, final int size, final int maxSize) {
+			private Seq6<A> appendSizedToSeq6(final Iterator<A> suffix, final int suffixSize, final int size, final int maxSize) {
 				final Object[] newTail = allocateTail(suffixSize);
 				final Object[][][][][][] newNode6 = allocateNode6(0, maxSize);
 				return fillSeq6(newNode6, 1, newNode6[0], 1, newNode6[0][0], 1, newNode6[0][0][0], 1, newNode6[0][0][0][0], 1,
@@ -1521,7 +1786,79 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			Seq<A> prependSized(final Iterator<A> prefix, final int prefixSize) {
-				throw new UnsupportedOperationException("Not implemented");
+				final int size = prefixSize + node1.length;
+				final int maxSize = prefixSize + 32;
+				if (maxSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (size <= 32) {
+					return prependSizedToSeq1(prefix, size);
+				} else if (maxSize <= (1 << 10)) {
+					return prependSizedToSeq2(prefix, prefixSize, size);
+				} else if (maxSize <= (1 << 15)) {
+					return prependSizedToSeq3(prefix, prefixSize, size, maxSize);
+				} else if (maxSize <= (1 << 20)) {
+					return prependSizedToSeq4(prefix, prefixSize, size, maxSize);
+				} else if (maxSize <= (1 << 25)) {
+					return prependSizedToSeq5(prefix, prefixSize, size, maxSize);
+				} else if (maxSize <= (1 << 30)) {
+					return prependSizedToSeq6(prefix, prefixSize, size, maxSize);
+				} else {
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				}
+			}
+
+			private Seq1<A> prependSizedToSeq1(final Iterator<A> prefix, final int size) {
+				final Object[] newNode1 = new Object[size];
+				System.arraycopy(node1, 0, newNode1, size - node1.length, node1.length);
+				return fillSeq1FromStart(newNode1, size - node1.length, prefix);
+			}
+
+			private Seq2<A> prependSizedToSeq2(final Iterator<A> prefix, final int prefixSize, final int size) {
+				final Object[] newInit = allocateTail(prefixSize);
+				final int size2 = (prefixSize - newInit.length) / 32;
+				final Object[][] newNode2;
+				if (size2 == 0) {
+					fillArray(newInit, 0, prefix);
+					return new Seq2<>(EMPTY_NODE2, newInit, node1, size);
+				} else {
+					newNode2 = new Object[size2][32];
+					return fillSeq2FromStart(newNode2, 1, newNode2[size2 - 1], 0, newInit, node1, size, prefix);
+				}
+			}
+
+			private Seq3<A> prependSizedToSeq3(final Iterator<A> prefix, final int prefixSize, final int size, final int maxSize) {
+				final Object[] newInit = allocateTail(prefixSize);
+				final Object[][][] newNode3 = allocateNode3FromStart(0, maxSize);
+				final int startIndex = calculateSeq3StartIndex(newNode3, newInit);
+				return fillSeq3FromStart(newNode3, 1, newNode3[newNode3.length - 1], 1, newNode3[newNode3.length - 1][30], 0,
+						newInit, node1, startIndex, size, prefix);
+			}
+
+			private Seq4<A> prependSizedToSeq4(final Iterator<A> prefix, final int prefixSize, final int size, final int maxSize) {
+				final Object[] newInit = allocateTail(prefixSize);
+				final Object[][][][] newNode4 = allocateNode4FromStart(0, maxSize);
+				final int startIndex = calculateSeq4StartIndex(newNode4, newInit);
+				return fillSeq4FromStart(newNode4, 1, newNode4[newNode4.length - 1], 1, newNode4[newNode4.length - 1][31], 1,
+						newNode4[newNode4.length - 1][31][30], 0, newInit, node1, startIndex, size, prefix);
+			}
+
+			private Seq5<A> prependSizedToSeq5(final Iterator<A> prefix, final int prefixSize, final int size, final int maxSize) {
+				final Object[] newInit = allocateTail(prefixSize);
+				final Object[][][][][] newNode5 = allocateNode5FromStart(0, maxSize);
+				final int startIndex = calculateSeq5StartIndex(newNode5, newInit);
+				return fillSeq5FromStart(newNode5, 1, newNode5[newNode5.length - 1], 1, newNode5[newNode5.length - 1][31], 1,
+						newNode5[newNode5.length - 1][31][31], 1, newNode5[newNode5.length - 1][31][31][30], 0, newInit, node1,
+						startIndex, size, prefix);
+			}
+
+			private Seq6<A> prependSizedToSeq6(final Iterator<A> prefix, final int prefixSize, final int size, final int maxSize) {
+				final Object[] newInit = allocateTail(prefixSize);
+				final Object[][][][][][] newNode6 = allocateNode6FromStart(0, maxSize);
+				final int startIndex = calculateSeq6StartIndex(newNode6, newInit);
+				return fillSeq6FromStart(newNode6, 1, newNode6[newNode6.length - 1], 1, newNode6[newNode6.length - 1][31], 1,
+						newNode6[newNode6.length - 1][31][31], 1, newNode6[newNode6.length - 1][31][31][31], 1,
+						newNode6[newNode6.length - 1][31][31][31][30], 0, newInit, node1, startIndex, size, prefix);
 			}
 
 			@Override
@@ -1736,7 +2073,7 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			private Seq<A> appendSizedToSeq2(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq2<A> appendSizedToSeq2(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final int size2 = (maxSize - 32 - newTail.length) / 32;
 				final Object[][] newNode2 = new Object[size2][];
@@ -1748,8 +2085,8 @@ final class SeqGenerator implements ClassGenerator {
 					}
 					return fillSeq2(newNode2, node2.length + 1, tail, 32, init, newTail, size + suffixSize, suffix);
 				} else {
-					for (int i = node2.length; i < size2; i++) {
-						newNode2[i] = new Object[32];
+					for (int index2 = node2.length; index2 < size2; index2++) {
+						newNode2[index2] = new Object[32];
 					}
 					System.arraycopy(tail, 0, newNode2[node2.length], 0, tail.length);
 					return fillSeq2(newNode2, node2.length + 1, newNode2[node2.length], tail.length,
@@ -1757,7 +2094,7 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			private Seq<A> appendSizedToSeq3(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq3<A> appendSizedToSeq3(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][] newNode3 = allocateNode3(1, maxSize);
 				final Object[][] newNode2 = new Object[31][];
@@ -1779,7 +2116,7 @@ final class SeqGenerator implements ClassGenerator {
 						init, newTail, 32 - init.length, size + suffixSize, suffix);
 			}
 
-			private Seq<A> appendSizedToSeq4(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq4<A> appendSizedToSeq4(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][][] newNode4 = allocateNode4(1, maxSize);
 				final Object[][][] newNode3 = new Object[32][][];
@@ -1806,7 +2143,7 @@ final class SeqGenerator implements ClassGenerator {
 						init, newTail, 32 - init.length, size + suffixSize, suffix);
 			}
 
-			private Seq<A> appendSizedToSeq5(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq5<A> appendSizedToSeq5(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][][][] newNode5 = allocateNode5(1, maxSize);
 				final Object[][][][] newNode4 = new Object[32][][][];
@@ -1838,7 +2175,7 @@ final class SeqGenerator implements ClassGenerator {
 						newNode2[node2.length], tail.length, init, newTail, 32 - init.length, size + suffixSize, suffix);
 			}
 
-			private Seq<A> appendSizedToSeq6(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq6<A> appendSizedToSeq6(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][][][][] newNode6 = allocateNode6(1, maxSize);
 				final Object[][][][][] newNode5 = new Object[32][][][][];
@@ -1877,7 +2214,176 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			Seq<A> prependSized(final Iterator<A> prefix, final int prefixSize) {
-				throw new UnsupportedOperationException("Not implemented");
+				if (init.length + prefixSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (init.length + prefixSize <= 32) {
+					final Object[] newInit = new Object[init.length + prefixSize];
+					System.arraycopy(init, 0, newInit, prefixSize, init.length);
+					fillArrayFromStart(newInit, prefixSize, prefix);
+					return new Seq2<>(node2, newInit, tail, size + prefixSize);
+				}
+
+				final int maxSize = size - tail.length + 32 + prefixSize;
+				if (maxSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (maxSize <= (1 << 10)) {
+					return prependSizedToSeq2(prefix, prefixSize, maxSize);
+				} else if (maxSize <= (1 << 15)) {
+					return prependSizedToSeq3(prefix, prefixSize, maxSize);
+				} else if (maxSize <= (1 << 20)) {
+					return prependSizedToSeq4(prefix, prefixSize, maxSize);
+				} else if (maxSize <= (1 << 25)) {
+					return prependSizedToSeq5(prefix, prefixSize, maxSize);
+				} else if (maxSize <= (1 << 30)) {
+					return prependSizedToSeq6(prefix, prefixSize, maxSize);
+				} else {
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				}
+			}
+
+			private Seq2<A> prependSizedToSeq2(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final int size2 = (maxSize - 32 - newInit.length) / 32;
+				final Object[][] newNode2 = new Object[size2][];
+				System.arraycopy(node2, 0, newNode2, size2 - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[size2 - node2.length - 1] = init;
+					for (int index2 = 0; index2 < size2 - node2.length - 1; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					return fillSeq2FromStart(newNode2, node2.length + 1, init, 32, newInit, tail, size + prefixSize, prefix);
+				} else {
+					for (int index2 = 0; index2 < size2 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[size2 - node2.length - 1], 32 - init.length, init.length);
+					return fillSeq2FromStart(newNode2, node2.length + 1, newNode2[size2 - node2.length - 1], init.length,
+							newInit, tail, size + prefixSize, prefix);
+				}
+			}
+
+			private Seq3<A> prependSizedToSeq3(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][] newNode3 = allocateNode3FromStart(1, maxSize);
+				final Object[][] newNode2 = new Object[31][];
+				System.arraycopy(node2, 0, newNode2, 31 - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[30 - node2.length] = init;
+					for (int index2 = 0; index2 < 30 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < 31 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[30 - node2.length], 32 - init.length, init.length);
+				}
+				newNode3[newNode3.length - 1] = newNode2;
+				final int startIndex = calculateSeq3StartIndex(newNode3, newInit);
+
+				return fillSeq3FromStart(newNode3, 1, newNode2, node2.length + 1, newNode2[30 - node2.length], init.length,
+						newInit, tail, startIndex, size + prefixSize, prefix);
+			}
+
+			private Seq4<A> prependSizedToSeq4(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][][] newNode4 = allocateNode4FromStart(1, maxSize);
+				final Object[][][] newNode3 = new Object[32][][];
+				final Object[][] newNode2 = new Object[31][];
+				System.arraycopy(node2, 0, newNode2, 31 - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[30 - node2.length] = init;
+					for (int index2 = 0; index2 < 30 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < 31 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[30 - node2.length], 32 - init.length, init.length);
+				}
+				newNode3[31] = newNode2;
+				for (int index3 = 0; index3 < 31; index3++) {
+					newNode3[index3] = new Object[32][32];
+				}
+				newNode4[newNode4.length - 1] = newNode3;
+				final int startIndex = calculateSeq4StartIndex(newNode4, newInit);
+
+				return fillSeq4FromStart(newNode4, 1, newNode3, 1, newNode2, node2.length + 1, newNode2[30 - node2.length],
+						init.length, newInit, tail, startIndex, size + prefixSize, prefix);
+			}
+
+			private Seq5<A> prependSizedToSeq5(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][][][] newNode5 = allocateNode5FromStart(1, maxSize);
+				final Object[][][][] newNode4 = new Object[32][][][];
+				final Object[][][] newNode3 = new Object[32][][];
+				final Object[][] newNode2 = new Object[31][];
+				System.arraycopy(node2, 0, newNode2, 31 - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[30 - node2.length] = init;
+					for (int index2 = 0; index2 < 30 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < 31 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[30 - node2.length], 32 - init.length, init.length);
+				}
+				newNode3[31] = newNode2;
+				for (int index3 = 0; index3 < 31; index3++) {
+					newNode3[index3] = new Object[32][32];
+				}
+				newNode4[31] = newNode3;
+				for (int index4 = 0; index4 < 31; index4++) {
+					newNode4[index4] = new Object[32][32][32];
+				}
+				newNode5[newNode5.length - 1] = newNode4;
+				final int startIndex = calculateSeq5StartIndex(newNode5, newInit);
+
+				return fillSeq5FromStart(newNode5, 1, newNode4, 1, newNode3, 1, newNode2, node2.length + 1,
+						newNode2[30 - node2.length], init.length, newInit, tail, startIndex, size + prefixSize, prefix);
+			}
+
+			private Seq6<A> prependSizedToSeq6(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][][][][] newNode6 = allocateNode6FromStart(1, maxSize);
+				final Object[][][][][] newNode5 = new Object[32][][][][];
+				final Object[][][][] newNode4 = new Object[32][][][];
+				final Object[][][] newNode3 = new Object[32][][];
+				final Object[][] newNode2 = new Object[31][];
+				System.arraycopy(node2, 0, newNode2, 31 - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[30 - node2.length] = init;
+					for (int index2 = 0; index2 < 30 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < 31 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[30 - node2.length], 32 - init.length, init.length);
+				}
+				newNode3[31] = newNode2;
+				for (int index3 = 0; index3 < 31; index3++) {
+					newNode3[index3] = new Object[32][32];
+				}
+				newNode4[31] = newNode3;
+				for (int index4 = 0; index4 < 31; index4++) {
+					newNode4[index4] = new Object[32][32][32];
+				}
+				newNode5[31] = newNode4;
+				for (int index5 = 0; index5 < 31; index5++) {
+					newNode5[index5] = new Object[32][32][32][32];
+				}
+				newNode6[newNode6.length - 1] = newNode5;
+				final int startIndex = calculateSeq6StartIndex(newNode6, newInit);
+
+				return fillSeq6FromStart(newNode6, 1, newNode5, 1, newNode4, 1, newNode3, 1, newNode2, node2.length + 1,
+						newNode2[30 - node2.length], init.length, newInit, tail, startIndex, size + prefixSize, prefix);
 			}
 
 			@Override
@@ -2187,7 +2693,7 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			private Seq<A> appendSizedToSeq3(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq3<A> appendSizedToSeq3(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][] newNode3 = allocateNode3(node3.length, maxSize);
 				System.arraycopy(node3, 0, newNode3, 0, node3.length - 1);
@@ -2219,7 +2725,7 @@ final class SeqGenerator implements ClassGenerator {
 						init, newTail, startIndex, size + suffixSize, suffix);
 			}
 
-			private Seq<A> appendSizedToSeq4(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq4<A> appendSizedToSeq4(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][][] newNode4 = allocateNode4(1, maxSize);
 				final Object[][][] newNode3 = new Object[32][][];
@@ -2248,7 +2754,7 @@ final class SeqGenerator implements ClassGenerator {
 						init, newTail, startIndex, size + suffixSize, suffix);
 			}
 
-			private Seq<A> appendSizedToSeq5(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq5<A> appendSizedToSeq5(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][][][] newNode5 = allocateNode5(1, maxSize);
 				final Object[][][][] newNode4 = new Object[32][][][];
@@ -2282,7 +2788,7 @@ final class SeqGenerator implements ClassGenerator {
 						newNode2[node2.length], tail.length, init, newTail, startIndex, size + suffixSize, suffix);
 			}
 
-			private Seq<A> appendSizedToSeq6(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq6<A> appendSizedToSeq6(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][][][][] newNode6 = allocateNode6(1, maxSize);
 				final Object[][][][][] newNode5 = new Object[32][][][][];
@@ -2323,7 +2829,170 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			Seq<A> prependSized(final Iterator<A> prefix, final int prefixSize) {
-				throw new UnsupportedOperationException("Not implemented");
+				if (init.length + prefixSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (init.length + prefixSize <= 32) {
+					final Object[] newInit = new Object[init.length + prefixSize];
+					System.arraycopy(init, 0, newInit, prefixSize, init.length);
+					fillArrayFromStart(newInit, prefixSize, prefix);
+					return new Seq3<>(node3, newInit, tail, startIndex - prefixSize, size + prefixSize);
+				}
+
+				final int maxSize = size - tail.length - 32*node3[node3.length - 1].length + (1 << 10) + prefixSize;
+				if (maxSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (maxSize <= (1 << 15)) {
+					return prependSizedToSeq3(prefix, prefixSize, maxSize);
+				} else if (maxSize <= (1 << 20)) {
+					return prependSizedToSeq4(prefix, prefixSize, maxSize);
+				} else if (maxSize <= (1 << 25)) {
+					return prependSizedToSeq5(prefix, prefixSize, maxSize);
+				} else if (maxSize <= (1 << 30)) {
+					return prependSizedToSeq6(prefix, prefixSize, maxSize);
+				} else {
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				}
+			}
+
+			private Seq3<A> prependSizedToSeq3(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][] newNode3 = allocateNode3FromStart(node3.length, maxSize);
+				System.arraycopy(node3, 1, newNode3, newNode3.length - node3.length + 1, node3.length - 1);
+
+				final Object[][] newNode2;
+				if (node3.length < newNode3.length) {
+					newNode2 = new Object[32][];
+				} else {
+					final int totalSize2 = (maxSize % (1 << 10) == 0) ? (1 << 10) : maxSize % (1 << 10);
+					newNode2 = new Object[(totalSize2 % 32 == 0) ? totalSize2 / 32 - 1 : totalSize2 / 32][];
+				}
+				final Object[][] node2 = node3[0];
+				System.arraycopy(node2, 0, newNode2, newNode2.length - node2.length, node2.length);
+
+				if (init.length == 32) {
+					newNode2[newNode2.length - node2.length - 1] = init;
+					for (int index2 = 0; index2 < newNode2.length - node2.length - 1; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < newNode2.length - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[newNode2.length - node2.length - 1], 32 - init.length, init.length);
+				}
+				newNode3[newNode3.length - node3.length] = newNode2;
+				final int newStartIndex = calculateSeq3StartIndex(newNode3, newInit);
+
+				return fillSeq3FromStart(newNode3, node3.length, newNode2, node2.length + 1,
+						newNode2[newNode2.length - node2.length - 1], init.length, newInit, tail, newStartIndex,
+						size + prefixSize, prefix);
+			}
+
+			private Seq4<A> prependSizedToSeq4(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][][] newNode4 = allocateNode4FromStart(1, maxSize);
+				final Object[][][] newNode3 = new Object[32][][];
+				System.arraycopy(node3, 1, newNode3, 33 - node3.length, node3.length - 1);
+				final Object[][] newNode2 = new Object[32][];
+				final Object[][] node2 = node3[0];
+				System.arraycopy(node2, 0, newNode2, 32 - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[31 - node2.length] = init;
+					for (int index2 = 0; index2 < 31 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < 32 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[31 - node2.length], 32 - init.length, init.length);
+				}
+				newNode3[32 - node3.length] = newNode2;
+				for (int index3 = 0; index3 < 32 - node3.length; index3++) {
+					newNode3[index3] = new Object[32][32];
+				}
+				newNode4[newNode4.length - 1] = newNode3;
+				final int newStartIndex = calculateSeq4StartIndex(newNode4, newInit);
+
+				return fillSeq4FromStart(newNode4, 1, newNode3, node3.length, newNode2, node2.length + 1,
+						newNode2[31 - node2.length], init.length, newInit, tail, newStartIndex, size + prefixSize, prefix);
+			}
+
+			private Seq5<A> prependSizedToSeq5(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][][][] newNode5 = allocateNode5FromStart(1, maxSize);
+				final Object[][][][] newNode4 = new Object[32][][][];
+				final Object[][][] newNode3 = new Object[32][][];
+				System.arraycopy(node3, 1, newNode3, 33 - node3.length, node3.length - 1);
+				final Object[][] newNode2 = new Object[32][];
+				final Object[][] node2 = node3[0];
+				System.arraycopy(node2, 0, newNode2, 32 - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[31 - node2.length] = init;
+					for (int index2 = 0; index2 < 31 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < 32 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[31 - node2.length], 32 - init.length, init.length);
+				}
+				newNode3[32 - node3.length] = newNode2;
+				for (int index3 = 0; index3 < 32 - node3.length; index3++) {
+					newNode3[index3] = new Object[32][32];
+				}
+				newNode4[31] = newNode3;
+				for (int index4 = 0; index4 < 31; index4++) {
+					newNode4[index4] = new Object[32][32][32];
+				}
+				newNode5[newNode5.length - 1] = newNode4;
+				final int newStartIndex = calculateSeq5StartIndex(newNode5, newInit);
+
+				return fillSeq5FromStart(newNode5, 1, newNode4, 1, newNode3, node3.length, newNode2, node2.length + 1,
+						newNode2[31 - node2.length], init.length, newInit, tail, newStartIndex, size + prefixSize, prefix);
+			}
+
+			private Seq6<A> prependSizedToSeq6(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][][][][] newNode6 = allocateNode6FromStart(1, maxSize);
+				final Object[][][][][] newNode5 = new Object[32][][][][];
+				final Object[][][][] newNode4 = new Object[32][][][];
+				final Object[][][] newNode3 = new Object[32][][];
+				System.arraycopy(node3, 1, newNode3, 33 - node3.length, node3.length - 1);
+				final Object[][] newNode2 = new Object[32][];
+				final Object[][] node2 = node3[0];
+				System.arraycopy(node2, 0, newNode2, 32 - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[31 - node2.length] = init;
+					for (int index2 = 0; index2 < 31 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < 32 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[31 - node2.length], 32 - init.length, init.length);
+				}
+				newNode3[32 - node3.length] = newNode2;
+				for (int index3 = 0; index3 < 32 - node3.length; index3++) {
+					newNode3[index3] = new Object[32][32];
+				}
+				newNode4[31] = newNode3;
+				for (int index4 = 0; index4 < 31; index4++) {
+					newNode4[index4] = new Object[32][32][32];
+				}
+				newNode5[31] = newNode4;
+				for (int index5 = 0; index5 < 31; index5++) {
+					newNode5[index5] = new Object[32][32][32][32];
+				}
+				newNode6[newNode6.length - 1] = newNode5;
+				final int newStartIndex = calculateSeq6StartIndex(newNode6, newInit);
+
+				return fillSeq6FromStart(newNode6, 1, newNode5, 1, newNode4, 1, newNode3, node3.length, newNode2, node2.length + 1,
+						newNode2[31 - node2.length], init.length, newInit, tail, newStartIndex, size + prefixSize, prefix);
 			}
 
 			@Override
@@ -2730,7 +3399,7 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			private Seq<A> appendSizedToSeq4(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq4<A> appendSizedToSeq4(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][][] newNode4 = allocateNode4(node4.length, maxSize);
 				System.arraycopy(node4, 0, newNode4, 0, node4.length - 1);
@@ -2775,7 +3444,7 @@ final class SeqGenerator implements ClassGenerator {
 						init, newTail, startIndex, size + suffixSize, suffix);
 			}
 
-			private Seq<A> appendSizedToSeq5(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq5<A> appendSizedToSeq5(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][][][] newNode5 = allocateNode5(1, maxSize);
 				final Object[][][][] newNode4 = new Object[32][][][];
@@ -2811,7 +3480,7 @@ final class SeqGenerator implements ClassGenerator {
 						newNode2[node2.length], tail.length, init, newTail, startIndex, size + suffixSize, suffix);
 			}
 
-			private Seq<A> appendSizedToSeq6(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq6<A> appendSizedToSeq6(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][][][][] newNode6 = allocateNode6(1, maxSize);
 				final Object[][][][][] newNode5 = new Object[32][][][][];
@@ -2854,7 +3523,157 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			Seq<A> prependSized(final Iterator<A> prefix, final int prefixSize) {
-				throw new UnsupportedOperationException("Not implemented");
+				if (init.length + prefixSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (init.length + prefixSize <= 32) {
+					final Object[] newInit = new Object[init.length + prefixSize];
+					System.arraycopy(init, 0, newInit, prefixSize, init.length);
+					fillArrayFromStart(newInit, prefixSize, prefix);
+					return new Seq4<>(node4, newInit, tail, startIndex - prefixSize, size + prefixSize);
+				}
+
+				final Object[][][] node3 = node4[node4.length - 1];
+				final int maxSize = size - tail.length - 32*node3[node3.length - 1].length - (1 << 10)*(node3.length - 1) +
+						(1 << 15) + prefixSize;
+				if (maxSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (maxSize <= (1 << 20)) {
+					return prependSizedToSeq4(prefix, prefixSize, maxSize);
+				} else if (maxSize <= (1 << 25)) {
+					return prependSizedToSeq5(prefix, prefixSize, maxSize);
+				} else if (maxSize <= (1 << 30)) {
+					return prependSizedToSeq6(prefix, prefixSize, maxSize);
+				} else {
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				}
+			}
+
+			private Seq4<A> prependSizedToSeq4(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][][] newNode4 = allocateNode4FromStart(node4.length, maxSize);
+				System.arraycopy(node4, 1, newNode4, newNode4.length - node4.length + 1, node4.length - 1);
+
+				final Object[][][] node3 = node4[0];
+				final Object[][] node2 = node3[0];
+				final Object[][][] newNode3;
+				final Object[][] newNode2;
+				if (node4.length < newNode4.length) {
+					newNode3 = new Object[32][][];
+					newNode2 = new Object[32][];
+					for (int index3 = 0; index3 < 32 - node3.length; index3++) {
+						newNode3[index3] = new Object[32][32];
+					}
+				} else {
+					final int totalSize3 = (maxSize % (1 << 15) == 0) ? (1 << 15) : maxSize % (1 << 15);
+					newNode3 = allocateNode3FromStart(node3.length, totalSize3);
+					if (node3.length < newNode3.length) {
+						newNode2 = new Object[32][];
+					} else {
+						final int totalSize2 = (totalSize3 % (1 << 10) == 0) ? (1 << 10) : totalSize3 % (1 << 10);
+						newNode2 = new Object[(totalSize2 % 32 == 0) ? totalSize2 / 32 - 1 : totalSize2 / 32][];
+					}
+				}
+				System.arraycopy(node3, 1, newNode3, newNode3.length - node3.length + 1, node3.length - 1);
+				System.arraycopy(node2, 0, newNode2, newNode2.length - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[newNode2.length - node2.length - 1] = init;
+					for (int index2 = 0; index2 < newNode2.length - node2.length - 1; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < newNode2.length - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[newNode2.length - node2.length - 1], 32 - init.length, init.length);
+				}
+				newNode3[newNode3.length - node3.length] = newNode2;
+				newNode4[newNode4.length - node4.length] = newNode3;
+				final int newStartIndex = calculateSeq4StartIndex(newNode4, newInit);
+
+				return fillSeq4FromStart(newNode4, node4.length, newNode3, node3.length, newNode2, node2.length + 1,
+						newNode2[newNode2.length - node2.length - 1], init.length, newInit, tail, newStartIndex, size + prefixSize, prefix);
+			}
+
+			private Seq5<A> prependSizedToSeq5(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][][][] newNode5 = allocateNode5FromStart(1, maxSize);
+				final Object[][][][] newNode4 = new Object[32][][][];
+				System.arraycopy(node4, 1, newNode4, newNode4.length - node4.length + 1, node4.length - 1);
+				final Object[][][] newNode3 = new Object[32][][];
+				final Object[][][] node3 = node4[0];
+				System.arraycopy(node3, 1, newNode3, newNode3.length - node3.length + 1, node3.length - 1);
+				final Object[][] newNode2 = new Object[32][];
+				final Object[][] node2 = node3[0];
+				System.arraycopy(node2, 0, newNode2, newNode2.length - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[31 - node2.length] = init;
+					for (int index2 = 0; index2 < 31 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < 32 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[31 - node2.length], 32 - init.length, init.length);
+				}
+				newNode3[32 - node3.length] = newNode2;
+				for (int index3 = 0; index3 < 32 - node3.length; index3++) {
+					newNode3[index3] = new Object[32][32];
+				}
+				newNode4[32 - node4.length] = newNode3;
+				for (int index4 = 0; index4 < 32 - node4.length; index4++) {
+					newNode4[index4] = new Object[32][32][32];
+				}
+				newNode5[newNode5.length - 1] = newNode4;
+				final int newStartIndex = calculateSeq5StartIndex(newNode5, newInit);
+
+				return fillSeq5FromStart(newNode5, 1, newNode4, node4.length, newNode3, node3.length, newNode2, node2.length + 1,
+						newNode2[newNode2.length - node2.length - 1], init.length, newInit, tail, newStartIndex, size + prefixSize, prefix);
+			}
+
+			private Seq6<A> prependSizedToSeq6(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][][][][] newNode6 = allocateNode6FromStart(1, maxSize);
+				final Object[][][][][] newNode5 = new Object[32][][][][];
+				final Object[][][][] newNode4 = new Object[32][][][];
+				System.arraycopy(node4, 1, newNode4, newNode4.length - node4.length + 1, node4.length - 1);
+				final Object[][][] newNode3 = new Object[32][][];
+				final Object[][][] node3 = node4[0];
+				System.arraycopy(node3, 1, newNode3, newNode3.length - node3.length + 1, node3.length - 1);
+				final Object[][] newNode2 = new Object[32][];
+				final Object[][] node2 = node3[0];
+				System.arraycopy(node2, 0, newNode2, newNode2.length - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[31 - node2.length] = init;
+					for (int index2 = 0; index2 < 31 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < 32 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[31 - node2.length], 32 - init.length, init.length);
+				}
+				newNode3[32 - node3.length] = newNode2;
+				for (int index3 = 0; index3 < 32 - node3.length; index3++) {
+					newNode3[index3] = new Object[32][32];
+				}
+				newNode4[32 - node4.length] = newNode3;
+				for (int index4 = 0; index4 < 32 - node4.length; index4++) {
+					newNode4[index4] = new Object[32][32][32];
+				}
+				newNode5[31] = newNode4;
+				for (int index5 = 0; index5 < 31; index5++) {
+					newNode5[index5] = new Object[32][32][32][32];
+				}
+				newNode6[newNode6.length - 1] = newNode5;
+				final int newStartIndex = calculateSeq6StartIndex(newNode6, newInit);
+
+				return fillSeq6FromStart(newNode6, 1, newNode5, 1, newNode4, node4.length, newNode3, node3.length, newNode2,
+						node2.length + 1, newNode2[newNode2.length - node2.length - 1], init.length, newInit, tail, newStartIndex,
+						size + prefixSize, prefix);
 			}
 
 			@Override
@@ -3376,7 +4195,7 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			private Seq<A> appendSizedToSeq5(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq5<A> appendSizedToSeq5(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][][][] newNode5 = allocateNode5(node5.length, maxSize);
 				System.arraycopy(node5, 0, newNode5, 0, node5.length - 1);
@@ -3439,7 +4258,7 @@ final class SeqGenerator implements ClassGenerator {
 						newNode2[node2.length], tail.length, init, newTail, startIndex, size + suffixSize, suffix);
 			}
 
-			private Seq<A> appendSizedToSeq6(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq6<A> appendSizedToSeq6(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][][][][] newNode6 = allocateNode6(1, maxSize);
 				final Object[][][][][] newNode5 = new Object[32][][][][];
@@ -3484,7 +4303,141 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			Seq<A> prependSized(final Iterator<A> prefix, final int prefixSize) {
-				throw new UnsupportedOperationException("Not implemented");
+				if (init.length + prefixSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (init.length + prefixSize <= 32) {
+					final Object[] newInit = new Object[init.length + prefixSize];
+					System.arraycopy(init, 0, newInit, prefixSize, init.length);
+					fillArrayFromStart(newInit, prefixSize, prefix);
+					return new Seq5<>(node5, newInit, tail, startIndex - prefixSize, size + prefixSize);
+				}
+
+				final Object[][][][] node4 = node5[node5.length - 1];
+				final Object[][][] node3 = node4[node4.length - 1];
+
+				final int maxSize = size - tail.length - 32*node3[node3.length - 1].length - (1 << 10)*(node3.length - 1)
+						- (1 << 15)*(node4.length - 1) + (1 << 20) + prefixSize;
+				if (maxSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (maxSize <= (1 << 25)) {
+					return prependSizedToSeq5(prefix, prefixSize, maxSize);
+				} else if (maxSize <= (1 << 30)) {
+					return prependSizedToSeq6(prefix, prefixSize, maxSize);
+				} else {
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				}
+			}
+
+			private Seq5<A> prependSizedToSeq5(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][][][] newNode5 = allocateNode5FromStart(node5.length, maxSize);
+				System.arraycopy(node5, 1, newNode5, newNode5.length - node5.length + 1, node5.length - 1);
+
+				final Object[][][][] node4 = node5[0];
+				final Object[][][] node3 = node4[0];
+				final Object[][] node2 = node3[0];
+				final Object[][][][] newNode4;
+				final Object[][][] newNode3;
+				final Object[][] newNode2;
+				if (node5.length < newNode5.length) {
+					newNode4 = new Object[32][][][];
+					newNode3 = new Object[32][][];
+					newNode2 = new Object[32][];
+					for (int index3 = 0; index3 < 32 - node3.length; index3++) {
+						newNode3[index3] = new Object[32][32];
+					}
+					for (int index4 = 0; index4 < 32 - node4.length; index4++) {
+						newNode4[index4] = new Object[32][32][32];
+					}
+				} else {
+					final int totalSize4 = (maxSize % (1 << 20) == 0) ? (1 << 20) : maxSize % (1 << 20);
+					newNode4 = allocateNode4FromStart(node4.length, totalSize4);
+					if (node4.length < newNode4.length) {
+						newNode3 = new Object[32][][];
+						newNode2 = new Object[32][];
+						for (int index3 = 0; index3 < 32 - node3.length; index3++) {
+							newNode3[index3] = new Object[32][32];
+						}
+					} else {
+						final int totalSize3 = (totalSize4 % (1 << 15) == 0) ? (1 << 15) : totalSize4 % (1 << 15);
+						newNode3 = allocateNode3FromStart(node3.length, totalSize3);
+						if (node3.length < newNode3.length) {
+							newNode2 = new Object[32][];
+						} else {
+							final int totalSize2 = (totalSize3 % (1 << 10) == 0) ? (1 << 10) : totalSize3 % (1 << 10);
+							newNode2 = new Object[(totalSize2 % 32 == 0) ? totalSize2 / 32 - 1 : totalSize2 / 32][];
+						}
+					}
+				}
+				System.arraycopy(node4, 1, newNode4, newNode4.length - node4.length + 1, node4.length - 1);
+				System.arraycopy(node3, 1, newNode3, newNode3.length - node3.length + 1, node3.length - 1);
+				System.arraycopy(node2, 0, newNode2, newNode2.length - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[newNode2.length - node2.length - 1] = init;
+					for (int index2 = 0; index2 < newNode2.length - node2.length - 1; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < newNode2.length - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[newNode2.length - node2.length - 1], 32 - init.length, init.length);
+				}
+				newNode3[newNode3.length - node3.length] = newNode2;
+				newNode4[newNode4.length - node4.length] = newNode3;
+				newNode5[newNode5.length - node5.length] = newNode4;
+				final int newStartIndex = calculateSeq5StartIndex(newNode5, newInit);
+
+				return fillSeq5FromStart(newNode5, node5.length, newNode4, node4.length, newNode3, node3.length,
+						newNode2, node2.length + 1, newNode2[newNode2.length - node2.length - 1], init.length, newInit, tail,
+						newStartIndex, size + prefixSize, prefix);
+			}
+
+			private Seq6<A> prependSizedToSeq6(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][][][][] newNode6 = allocateNode6FromStart(1, maxSize);
+				final Object[][][][][] newNode5 = new Object[32][][][][];
+				System.arraycopy(node5, 1, newNode5, newNode5.length - node5.length + 1, node5.length - 1);
+				final Object[][][][] newNode4 = new Object[32][][][];
+				final Object[][][][] node4 = node5[0];
+				System.arraycopy(node4, 1, newNode4, newNode4.length - node4.length + 1, node4.length - 1);
+				final Object[][][] newNode3 = new Object[32][][];
+				final Object[][][] node3 = node4[0];
+				System.arraycopy(node3, 1, newNode3, newNode3.length - node3.length + 1, node3.length - 1);
+				final Object[][] newNode2 = new Object[32][];
+				final Object[][] node2 = node3[0];
+				System.arraycopy(node2, 0, newNode2, newNode2.length - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[31 - node2.length] = init;
+					for (int index2 = 0; index2 < 31 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < 32 - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[31 - node2.length], 32 - init.length, init.length);
+				}
+				newNode3[32 - node3.length] = newNode2;
+				for (int index3 = 0; index3 < 32 - node3.length; index3++) {
+					newNode3[index3] = new Object[32][32];
+				}
+				newNode4[32 - node4.length] = newNode3;
+				for (int index4 = 0; index4 < 32 - node4.length; index4++) {
+					newNode4[index4] = new Object[32][32][32];
+				}
+				newNode5[32 - node5.length] = newNode4;
+				for (int index5 = 0; index5 < 32 - node5.length; index5++) {
+					newNode5[index5] = new Object[32][32][32][32];
+				}
+				newNode6[newNode6.length - 1] = newNode5;
+				final int newStartIndex = calculateSeq6StartIndex(newNode6, newInit);
+
+				return fillSeq6FromStart(newNode6, 1, newNode5, node5.length, newNode4, node4.length, newNode3, node3.length, newNode2,
+						node2.length + 1, newNode2[newNode2.length - node2.length - 1], init.length, newInit, tail, newStartIndex,
+						size + prefixSize, prefix);
 			}
 
 			@Override
@@ -4106,7 +5059,7 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			private Seq<A> appendSizedToSeq6(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
+			private Seq6<A> appendSizedToSeq6(final Iterator<A> suffix, final int suffixSize, final int maxSize) {
 				final Object[] newTail = allocateTail(maxSize);
 				final Object[][][][][][] newNode6 = allocateNode6(node6.length, maxSize);
 				System.arraycopy(node6, 0, newNode6, 0, node6.length - 1);
@@ -4193,7 +5146,114 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			Seq<A> prependSized(final Iterator<A> prefix, final int prefixSize) {
-				throw new UnsupportedOperationException("Not implemented");
+				if (init.length + prefixSize < 0) {
+					// Overflow
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				} else if (init.length + prefixSize <= 32) {
+					final Object[] newInit = new Object[init.length + prefixSize];
+					System.arraycopy(init, 0, newInit, prefixSize, init.length);
+					fillArrayFromStart(newInit, prefixSize, prefix);
+					return new Seq6<>(node6, newInit, tail, startIndex - prefixSize, size + prefixSize);
+				}
+
+				final Object[][][][][] node5 = node6[node6.length - 1];
+				final Object[][][][] node4 = node5[node5.length - 1];
+				final Object[][][] node3 = node4[node4.length - 1];
+
+				final int maxSize = size - tail.length - 32*node3[node3.length - 1].length - (1 << 10)*(node3.length - 1)
+						- (1 << 15)*(node4.length - 1) - (1 << 20)*(node5.length - 1) + (1 << 25) + prefixSize;
+				if (maxSize >= 0 && maxSize <= (1 << 30)) {
+					return prependSizedToSeq6(prefix, prefixSize, maxSize);
+				} else {
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				}
+			}
+
+			private Seq6<A> prependSizedToSeq6(final Iterator<A> prefix, final int prefixSize, final int maxSize) {
+				final Object[] newInit = allocateTail(maxSize);
+				final Object[][][][][][] newNode6 = allocateNode6FromStart(node6.length, maxSize);
+				System.arraycopy(node6, 1, newNode6, newNode6.length - node6.length + 1, node6.length - 1);
+
+				final Object[][][][][] node5 = node6[0];
+				final Object[][][][] node4 = node5[0];
+				final Object[][][] node3 = node4[0];
+				final Object[][] node2 = node3[0];
+				final Object[][][][][] newNode5;
+				final Object[][][][] newNode4;
+				final Object[][][] newNode3;
+				final Object[][] newNode2;
+				if (node6.length < newNode6.length) {
+					newNode5 = new Object[32][][][][];
+					newNode4 = new Object[32][][][];
+					newNode3 = new Object[32][][];
+					newNode2 = new Object[32][];
+					for (int index3 = 0; index3 < 32 - node3.length; index3++) {
+						newNode3[index3] = new Object[32][32];
+					}
+					for (int index4 = 0; index4 < 32 - node4.length; index4++) {
+						newNode4[index4] = new Object[32][32][32];
+					}
+					for (int index5 = 0; index5 < 32 - node5.length; index5++) {
+						newNode5[index5] = new Object[32][32][32][32];
+					}
+				} else {
+					final int totalSize5 = (maxSize % (1 << 25) == 0) ? (1 << 25) : maxSize % (1 << 25);
+					newNode5 = allocateNode5FromStart(node5.length, totalSize5);
+					if (node5.length < newNode5.length) {
+						newNode4 = new Object[32][][][];
+						newNode3 = new Object[32][][];
+						newNode2 = new Object[32][];
+						for (int index4 = 0; index4 < 32 - node4.length; index4++) {
+							newNode4[index4] = new Object[32][32][32];
+						}
+						for (int index3 = 0; index3 < 32 - node3.length; index3++) {
+							newNode3[index3] = new Object[32][32];
+						}
+					} else {
+						final int totalSize4 = (totalSize5 % (1 << 20) == 0) ? (1 << 20) : totalSize5 % (1 << 20);
+						newNode4 = allocateNode4FromStart(node4.length, totalSize4);
+						if (node4.length < newNode4.length) {
+							newNode3 = new Object[32][][];
+							newNode2 = new Object[32][];
+							for (int index3 = 0; index3 < 32 - node3.length; index3++) {
+								newNode3[index3] = new Object[32][32];
+							}
+						} else {
+							final int totalSize3 = (totalSize4 % (1 << 15) == 0) ? (1 << 15) : totalSize4 % (1 << 15);
+							newNode3 = allocateNode3FromStart(node3.length, totalSize3);
+							if (node3.length < newNode3.length) {
+								newNode2 = new Object[32][];
+							} else {
+								final int totalSize2 = (totalSize3 % (1 << 10) == 0) ? (1 << 10) : totalSize3 % (1 << 10);
+								newNode2 = new Object[(totalSize2 % 32 == 0) ? totalSize2 / 32 - 1 : totalSize2 / 32][];
+							}
+						}
+					}
+				}
+				System.arraycopy(node5, 1, newNode5, newNode5.length - node5.length + 1, node5.length - 1);
+				System.arraycopy(node4, 1, newNode4, newNode4.length - node4.length + 1, node4.length - 1);
+				System.arraycopy(node3, 1, newNode3, newNode3.length - node3.length + 1, node3.length - 1);
+				System.arraycopy(node2, 0, newNode2, newNode2.length - node2.length, node2.length);
+				if (init.length == 32) {
+					newNode2[newNode2.length - node2.length - 1] = init;
+					for (int index2 = 0; index2 < newNode2.length - node2.length - 1; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+				} else {
+					for (int index2 = 0; index2 < newNode2.length - node2.length; index2++) {
+						newNode2[index2] = new Object[32];
+					}
+					System.arraycopy(init, 0, newNode2[newNode2.length - node2.length - 1], 32 - init.length, init.length);
+				}
+				newNode3[newNode3.length - node3.length] = newNode2;
+				newNode4[newNode4.length - node4.length] = newNode3;
+				newNode5[newNode5.length - node5.length] = newNode4;
+				newNode6[newNode6.length - node6.length] = newNode5;
+				final int newStartIndex = calculateSeq6StartIndex(newNode6, newInit);
+
+				return fillSeq6FromStart(newNode6, node6.length, newNode5, node5.length, newNode4, node4.length, newNode3, node3.length,
+						newNode2, node2.length + 1, newNode2[newNode2.length - node2.length - 1], init.length, newInit, tail,
+						newStartIndex, size + prefixSize, prefix);
 			}
 
 			@Override
