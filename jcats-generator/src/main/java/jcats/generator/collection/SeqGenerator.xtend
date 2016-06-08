@@ -171,7 +171,22 @@ final class SeqGenerator implements ClassGenerator {
 				} else {
 					final Iterator<A> iterator = prefix.iterator();
 					if (iterator.hasNext()) {
-						throw new UnsupportedOperationException("Not implemented");
+						if (isEmpty()) {
+							final SeqBuilder<A> builder = new SeqBuilder<>();
+							while (iterator.hasNext()) {
+								builder.append(iterator.next());
+							}
+							return builder.build();
+						} else {
+							// We must know exact size, so use a temporary list
+							final BufferedList<A> tempList = new BufferedList<>();
+							int size = 0;
+							while (iterator.hasNext()) {
+								tempList.append(iterator.next());
+								size++;
+							}
+							return prependSized(tempList.iterator(), size);
+						}
 					} else {
 						return this;
 					}

@@ -84,5 +84,62 @@ final class CommonGenerator implements ClassGenerator {
 				}
 			}
 		}
+
+		final class BufferedList<A> {
+			private final BufferedListNode head = new BufferedListNode();
+			private BufferedListNode last = head;
+
+			void append(final A value) {
+				requireNonNull(value);
+				if (last.size < 32) {
+					last.values[last.size++] = value;
+				} else {
+					final BufferedListNode newLast = new BufferedListNode();
+					last.next = newLast;
+					last = newLast;
+					last.values[0] = value;
+					last.size = 1;
+				}
+			}
+
+			Iterator<A> iterator() {
+				return new BufferedListIterator<>(head);
+			}
+
+			static final class BufferedListNode {
+				final Object[] values = new Object[32];
+				int size;
+				BufferedListNode next;
+			}
+
+			static final class BufferedListIterator<A> implements Iterator<A> {
+				BufferedListNode node;
+				int i;
+
+				BufferedListIterator(final BufferedListNode node) {
+					this.node = node;
+				}
+
+				@Override
+				public boolean hasNext() {
+					return (i < node.size);
+				}
+
+				@Override
+				public A next() {
+					if (i < node.size) {
+						final Object value = node.values[i];
+						node.values[i++] = null;
+						if (i == node.size && node.next != null) {
+							i = 0;
+							node = node.next;
+						}
+						return (A) value;
+					} else {
+						throw new NoSuchElementException();
+					}
+				}
+			}
+		}
 	''' }
 }
