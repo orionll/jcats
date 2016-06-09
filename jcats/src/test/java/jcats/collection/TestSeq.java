@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class TestSeq {
 
@@ -392,6 +393,38 @@ public class TestSeq {
 			}
 			seq = seq.append(i % 63);
 		}
+	}
+
+	@Test
+	public void testConcatRandom() {
+		final Random random = new Random();
+		for (int i = 0; i < 100; i++) {
+			final Seq<Integer> seq1 = randomSeq(random);
+			final Seq<Integer> seq2 = randomSeq(random);
+			final Seq<Integer> concat = seq1.concat(seq2);
+			assertEquals(seq1.size() + seq2.size(), concat.size());
+			if (seq1.isNotEmpty()) {
+				assertEquals(seq1.head(), concat.head());
+				assertEquals(seq1.last(), concat.get(seq1.size() - 1));
+			}
+			if (seq2.isNotEmpty()) {
+				assertEquals(seq2.last(), concat.last());
+			}
+			assertTrue(Iterables.elementsEqual(Iterables.concat(seq1, seq2), concat));
+		}
+	}
+
+	private static Seq<Integer> randomSeq(final Random random) {
+		final int size = random.nextInt(1 << 21);
+		Seq<Integer> seq = Seq.emptySeq();
+		for (int i = 0; i < size; i++) {
+			if (random.nextBoolean()) {
+				seq = seq.prepend(random.nextInt() % 63);
+			} else {
+				seq = seq.append(random.nextInt() % 63);
+			}
+		}
+		return seq;
 	}
 
 	@Test
