@@ -288,31 +288,31 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			static <A> void fillNode2(final Object[][] node2, final int startIndex2, final int endIndex2, final Iterator<A> iterator) {
+			private static <A> void fillNode2(final Object[][] node2, final int startIndex2, final int endIndex2, final Iterator<A> iterator) {
 				for (int i = startIndex2; i < endIndex2; i++) {
 					fillArray(node2[i], 0, iterator);
 				}
 			}
 
-			static <A> void fillNode3(final Object[][][] node3, final int startIndex3, final int endIndex3, final Iterator<A> iterator) {
+			private static <A> void fillNode3(final Object[][][] node3, final int startIndex3, final int endIndex3, final Iterator<A> iterator) {
 				for (int i = startIndex3; i < endIndex3; i++) {
 					fillNode2(node3[i], 0, node3[i].length, iterator);
 				}
 			}
 
-			static <A> void fillNode4(final Object[][][][] node4, final int startIndex4, final int endIndex4, final Iterator<A> iterator) {
+			private static <A> void fillNode4(final Object[][][][] node4, final int startIndex4, final int endIndex4, final Iterator<A> iterator) {
 				for (int i = startIndex4; i < endIndex4; i++) {
 					fillNode3(node4[i], 0, node4[i].length, iterator);
 				}
 			}
 
-			static <A> void fillNode5(final Object[][][][][] node5, final int startIndex5, final int endIndex5, final Iterator<A> iterator) {
+			private static <A> void fillNode5(final Object[][][][][] node5, final int startIndex5, final int endIndex5, final Iterator<A> iterator) {
 				for (int i = startIndex5; i < endIndex5; i++) {
 					fillNode4(node5[i], 0, node5[i].length, iterator);
 				}
 			}
 
-			static <A> void fillNode6(final Object[][][][][][] node6, final int startIndex6, final int endIndex6, final Iterator<A> iterator) {
+			private static <A> void fillNode6(final Object[][][][][][] node6, final int startIndex6, final int endIndex6, final Iterator<A> iterator) {
 				for (int i = startIndex6; i < endIndex6; i++) {
 					fillNode5(node6[i], 0, node6[i].length, iterator);
 				}
@@ -1640,6 +1640,7 @@ final class SeqGenerator implements ClassGenerator {
 
 			Seq1(final Object[] node1) {
 				this.node1 = node1;
+				assert node1.length >= 1 && node1.length <= 32 : "node1.length = " + node1.length;
 			}
 
 			@Override
@@ -1907,6 +1908,29 @@ final class SeqGenerator implements ClassGenerator {
 				this.init = init;
 				this.tail = tail;
 				this.size = size;
+
+				boolean ea = false;
+				assert ea = true;
+				if (ea) {
+					assert node2.length <= 30 : "node2.length = " + node2.length;
+					assert node2.length > 0 || node2 == EMPTY_NODE2;
+					assert init.length >= 1 && init.length <= 32 : "init.length = " + init.length;
+					assert tail.length >= 1 && tail.length <= 32 : "tail.length = " + tail.length;
+					assert size >= 33 && size <= (1 << 10) : "size = " + size;
+					for (final Object[] node1 : node2) {
+						assert node1.length == 32 : "node1.length = " + node1.length;
+						for (final Object value : node1) {
+							assert value != null;
+						}
+					}
+					for (final Object value : init) {
+						assert value != null;
+					}
+					for (final Object value : tail) {
+						assert value != null;
+					}
+					assert 32*node2.length + init.length + tail.length == size;
+				}
 			}
 
 			@Override
@@ -2440,6 +2464,44 @@ final class SeqGenerator implements ClassGenerator {
 				this.tail = tail;
 				this.startIndex = startIndex;
 				this.size = size;
+
+				boolean ea = false;
+				assert ea = true;
+				if (ea) {
+					final Object[][] lastNode2 = node3[node3.length - 1];
+
+					assert node3.length >= 2 && node3.length <= 32 : "node3.length = " + node3.length;
+					assert init.length >= 1 && init.length <= 32 : "init.length = " + init.length;
+					assert tail.length >= 1 && tail.length <= 32 : "tail.length = " + tail.length;
+					assert size >= 31*32 + 2 && size <= (1 << 15) : "size = " + size;
+
+					assert node3[0].length <= 31 : "node2.length = " + node3[0].length;
+					assert lastNode2.length <= 31 : "node2.length = " + lastNode2.length;
+					assert node3[0].length != 0 || node3[0] == EMPTY_NODE2;
+					assert lastNode2.length != 0 || lastNode2 == EMPTY_NODE2;
+
+					for (int i = 1; i < node3.length - 1; i++) {
+						assert node3[i].length == 32 : "node2.length = " + node3[i].length;
+					}
+					for (final Object[][] node2 : node3) {
+						for (final Object[] node1 : node2) {
+							assert node1.length == 32 : "node1.length = " + node1.length;
+							for (final Object value : node1) {
+								assert value != null;
+							}
+						}
+					}
+					for (final Object value : init) {
+						assert value != null;
+					}
+					for (final Object value : tail) {
+						assert value != null;
+					}
+
+					assert 32*node3[0].length + 32*lastNode2.length + 32*32*(node3.length - 2) +
+							init.length + tail.length == size : "size = " + size;
+					assert startIndex == calculateSeq3StartIndex(node3, init) : "startIndex = " + startIndex;
+				}
 			}
 
 			@Override
@@ -3054,6 +3116,60 @@ final class SeqGenerator implements ClassGenerator {
 				this.tail = tail;
 				this.startIndex = startIndex;
 				this.size = size;
+
+				boolean ea = false;
+				assert ea = true;
+				if (ea) {
+					final Object[][][] lastNode3 = node4[node4.length - 1];
+					final Object[][] lastNode2 = lastNode3[lastNode3.length - 1];
+
+					assert node4.length >= 2 && node4.length <= 32 : "node4.length = " + node4.length;
+					assert init.length >= 1 && init.length <= 32 : "init.length = " + init.length;
+					assert tail.length >= 1 && tail.length <= 32 : "tail.length = " + tail.length;
+					assert size >= 31*32*32 + 2 && size <= (1 << 20) : "size = " + size;
+
+					assert node4[0].length >= 1 && node4[0].length <= 32 : "node3.length = " + node4[0].length;
+					assert lastNode3.length >= 1 && lastNode3.length <= 32 : "node3.length = " + lastNode3.length;
+
+					assert node4[0][0].length <= 31 : "node2.length = " + node4[0][0].length;
+					assert lastNode2.length <= 31 : "node2.length = " + lastNode2.length;
+					assert node4[0][0].length != 0 || node4[0][0] == EMPTY_NODE2;
+					assert lastNode2.length != 0 || lastNode2 == EMPTY_NODE2;
+
+					for (int i = 1; i < node4.length - 1; i++) {
+						assert node4[i].length == 32 : "node3.length = " + node4[i].length;
+						for (final Object[][] node2 : node4[i]) {
+							assert node2.length == 32 : "node2.length = " + node2.length;
+						}
+					}
+					for (int i = 1; i < node4[0].length; i++) {
+						assert node4[0][i].length == 32 : "node2.length = " + node4[0][i].length;
+					}
+					for (int i = 0; i < lastNode3.length - 1; i++) {
+						assert lastNode3[i].length == 32 : "node2.length = " + lastNode3[i].length;
+					}
+
+					for (final Object[][][] node3 : node4) {
+						for (final Object[][] node2 : node3) {
+							for (final Object[] node1 : node2) {
+								assert node1.length == 32 : "node1.length = " + node1.length;
+								for (final Object value : node1) {
+									assert value != null;
+								}
+							}
+						}
+					}
+					for (final Object value : init) {
+						assert value != null;
+					}
+					for (final Object value : tail) {
+						assert value != null;
+					}
+
+					assert 32*node4[0][0].length + 32*32*(node4[0].length - 1) + 32*lastNode2.length + 32*32*(lastNode3.length - 1) +
+							32*32*32*(node4.length - 2) + init.length + tail.length == size : "size = " + size;
+					assert startIndex == calculateSeq4StartIndex(node4, init) : "startIndex = " + startIndex;
+				}
 			}
 
 			@Override
@@ -3740,6 +3856,80 @@ final class SeqGenerator implements ClassGenerator {
 				this.tail = tail;
 				this.startIndex = startIndex;
 				this.size = size;
+
+				boolean ea = false;
+				assert ea = true;
+				if (ea) {
+					final Object[][][][] lastNode4 = node5[node5.length - 1];
+					final Object[][][] lastNode3 = lastNode4[lastNode4.length - 1];
+					final Object[][] lastNode2 = lastNode3[lastNode3.length - 1];
+
+					assert node5.length >= 2 && node5.length <= 32 : "node5.length = " + node5.length;
+					assert init.length >= 1 && init.length <= 32 : "init.length = " + init.length;
+					assert tail.length >= 1 && tail.length <= 32 : "tail.length = " + tail.length;
+					assert size >= 31*32*32*32 + 2 && size <= (1 << 25) : "size = " + size;
+
+					assert node5[0].length >= 1 && node5[0].length <= 32 : "node4.length = " + node5[0].length;
+					assert lastNode4.length >= 1 && lastNode4.length <= 32 : "node4.length = " + lastNode4.length;
+					assert node5[0][0].length >= 1 && node5[0][0].length <= 32 : "node3.length = " + node5[0][0].length;
+					assert lastNode3.length >= 1 && lastNode3.length <= 32 : "node3.length = " + lastNode3.length;
+
+					assert node5[0][0][0].length <= 31 : "node2.length = " + node5[0][0][0].length;
+					assert lastNode2.length <= 31 : "node2.length = " + lastNode2.length;
+					assert node5[0][0][0].length != 0 || node5[0][0][0] == EMPTY_NODE2;
+					assert lastNode2.length != 0 || lastNode2 == EMPTY_NODE2;
+
+					for (int i = 1; i < node5.length - 1; i++) {
+						assert node5[i].length == 32 : "node4.length = " + node5[i].length;
+						for (final Object[][][] node3 : node5[i]) {
+							assert node3.length == 32 : "node3.length = " + node3.length;
+							for (final Object[][] node2 : node3) {
+								assert node2.length == 32 : "node2.length = " + node2.length;
+							}
+						}
+					}
+		
+					for (int i = 1; i < node5[0].length; i++) {
+						assert node5[0][i].length == 32 : "node3.length = " + node5[0][i].length;
+						for (final Object[][] node2 : node5[0][i]) {
+							assert node2.length == 32 : "node2.length = " + node2.length;
+						}
+					}
+					for (int i = 0; i < lastNode4.length - 1; i++) {
+						assert lastNode4[i].length == 32 : "node3.length = " + lastNode4[i].length;
+						for (final Object[][] node2 : lastNode4[i]) {
+							assert node2.length == 32 : "node2.length = " + node2.length;
+						}
+					}
+					for (int i = 1; i < node5[0][0].length; i++) {
+						assert node5[0][0][i].length == 32 : "node2.length = " + node5[0][0][i].length;
+					}
+					for (int i = 0; i < lastNode3.length - 1; i++) {
+						assert lastNode3[i].length == 32 : "node2.length = " + lastNode3[i].length;
+					}
+					for (final Object[][][][] node4 : node5) {
+						for (final Object[][][] node3 : node4) {
+							for (final Object[][] node2 : node3) {
+								for (final Object[] node1 : node2) {
+									assert node1.length == 32 : "node1.length = " + node1.length;
+									for (final Object value : node1) {
+										assert value != null;
+									}
+								}
+							}
+						}
+					}
+					for (final Object value : init) {
+						assert value != null;
+					}
+					for (final Object value : tail) {
+						assert value != null;
+					}
+					assert 32*node5[0][0][0].length + 32*32*(node5[0][0].length - 1) + 32*32*32*(node5[0].length - 1) +
+							32*lastNode2.length + 32*32*(lastNode3.length - 1) + 32*32*32*(lastNode4.length - 1) +
+							32*32*32*32*(node5.length - 2) + init.length + tail.length == size : "size = " + size;
+					assert startIndex == calculateSeq5StartIndex(node5, init) : "startIndex = " + startIndex;
+				}
 			}
 
 			@Override
@@ -4509,6 +4699,108 @@ final class SeqGenerator implements ClassGenerator {
 				this.tail = tail;
 				this.startIndex = startIndex;
 				this.size = size;
+
+				boolean ea = false;
+				assert ea = true;
+				if (ea) {
+					final Object[][][][][] lastNode5 = node6[node6.length - 1];
+					final Object[][][][] lastNode4 = lastNode5[lastNode5.length - 1];
+					final Object[][][] lastNode3 = lastNode4[lastNode4.length - 1];
+					final Object[][] lastNode2 = lastNode3[lastNode3.length - 1];
+
+					assert node6.length >= 2 && node6.length <= 32 : "node6.length = " + node6.length;
+					assert init.length >= 1 && init.length <= 32 : "init.length = " + init.length;
+					assert tail.length >= 1 && tail.length <= 32 : "tail.length = " + tail.length;
+					assert size >= 31*32*32*32*32 + 2 && size <= (1 << 30) : "size = " + size;
+
+					assert node6[0].length >= 1 && node6[0].length <= 32 : "node5.length = " + node6[0].length;
+					assert lastNode5.length >= 1 && lastNode5.length <= 32 : "node5.length = " + lastNode5.length;
+					assert node6[0][0].length >= 1 && node6[0][0].length <= 32 : "node4.length = " + node6[0][0].length;
+					assert lastNode4.length >= 1 && lastNode4.length <= 32 : "node4.length = " + lastNode4.length;
+					assert node6[0][0][0].length >= 1 && node6[0][0][0].length <= 32 : "node3.length = " + node6[0][0][0].length;
+					assert lastNode3.length >= 1 && lastNode3.length <= 32 : "node3.length = " + lastNode3.length;
+
+					assert node6[0][0][0][0].length <= 31 : "node2.length = " + node6[0][0][0][0].length;
+					assert lastNode2.length <= 31 : "node2.length = " + lastNode2.length;
+					assert node6[0][0][0][0].length != 0 || node6[0][0][0][0] == EMPTY_NODE2;
+					assert lastNode2.length != 0 || lastNode2 == EMPTY_NODE2;
+
+					for (int i = 1; i < node6.length - 1; i++) {
+						assert node6[i].length == 32 : "node5.length = " + node6[i].length;
+						for (final Object[][][][] node4 : node6[i]) {
+							assert node4.length == 32 : "node4.length = " + node4.length;
+							for (final Object[][][] node3 : node4) {
+								assert node3.length == 32 : "node3.length = " + node3.length;
+								for (final Object[][] node2 : node3) {
+									assert node2.length == 32 : "node2.length = " + node2.length;
+								}
+							}
+						}
+					}
+
+					for (int i = 1; i < node6[0].length; i++) {
+						assert node6[0][i].length == 32 : "node4.length = " + node6[0][i].length;
+						for (final Object[][][] node3 : node6[0][i]) {
+							assert node3.length == 32 : "node3.length = " + node3.length;
+							for (final Object[][] node2 : node3) {
+								assert node2.length == 32 : "node2.length = " + node2.length;
+							}
+						}
+					}
+					for (int i = 0; i < lastNode5.length - 1; i++) {
+						assert lastNode5[i].length == 32 : "node4.length = " + lastNode5[i].length;
+						for (final Object[][][] node3 : lastNode5[i]) {
+							assert node3.length == 32 : "node3.length = " + node3.length;
+							for (final Object[][] node2 : node3) {
+								assert node2.length == 32 : "node2.length = " + node2.length;
+							}
+						}
+					}
+					for (int i = 1; i < node6[0][0].length; i++) {
+						assert node6[0][0][i].length == 32 : "node3.length = " + node6[0][0][i].length;
+						for (final Object[][] node2 : node6[0][0][i]) {
+							assert node2.length == 32 : "node2.length = " + node2.length;
+						}
+					}
+					for (int i = 0; i < lastNode4.length - 1; i++) {
+						assert lastNode4[i].length == 32 : "node3.length = " + lastNode4[i].length;
+						for (final Object[][] node2 : lastNode4[i]) {
+							assert node2.length == 32 : "node2.length = " + node2.length;
+						}
+					}
+					for (int i = 1; i < node6[0][0][0].length; i++) {
+						assert node6[0][0][0][i].length == 32 : "node2.length = " + node6[0][0][0][i].length;
+					}
+					for (int i = 0; i < lastNode3.length - 1; i++) {
+						assert lastNode3[i].length == 32 : "node2.length = " + lastNode3[i].length;
+					}
+					for (final Object[][][][][] node5 : node6) {
+						for (final Object[][][][] node4 : node5) {
+							for (final Object[][][] node3 : node4) {
+								for (final Object[][] node2 : node3) {
+									for (final Object[] node1 : node2) {
+										assert node1.length == 32 : "node1.length = " + node1.length;
+										for (final Object value : node1) {
+											assert value != null;
+										}
+									}
+								}
+							}
+						}
+					}
+					for (final Object value : init) {
+						assert value != null;
+					}
+					for (final Object value : tail) {
+						assert value != null;
+					}
+					assert 32*node6[0][0][0][0].length + 32*32*(node6[0][0][0].length - 1) +
+							32*32*32*(node6[0][0].length - 1) + 32*32*32*32*(node6[0].length - 1) +
+							32*lastNode2.length + 32*32*(lastNode3.length - 1) +
+							32*32*32*(lastNode4.length - 1) + 32*32*32*32*(lastNode5.length - 1) +
+							32*32*32*32*32*(node6.length - 2) + init.length + tail.length == size : "size = " + size;
+					assert startIndex == calculateSeq6StartIndex(node6, init) : "startIndex = " + startIndex;
+				}
 			}
 
 			@Override
