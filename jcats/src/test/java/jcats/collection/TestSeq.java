@@ -4,8 +4,6 @@ import static jcats.collection.Seq.emptySeq;
 import static org.junit.Assert.*;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -283,12 +281,12 @@ public class TestSeq {
 
 	@Test
 	public void testSeqFromArray() {
-		List<Integer> list = new ArrayList<>();
+		final List<Integer> list = new ArrayList<>();
 
 		for (int i = 0; i < MAX; i++) {
 			list.add(i % 63);
 			if (isTestIndex(i)) {
-				Seq<Integer> seq = Seq.seq(list.toArray(new Integer[0]));
+				final Seq<Integer> seq = Seq.seq(list.toArray(new Integer[0]));
 				assertEquals(list.size(), seq.size());
 				assertTrue("Elements not equal for size = " + list.size(), Iterables.elementsEqual(list, seq));
 			}
@@ -361,6 +359,29 @@ public class TestSeq {
 	}
 
 	@Test
+	public void testInitTailRandom() {
+		final Random random = new Random();
+		for (int i = 0; i < 20; i++) {
+			// Seq.EA = false;
+			Seq<Integer> seq = randomSeq(random, 1 << 25, 1 << 27);
+			System.out.println("size = " + seq.size());
+			while (seq.isNotEmpty()) {
+				//if (seq.size() % 250 == 0) {
+				//	System.out.println(seq.size());
+				//}
+
+				if (random.nextBoolean()) {
+					seq = seq.tail();
+				} else {
+					seq = seq.init();
+				}
+
+				// Seq.EA = false;
+			}
+		}
+	}
+
+	@Test
 	public void testConcat() {
 		Seq<Integer> seq = Seq.emptySeq();
 		for (int i = 0; i < MAX; i++) {
@@ -399,8 +420,8 @@ public class TestSeq {
 	public void testConcatRandom() {
 		final Random random = new Random();
 		for (int i = 0; i < 100; i++) {
-			final Seq<Integer> seq1 = randomSeq(random);
-			final Seq<Integer> seq2 = randomSeq(random);
+			final Seq<Integer> seq1 = randomSeq(random, 0, MAX);
+			final Seq<Integer> seq2 = randomSeq(random, 0, MAX);
 			final Seq<Integer> concat = seq1.concat(seq2);
 			assertEquals(seq1.size() + seq2.size(), concat.size());
 			if (seq1.isNotEmpty()) {
@@ -414,8 +435,8 @@ public class TestSeq {
 		}
 	}
 
-	private static Seq<Integer> randomSeq(final Random random) {
-		final int size = random.nextInt(1 << 21);
+	private static Seq<Integer> randomSeq(final Random random, final int minSize, final int maxSize) {
+		final int size = randInt(random, minSize, maxSize);
 		Seq<Integer> seq = Seq.emptySeq();
 		for (int i = 0; i < size; i++) {
 			if (random.nextBoolean()) {
@@ -427,7 +448,11 @@ public class TestSeq {
 		return seq;
 	}
 
-	@Test
+	private static int randInt(final Random random, final int min, final int max) {
+		return random.nextInt((max - min) + 1) + min;
+	}
+
+	//@Test
 	public void testAppendSized() {
 		for (int size = (1 << 10); size < (1 << 10) + 1; size++) {
 			//if (isTestIndex(size)) {
@@ -505,8 +530,25 @@ public class TestSeq {
 		}
 	}
 
+	//@Test
+	/*public void testTake() {
+		Seq<Integer> seq = emptySeq();
+		for (int i = 0; i < 1500; i++) {
+			for (int n = 0; n <= i; n++) {
+				final Seq<Integer> take = seq.take(n);
+				assertEquals(n, take.size());
+				try {
+					assertTrue(Iterables.elementsEqual(Iterables.limit(seq, n), take));
+				} catch (final RuntimeException ex) {
+					throw new AssertionError("seq.size = " + seq.size() + ", n = " + n, ex);
+				}
+			}
+			seq = seq.prepend(i % 63);
+		}
+	}*/
+
 	@Test(expected = IndexOutOfBoundsException.class)
-	public void test7() {
+	public void testGetOutOfBounds() {
 		Seq<Integer> seq = emptySeq();
 		final int max = 10000;
 		for (int i = 0; i < max; i++) {
