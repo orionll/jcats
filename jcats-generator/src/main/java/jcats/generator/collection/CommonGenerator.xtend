@@ -147,8 +147,8 @@ final class CommonGenerator implements ClassGenerator {
 			}
 		}
 
-		final class IndexedIterableAsList<A, I extends Iterable<A> & Indexed<A> & Sized> extends AbstractList<A> implements RandomAccess {
-			private final I iterable;
+		class IndexedIterableAsList<A, I extends Iterable<A> & Indexed<A> & Sized> extends AbstractList<A> implements RandomAccess {
+			final I iterable;
 
 			IndexedIterableAsList(final I iterable) {
 				this.iterable = iterable;

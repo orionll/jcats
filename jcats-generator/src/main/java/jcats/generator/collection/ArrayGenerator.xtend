@@ -10,6 +10,8 @@ final class ArrayGenerator implements ClassGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.io.Serializable;
+		import java.util.AbstractList;
+		import java.util.ArrayList;
 		import java.util.Arrays;
 		import java.util.Collection;
 		import java.util.Collections;
@@ -37,7 +39,6 @@ final class ArrayGenerator implements ClassGenerator {
 
 		import static java.lang.Math.min;
 		import static java.util.Collections.emptyIterator;
-		import static java.util.Collections.unmodifiableList;
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
 		import static «Constants.F».id;
@@ -283,7 +284,27 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			public List<A> asList() {
-				return new IndexedIterableAsList<>(this);
+				return new ArrayAsList<>(this);
+			}
+
+			«toArrayList»
+
+			public Seq<A> toSeq() {
+				if (array.length == 0) {
+					return Seq.emptySeq();
+				} else {
+					return Seq.seqFromArray(array);
+				}
+			}
+
+			public Object[] toObjectArray() {
+				if (array.length == 0) {
+					return array;
+				} else {
+					final Object[] newArray = new Object[array.length];
+					System.arraycopy(array, 0, newArray, 0, array.length);
+					return newArray;
+				}
 			}
 
 			public static <A> Array<A> emptyArray() {
@@ -311,7 +332,9 @@ final class ArrayGenerator implements ClassGenerator {
 					for (final Object a : values) {
 						requireNonNull(a);
 					}
-					return new Array<>(Arrays.copyOf(values, values.length, Object[].class));
+					final Object[] array = new Object[values.length];
+					System.arraycopy(values, 0, array, 0, values.length);
+					return new Array<>(array);
 				}
 			}
 
@@ -473,6 +496,17 @@ final class ArrayGenerator implements ClassGenerator {
 
 			public static <A> ArrayBuilder<A> arrayBuilderWithCapacity(final int initialCapacity) {
 				return new ArrayBuilder<>(initialCapacity);
+			}
+		}
+
+		final class ArrayAsList<A> extends IndexedIterableAsList<A, Array<A>> {
+			ArrayAsList(final Array<A> array) {
+				super(array);
+			}
+
+			@Override
+			public Object[] toArray() {
+				return iterable.toObjectArray();
 			}
 		}
 	''' }

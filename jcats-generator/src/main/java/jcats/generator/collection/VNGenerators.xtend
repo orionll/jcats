@@ -158,6 +158,19 @@ final class VNGenerators {
 						return result;
 					}
 
+					public Array<A> toArray() {
+						return new Array<>(toObjectArray());
+					}
+
+					public Seq<A> toSeq() {
+						final Object[] node1 = { «(1 .. arity).map["a" + it].join(", ")» };
+						return new Seq1<>(node1);
+					}
+
+					public Object[] toObjectArray() {
+						return new Object[] { «(1 .. arity).map["a" + it].join(", ")» };
+					}
+
 					@Override
 					public int hashCode() {
 						int result = 1;

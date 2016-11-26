@@ -10,6 +10,7 @@ final class SeqGenerator implements ClassGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.io.Serializable;
+		import java.util.ArrayList;
 		import java.util.Collection;
 		import java.util.Iterator;
 		import java.util.List;
@@ -36,7 +37,6 @@ final class SeqGenerator implements ClassGenerator {
 		import «Constants.SIZED»;
 
 		import static java.util.Collections.emptyIterator;
-		import static java.util.Collections.unmodifiableList;
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
 		import static jcats.collection.Array.mapArray;
@@ -234,8 +234,20 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			public final List<A> asList() {
-				return new IndexedIterableAsList<>(this);
+				return new SeqAsList<>(this);
 			}
+
+			«toArrayList»
+
+			public final Array<A> toArray() {
+				if (isEmpty()) {
+					return Array.emptyArray();
+				} else {
+					return new Array<>(toObjectArray());
+				}
+			}
+
+			public abstract Object[] toObjectArray();
 
 			public static <A> Seq<A> emptySeq() {
 				return Seq.EMPTY;
@@ -254,21 +266,7 @@ final class SeqGenerator implements ClassGenerator {
 					for (final Object value : values) {
 						requireNonNull(value);
 					}
-					if (values.length <= 32) {
-						return seq1FromArray(values);
-					} else if (values.length <= (1 << 10)) {
-						return seq2FromArray(values);
-					} else if (values.length <= (1 << 15)) {
-						return seq3FromArray(values);
-					} else if (values.length <= (1 << 20)) {
-						return seq4FromArray(values);
-					} else if (values.length <= (1 << 25)) {
-						return seq5FromArray(values);
-					} else if (values.length <= (1 << 30)) {
-						return seq6FromArray(values);
-					} else {
-						throw new IndexOutOfBoundsException("Seq size limit exceeded");
-					}
+					return seqFromArray(values);
 				}
 			}
 
@@ -452,6 +450,24 @@ final class SeqGenerator implements ClassGenerator {
 				fillNode2(node2, 0, node2.length - fromEndIndex2, iterator);
 				fillArrayFromStart(node1, node1.length - fromEndIndex1, iterator);
 				return new Seq6<>(node6, init, tail, startIndex, size);
+			}
+
+			static <A> Seq<A> seqFromArray(final Object[] values) {
+				if (values.length <= 32) {
+					return seq1FromArray(values);
+				} else if (values.length <= (1 << 10)) {
+					return seq2FromArray(values);
+				} else if (values.length <= (1 << 15)) {
+					return seq3FromArray(values);
+				} else if (values.length <= (1 << 20)) {
+					return seq4FromArray(values);
+				} else if (values.length <= (1 << 25)) {
+					return seq5FromArray(values);
+				} else if (values.length <= (1 << 30)) {
+					return seq6FromArray(values);
+				} else {
+					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+				}
 			}
 
 			private static <A> Seq1<A> seq1FromArray(final Object[] values) {
@@ -1565,6 +1581,17 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 		}
+
+		final class SeqAsList<A> extends IndexedIterableAsList<A, Seq<A>> {
+			SeqAsList(final Seq<A> seq) {
+				super(seq);
+			}
+
+			@Override
+			public Object[] toArray() {
+				return iterable.toObjectArray();
+			}
+		}
 	''' }
 
 	def seq0SourceCode() { '''
@@ -1637,6 +1664,11 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			void initSeqBuilder(final SeqBuilder<A> builder) {
+			}
+
+			@Override
+			public Object[] toObjectArray() {
+				return Array.emptyArray().array;
 			}
 
 			@Override
@@ -1912,6 +1944,13 @@ final class SeqGenerator implements ClassGenerator {
 				}
 				builder.index1 = node1.length;
 				builder.size = node1.length;
+			}
+
+			@Override
+			public Object[] toObjectArray() {
+				final Object[] array = new Object[node1.length];
+				System.arraycopy(node1, 0, array, 0, node1.length);
+				return array;
 			}
 
 			@Override
@@ -2532,6 +2571,19 @@ final class SeqGenerator implements ClassGenerator {
 				builder.index2 = node2.length + 1;
 				builder.startIndex = 32 - init.length;
 				builder.size = size;
+			}
+
+			@Override
+			public Object[] toObjectArray() {
+				final Object[] array = new Object[size];
+				System.arraycopy(init, 0, array, 0, init.length);
+				int index = init.length;
+				for (final Object[] node1 : node2) {
+					System.arraycopy(node1, 0, array, index, 32);
+					index += 32;
+				}
+				System.arraycopy(tail, 0, array, index, tail.length);
+				return array;
 			}
 
 			@Override
@@ -3284,6 +3336,21 @@ final class SeqGenerator implements ClassGenerator {
 				builder.index3 = node3.length;
 				builder.startIndex = startIndex;
 				builder.size = size;
+			}
+
+			@Override
+			public Object[] toObjectArray() {
+				final Object[] array = new Object[size];
+				System.arraycopy(init, 0, array, 0, init.length);
+				int index = init.length;
+				for (final Object[][] node2 : node3) {
+					for (final Object[] node1 : node2) {
+						System.arraycopy(node1, 0, array, index, 32);
+						index += 32;
+					}
+				}
+				System.arraycopy(tail, 0, array, index, tail.length);
+				return array;
 			}
 
 			@Override
@@ -4156,6 +4223,23 @@ final class SeqGenerator implements ClassGenerator {
 				builder.index4 = node4.length;
 				builder.startIndex = startIndex;
 				builder.size = size;
+			}
+
+			@Override
+			public Object[] toObjectArray() {
+				final Object[] array = new Object[size];
+				System.arraycopy(init, 0, array, 0, init.length);
+				int index = init.length;
+				for (final Object[][][] node3 : node4) {
+					for (final Object[][] node2 : node3) {
+						for (final Object[] node1 : node2) {
+							System.arraycopy(node1, 0, array, index, 32);
+							index += 32;
+						}
+					}
+				}
+				System.arraycopy(tail, 0, array, index, tail.length);
+				return array;
 			}
 
 			@Override
@@ -5162,6 +5246,25 @@ final class SeqGenerator implements ClassGenerator {
 				builder.index5 = node5.length;
 				builder.startIndex = startIndex;
 				builder.size = size;
+			}
+
+			@Override
+			public Object[] toObjectArray() {
+				final Object[] array = new Object[size];
+				System.arraycopy(init, 0, array, 0, init.length);
+				int index = init.length;
+				for (final Object[][][][] node4 : node5) {
+					for (final Object[][][] node3 : node4) {
+						for (final Object[][] node2 : node3) {
+							for (final Object[] node1 : node2) {
+								System.arraycopy(node1, 0, array, index, 32);
+								index += 32;
+							}
+						}
+					}
+				}
+				System.arraycopy(tail, 0, array, index, tail.length);
+				return array;
 			}
 
 			@Override
@@ -6276,6 +6379,27 @@ final class SeqGenerator implements ClassGenerator {
 				builder.index6 = node6.length;
 				builder.startIndex = startIndex;
 				builder.size = size;
+			}
+
+			@Override
+			public Object[] toObjectArray() {
+				final Object[] array = new Object[size];
+				System.arraycopy(init, 0, array, 0, init.length);
+				int index = init.length;
+				for (final Object[][][][][] node5 : node6) {
+					for (final Object[][][][] node4 : node5) {
+						for (final Object[][][] node3 : node4) {
+							for (final Object[][] node2 : node3) {
+								for (final Object[] node1 : node2) {
+									System.arraycopy(node1, 0, array, index, 32);
+									index += 32;
+								}
+							}
+						}
+					}
+				}
+				System.arraycopy(tail, 0, array, index, tail.length);
+				return array;
 			}
 
 			@Override

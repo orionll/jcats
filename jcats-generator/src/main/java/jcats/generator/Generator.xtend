@@ -47,6 +47,12 @@ interface Generator {
 		}
 	'''}
 
+	def toArrayList() { '''
+		public final ArrayList<A> toArrayList() {
+			return new ArrayList<>(asList());
+		}
+	'''}
+
 	def static hashcode() { '''
 		@Override
 		public int hashCode() {
