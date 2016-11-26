@@ -20,8 +20,10 @@ final class VNGenerators {
 
 				import java.io.Serializable;
 				import java.util.ArrayList;
+				import java.util.Arrays;
 				import java.util.Iterator;
 				import java.util.HashSet;
+				import java.util.List;
 				import java.util.stream.Stream;
 				import java.util.stream.StreamSupport;
 
@@ -37,7 +39,6 @@ final class VNGenerators {
 					import «Constants.F»«arity»;
 				«ENDFOR»
 
-				import static java.util.Arrays.asList;
 				import static java.util.Objects.requireNonNull;
 				import static «Constants.P».p;
 				«IF arity > 2»
@@ -133,6 +134,10 @@ final class VNGenerators {
 						return false;
 					}
 
+					public List<A> asList() {
+						return new IndexedIterableAsList<>(this);
+					}
+
 					public «PNGenerators.shortName(arity)»<«(1 .. arity).map["A"].join(", ")»> toP«if (arity == 2) "" else arity»() {
 						return «PNGenerators.shortName(arity).toLowerCase»(«(1 .. arity).map["a" + it].join(", ")»);
 					}
@@ -179,7 +184,7 @@ final class VNGenerators {
 
 					@Override
 					public Iterator<A> iterator() {
-						return asList(«(1 .. arity).map["a" + it].join(", ")»).iterator();
+						return Arrays.asList(«(1 .. arity).map["a" + it].join(", ")»).iterator();
 					}
 
 					«stream»
