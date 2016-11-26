@@ -12,6 +12,7 @@ final class SeqGenerator implements ClassGenerator {
 		import java.io.Serializable;
 		import java.util.Collection;
 		import java.util.Iterator;
+		import java.util.List;
 		import java.util.NoSuchElementException;
 		import java.util.RandomAccess;
 		import java.util.Spliterator;
@@ -230,6 +231,10 @@ final class SeqGenerator implements ClassGenerator {
 					}
 					return builder.build();
 				}
+			}
+
+			public final List<A> asList() {
+				return new IndexedIterableAsList<>(this);
 			}
 
 			public static <A> Seq<A> emptySeq() {

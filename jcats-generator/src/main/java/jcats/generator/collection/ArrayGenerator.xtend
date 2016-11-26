@@ -14,6 +14,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import java.util.Collection;
 		import java.util.Collections;
 		import java.util.Iterator;
+		import java.util.List;
 		import java.util.NoSuchElementException;
 		import java.util.RandomAccess;
 		import java.util.Spliterator;
@@ -281,8 +282,8 @@ final class ArrayGenerator implements ClassGenerator {
 				return false;
 			}
 
-			public java.util.List<A> asList() {
-				return unmodifiableList((java.util.List<A>) Arrays.asList(array));
+			public List<A> asList() {
+				return new IndexedIterableAsList<>(this);
 			}
 
 			public static <A> Array<A> emptyArray() {

@@ -9,9 +9,14 @@ final class CommonGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
+		import java.util.AbstractList;
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
+		import java.util.RandomAccess;
+		import java.util.Spliterator;
 
+		import jcats.Indexed;
+		import jcats.Sized;
 		import «Constants.F»;
 		import «Constants.FUNCTION».IntObjectF;
 
@@ -139,6 +144,34 @@ final class CommonGenerator implements ClassGenerator {
 						throw new NoSuchElementException();
 					}
 				}
+			}
+		}
+
+		final class IndexedIterableAsList<A, I extends Iterable<A> & Indexed<A> & Sized> extends AbstractList<A> implements RandomAccess {
+			private final I iterable;
+
+			IndexedIterableAsList(final I iterable) {
+				this.iterable = iterable;
+			}
+
+			@Override
+			public A get(final int index) {
+				return iterable.get(index);
+			}
+
+			@Override
+			public int size() {
+				return iterable.size();
+			}
+
+			@Override
+			public Iterator<A> iterator() {
+				return iterable.iterator();
+			}
+
+			@Override
+			public Spliterator<A> spliterator() {
+				return iterable.spliterator();
 			}
 		}
 	''' }
