@@ -4,6 +4,7 @@ import static jcats.collection.Seq.emptySeq;
 import static org.junit.Assert.*;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.Random;
 
 public class TestSeq {
 
-	public static final int MAX = (1 << 21) + (1 << 19) + 117;
+	private static final int MAX = (1 << 13); // (1 << 21) + (1 << 19) + 117;
 
 	private static final int[] TEST_INDICES = testIndices();
 
@@ -319,6 +320,9 @@ public class TestSeq {
 			final Seq<Integer> newSeq = seq.append(i % 63);
 			if (isTestIndex(i + 31)) {
 				assertSeqsDeepEqual("Init is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.init());
+				// Seq.EA = true;
+				assertSeqsDeepEqual("Take is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.take(newSeq.size() - 1));
+				// Seq.EA = false;
 			}
 			seq = newSeq;
 		}
@@ -328,6 +332,7 @@ public class TestSeq {
 			final Seq<Integer> newSeq = seq.append(i % 61);
 			if (isTestIndex(i)) {
 				assertSeqsDeepEqual("Init is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.init());
+				assertSeqsDeepEqual("Take is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.take(newSeq.size() - 1));
 			}
 			seq = newSeq;
 		}
@@ -452,7 +457,7 @@ public class TestSeq {
 		return random.nextInt((max - min) + 1) + min;
 	}
 
-	//@Test
+	@Test
 	public void testAppendSized() {
 		for (int size = (1 << 10); size < (1 << 10) + 1; size++) {
 			//if (isTestIndex(size)) {
@@ -530,22 +535,44 @@ public class TestSeq {
 		}
 	}
 
-	//@Test
-	/*public void testTake() {
+	@Test
+	public void testTake() {
 		Seq<Integer> seq = emptySeq();
 		for (int i = 0; i < 1500; i++) {
 			for (int n = 0; n <= i; n++) {
-				final Seq<Integer> take = seq.take(n);
-				assertEquals(n, take.size());
 				try {
+					final Seq<Integer> take = seq.take(n);
+					assertEquals(n, take.size());
 					assertTrue(Iterables.elementsEqual(Iterables.limit(seq, n), take));
-				} catch (final RuntimeException ex) {
-					throw new AssertionError("seq.size = " + seq.size() + ", n = " + n, ex);
+				} catch (final Throwable t) {
+					throw new AssertionError("seq.size = " + seq.size() + ", n = " + n, t);
 				}
 			}
 			seq = seq.prepend(i % 63);
 		}
-	}*/
+	}
+
+	@Test
+	public void testTakeRandom() {
+		final Random random = new Random();
+		for (int i = 0; i < 5; i++) {
+			//Seq.EA = false;
+			final Seq<Integer> seq = randomSeq(random, 0, 1<<15);
+
+			//Seq.EA = true;
+			for (int j = 0; j < 100; j++) {
+				final int n = randInt(random, 0, seq.size() / (j + 1));
+
+				try {
+					final Seq<Integer> take = seq.take(n);
+					assertEquals(n, take.size());
+					assertTrue(Iterables.elementsEqual(Iterables.limit(seq, n), take));
+				} catch (final Throwable t) {
+					throw new AssertionError("seq.size = " + seq.size() + ", n = " + n, t);
+				}
+			}
+		}
+	}
 
 	@Test(expected = IndexOutOfBoundsException.class)
 	public void testGetOutOfBounds() {
