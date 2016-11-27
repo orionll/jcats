@@ -16,6 +16,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import java.util.Collection;
 		import java.util.Collections;
 		import java.util.Iterator;
+		import java.util.HashSet;
 		import java.util.List;
 		import java.util.NoSuchElementException;
 		import java.util.RandomAccess;
@@ -288,6 +289,8 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			«toArrayList»
+
+			«toHashSet»
 
 			public Seq<A> toSeq() {
 				if (array.length == 0) {

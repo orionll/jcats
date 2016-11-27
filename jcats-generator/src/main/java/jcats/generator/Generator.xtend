@@ -53,6 +53,12 @@ interface Generator {
 		}
 	'''}
 
+	def toHashSet() { '''
+		public final HashSet<A> toHashSet() {
+			return new HashSet<>(asList());
+		}
+	'''}
+
 	def static hashcode() { '''
 		@Override
 		public int hashCode() {
