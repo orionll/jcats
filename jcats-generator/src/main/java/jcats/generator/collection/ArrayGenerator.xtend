@@ -274,6 +274,8 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
+			«takeWhile(false)»
+
 			public boolean contains(final A value) {
 				requireNonNull(value);
 				for (final Object a : array) {
@@ -288,9 +290,9 @@ final class ArrayGenerator implements ClassGenerator {
 				return new ArrayAsList<>(this);
 			}
 
-			«toArrayList»
+			«toArrayList(false)»
 
-			«toHashSet»
+			«toHashSet(false)»
 
 			public Seq<A> toSeq() {
 				if (array.length == 0) {

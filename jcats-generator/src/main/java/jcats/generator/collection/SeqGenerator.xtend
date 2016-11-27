@@ -91,6 +91,8 @@ final class SeqGenerator implements ClassGenerator {
 
 			public abstract Seq<A> take(final int n);
 
+			«takeWhile(true)»
+
 			/**
 			 * O(1)
 			 */
@@ -238,9 +240,9 @@ final class SeqGenerator implements ClassGenerator {
 				return new SeqAsList<>(this);
 			}
 
-			«toArrayList»
+			«toArrayList(true)»
 
-			«toHashSet»
+			«toHashSet(true)»
 
 			public final Array<A> toArray() {
 				if (isEmpty()) {

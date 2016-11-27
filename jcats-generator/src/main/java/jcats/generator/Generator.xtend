@@ -19,6 +19,20 @@ interface Generator {
 		if (primitive == "boolean") "bool" else primitive
 	}
 
+	def String takeWhile(boolean isFinal) { '''
+		public «if (isFinal) "final " else ""»«name»<A> takeWhile(final BoolF<A> predicate) {
+			int n = 0;
+			for (final A value : this) {
+				if (predicate.apply(value)) {
+					n++;
+				} else {
+					break;
+				}
+			}
+			return take(n);
+		}
+	''' }
+
 	def static String stream() { '''
 		public Stream<A> stream() {
 			return StreamSupport.stream(spliterator(), false);
@@ -47,14 +61,14 @@ interface Generator {
 		}
 	'''}
 
-	def toArrayList() { '''
-		public final ArrayList<A> toArrayList() {
+	def toArrayList(boolean isFinal) { '''
+		public «if (isFinal) "final " else ""»ArrayList<A> toArrayList() {
 			return new ArrayList<>(asList());
 		}
 	'''}
 
-	def toHashSet() { '''
-		public final HashSet<A> toHashSet() {
+	def toHashSet(boolean isFinal) { '''
+		public «if (isFinal) "final " else ""»HashSet<A> toHashSet() {
 			return new HashSet<>(asList());
 		}
 	'''}
