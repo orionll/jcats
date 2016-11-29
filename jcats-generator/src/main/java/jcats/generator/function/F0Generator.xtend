@@ -70,6 +70,29 @@ final class F0Generator implements InterfaceGenerator {
 			«ENDIF»
 
 			«IF type == Type.OBJECT»
+				«FOR primitive : Type.values.filter[it != Type.OBJECT]»
+					default «primitive.typeName»F0 mapTo«primitive.typeName»(final «primitive.typeName»F<A> f) {
+						requireNonNull(f);
+						return () -> {
+							final A a = requireNonNull(apply());
+							return f.apply(a);
+						};
+					}
+
+				«ENDFOR»
+			«ELSE»
+				«FOR primitive : Type.values.filter[it != Type.OBJECT]»
+					default «primitive.typeName»F0 mapTo«primitive.typeName»(final «type.typeName»«primitive.typeName»F f) {
+						requireNonNull(f);
+						return () -> {
+							final «typeName» value = apply();
+							return f.apply(value);
+						};
+					}
+
+				«ENDFOR»
+			«ENDIF»
+			«IF type == Type.OBJECT»
 				default <B> F0<B> flatMap(final F<A, F0<B>> f) {
 					requireNonNull(f);
 					return () -> {

@@ -117,13 +117,50 @@ final class FGenerator implements InterfaceGenerator {
 				default <A> «from.typeName»ObjectF<A> map(final «to.typeName»ObjectF<A> f) {
 					requireNonNull(f);
 					return value -> {
-						requireNonNull(value);
 						final «toName» result = apply(value);
 						return requireNonNull(f.apply(result));
 					};
 				}
 			«ENDIF»
 
+			«FOR primitive : Type.values.filter[it != Type.OBJECT]»
+				«IF from == Type.OBJECT && to == Type.OBJECT»
+					default «primitive.typeName»F<A> mapTo«primitive.typeName»(final «primitive.typeName»F<B> f) {
+						requireNonNull(f);
+						return a -> {
+							requireNonNull(a);
+							final B b = requireNonNull(apply(a));
+							return f.apply(b);
+						};
+					}
+				«ELSEIF to == Type.OBJECT»
+					default «from.typeName»«primitive.typeName»F mapTo«primitive.typeName»(final «primitive.typeName»F<A> f) {
+						requireNonNull(f);
+						return value -> {
+							final A a = requireNonNull(apply(value));
+							return f.apply(a);
+						};
+					}
+				«ELSEIF from == Type.OBJECT»
+					default «primitive.typeName»F<A> mapTo«primitive.typeName»(final «to.typeName»«primitive.typeName»F f) {
+						requireNonNull(f);
+						return a -> {
+							requireNonNull(a);
+							final «toName» value = apply(a);
+							return f.apply(value);
+						};
+					}
+				«ELSE»
+					default «from.typeName»«primitive.typeName»F mapTo«primitive.typeName»(final «to.typeName»«primitive.typeName»F f) {
+						requireNonNull(f);
+						return value -> {
+							final «toName» result = apply(value);
+							return f.apply(result);
+						};
+					}
+				«ENDIF»
+
+			«ENDFOR»
 			«IF from == Type.OBJECT && to == Type.OBJECT»
 				default <C> F<C, B> contraMap(final F<C, A> f) {
 					requireNonNull(f);
