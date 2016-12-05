@@ -33,6 +33,20 @@ interface Generator {
 		}
 	''' }
 
+	def String takeWhile(boolean isFinal, String typeName, String javaName) { '''
+		public «if (isFinal) "final " else ""»«name» takeWhile(final «typeName»BoolF predicate) {
+			int n = 0;
+			for (final «javaName» value : this) {
+				if (predicate.apply(value)) {
+					n++;
+				} else {
+					break;
+				}
+			}
+			return take(n);
+		}
+	''' }
+
 	def static String stream() { '''
 		public Stream<A> stream() {
 			return StreamSupport.stream(spliterator(), false);
@@ -45,13 +59,15 @@ interface Generator {
 		}
 	'''}
 
-	def toStr() { '''
+	def toStr() { return toStr("Iterator<A>", "next") }
+
+	def toStr(String iteratorName, String iteratorFunction) { '''
 		@Override
 		public String toString() {
 			final StringBuilder builder = new StringBuilder("«name»(");
-			final Iterator<A> iterator = iterator();
+			final «iteratorName» iterator = iterator();
 			while (iterator.hasNext()) {
-				builder.append(iterator.next());
+				builder.append(iterator.«iteratorFunction»());
 				if (iterator.hasNext()) {
 					builder.append(", ");
 				}
@@ -73,11 +89,13 @@ interface Generator {
 		}
 	'''}
 
-	def static hashcode() { '''
+	def static hashcode() { return hashcode("A") }
+
+	def static hashcode(String paramBoxedName) { '''
 		@Override
 		public int hashCode() {
 			int hashCode = 1;
-			for (final A value : this) {
+			for (final «paramBoxedName» value : this) {
 				hashCode = 31 * hashCode + value.hashCode();
 			}
 			return hashCode;

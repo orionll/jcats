@@ -281,6 +281,20 @@ final class FGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
+			«IF from != Type.OBJECT && to == Type.OBJECT»
+				default F<«from.boxedName», A> toF() {
+					return value -> {
+						final A result = apply(value);
+						return requireNonNull(result);
+					};
+				}
+
+			«ELSEIF from != Type.OBJECT && to != Type.OBJECT»
+				default «from.typeName»ObjectF<«to.boxedName»> to«from.typeName»ObjectF() {
+					return this::apply;
+				}
+
+			«ENDIF»
 			«IF from == Type.OBJECT && to == Type.OBJECT»
 				default Function<A, B> toFunction() {
 					return a -> {

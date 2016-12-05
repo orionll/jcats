@@ -21,6 +21,7 @@ import jcats.generator.function.FNGenerators
 import jcats.generator.function.FsGenerator
 
 import static extension java.nio.file.Files.*
+import java.util.Arrays
 
 class Main {
 	def static void main(String[] args) {
@@ -51,7 +52,10 @@ class Main {
 			srcFilePath.parent.createDirectories
 			val sourceCode = generator.sourceCode
 			validate(sourceCode, srcFilePath.fileName)
-			srcFilePath.write(sourceCode.getBytes(StandardCharsets.UTF_8))
+			val bytes = sourceCode.getBytes(StandardCharsets.UTF_8)
+			if (!srcFilePath.exists || !Arrays.equals(bytes, srcFilePath.readAllBytes)) {
+				srcFilePath.write(bytes)
+			}
 		}
 	}
 
@@ -71,8 +75,6 @@ class Main {
 			new StackBuilderGenerator,
 			new ArrayGenerator,
 			new ArrayBuilderGenerator,
-			new SeqGenerator,
-			new SeqBuilderGenerator,
 			new CommonGenerator
 		],
 			FGenerator.generators,
@@ -80,6 +82,8 @@ class Main {
 			EffGenerator.generators,
 			FNGenerators.generators,
 			EffNGenerators.generators,
+			SeqGenerator.generators,
+			SeqBuilderGenerator.generators,
 			PNGenerators.generators,
 			VNGenerators.generators
 		].flatten.toList

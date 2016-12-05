@@ -1,5 +1,7 @@
 package jcats.generator;
 
+import com.google.common.collect.ImmutableList;
+
 public enum Type {
 	OBJECT,
 	INT,
@@ -14,6 +16,8 @@ public enum Type {
 	public String javaName() {
 		if (this == BOOL) {
 			return "boolean";
+		} else if (this == OBJECT) {
+			return "Object";
 		} else {
 			return toString().toLowerCase();
 		}
@@ -32,5 +36,13 @@ public enum Type {
 			case BOOL: return "Boolean";
 		}
 		throw new IllegalStateException();
+	}
+
+	public String genericName() {
+		return (this == OBJECT) ? "A" : javaName();
+	}
+
+	public static ImmutableList<Type> javaUnboxedTypes() {
+		return ImmutableList.of(Type.INT, Type.LONG, Type.DOUBLE);
 	}
 }
