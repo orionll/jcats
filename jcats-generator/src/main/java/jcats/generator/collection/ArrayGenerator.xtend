@@ -2,6 +2,7 @@ package jcats.generator.collection
 
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
+import jcats.generator.Type
 
 final class ArrayGenerator implements ClassGenerator {
 	override className() { Constants.ARRAY }
@@ -290,9 +291,9 @@ final class ArrayGenerator implements ClassGenerator {
 				return new ArrayAsList<>(this);
 			}
 
-			«toArrayList(false)»
+			«toArrayList(Type.OBJECT, false)»
 
-			«toHashSet(false)»
+			«toHashSet(Type.OBJECT, false)»
 
 			public Seq<A> toSeq() {
 				if (array.length == 0) {

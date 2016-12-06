@@ -42,6 +42,10 @@ public enum Type {
 		return (this == OBJECT) ? "A" : javaName();
 	}
 
+	public String genericBoxedName() {
+		return (this == OBJECT) ? "A" : boxedName();
+	}
+
 	public static ImmutableList<Type> javaUnboxedTypes() {
 		return ImmutableList.of(Type.INT, Type.LONG, Type.DOUBLE);
 	}

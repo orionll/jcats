@@ -20,9 +20,9 @@ final class SeqGenerator implements ClassGenerator {
 	def shortName() { if (type == Type.OBJECT) "Seq" else type.typeName + "Seq" }
 	def genericName() { if (type == Type.OBJECT) "Seq<A>" else shortName }
 	def genericName(int index) { if (type == Type.OBJECT) "Seq" + index + "<A>" else shortName + index }
+	def genericCast() { if (type == Type.OBJECT) "(A) " else "" }
 	def diamondName(int index) { if (type == Type.OBJECT) "Seq" + index + "<>" else shortName + index }
 	def wildcardName() { if (type == Type.OBJECT) "Seq<?>" else shortName }
-	def paramBoxedName() { if (type == Type.OBJECT) "A" else type.boxedName }
 	def paramGenericName() { if (type == Type.OBJECT) "<A> Seq<A>" else shortName }
 	def paramGenericName(int index) { if (type == Type.OBJECT) "<A> Seq" + index + "<A>" else shortName + index }
 	def updateFunction() { if (type == Type.OBJECT) "F<A, A>" else type.typeName + type.typeName + "F" }
@@ -85,7 +85,11 @@ final class SeqGenerator implements ClassGenerator {
 			«ENDIF»
 		«ENDIF»
 		import «Constants.EQUATABLE»;
-		import «Constants.INDEXED»;
+		«IF type == Type.OBJECT»
+			import «Constants.INDEXED»;
+		«ELSE»
+			import «Constants.JCATS».«type.typeName»Indexed;
+		«ENDIF»
 		import «Constants.P»;
 		«FOR arity : 3 .. Constants.MAX_ARITY»
 			import «Constants.P»«arity»;
@@ -101,7 +105,7 @@ final class SeqGenerator implements ClassGenerator {
 		import static «Constants.F».id;
 		import static «Constants.P».p;
 
-		public abstract class «genericName» implements Iterable<«paramBoxedName»>, Equatable<«genericName»>, Sized, «if (type == Type.OBJECT) "Indexed<A>, " else ""»Serializable {
+		public abstract class «genericName» implements Iterable<«type.genericBoxedName»>, Equatable<«genericName»>, Sized, «IF type == Type.OBJECT»Indexed<A>«ELSE»«type.typeName»Indexed«ENDIF», Serializable {
 			private static final «shortName» EMPTY = new «shortName»0();
 
 			static final «type.javaName»[][] EMPTY_NODE2 = new «type.javaName»[0][];
@@ -138,7 +142,7 @@ final class SeqGenerator implements ClassGenerator {
 			/**
 			 * O(log(size))
 			 */
-			«if (type == Type.OBJECT) "@Override" else ""»
+			@Override
 			public abstract «type.genericName» get(final int index);
 
 			/**
@@ -192,12 +196,12 @@ final class SeqGenerator implements ClassGenerator {
 
 			abstract «genericName» prependSized(final «iteratorName» prefix, final int prefixSize);
 
-			public final «genericName» appendAll(final Iterable<«paramBoxedName»> suffix) {
+			public final «genericName» appendAll(final Iterable<«type.genericBoxedName»> suffix) {
 				requireNonNull(suffix);
 				if (suffix instanceof «wildcardName») {
 					return concat((«genericName») suffix);
 				} else if (suffix instanceof Collection<?> && suffix instanceof RandomAccess) {
-					final int suffixSize = ((Collection<«paramBoxedName»>) suffix).size();
+					final int suffixSize = ((Collection<«type.genericBoxedName»>) suffix).size();
 					if (suffixSize == 0) {
 						return this;
 					} else {
@@ -224,12 +228,12 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			public final «genericName» prependAll(final Iterable<«paramBoxedName»> prefix) {
+			public final «genericName» prependAll(final Iterable<«type.genericBoxedName»> prefix) {
 				requireNonNull(prefix);
 				if (prefix instanceof «wildcardName») {
 					return ((«genericName») prefix).concat(this);
 				} else if (prefix instanceof Collection<?> && prefix instanceof RandomAccess) {
-					final int prefixSize = ((Collection<«paramBoxedName»>) prefix).size();
+					final int prefixSize = ((Collection<«type.genericBoxedName»>) prefix).size();
 					if (prefixSize == 0) {
 						return this;
 					} else {
@@ -319,15 +323,21 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			«IF (type == Type.OBJECT)»
+			«IF type == Type.OBJECT»
 				public final List<A> asList() {
 					return new SeqAsList<>(this);
 				}
+			«ELSE»
+				public final List<«type.genericBoxedName»> asList() {
+					return new «type.typeName»IndexedIterableAsList<>(this);
+				}
+			«ENDIF»
 
-				«toArrayList(true)»
+			«toArrayList(type, true)»
 
-				«toHashSet(true)»
+			«toHashSet(type, true)»
 
+			«IF type == Type.OBJECT»
 				public final Array<A> toArray() {
 					if (isEmpty()) {
 						return Array.emptyArray();
@@ -678,12 +688,12 @@ final class SeqGenerator implements ClassGenerator {
 				return tail;
 			}
 
-			public static «paramGenericName» iterableToSeq(final Iterable<«paramBoxedName»> iterable) {
+			public static «paramGenericName» iterableToSeq(final Iterable<«type.genericBoxedName»> iterable) {
 				requireNonNull(iterable);
 				if (iterable instanceof «wildcardName») {
 					return («genericName») iterable;
 				} else if (iterable instanceof Collection<?> && iterable instanceof RandomAccess) {
-					return sizedToSeq(«iterator("iterable.iterator()")», ((Collection<«paramBoxedName»>) iterable).size());
+					return sizedToSeq(«iterator("iterable.iterator()")», ((Collection<«type.genericBoxedName»>) iterable).size());
 				} else if (iterable instanceof Sized) {
 					return sizedToSeq(«iterator("iterable.iterator()")», ((Sized) iterable).size());
 				} else {
@@ -1146,7 +1156,7 @@ final class SeqGenerator implements ClassGenerator {
 				return StreamSupport.«streamFunction»(spliterator(), true);
 			}
 
-			«hashcode(paramBoxedName)»
+			«hashcode(type.genericBoxedName)»
 
 			@Override
 			public boolean equals(final Object obj) {
@@ -1258,16 +1268,16 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public «iteratorReturnType» «iteratorNext»() {
 				if (index1 < node1.length) {
-					return («paramBoxedName») node1[index1++];
+					return «genericCast»node1[index1++];
 				} else if (index2 < node2.length) {
 					node1 = node2[index2++];
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (index2 == node2.length) {
 					node1 = tail;
 					index2++;
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else {
 					throw new NoSuchElementException();
 				}
@@ -1298,11 +1308,11 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public «iteratorReturnType» «iteratorNext»() {
 				if (index1 < node1.length) {
-					return («paramBoxedName») node1[index1++];
+					return «genericCast»node1[index1++];
 				} else if (node2 != null && index2 < node2.length) {
 					node1 = node2[index2++];
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (index3 < node3.length) {
 					if (node3[index3].length == 0) {
 						if (index3 == 0) {
@@ -1321,13 +1331,13 @@ final class SeqGenerator implements ClassGenerator {
 						index2 = 1;
 					}
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (index3 == node3.length) {
 					node2 = null;
 					node1 = tail;
 					index3++;
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else {
 					throw new NoSuchElementException();
 				}
@@ -1361,11 +1371,11 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public «iteratorReturnType» «iteratorNext»() {
 				if (index1 < node1.length) {
-					return («paramBoxedName») node1[index1++];
+					return «genericCast»node1[index1++];
 				} else if (node2 != null && index2 < node2.length) {
 					node1 = node2[index2++];
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (node3 != null && index3 < node3.length) {
 					if (node3[index3].length == 0) {
 						node3 = null;
@@ -1378,7 +1388,7 @@ final class SeqGenerator implements ClassGenerator {
 						index2 = 1;
 					}
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (index4 < node4.length) {
 					if (node4[index4][0].length == 0) {
 						if (node4[index4].length == 1) {
@@ -1410,14 +1420,14 @@ final class SeqGenerator implements ClassGenerator {
 						index2 = 1;
 					}
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (index4 == node4.length) {
 					node3 = null;
 					node2 = null;
 					node1 = tail;
 					index4++;
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else {
 					throw new NoSuchElementException();
 				}
@@ -1454,11 +1464,11 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public «iteratorReturnType» «iteratorNext»() {
 				if (index1 < node1.length) {
-					return («paramBoxedName») node1[index1++];
+					return «genericCast»node1[index1++];
 				} else if (node2 != null && index2 < node2.length) {
 					node1 = node2[index2++];
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (node3 != null && index3 < node3.length) {
 					if (node3[index3].length == 0) {
 						node4 = null;
@@ -1472,7 +1482,7 @@ final class SeqGenerator implements ClassGenerator {
 						index2 = 1;
 					}
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (node4 != null && index4 < node4.length) {
 					if (node4[index4][0].length == 0) {
 						node4 = null;
@@ -1488,7 +1498,7 @@ final class SeqGenerator implements ClassGenerator {
 						index2 = 1;
 					}
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (index5 < node5.length) {
 					if (node5[index5][0][0].length == 0) {
 						if (node5[index5][0].length == 1) {
@@ -1537,7 +1547,7 @@ final class SeqGenerator implements ClassGenerator {
 						index2 = 1;
 					}
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (index5 == node5.length) {
 					node4 = null;
 					node3 = null;
@@ -1545,7 +1555,7 @@ final class SeqGenerator implements ClassGenerator {
 					node1 = tail;
 					index5++;
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else {
 					throw new NoSuchElementException();
 				}
@@ -1584,11 +1594,11 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public «iteratorReturnType» «iteratorNext»() {
 				if (index1 < node1.length) {
-					return («paramBoxedName») node1[index1++];
+					return «genericCast»node1[index1++];
 				} else if (node2 != null && index2 < node2.length) {
 					node1 = node2[index2++];
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (node3 != null && index3 < node3.length) {
 					if (node3[index3].length == 0) {
 						node5 = null;
@@ -1603,7 +1613,7 @@ final class SeqGenerator implements ClassGenerator {
 						index2 = 1;
 					}
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (node4 != null && index4 < node4.length) {
 					if (node4[index4][0].length == 0) {
 						node5 = null;
@@ -1620,7 +1630,7 @@ final class SeqGenerator implements ClassGenerator {
 						index2 = 1;
 					}
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (node5 != null && index5 < node5.length) {
 					if (node5[index5][0][0].length == 0) {
 						node5 = null;
@@ -1639,7 +1649,7 @@ final class SeqGenerator implements ClassGenerator {
 						index2 = 1;
 					}
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (index6 < node6.length) {
 					if (node6[index6][0][0][0].length == 0) {
 						if (node6[index6][0][0].length == 1) {
@@ -1709,7 +1719,7 @@ final class SeqGenerator implements ClassGenerator {
 						index2 = 1;
 					}
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else if (index6 == node6.length) {
 					node5 = null;
 					node4 = null;
@@ -1718,16 +1728,16 @@ final class SeqGenerator implements ClassGenerator {
 					node1 = tail;
 					index6++;
 					index1 = 1;
-					return («paramBoxedName») node1[0];
+					return «genericCast»node1[0];
 				} else {
 					throw new NoSuchElementException();
 				}
 			}
 		}
-
 		«IF type == Type.OBJECT»
+
 			final class SeqAsList<A> extends IndexedIterableAsList<A, Seq<A>> {
-				SeqAsList(final Seq<A> seq) {
+				SeqAsList(final «shortName»«IF type == Type.OBJECT»<A>«ENDIF» seq) {
 					super(seq);
 				}
 
@@ -1847,12 +1857,12 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public «type.genericName» head() {
-				return («type.genericName») node1[0];
+				return «genericCast»node1[0];
 			}
 
 			@Override
 			public «type.genericName» last() {
-				return («type.genericName») node1[node1.length - 1];
+				return «genericCast»node1[node1.length - 1];
 			}
 
 			@Override
@@ -1879,14 +1889,14 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public «type.genericName» get(final int index) {
-				return («type.genericName») node1[index];
+				return «genericCast»node1[index];
 			}
 
 			@Override
 			public «genericName» update(final int index, final «updateFunction» f) {
 				requireNonNull(f);
 				final «type.javaName»[] newNode1 = node1.clone();
-				final «type.genericName» oldValue = («type.genericName») node1[index];
+				final «type.genericName» oldValue = «genericCast»node1[index];
 				final «type.genericName» newValue = f.apply(oldValue);
 				newNode1[index] = newValue;
 				return new «diamondName(1)»(newNode1);
@@ -2163,12 +2173,12 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public «type.genericName» head() {
-				return («type.genericName») init[0];
+				return «genericCast»init[0];
 			}
 
 			@Override
 			public «type.genericName» last() {
-				return («type.genericName») tail[tail.length - 1];
+				return «genericCast»tail[tail.length - 1];
 			}
 
 			@Override
@@ -2223,12 +2233,12 @@ final class SeqGenerator implements ClassGenerator {
 			public «type.genericName» get(final int index) {
 				try {
 					if (index < init.length) {
-						return («type.genericName») init[index];
+						return «genericCast»init[index];
 					} else if (index >= size - tail.length) {
-						return («type.genericName») tail[index + tail.length - size];
+						return «genericCast»tail[index + tail.length - size];
 					} else {
 						final int idx = index + 32 - init.length;
-						return («type.genericName») node2[index2(idx) - 1][index1(idx)];
+						return «genericCast»node2[index2(idx) - 1][index1(idx)];
 					}
 				} catch (final ArrayIndexOutOfBoundsException __) {
 					throw new IndexOutOfBoundsException(Integer.toString(index));
@@ -2241,14 +2251,14 @@ final class SeqGenerator implements ClassGenerator {
 				try {
 					if (index < init.length) {
 						final «type.javaName»[] newInit = init.clone();
-						final «type.genericName» oldValue = («type.genericName») init[index];
+						final «type.genericName» oldValue = «genericCast»init[index];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newInit[index] = newValue;
 						return new «diamondName(2)»(node2, newInit, tail, size);
 					} else if (index >= size - tail.length) {
 						final «type.javaName»[] newTail = tail.clone();
 						final int tailIndex = index + tail.length - size;
-						final «type.genericName» oldValue = («type.genericName») tail[tailIndex];
+						final «type.genericName» oldValue = «genericCast»tail[tailIndex];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newTail[tailIndex] = newValue;
 						return new «diamondName(2)»(node2, init, newTail, size);
@@ -2258,7 +2268,7 @@ final class SeqGenerator implements ClassGenerator {
 						final int index2 = index2(idx) - 1;
 						final «type.javaName»[] newNode1 = newNode2[index2].clone();
 						final int index1 = index1(idx);
-						final «type.genericName» oldValue = («type.genericName») newNode1[index1];
+						final «type.genericName» oldValue = «genericCast»newNode1[index1];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newNode2[index2] = newNode1;
 						newNode1[index1] = newValue;
@@ -2824,12 +2834,12 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public «type.genericName» head() {
-				return («type.genericName») init[0];
+				return «genericCast»init[0];
 			}
 
 			@Override
 			public «type.genericName» last() {
-				return («type.genericName») tail[tail.length - 1];
+				return «genericCast»tail[tail.length - 1];
 			}
 
 			@Override
@@ -2936,9 +2946,9 @@ final class SeqGenerator implements ClassGenerator {
 			public «type.genericName» get(final int index) {
 				try {
 					if (index < init.length) {
-						return («type.genericName») init[index];
+						return «genericCast»init[index];
 					} else if (index >= size - tail.length) {
-						return («type.genericName») tail[index + tail.length - size];
+						return «genericCast»tail[index + tail.length - size];
 					} else {
 						final int idx = index + startIndex;
 						final int index3 = index3(idx);
@@ -2946,7 +2956,7 @@ final class SeqGenerator implements ClassGenerator {
 						final int index2 = index2(idx, index3, node2);
 						final «type.javaName»[] node1 = node2[index2];
 						final int index1 = index1(idx);
-						return («type.genericName») node1[index1];
+						return «genericCast»node1[index1];
 					}
 				} catch (final ArrayIndexOutOfBoundsException __) {
 					throw new IndexOutOfBoundsException(Integer.toString(index));
@@ -2959,14 +2969,14 @@ final class SeqGenerator implements ClassGenerator {
 				try {
 					if (index < init.length) {
 						final «type.javaName»[] newInit = init.clone();
-						final «type.genericName» oldValue = («type.genericName») init[index];
+						final «type.genericName» oldValue = «genericCast»init[index];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newInit[index] = newValue;
 						return new «diamondName(3)»(node3, newInit, tail, startIndex, size);
 					} else if (index >= size - tail.length) {
 						final «type.javaName»[] newTail = tail.clone();
 						final int tailIndex = index + tail.length - size;
-						final «type.genericName» oldValue = («type.genericName») tail[tailIndex];
+						final «type.genericName» oldValue = «genericCast»tail[tailIndex];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newTail[tailIndex] = newValue;
 						return new «diamondName(3)»(node3, init, newTail, startIndex, size);
@@ -2978,7 +2988,7 @@ final class SeqGenerator implements ClassGenerator {
 						final int index2 = index2(idx, index3, newNode2);
 						final «type.javaName»[] newNode1 = newNode2[index2].clone();
 						final int index1 = index1(idx);
-						final «type.genericName» oldValue = («type.genericName») newNode1[index1];
+						final «type.genericName» oldValue = «genericCast»newNode1[index1];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newNode3[index3] = newNode2;
 						newNode2[index2] = newNode1;
@@ -3615,12 +3625,12 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public «type.genericName» head() {
-				return («type.genericName») init[0];
+				return «genericCast»init[0];
 			}
 
 			@Override
 			public «type.genericName» last() {
-				return («type.genericName») tail[tail.length - 1];
+				return «genericCast»tail[tail.length - 1];
 			}
 
 			@Override
@@ -3783,9 +3793,9 @@ final class SeqGenerator implements ClassGenerator {
 			public «type.genericName» get(final int index) {
 				try {
 					if (index < init.length) {
-						return («type.genericName») init[index];
+						return «genericCast»init[index];
 					} else if (index >= size - tail.length) {
-						return («type.genericName») tail[index + tail.length - size];
+						return «genericCast»tail[index + tail.length - size];
 					} else {
 						final int idx = index + startIndex;
 						final int index4 = index4(idx);
@@ -3795,7 +3805,7 @@ final class SeqGenerator implements ClassGenerator {
 						final int index2 = index2(idx, index3, index4, node2);
 						final «type.javaName»[] node1 = node2[index2];
 						final int index1 = index1(idx);
-						return («type.genericName») node1[index1];
+						return «genericCast»node1[index1];
 					}
 				} catch (final ArrayIndexOutOfBoundsException __) {
 					throw new IndexOutOfBoundsException(Integer.toString(index));
@@ -3808,14 +3818,14 @@ final class SeqGenerator implements ClassGenerator {
 				try {
 					if (index < init.length) {
 						final «type.javaName»[] newInit = init.clone();
-						final «type.genericName» oldValue = («type.genericName») init[index];
+						final «type.genericName» oldValue = «genericCast»init[index];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newInit[index] = newValue;
 						return new «diamondName(4)»(node4, newInit, tail, startIndex, size);
 					} else if (index >= size - tail.length) {
 						final «type.javaName»[] newTail = tail.clone();
 						final int tailIndex = index + tail.length - size;
-						final «type.genericName» oldValue = («type.genericName») tail[tailIndex];
+						final «type.genericName» oldValue = «genericCast»tail[tailIndex];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newTail[tailIndex] = newValue;
 						return new «diamondName(4)»(node4, init, newTail, startIndex, size);
@@ -3829,7 +3839,7 @@ final class SeqGenerator implements ClassGenerator {
 						final int index2 = index2(idx, index3, index4, newNode2);
 						final «type.javaName»[] newNode1 = newNode2[index2].clone();
 						final int index1 = index1(idx);
-						final «type.genericName» oldValue = («type.genericName») newNode1[index1];
+						final «type.genericName» oldValue = «genericCast»newNode1[index1];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newNode4[index4] = newNode3;
 						newNode3[index3] = newNode2;
@@ -4532,12 +4542,12 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public «type.genericName» head() {
-				return («type.genericName») init[0];
+				return «genericCast»init[0];
 			}
 
 			@Override
 			public «type.genericName» last() {
-				return («type.genericName») tail[tail.length - 1];
+				return «genericCast»tail[tail.length - 1];
 			}
 
 			@Override
@@ -4762,9 +4772,9 @@ final class SeqGenerator implements ClassGenerator {
 			public «type.genericName» get(final int index) {
 				try {
 					if (index < init.length) {
-						return («type.genericName») init[index];
+						return «genericCast»init[index];
 					} else if (index >= size - tail.length) {
-						return («type.genericName») tail[index + tail.length - size];
+						return «genericCast»tail[index + tail.length - size];
 					} else {
 						final int idx = index + startIndex;
 						final int index5 = index5(idx);
@@ -4776,7 +4786,7 @@ final class SeqGenerator implements ClassGenerator {
 						final int index2 = index2(idx, index3, index4, index5, node2);
 						final «type.javaName»[] node1 = node2[index2];
 						final int index1 = index1(idx);
-						return («type.genericName») node1[index1];
+						return «genericCast»node1[index1];
 					}
 				} catch (final ArrayIndexOutOfBoundsException __) {
 					throw new IndexOutOfBoundsException(Integer.toString(index));
@@ -4789,14 +4799,14 @@ final class SeqGenerator implements ClassGenerator {
 				try {
 					if (index < init.length) {
 						final «type.javaName»[] newInit = init.clone();
-						final «type.genericName» oldValue = («type.genericName») init[index];
+						final «type.genericName» oldValue = «genericCast»init[index];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newInit[index] = newValue;
 						return new «diamondName(5)»(node5, newInit, tail, startIndex, size);
 					} else if (index >= size - tail.length) {
 						final «type.javaName»[] newTail = tail.clone();
 						final int tailIndex = index + tail.length - size;
-						final «type.genericName» oldValue = («type.genericName») tail[tailIndex];
+						final «type.genericName» oldValue = «genericCast»tail[tailIndex];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newTail[tailIndex] = newValue;
 						return new «diamondName(5)»(node5, init, newTail, startIndex, size);
@@ -4812,7 +4822,7 @@ final class SeqGenerator implements ClassGenerator {
 						final int index2 = index2(idx, index3, index4, index5, newNode2);
 						final «type.javaName»[] newNode1 = newNode2[index2].clone();
 						final int index1 = index1(idx);
-						final «type.genericName» oldValue = («type.genericName») newNode1[index1];
+						final «type.genericName» oldValue = «genericCast»newNode1[index1];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newNode5[index5] = newNode4;
 						newNode4[index4] = newNode3;
@@ -5592,12 +5602,12 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public «type.genericName» head() {
-				return («type.genericName») init[0];
+				return «genericCast»init[0];
 			}
 
 			@Override
 			public «type.genericName» last() {
-				return («type.genericName») tail[tail.length - 1];
+				return «genericCast»tail[tail.length - 1];
 			}
 
 			@Override
@@ -5894,9 +5904,9 @@ final class SeqGenerator implements ClassGenerator {
 			public «type.genericName» get(final int index) {
 				try {
 					if (index < init.length) {
-						return («type.genericName») init[index];
+						return «genericCast»init[index];
 					} else if (index >= size - tail.length) {
-						return («type.genericName») tail[index + tail.length - size];
+						return «genericCast»tail[index + tail.length - size];
 					} else {
 						final int idx = index + startIndex;
 						final int index6 = index6(idx);
@@ -5910,7 +5920,7 @@ final class SeqGenerator implements ClassGenerator {
 						final int index2 = index2(idx, index3, index4, index5, index6, node2);
 						final «type.javaName»[] node1 = node2[index2];
 						final int index1 = index1(idx);
-						return («type.genericName») node1[index1];
+						return «genericCast»node1[index1];
 					}
 				} catch (final ArrayIndexOutOfBoundsException __) {
 					throw new IndexOutOfBoundsException(Integer.toString(index));
@@ -5923,14 +5933,14 @@ final class SeqGenerator implements ClassGenerator {
 				try {
 					if (index < init.length) {
 						final «type.javaName»[] newInit = init.clone();
-						final «type.genericName» oldValue = («type.genericName») init[index];
+						final «type.genericName» oldValue = «genericCast»init[index];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newInit[index] = newValue;
 						return new «diamondName(6)»(node6, newInit, tail, startIndex, size);
 					} else if (index >= size - tail.length) {
 						final «type.javaName»[] newTail = tail.clone();
 						final int tailIndex = index + tail.length - size;
-						final «type.genericName» oldValue = («type.genericName») tail[tailIndex];
+						final «type.genericName» oldValue = «genericCast»tail[tailIndex];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newTail[tailIndex] = newValue;
 						return new «diamondName(6)»(node6, init, newTail, startIndex, size);
@@ -5948,7 +5958,7 @@ final class SeqGenerator implements ClassGenerator {
 						final int index2 = index2(idx, index3, index4, index5, index6, newNode2);
 						final «type.javaName»[] newNode1 = newNode2[index2].clone();
 						final int index1 = index1(idx);
-						final «type.genericName» oldValue = («type.genericName») newNode1[index1];
+						final «type.genericName» oldValue = «genericCast»newNode1[index1];
 						final «type.genericName» newValue = f.apply(oldValue);
 						newNode6[index6] = newNode5;
 						newNode5[index5] = newNode4;

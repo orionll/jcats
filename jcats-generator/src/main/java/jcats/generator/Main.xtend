@@ -68,7 +68,6 @@ class Main {
 			new Eff0Generator,
 			new EquatableGenerator,
 			new SizedGenerator,
-			new IndexedGenerator,
 			new OrderGenerator,
 			new OrdGenerator,
 			new StackGenerator,
@@ -85,6 +84,7 @@ class Main {
 			SeqGenerator.generators,
 			SeqBuilderGenerator.generators,
 			PNGenerators.generators,
+			IndexedGenerator.generators,
 			VNGenerators.generators
 		].flatten.toList
 	}

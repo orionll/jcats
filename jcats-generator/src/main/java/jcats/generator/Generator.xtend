@@ -77,14 +77,14 @@ interface Generator {
 		}
 	'''}
 
-	def toArrayList(boolean isFinal) { '''
-		public «if (isFinal) "final " else ""»ArrayList<A> toArrayList() {
+	def toArrayList(Type type, boolean isFinal) { '''
+		public «if (isFinal) "final " else ""»ArrayList<«type.genericBoxedName»> toArrayList() {
 			return new ArrayList<>(asList());
 		}
 	'''}
 
-	def toHashSet(boolean isFinal) { '''
-		public «if (isFinal) "final " else ""»HashSet<A> toHashSet() {
+	def toHashSet(Type type, boolean isFinal) { '''
+		public «if (isFinal) "final " else ""»HashSet<«type.genericBoxedName»> toHashSet() {
 			return new HashSet<>(asList());
 		}
 	'''}

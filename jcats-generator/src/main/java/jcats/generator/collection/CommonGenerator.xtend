@@ -17,7 +17,9 @@ final class CommonGenerator implements ClassGenerator {
 		import java.util.RandomAccess;
 		import java.util.Spliterator;
 
-		import jcats.Indexed;
+		«FOR type : Type.values»
+			import jcats.«IF type != Type.OBJECT»«type.typeName»«ENDIF»Indexed;
+		«ENDFOR»
 		import jcats.Sized;
 		import «Constants.F»;
 		«FOR type : Type.javaUnboxedTypes»
@@ -58,7 +60,7 @@ final class CommonGenerator implements ClassGenerator {
 					if (i >= array.length) {
 						throw new NoSuchElementException();
 					} else {
-						return («type.genericName») array[i++];
+						return «IF type == Type.OBJECT»(«type.genericName») «ENDIF»array[i++];
 					}
 				}
 			}
@@ -104,8 +106,8 @@ final class CommonGenerator implements ClassGenerator {
 					return f.apply(iterator.next«type.javaPrefix»());
 				}
 			}
-		«ENDFOR»
 
+		«ENDFOR»
 		final class TableIterator<A> implements Iterator<A> {
 			private final int size;
 			private final IntObjectF<A> f;
@@ -283,32 +285,39 @@ final class CommonGenerator implements ClassGenerator {
 			}
 
 		«ENDFOR»
-		class IndexedIterableAsList<A, I extends Iterable<A> & Indexed<A> & Sized> extends AbstractList<A> implements RandomAccess {
-			final I iterable;
+		«FOR type : Type.values»
+			«IF type == Type.OBJECT»
+				class IndexedIterableAsList<A, I extends Iterable<A> & Indexed<A> & Sized> extends AbstractList<A> implements RandomAccess {
+			«ELSE»
+				class «type.typeName»IndexedIterableAsList<I extends Iterable<«type.boxedName»> & «type.typeName»Indexed & Sized> extends AbstractList<«type.boxedName»> implements RandomAccess {
+			«ENDIF»
+				final I iterable;
 
-			IndexedIterableAsList(final I iterable) {
-				this.iterable = iterable;
+				«IF type != Type.OBJECT»«type.typeName»«ENDIF»IndexedIterableAsList(final I iterable) {
+					this.iterable = iterable;
+				}
+
+				@Override
+				public «type.genericBoxedName» get(final int index) {
+					return iterable.get(index);
+				}
+
+				@Override
+				public int size() {
+					return iterable.size();
+				}
+
+				@Override
+				public Iterator<«type.genericBoxedName»> iterator() {
+					return iterable.iterator();
+				}
+
+				@Override
+				public Spliterator<«type.genericBoxedName»> spliterator() {
+					return iterable.spliterator();
+				}
 			}
 
-			@Override
-			public A get(final int index) {
-				return iterable.get(index);
-			}
-
-			@Override
-			public int size() {
-				return iterable.size();
-			}
-
-			@Override
-			public Iterator<A> iterator() {
-				return iterable.iterator();
-			}
-
-			@Override
-			public Spliterator<A> spliterator() {
-				return iterable.spliterator();
-			}
-		}
+		«ENDFOR»
 	''' }
 }
