@@ -110,6 +110,12 @@ final class F0Generator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
+			«IF type != Type.OBJECT»
+				default F0<«type.boxedName»> toF0() {
+					return this::apply;
+				}
+
+			«ENDIF»
 			«IF type == Type.OBJECT»
 				default <B> F<B, A> toConstF() {
 					return b -> {

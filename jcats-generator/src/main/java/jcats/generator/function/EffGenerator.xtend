@@ -62,6 +62,12 @@ final class EffGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
+			«IF type != Type.OBJECT»
+				default Eff<«type.boxedName»> toEff() {
+					return this::apply;
+				}
+
+			«ENDIF»
 			«IF type == Type.OBJECT»
 				default Consumer<A> toConsumer() {
 					return (A a) -> apply(requireNonNull(a));
