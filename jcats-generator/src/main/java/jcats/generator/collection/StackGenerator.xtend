@@ -2,6 +2,7 @@ package jcats.generator.collection
 
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
+import jcats.generator.Type
 
 final class StackGenerator implements ClassGenerator {
 	override className() { Constants.STACK }
@@ -304,9 +305,9 @@ final class StackGenerator implements ClassGenerator {
 				return isEmpty() ? emptySpliterator() : spliteratorUnknownSize(iterator(),  Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 
-			«stream»
+			«stream(Type.OBJECT)»
 
-			«parallelStream»
+			«parallelStream(Type.OBJECT)»
 
 			«hashcode»
 

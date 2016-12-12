@@ -17,25 +17,10 @@ final class SeqBuilderGenerator implements ClassGenerator {
 
 	override className() { Constants.COLLECTION + "." + shortName }
 
-	def shortName() {
-		if (type == Type.OBJECT) "SeqBuilder" else type.typeName + "SeqBuilder"
-	}
-
-	def shortSeqName() {
-		if (type == Type.OBJECT) "Seq" else type.typeName + "Seq"
-	}
-
-	def genericName() {
-		if (type == Type.OBJECT) shortName + "<A>" else shortName
-	}
-
-	def paramName() {
-		if (type == Type.OBJECT) "A" else type.boxedName
-	}
-	
-	def seqGenericName() {
-		if (type == Type.OBJECT) "Seq<A>" else type.typeName + "Seq"
-	}
+	def shortName() { if (type == Type.OBJECT) "SeqBuilder" else type.typeName + "SeqBuilder" }
+	def shortSeqName() { if (type == Type.OBJECT) "Seq" else type.typeName + "Seq" }
+	def genericName() { if (type == Type.OBJECT) shortName + "<A>" else shortName }
+	def seqGenericName() { if (type == Type.OBJECT) "Seq<A>" else type.typeName + "Seq" }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -45,7 +30,9 @@ final class SeqBuilderGenerator implements ClassGenerator {
 
 		import static «Constants.COLLECTION».«shortSeqName».empty«shortSeqName»;
 
-		import static java.util.Objects.requireNonNull;
+		«IF type == Type.OBJECT»
+			import static java.util.Objects.requireNonNull;
+		«ENDIF»
 
 		public final class «genericName» {
 			«type.javaName»[][][][][][] node6;
@@ -168,7 +155,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 				return this;
 			}
 
-			public «genericName» appendAll(final Iterable<«paramName»> iterable) {
+			public «genericName» appendAll(final Iterable<«type.genericBoxedName»> iterable) {
 				for (final «type.javaName» value : iterable) {
 					append(value);
 				}

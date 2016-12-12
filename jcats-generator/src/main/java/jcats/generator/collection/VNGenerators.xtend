@@ -5,6 +5,7 @@ import jcats.generator.ClassGenerator
 import jcats.generator.Constants
 import jcats.generator.Generator
 import jcats.generator.PNGenerators
+import jcats.generator.Type
 
 final class VNGenerators {
 	def static List<Generator> generators() {
@@ -200,9 +201,9 @@ final class VNGenerators {
 						return Arrays.asList(«(1 .. arity).map["a" + it].join(", ")»).iterator();
 					}
 
-					«stream»
+					«stream(Type.OBJECT)»
 
-					«parallelStream»
+					«parallelStream(Type.OBJECT)»
 
 					«zip(false)»
 

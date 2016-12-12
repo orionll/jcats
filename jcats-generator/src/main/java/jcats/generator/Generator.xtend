@@ -19,10 +19,10 @@ interface Generator {
 		if (primitive == "boolean") "bool" else primitive
 	}
 
-	def String takeWhile(boolean isFinal) { '''
-		public «if (isFinal) "final " else ""»«name»<A> takeWhile(final BoolF<A> predicate) {
+	def String takeWhile(boolean isFinal, Type type) { '''
+		public «if (isFinal) "final " else ""»«name»«IF type == Type.OBJECT»<A>«ENDIF» takeWhile(final «IF type != Type.OBJECT»«type.typeName»«ENDIF»BoolF«IF type == Type.OBJECT»<A>«ENDIF» predicate) {
 			int n = 0;
-			for (final A value : this) {
+			for (final «type.genericName» value : this) {
 				if (predicate.apply(value)) {
 					n++;
 				} else {
@@ -33,41 +33,27 @@ interface Generator {
 		}
 	''' }
 
-	def String takeWhile(boolean isFinal, String typeName, String javaName) { '''
-		public «if (isFinal) "final " else ""»«name» takeWhile(final «typeName»BoolF predicate) {
-			int n = 0;
-			for (final «javaName» value : this) {
-				if (predicate.apply(value)) {
-					n++;
-				} else {
-					break;
-				}
-			}
-			return take(n);
+	def static String stream(Type type) { '''
+		public «type.streamGenericName» stream() {
+			return StreamSupport.«type.streamFunction»(spliterator(), false);
 		}
 	''' }
 
-	def static String stream() { '''
-		public Stream<A> stream() {
-			return StreamSupport.stream(spliterator(), false);
-		}
-	''' }
-
-	def static String parallelStream() { '''
-		public Stream<A> parallelStream() {
-			return StreamSupport.stream(spliterator(), true);
+	def static String parallelStream(Type type) { '''
+		public «type.streamGenericName» parallelStream() {
+			return StreamSupport.«type.streamFunction»(spliterator(), true);
 		}
 	'''}
 
-	def toStr() { return toStr("Iterator<A>", "next") }
+	def toStr() { return toStr(Type.OBJECT) }
 
-	def toStr(String iteratorName, String iteratorFunction) { '''
+	def toStr(Type type) { '''
 		@Override
 		public String toString() {
 			final StringBuilder builder = new StringBuilder("«name»(");
-			final «iteratorName» iterator = iterator();
+			final «type.iteratorGenericName» iterator = iterator();
 			while (iterator.hasNext()) {
-				builder.append(iterator.«iteratorFunction»());
+				builder.append(iterator.«type.iteratorNext»());
 				if (iterator.hasNext()) {
 					builder.append(", ");
 				}
@@ -139,7 +125,7 @@ interface Generator {
 	def zipN() { zipN(true) }
 
 	def zipN(boolean javadocComplexity) { '''
-		«FOR arity : 2 .. Constants.MAX_ARITY»
+		«FOR arity : 2 .. Constants.MAX_FUNCTIONS_ARITY»
 			«IF javadocComplexity»
 				/**
 				 * O(min(«(1 .. arity).map['''«name.firstToLowerCase»«it».size'''].join(", ")»))
@@ -155,7 +141,7 @@ interface Generator {
 	def zipWithN((int) => String body) { zipWithN(true, body) }
 
 	def zipWithN(boolean javadocComplexity, (int) => String body) { '''
-		«FOR arity : 2 .. Constants.MAX_ARITY»
+		«FOR arity : 2 .. Constants.MAX_FUNCTIONS_ARITY»
 			«IF javadocComplexity»
 				/**
 				 * O(min(«(1 .. arity).map['''«name.firstToLowerCase»«it».size'''].join(", ")»))
@@ -169,7 +155,7 @@ interface Generator {
 	'''}
 
 	def productN() { '''
-		«FOR arity : 2 .. Constants.MAX_ARITY»
+		«FOR arity : 2 .. Constants.MAX_FUNCTIONS_ARITY»
 			«staticModifier» <«(1 .. arity).map["A" + it].join(", ")»> «name»<«PNGenerators.shortName(arity)»<«(1 .. arity).map["A" + it].join(", ")»>> product«arity»(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")») {
 				return productWith«arity»(«(1 .. arity).map[name.firstToLowerCase + it].join(", ")», «PNGenerators.shortName(arity)»::«PNGenerators.shortName(arity).toLowerCase»);
 			}
@@ -178,7 +164,7 @@ interface Generator {
 	'''}
 
 	def productWithN((int) => String body) { '''
-		«FOR arity : 2 .. Constants.MAX_ARITY»
+		«FOR arity : 2 .. Constants.MAX_FUNCTIONS_ARITY»
 			«staticModifier» <«(1 .. arity).map["A" + it + ", "].join»B> «name»<B> productWith«arity»(«(1 .. arity).map['''final «name»<A«it»> «name.firstToLowerCase»«it»'''].join(", ")», final F«arity»<«(1 .. arity).map["A" + it + ", "].join»B> f) {
 				«body.apply(arity)»
 			}

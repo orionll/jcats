@@ -72,8 +72,6 @@ class Main {
 			new OrdGenerator,
 			new StackGenerator,
 			new StackBuilderGenerator,
-			new ArrayGenerator,
-			new ArrayBuilderGenerator,
 			new CommonGenerator
 		],
 			FGenerator.generators,
@@ -81,6 +79,8 @@ class Main {
 			EffGenerator.generators,
 			FNGenerators.generators,
 			EffNGenerators.generators,
+			ArrayGenerator.generators,
+			ArrayBuilderGenerator.generators,
 			SeqGenerator.generators,
 			SeqBuilderGenerator.generators,
 			PNGenerators.generators,
