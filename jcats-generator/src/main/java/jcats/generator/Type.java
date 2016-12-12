@@ -99,4 +99,8 @@ public enum Type {
 	public static ImmutableList<Type> javaUnboxedTypes() {
 		return ImmutableList.of(Type.INT, Type.LONG, Type.DOUBLE);
 	}
+
+	public static ImmutableList<Type> primitives() {
+		return ImmutableList.of(Type.INT, Type.LONG, Type.DOUBLE, Type.BOOL);
+	}
 }

@@ -53,9 +53,13 @@ final class ArrayGenerator implements ClassGenerator {
 		import java.util.stream.StreamSupport;
 
 		«IF type == Type.OBJECT»
-			import «Constants.FUNCTION».BoolF;
+			«FOR toType : Type.primitives»
+				import «Constants.FUNCTION».«toType.typeName»F;
+			«ENDFOR»
 		«ELSE»
-			import «Constants.FUNCTION».«type.typeName»BoolF;
+			«FOR toType : Type.primitives»
+				import «Constants.FUNCTION».«type.typeName»«toType.typeName»F;
+			«ENDFOR»
 			import «Constants.FUNCTION».«type.typeName»ObjectF;
 		«ENDIF»
 		import «Constants.F»;
@@ -75,6 +79,9 @@ final class ArrayGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static java.util.Spliterators.emptySpliterator;
 		import static «Constants.ARRAY».emptyArray;
+		«FOR toType : Type.primitives.filter[it != type]»
+			import static «Constants.COLLECTION».«toType.typeName»Array.empty«toType.typeName»Array;
+		«ENDFOR»
 		import static «Constants.F».id;
 		import static «Constants.P».p;
 
@@ -286,10 +293,10 @@ final class ArrayGenerator implements ClassGenerator {
 				requireNonNull(f);
 				if (isEmpty()) {
 					return emptyArray();
-			«IF type == Type.OBJECT»
+				«IF type == Type.OBJECT»
 					} else if (f == F.id()) {
 						return (Array<B>) this;
-			«ENDIF»
+				«ENDIF»
 				} else {
 					final Object[] newArray = new Object[array.length];
 					for (int i = 0; i < array.length; i++) {
@@ -299,6 +306,25 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
+			«FOR toType : Type.primitives»
+				public «toType.typeName»Array mapTo«toType.typeName»(final «IF type != Type.OBJECT»«type.typeName»«ENDIF»«toType.typeName»F«IF type == Type.OBJECT»<A>«ENDIF» f) {
+					requireNonNull(f);
+					if (isEmpty()) {
+						return empty«toType.typeName»Array();
+					«IF type == toType»
+					} else if (f == «type.typeName»«type.typeName»F.id()) {
+						return this;
+					«ENDIF»
+					} else {
+						final «toType.javaName»[] newArray = new «toType.javaName»[array.length];
+						for (int i = 0; i < array.length; i++) {
+							newArray[i] = f.apply(«type.genericCast»array[i]);
+						}
+						return new «toType.typeName»Array(newArray);
+					}
+				}
+
+			«ENDFOR»
 			«IF type == Type.OBJECT»
 				public <B> Array<B> flatMap(final F<A, Array<B>> f) {
 			«ELSE»
