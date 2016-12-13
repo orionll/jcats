@@ -22,9 +22,12 @@ final class CommonGenerator implements ClassGenerator {
 		«ENDFOR»
 		import jcats.Sized;
 		import «Constants.F»;
-		«FOR type : Type.javaUnboxedTypes»
+		«FOR type : Type.primitives»
 			import «Constants.FUNCTION».«type.typeName»ObjectF;
-			import «Constants.FUNCTION».Int«type.typeName»F;
+			import «Constants.FUNCTION».«type.typeName»F;
+			«FOR toType : Type.primitives»
+				import «Constants.FUNCTION».«type.typeName»«toType.typeName»F;
+			«ENDFOR»
 		«ENDFOR»
 
 		import static java.util.Objects.requireNonNull;
@@ -86,27 +89,31 @@ final class CommonGenerator implements ClassGenerator {
 			}
 		}
 
-		«FOR type : Type.javaUnboxedTypes»
-			final class Mapped«type.typeName»ObjectIterator<A> implements Iterator<A> {
-				private final PrimitiveIterator.Of«type.javaPrefix» iterator;
-				private final «type.typeName»ObjectF<A> f;
+		«FOR fromType : Type.values»
+			«FOR toType : Type.values»
+				«IF fromType != Type.OBJECT || toType != Type.OBJECT»
+					final class Mapped«fromType.typeName»«toType.typeName»Iterator«IF fromType == Type.OBJECT || toType == Type.OBJECT»<A>«ENDIF» implements «toType.iteratorGenericName» {
+						private final «fromType.iteratorGenericName» iterator;
+						private final «IF fromType != Type.OBJECT»«fromType.typeName»«ENDIF»«toType.typeName»F«IF fromType == Type.OBJECT || toType == Type.OBJECT»<A>«ENDIF» f;
 
-				Mapped«type.typeName»ObjectIterator(final PrimitiveIterator.Of«type.javaPrefix» iterator, final «type.typeName»ObjectF<A> f) {
-					this.iterator = iterator;
-					this.f = f;
-				}
+						Mapped«fromType.typeName»«toType.typeName»Iterator(final «fromType.iteratorGenericName» iterator, final «IF fromType != Type.OBJECT»«fromType.typeName»«ENDIF»«toType.typeName»F«IF fromType == Type.OBJECT || toType == Type.OBJECT»<A>«ENDIF» f) {
+							this.iterator = iterator;
+							this.f = f;
+						}
 
-				@Override
-				public boolean hasNext() {
-					return iterator.hasNext();
-				}
+						@Override
+						public boolean hasNext() {
+							return iterator.hasNext();
+						}
 
-				@Override
-				public A next() {
-					return f.apply(iterator.next«type.javaPrefix»());
-				}
-			}
+						@Override
+						public «toType.genericJavaUnboxedName» «toType.iteratorNext»() {
+							return f.apply(iterator.«fromType.iteratorNext»());
+						}
+					}
 
+				«ENDIF»
+			«ENDFOR»
 		«ENDFOR»
 		final class TableIterator<A> implements Iterator<A> {
 			private final int size;

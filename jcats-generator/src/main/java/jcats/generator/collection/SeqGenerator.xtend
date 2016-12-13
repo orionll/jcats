@@ -67,14 +67,17 @@ final class SeqGenerator implements ClassGenerator {
 			import «Constants.F»«arity»;
 		«ENDFOR»
 		«IF type == Type.OBJECT»
-			import «Constants.FUNCTION».BoolF;
+			«FOR toType : Type.primitives»
+				import «Constants.FUNCTION».«toType.typeName»F;
+			«ENDFOR»
 			import «Constants.FUNCTION».IntObjectF;
 		«ELSE»
-			import «Constants.FUNCTION».«type.typeName»BoolF;
+			«FOR toType : Type.primitives»
+				import «Constants.FUNCTION».«type.typeName»«toType.typeName»F;
+			«ENDFOR»
 			import «Constants.FUNCTION».«type.typeName»ObjectF;
-			import «Constants.FUNCTION».Int«type.typeName»F;
 			«IF type != Type.INT»
-				import «Constants.FUNCTION».«type.typeName»«type.typeName»F;
+				import «Constants.FUNCTION».Int«type.typeName»F;
 			«ENDIF»
 		«ENDIF»
 		import «Constants.EQUATABLE»;
@@ -275,6 +278,28 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			«ENDIF»
 
+			«FOR toType : Type.primitives»
+				«IF type == Type.OBJECT»
+					public final «toType.typeName»Seq mapTo«toType.typeName»(final «toType.typeName»F<A> f) {
+						requireNonNull(f);
+						return «toType.typeName»Seq.sizedToSeq(new MappedObject«toType.typeName»Iterator<>(iterator(), f), size());
+					}
+				«ELSE»
+					public final «toType.typeName»Seq mapTo«toType.typeName»(final «type.typeName»«toType.typeName»F f) {
+						requireNonNull(f);
+						«IF type == toType»
+						if (f == «type.typeName»«type.typeName»F.id()) {
+							return this;
+						} else {
+						«ENDIF»
+						«IF type == toType»	«ENDIF»return «toType.typeName»Seq.sizedToSeq(new Mapped«type.typeName»«toType.typeName»Iterator(iterator(), f), size());
+						«IF type == toType»
+						}
+						«ENDIF»
+					}
+				«ENDIF»
+
+			«ENDFOR»
 			«IF type == Type.OBJECT»
 				public final <B> Seq<B> flatMap(final F<A, Seq<B>> f) {
 			«ELSE»

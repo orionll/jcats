@@ -46,6 +46,10 @@ public enum Type {
 		return (this == OBJECT) ? "A" : boxedName();
 	}
 
+	public String genericJavaUnboxedName() {
+		return (this == BOOL) ? "Boolean" : genericName();
+	}
+
 	public String genericCast() {
 		return (this == OBJECT) ? "(A) " : "";
 	}
