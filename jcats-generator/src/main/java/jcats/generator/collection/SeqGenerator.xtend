@@ -32,6 +32,7 @@ final class SeqGenerator implements ClassGenerator {
 	def iteratorReturnType() { if (type == Type.OBJECT) "A" else if (type == Type.BOOL) "Boolean" else type.javaName }
 	def bufferedListName() { if (type == Type.OBJECT) "BufferedList<A>" else if (type == Type.BOOL) "BufferedList<Boolean>" else "Buffered" + type.typeName + "List" }
 	def bufferedListDiamondName() { if (type == Type.OBJECT) "BufferedList<>" else if (type == Type.BOOL) "BufferedList<>" else "Buffered" + type.typeName + "List" }
+	def index() { if (type == Type.OBJECT) "index" else "Seq.index" }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -91,7 +92,7 @@ final class SeqGenerator implements ClassGenerator {
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
 		«IF type != Type.OBJECT»
-			import static jcats.collection.Seq.emptySeq;
+			import static jcats.collection.Seq.*;
 		«ENDIF»
 		import static «Constants.F».id;
 		import static «Constants.P».p;
@@ -383,13 +384,9 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			public static «paramGenericName» replicate(final int size, final «type.genericName» value) {
-				return tabulate(size, Int«type.typeName»F.constant(value));
-			}
+			«replicate(type, paramGenericName)»
 
-			public static «paramGenericName» fill(final int size, final «IF type == Type.OBJECT»F0<A>«ELSE»«type.typeName»F0«ENDIF» f) {
-				return tabulate(size, f.toConstInt«type.typeName»F());
-			}
+			«fill(type, paramGenericName)»
 
 			public static «paramGenericName» tabulate(final int size, final Int«type.typeName»F«IF type == Type.OBJECT»<A>«ENDIF» f) {
 				requireNonNull(f);
@@ -1208,30 +1205,32 @@ final class SeqGenerator implements ClassGenerator {
 
 			«toStr(type)»
 
-			static int index1(final int index) {
-				return (index & 0x1F);
-			}
+			«IF type == Type.OBJECT»
+				static int index1(final int index) {
+					return (index & 0x1F);
+				}
 
-			static int index2(final int index) {
-				return ((index >> 5) & 0x1F);
-			}
+				static int index2(final int index) {
+					return ((index >> 5) & 0x1F);
+				}
 
-			static int index3(final int index) {
-				return ((index >> 10) & 0x1F);
-			}
+				static int index3(final int index) {
+					return ((index >> 10) & 0x1F);
+				}
 
-			static int index4(final int index) {
-				return ((index >> 15) & 0x1F);
-			}
+				static int index4(final int index) {
+					return ((index >> 15) & 0x1F);
+				}
 
-			static int index5(final int index) {
-				return ((index >> 20) & 0x1F);
-			}
+				static int index5(final int index) {
+					return ((index >> 20) & 0x1F);
+				}
 
-			static int index6(final int index) {
-				return ((index >> 25) & 0x1F);
-			}
+				static int index6(final int index) {
+					return ((index >> 25) & 0x1F);
+				}
 
+			«ENDIF»
 			«IF type == Type.OBJECT»
 				«cast(#["A"], #[], #["A"])»
 
@@ -2950,7 +2949,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			private static int index2(final int idx, final int index3, final «type.javaName»[][] node2) {
-				return (index3 == 0) ? index2(idx) + node2.length - 32 : index2(idx);
+				return (index3 == 0) ? «index»2(idx) + node2.length - 32 : «index»2(idx);
 			}
 
 			@Override
@@ -3793,11 +3792,11 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			private static int index2(final int idx, final int index3, final int index4, final «type.javaName»[][] node2) {
-				return (index4 == 0 && index3 == 0) ? index2(idx) + node2.length - 32 : index2(idx);
+				return (index4 == 0 && index3 == 0) ? «index»2(idx) + node2.length - 32 : «index»2(idx);
 			}
 
 			private static int index3(final int idx, final int index4, final «type.javaName»[][][] node3) {
-				return (index4 == 0) ? index3(idx) + node3.length - 32 : index3(idx);
+				return (index4 == 0) ? «index»3(idx) + node3.length - 32 : «index»3(idx);
 			}
 
 			@Override
@@ -4768,15 +4767,15 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			private static int index2(final int idx, final int index3, final int index4, final int index5, final «type.javaName»[][] node2) {
-				return (index5 == 0 && index4 == 0 && index3 == 0) ? index2(idx) + node2.length - 32 : index2(idx);
+				return (index5 == 0 && index4 == 0 && index3 == 0) ? «index»2(idx) + node2.length - 32 : «index»2(idx);
 			}
 
 			private static int index3(final int idx, final int index4, final int index5, final «type.javaName»[][][] node3) {
-				return (index5 == 0 && index4 == 0) ? index3(idx) + node3.length - 32 : index3(idx);
+				return (index5 == 0 && index4 == 0) ? «index»3(idx) + node3.length - 32 : «index»3(idx);
 			}
 
 			private static int index4(final int idx, final int index5, final «type.javaName»[][][][] node4) {
-				return (index5 == 0) ? index4(idx) + node4.length - 32 : index4(idx);
+				return (index5 == 0) ? «index»4(idx) + node4.length - 32 : «index»4(idx);
 			}
 
 			@Override
@@ -5896,19 +5895,19 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			private static int index2(final int idx, final int index3, final int index4, final int index5, final int index6, final «type.javaName»[][] node2) {
-				return (index6 == 0 && index5 == 0 && index4 == 0 && index3 == 0) ? index2(idx) + node2.length - 32 : index2(idx);
+				return (index6 == 0 && index5 == 0 && index4 == 0 && index3 == 0) ? «index»2(idx) + node2.length - 32 : «index»2(idx);
 			}
 
 			private static int index3(final int idx, final int index4, final int index5, final int index6, final «type.javaName»[][][] node3) {
-				return (index6 == 0 && index5 == 0 && index4 == 0) ? index3(idx) + node3.length - 32 : index3(idx);
+				return (index6 == 0 && index5 == 0 && index4 == 0) ? «index»3(idx) + node3.length - 32 : «index»3(idx);
 			}
 
 			private static int index4(final int idx, final int index5, final int index6, final «type.javaName»[][][][] node4) {
-				return (index6 == 0 && index5 == 0) ? index4(idx) + node4.length - 32 : index4(idx);
+				return (index6 == 0 && index5 == 0) ? «index»4(idx) + node4.length - 32 : «index»4(idx);
 			}
 
 			private static int index5(final int idx, final int index6, final «type.javaName»[][][][][] node5) {
-				return (index6 == 0) ? index5(idx) + node5.length - 32 : index5(idx);
+				return (index6 == 0) ? «index»5(idx) + node5.length - 32 : «index»5(idx);
 			}
 
 			@Override

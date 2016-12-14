@@ -88,6 +88,18 @@ interface Generator {
 		}
 	'''}
 
+	def static replicate(Type type, String paramGenericName) { '''
+		public static «paramGenericName» replicate(final int size, final «type.genericName» value) {
+			return tabulate(size, Int«type.typeName»F.constant(value));
+		}
+	'''}
+
+	def static fill(Type type, String paramGenericName) { '''
+		public static «paramGenericName» fill(final int size, final «IF type == Type.OBJECT»F0<A>«ELSE»«type.typeName»F0«ENDIF» f) {
+			return tabulate(size, f.toConstInt«type.typeName»F());
+		}
+	'''}
+
 	def join() { joinMultiple(#[], "A") }
 
 	def joinMultiple(Iterable<String> typeParams, String typeParam) { '''

@@ -52,17 +52,26 @@ final class ArrayGenerator implements ClassGenerator {
 		«ENDIF»
 		import java.util.stream.StreamSupport;
 
+		import «Constants.F»;
+		«IF type == Type.OBJECT»
+			import «Constants.F0»;
+		«ELSE»
+			import «Constants.FUNCTION».«type.typeName»F0;
+		«ENDIF»
 		«IF type == Type.OBJECT»
 			«FOR toType : Type.primitives»
 				import «Constants.FUNCTION».«toType.typeName»F;
 			«ENDFOR»
+			import «Constants.FUNCTION».IntObjectF;
 		«ELSE»
 			«FOR toType : Type.primitives»
 				import «Constants.FUNCTION».«type.typeName»«toType.typeName»F;
 			«ENDFOR»
 			import «Constants.FUNCTION».«type.typeName»ObjectF;
+			«IF type != Type.INT»
+				import «Constants.FUNCTION».Int«type.typeName»F;
+			«ENDIF»
 		«ENDIF»
-		import «Constants.F»;
 		«FOR arity : 2 .. Constants.MAX_ARITY»
 			import «Constants.F»«arity»;
 		«ENDFOR»
@@ -452,6 +461,27 @@ final class ArrayGenerator implements ClassGenerator {
 					«ENDIF»
 					final «type.javaName»[] array = new «type.javaName»[values.length];
 					System.arraycopy(values, 0, array, 0, values.length);
+					return new «diamondName»(array);
+				}
+			}
+
+			«replicate(type, paramGenericName)»
+
+			«fill(type, paramGenericName)»
+
+			public static «paramGenericName» tabulate(final int size, final Int«type.typeName»F«IF type == Type.OBJECT»<A>«ENDIF» f) {
+				requireNonNull(f);
+				if (size <= 0) {
+					return empty«shortName»();
+				} else {
+					final «type.javaName»[] array = new «type.javaName»[size];
+					for (int i = 0; i < size; i++) {
+						«IF type == Type.OBJECT»
+							array[i] = requireNonNull(f.apply(i));
+						«ELSE»
+							array[i] = f.apply(i);
+						«ENDIF»
+					}
 					return new «diamondName»(array);
 				}
 			}
