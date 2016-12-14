@@ -89,6 +89,7 @@ final class SeqGenerator implements ClassGenerator {
 		«ENDFOR»
 		import «Constants.SIZED»;
 
+		import static java.lang.Math.min;
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
 		«IF type != Type.OBJECT»
@@ -1206,6 +1207,35 @@ final class SeqGenerator implements ClassGenerator {
 			«toStr(type)»
 
 			«IF type == Type.OBJECT»
+				«zip»
+
+				«zipWith»
+
+				/**
+				 * O(size)
+				 */
+				public Seq<P<A, Integer>> zipWithIndex() {
+					if (isEmpty()) {
+						return emptySeq();
+					} else {
+						final Iterator<A> iterator = iterator();
+						return tabulate(size(), i -> p(iterator.next(), i));
+					}
+				}
+
+				«zipN»
+				«zipWithN[arity | '''
+					requireNonNull(f);
+					if («(1 .. arity).map["seq" + it + ".isEmpty()"].join(" || ")») {
+						return emptySeq();
+					} else {
+						final int size = «(1 ..< arity).map['''min(seq«it».size()'''].join(", ")», seq«arity».size()«(1 ..< arity).map[")"].join»;
+						«FOR i : 1 .. arity»
+							final Iterator<A«i»> iterator«i» = seq«i».iterator();
+						«ENDFOR»
+						return fill(size, () -> requireNonNull(f.apply(«(1 .. arity).map['''iterator«it».next()'''].join(", ")»)));
+					}
+				''']»
 				static int index1(final int index) {
 					return (index & 0x1F);
 				}
