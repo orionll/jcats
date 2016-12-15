@@ -1236,6 +1236,22 @@ final class SeqGenerator implements ClassGenerator {
 						return fill(size, () -> requireNonNull(f.apply(«(1 .. arity).map['''iterator«it».next()'''].join(", ")»)));
 					}
 				''']»
+				«productN»
+				«productWithN[arity | '''
+					requireNonNull(f);
+					if («(1 .. arity).map["seq" + it + ".isEmpty()"].join(" || ")») {
+						return emptySeq();
+					} else {
+						final long size1 = seq1.size();
+						«FOR i : 2 .. arity»
+							final long size«i» = size«i-1» * seq«i».size();
+							if (size«i» != (int) size«i») {
+								throw new IndexOutOfBoundsException("Size overflow");
+							}
+						«ENDFOR»
+						return sizedToSeq(new Product«arity»Iterator<>(«(1 .. arity).map['''seq«it»'''].join(", ")», f), (int) size«arity»);
+					}
+				''']»
 				static int index1(final int index) {
 					return (index & 0x1F);
 				}

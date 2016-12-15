@@ -22,6 +22,9 @@ final class CommonGenerator implements ClassGenerator {
 		«ENDFOR»
 		import jcats.Sized;
 		import «Constants.F»;
+		«FOR arity : 2 .. Constants.MAX_FUNCTIONS_ARITY»
+			import «Constants.F»«arity»;
+		«ENDFOR»
 		«FOR type : Type.primitives»
 			import «Constants.FUNCTION».«type.typeName»ObjectF;
 			import «Constants.FUNCTION».«type.typeName»F;
@@ -216,6 +219,85 @@ final class CommonGenerator implements ClassGenerator {
 			}
 
 		«ENDFOR»
+		final class Product2Iterator<A1, A2, B> implements Iterator<B> {
+			private final Iterator<A1> iterator1;
+			private final Iterable<A2> iterable2;
+			private final F2<A1, A2, B> f;
+			private A1 a1;
+			private Iterator<A2> iterator2;
+
+			public Product2Iterator(final Iterable<A1> iterable1, final Iterable<A2> iterable2, final F2<A1, A2, B> f) {
+				this.iterator1 = iterable1.iterator();
+				this.iterable2 = iterable2;
+				this.f = f;
+				this.a1 = iterator1.next();
+				this.iterator2 = iterable2.iterator();
+			}
+
+			@Override
+			public boolean hasNext() {
+				return iterator1.hasNext() || iterator2.hasNext();
+			}
+
+			@Override
+			public B next() {
+				if (iterator2.hasNext()) {
+					return f.apply(a1, iterator2.next());
+				} else if (iterator1.hasNext()) {
+					a1 = iterator1.next();
+					iterator2 = iterable2.iterator();
+					return f.apply(a1, iterator2.next());
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+		}
+
+		final class Product3Iterator<A1, A2, A3, B> implements Iterator<B> {
+			private final Iterator<A1> iterator1;
+			private final Iterable<A2> iterable2;
+			private final Iterable<A3> iterable3;
+			private final F3<A1, A2, A3, B> f;
+			private A1 a1;
+			private A2 a2;
+			private Iterator<A2> iterator2;
+			private Iterator<A3> iterator3;
+
+			public Product3Iterator(final Iterable<A1> iterable1, final Iterable<A2> iterable2, final Iterable<A3> iterable3, final F3<A1, A2, A3, B> f) {
+				this.iterator1 = iterable1.iterator();
+				this.iterable2 = iterable2;
+				this.iterable3 = iterable3;
+				this.f = f;
+				this.a1 = iterator1.next();
+				this.iterator2 = iterable2.iterator();
+				this.a2 = iterator2.next();
+				this.iterator3 = iterable3.iterator();
+			}
+
+			@Override
+			public boolean hasNext() {
+				return iterator1.hasNext() || iterator2.hasNext() || iterator3.hasNext();
+			}
+
+			@Override
+			public B next() {
+				if (iterator3.hasNext()) {
+					return f.apply(a1, a2, iterator3.next());
+				} else if (iterator2.hasNext()) {
+					a2 = iterator2.next();
+					iterator3 = iterable3.iterator();
+					return f.apply(a1, a2, iterator3.next());
+				} else if (iterator1.hasNext()) {
+					a1 = iterator1.next();
+					iterator2 = iterable2.iterator();
+					a2 = iterator2.next();
+					iterator3 = iterable3.iterator();
+					return f.apply(a1, a2, iterator3.next());
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+		}
 		«FOR type : Type.values.filter[it != Type.BOOL]»
 			«IF type == Type.OBJECT»
 				final class BufferedList<A> {
