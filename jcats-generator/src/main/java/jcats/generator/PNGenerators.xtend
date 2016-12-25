@@ -73,11 +73,11 @@ final class PNGenerators {
 						}
 
 					«ENDFOR»
-					«IF arity == 2»
-						public «shortName»<A2, A1> flip() {
-							return new «shortName»<>(a2, a1);
-						}
+					public «shortName»<«(arity .. 1).map["A" + it].join(", ")»> reverse() {
+						return new «shortName»<>(«(arity .. 1).map["a" + it].join(", ")»);
+					}
 
+					«IF arity == 2»
 						public <B1, B2> «shortName»<B1, B2> biMap(final F<A1, B1> f1, final F<A2, B2> f2) {
 							return «shortName.toLowerCase»(f1.apply(a1), f2.apply(a2));
 						}

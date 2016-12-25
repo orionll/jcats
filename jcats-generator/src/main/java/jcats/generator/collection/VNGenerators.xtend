@@ -119,12 +119,10 @@ final class VNGenerators {
 						return v«arity»(«(1 .. arity).map["f.apply(a" + it + ")"].join(", ")»);
 					}
 
-					«IF arity == 2»
-						public V2<A> flip() {
-							return new V2<>(a2, a1);
-						}
+					public V«arity»<A> reverse() {
+						return new V«arity»<>(«(arity .. 1).map["a" + it].join(", ")»);
+					}
 
-					«ENDIF»
 					public boolean contains(final A value) {
 						requireNonNull(value);
 						«FOR i : 1 .. arity»

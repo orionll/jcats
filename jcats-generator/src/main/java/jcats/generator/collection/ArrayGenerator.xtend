@@ -282,18 +282,18 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			«IF type == Type.OBJECT»
-			public Array<A> reverse() {
-				if (isEmpty() || array.length == 1) {
+			public «genericName» reverse() {
+				if (array.length == 0 || array.length == 1) {
 					return this;
 				} else {
-					final Object[] newArray = array.clone();
-					Collections.reverse(Arrays.asList(newArray));
-					return new Array<>(newArray);
+					final «type.javaName»[] newArray = new «type.javaName»[array.length];
+					for (int i = 0; i < array.length; i++) {
+						newArray[array.length - i - 1] = array[i];
+					}
+					return new «diamondName»(newArray);
 				}
 			}
 
-			«ENDIF»
 			«IF type == Type.OBJECT»
 				public <B> Array<B> map(final F<A, B> f) {
 			«ELSE»
