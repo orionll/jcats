@@ -152,6 +152,8 @@ final class SeqGenerator implements ClassGenerator {
 
 			public abstract «genericName» take(final int n);
 
+			public abstract «genericName» drop(final int n);
+
 			«takeWhile(true, type)»
 
 			/**
@@ -1127,6 +1129,19 @@ final class SeqGenerator implements ClassGenerator {
 						(1 << 15)*(node6[0][0].length - 1) - (1 << 20)*(node6[0].length - 1) - init.length;
 			}
 
+			static int calculateSeq3EndIndex(final «type.javaName»[][][] lastNode3, final «type.javaName»[] tail) {
+				return (1 << 10) - 32*lastNode3[lastNode3.length - 1].length - tail.length;
+			}
+
+			static int calculateSeq4EndIndex(final «type.javaName»[][][] lastNode3, final «type.javaName»[] tail) {
+				return (1 << 15) - 32*lastNode3[lastNode3.length - 1].length - (1 << 10)*(lastNode3.length - 1) - tail.length;
+			}
+
+			static int calculateSeq5EndIndex(final «type.javaName»[][][][] lastNode4, final «type.javaName»[][][] lastNode3, final «type.javaName»[] init) {
+				return (1 << 20) - 32*lastNode3[lastNode3.length - 1].length - (1 << 10)*(lastNode3.length - 1)
+						- (1 << 15)*(lastNode4.length - 1) - init.length;
+			}
+
 			abstract void initSeqBuilder(final «seqBuilderName» builder);
 
 			«IF type == Type.OBJECT /* TODO */»
@@ -1852,6 +1867,11 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public «genericName» drop(final int n) {
+				return empty«shortName»();
+			}
+
+			@Override
 			public «genericName» prepend(final «type.genericName» value) {
 				return append(value);
 			}
@@ -1967,6 +1987,19 @@ final class SeqGenerator implements ClassGenerator {
 				} else {
 					final «type.javaName»[] newNode1 = new «type.javaName»[n];
 					System.arraycopy(node1, 0, newNode1, 0, n);
+					return new «diamondName(1)»(newNode1);
+				}
+			}
+
+			@Override
+			public «genericName» drop(final int n) {
+				if (n >= node1.length) {
+					return empty«shortName»();
+				} else if (n <= 0) {
+					return this;
+				} else {
+					final «type.javaName»[] newNode1 = new «type.javaName»[node1.length - n];
+					System.arraycopy(node1, n, newNode1, 0, newNode1.length);
 					return new «diamondName(1)»(newNode1);
 				}
 			}
@@ -2387,6 +2420,63 @@ final class SeqGenerator implements ClassGenerator {
 						}
 
 						return new «diamondName(2)»(newNode2, init, newTail, n);
+					}
+				}
+			}
+
+			@Override
+			public «genericName» drop(final int n) {
+				if (n >= size) {
+					return empty«shortName»();
+				} else if (n > size - tail.length) {
+					final «type.javaName»[] node1 = new «type.javaName»[size - n];
+					System.arraycopy(tail, n - size + tail.length, node1, 0, node1.length);
+					return new «diamondName(1)»(node1);
+				} else if (n == size - tail.length) {
+					return new «diamondName(1)»(tail);
+				} else if (n <= 0) {
+					return this;
+				} else if (n < init.length) {
+					if (size - n <= 32) {
+						final «type.javaName»[] newNode1 = new «type.javaName»[size - n];
+						System.arraycopy(init, n, newNode1, 0, init.length - n);
+						System.arraycopy(tail, 0, newNode1, init.length - n, tail.length);
+						return new «diamondName(1)»(newNode1);
+					} else {
+						final «type.javaName»[] newInit = new «type.javaName»[init.length - n];
+						System.arraycopy(init, n, newInit, 0, newInit.length);
+						return new «diamondName(2)»(node2, newInit, tail, size - n);
+					}
+				} else {
+					final int idx = n + 32 - init.length;
+					final int index2 = index2(idx) - 1;
+					final «type.javaName»[] node1 = node2[index2];
+					final int index1 = index1(idx);
+					final int newSize = size - n;
+
+					if (newSize <= 32) {
+						final «type.javaName»[] newNode1 = new «type.javaName»[newSize];
+						System.arraycopy(node1, index1, newNode1, 0, 32 - index1);
+						System.arraycopy(tail, 0, newNode1, 32 - index1, tail.length);
+						return new «diamondName(1)»(newNode1);
+					} else {
+						final «type.javaName»[] newInit;
+						if (index1 == 0) {
+							newInit = node1;
+						} else {
+							newInit = new «type.javaName»[32 - index1];
+							System.arraycopy(node1, index1, newInit, 0, newInit.length);
+						}
+
+						final «type.javaName»[][] newNode2;
+						if (index2 == node2.length - 1) {
+							newNode2 = EMPTY_NODE2;
+						} else {
+							newNode2 = new «type.javaName»[node2.length - index2 - 1][];
+							System.arraycopy(node2, index2 + 1, newNode2, 0, newNode2.length);
+						}
+
+						return new «diamondName(2)»(newNode2, newInit, tail, newSize);
 					}
 				}
 			}
@@ -3127,6 +3217,84 @@ final class SeqGenerator implements ClassGenerator {
 							System.arraycopy(node3, 0, newNode3, 0, index3);
 							newNode3[index3] = newNode2;
 							return new «diamondName(3)»(newNode3, init, newTail, startIndex, n);
+						}
+					}
+				}
+			}
+
+			@Override
+			public «genericName» drop(final int n) {
+				if (n >= size) {
+					return empty«shortName»();
+				} else if (n > size - tail.length) {
+					final «type.javaName»[] node1 = new «type.javaName»[size - n];
+					System.arraycopy(tail, n - size + tail.length, node1, 0, node1.length);
+					return new «diamondName(1)»(node1);
+				} else if (n == size - tail.length) {
+					return new «diamondName(1)»(tail);
+				} else if (n <= 0) {
+					return this;
+				} else if (n < init.length) {
+					final «type.javaName»[] newInit = new «type.javaName»[init.length - n];
+					System.arraycopy(init, n, newInit, 0, newInit.length);
+					return new «diamondName(3)»(node3, newInit, tail, startIndex + n, size - n);
+				} else {
+					final int idx = n + startIndex;
+					final int index3 = index3(idx);
+					final «type.javaName»[][] node2 = node3[index3];
+					final int index2 = index2(idx, index3, node2);
+					final «type.javaName»[] node1 = node2[index2];
+					final int index1 = index1(idx);
+					final int newSize = size - n;
+
+					if (newSize <= 32) {
+						final «type.javaName»[] newNode1 = new «type.javaName»[newSize];
+						System.arraycopy(node1, index1, newNode1, 0, 32 - index1);
+						System.arraycopy(tail, 0, newNode1, 32 - index1, tail.length);
+						return new «diamondName(1)»(newNode1);
+					} else {
+						final «type.javaName»[] newInit;
+						if (index1 == 0) {
+							newInit = node1;
+						} else {
+							newInit = new «type.javaName»[32 - index1];
+							System.arraycopy(node1, index1, newInit, 0, newInit.length);
+						}
+
+						if (newSize <= 1024 - 32 + tail.length) {
+							final «type.javaName»[][] newNode2;
+							if (index3 == node3.length - 1) {
+								if (index2 == node2.length - 1) {
+									newNode2 = EMPTY_NODE2;
+								} else {
+									newNode2 = new «type.javaName»[node2.length - index2 - 1][];
+									System.arraycopy(node2, index2 + 1, newNode2, 0, newNode2.length);
+								}
+							} else {
+								final «type.javaName»[][] lastNode2 = node3[node3.length - 1];
+								if (lastNode2.length == 0 && index2 == node2.length - 1) {
+									newNode2 = EMPTY_NODE2;
+								} else {
+									newNode2 = new «type.javaName»[node2.length - index2 - 1 + lastNode2.length][];
+									System.arraycopy(node2, index2 + 1, newNode2, 0, node2.length - index2 - 1);
+									System.arraycopy(lastNode2, 0, newNode2, node2.length - index2 - 1, lastNode2.length);
+								}
+							}
+							return new «diamondName(2)»(newNode2, newInit, tail, newSize);
+						} else {
+							final «type.javaName»[][] newNode2;
+							if (index2 == node2.length - 1) {
+								newNode2 = EMPTY_NODE2;
+							} else {
+								newNode2 = new «type.javaName»[node2.length - index2 - 1][];
+								System.arraycopy(node2, index2 + 1, newNode2, 0, newNode2.length);
+							}
+
+							final «type.javaName»[][][] newNode3 = new «type.javaName»[node3.length - index3][][];
+							System.arraycopy(node3, index3, newNode3, 0, newNode3.length);
+							newNode3[0] = newNode2;
+							final int newStartIndex = calculateSeq3StartIndex(newNode3, newInit);
+							return new «diamondName(3)»(newNode3, newInit, tail, newStartIndex, newSize);
 						}
 					}
 				}
@@ -4000,6 +4168,106 @@ final class SeqGenerator implements ClassGenerator {
 								System.arraycopy(node4, 0, newNode4, 0, index4);
 								newNode4[index4] = newNode3;
 								return new «diamondName(4)»(newNode4, init, newTail, startIndex, n);
+							}
+						}
+					}
+				}
+			}
+
+			@Override
+			public «genericName» drop(final int n) {
+				if (n >= size) {
+					return empty«shortName»();
+				} else if (n > size - tail.length) {
+					final «type.javaName»[] node1 = new «type.javaName»[size - n];
+					System.arraycopy(tail, n - size + tail.length, node1, 0, node1.length);
+					return new «diamondName(1)»(node1);
+				} else if (n == size - tail.length) {
+					return new «diamondName(1)»(tail);
+				} else if (n <= 0) {
+					return this;
+				} else if (n < init.length) {
+					final «type.javaName»[] newInit = new «type.javaName»[init.length - n];
+					System.arraycopy(init, n, newInit, 0, newInit.length);
+					return new «diamondName(4)»(node4, newInit, tail, startIndex + n, size - n);
+				} else {
+					final int idx = n + startIndex;
+					final int index4 = index4(idx);
+					final «type.javaName»[][][] node3 = node4[index4];
+					final int index3 = index3(idx, index4, node3);
+					final «type.javaName»[][] node2 = node3[index3];
+					final int index2 = index2(idx, index3, index4, node2);
+					final «type.javaName»[] node1 = node2[index2];
+					final int index1 = index1(idx);
+					final int newSize = size - n;
+
+					if (newSize <= 32) {
+						final «type.javaName»[] newNode1 = new «type.javaName»[newSize];
+						System.arraycopy(node1, index1, newNode1, 0, 32 - index1);
+						System.arraycopy(tail, 0, newNode1, 32 - index1, tail.length);
+						return new «diamondName(1)»(newNode1);
+					} else {
+						final «type.javaName»[] newInit;
+						if (index1 == 0) {
+							newInit = node1;
+						} else {
+							newInit = new «type.javaName»[32 - index1];
+							System.arraycopy(node1, index1, newInit, 0, newInit.length);
+						}
+
+						if (newSize <= 1024 - 32 + tail.length) {
+							final «type.javaName»[][] newNode2;
+							if (index4 == node4.length - 1 && index3 == node3.length - 1) {
+								if (index2 == node2.length - 1) {
+									newNode2 = EMPTY_NODE2;
+								} else {
+									newNode2 = new «type.javaName»[node2.length - index2 - 1][];
+									System.arraycopy(node2, index2 + 1, newNode2, 0, newNode2.length);
+								}
+							} else {
+								final «type.javaName»[][][] lastNode3 = node4[node4.length - 1];
+								final «type.javaName»[][] lastNode2 = lastNode3[lastNode3.length - 1];
+								if (lastNode2.length == 0 && index2 == node2.length - 1) {
+									newNode2 = EMPTY_NODE2;
+								} else {
+									newNode2 = new «type.javaName»[node2.length - index2 - 1 + lastNode2.length][];
+									System.arraycopy(node2, index2 + 1, newNode2, 0, node2.length - index2 - 1);
+									System.arraycopy(lastNode2, 0, newNode2, node2.length - index2 - 1, lastNode2.length);
+								}
+							}
+							return new «diamondName(2)»(newNode2, newInit, tail, newSize);
+						} else {
+							final «type.javaName»[][] newNode2;
+							if (index2 == node2.length - 1) {
+								newNode2 = EMPTY_NODE2;
+							} else {
+								newNode2 = new «type.javaName»[node2.length - index2 - 1][];
+								System.arraycopy(node2, index2 + 1, newNode2, 0, newNode2.length);
+							}
+
+							final «type.javaName»[][][] lastNode3 = node4[node4.length - 1];
+							if (newSize <= (1 << 15) - calculateSeq3EndIndex(lastNode3, tail)) {
+								final «type.javaName»[][][] newNode3;
+								if (index4 == node4.length - 1) {
+									newNode3 = new «type.javaName»[node3.length - index3][][];
+									System.arraycopy(node3, index3, newNode3, 0, newNode3.length);
+								} else {
+									newNode3 = new «type.javaName»[node3.length - index3 + lastNode3.length][][];
+									System.arraycopy(node3, index3, newNode3, 0, node3.length - index3);
+									System.arraycopy(lastNode3, 0, newNode3, node3.length - index3, lastNode3.length);
+								}
+								newNode3[0] = newNode2;
+								final int newStartIndex = calculateSeq3StartIndex(newNode3, newInit);
+								return new «diamondName(3)»(newNode3, newInit, tail, newStartIndex, newSize);
+							} else {
+								final «type.javaName»[][][] newNode3 = new «type.javaName»[node3.length - index3][][];
+								System.arraycopy(node3, index3, newNode3, 0, newNode3.length);
+								newNode3[0] = newNode2;
+								final «type.javaName»[][][][] newNode4 = new «type.javaName»[node4.length - index4][][][];
+								System.arraycopy(node4, index4, newNode4, 0, newNode4.length);
+								newNode4[0] = newNode3;
+								final int newStartIndex = calculateSeq4StartIndex(newNode4, newInit);
+								return new «diamondName(4)»(newNode4, newInit, tail, newStartIndex, newSize);
 							}
 						}
 					}
@@ -5012,7 +5280,129 @@ final class SeqGenerator implements ClassGenerator {
 					}
 				}
 			}
-		
+
+			@Override
+			public «genericName» drop(final int n) {
+				if (n >= size) {
+					return empty«shortName»();
+				} else if (n > size - tail.length) {
+					final «type.javaName»[] node1 = new «type.javaName»[size - n];
+					System.arraycopy(tail, n - size + tail.length, node1, 0, node1.length);
+					return new «diamondName(1)»(node1);
+				} else if (n == size - tail.length) {
+					return new «diamondName(1)»(tail);
+				} else if (n <= 0) {
+					return this;
+				} else if (n < init.length) {
+					final «type.javaName»[] newInit = new «type.javaName»[init.length - n];
+					System.arraycopy(init, n, newInit, 0, newInit.length);
+					return new «diamondName(5)»(node5, newInit, tail, startIndex + n, size - n);
+				} else {
+					final int idx = n + startIndex;
+					final int index5 = index5(idx);
+					final «type.javaName»[][][][] node4 = node5[index5];
+					final int index4 = index4(idx, index5, node4);
+					final «type.javaName»[][][] node3 = node4[index4];
+					final int index3 = index3(idx, index4, index5, node3);
+					final «type.javaName»[][] node2 = node3[index3];
+					final int index2 = index2(idx, index3, index4, index5, node2);
+					final «type.javaName»[] node1 = node2[index2];
+					final int index1 = index1(idx);
+					final int newSize = size - n;
+
+					if (newSize <= 32) {
+						final «type.javaName»[] newNode1 = new «type.javaName»[newSize];
+						System.arraycopy(node1, index1, newNode1, 0, 32 - index1);
+						System.arraycopy(tail, 0, newNode1, 32 - index1, tail.length);
+						return new «diamondName(1)»(newNode1);
+					} else {
+						final «type.javaName»[] newInit;
+						if (index1 == 0) {
+							newInit = node1;
+						} else {
+							newInit = new «type.javaName»[32 - index1];
+							System.arraycopy(node1, index1, newInit, 0, newInit.length);
+						}
+
+						if (newSize <= 1024 - 32 + tail.length) {
+							final «type.javaName»[][] newNode2;
+							if (index5 == node5.length - 1 && index4 == node4.length - 1 && index3 == node3.length - 1) {
+								if (index2 == node2.length - 1) {
+									newNode2 = EMPTY_NODE2;
+								} else {
+									newNode2 = new «type.javaName»[node2.length - index2 - 1][];
+									System.arraycopy(node2, index2 + 1, newNode2, 0, newNode2.length);
+								}
+							} else {
+								final «type.javaName»[][][][] lastNode4 = node5[node5.length - 1];
+								final «type.javaName»[][][] lastNode3 = lastNode4[lastNode4.length - 1];
+								final «type.javaName»[][] lastNode2 = lastNode3[lastNode3.length - 1];
+								if (lastNode2.length == 0 && index2 == node2.length - 1) {
+									newNode2 = EMPTY_NODE2;
+								} else {
+									newNode2 = new «type.javaName»[node2.length - index2 - 1 + lastNode2.length][];
+									System.arraycopy(node2, index2 + 1, newNode2, 0, node2.length - index2 - 1);
+									System.arraycopy(lastNode2, 0, newNode2, node2.length - index2 - 1, lastNode2.length);
+								}
+							}
+							return new «diamondName(2)»(newNode2, newInit, tail, newSize);
+						} else {
+							final «type.javaName»[][] newNode2;
+							if (index2 == node2.length - 1) {
+								newNode2 = EMPTY_NODE2;
+							} else {
+								newNode2 = new «type.javaName»[node2.length - index2 - 1][];
+								System.arraycopy(node2, index2 + 1, newNode2, 0, newNode2.length);
+							}
+
+							final «type.javaName»[][][][] lastNode4 = node5[node5.length - 1];
+							final «type.javaName»[][][] lastNode3 = lastNode4[lastNode4.length - 1];
+							if (newSize <= (1 << 15) - calculateSeq3EndIndex(lastNode3, tail)) {
+								final «type.javaName»[][][] newNode3;
+								if (index5 == node5.length - 1 && index4 == node4.length - 1) {
+									newNode3 = new «type.javaName»[node3.length - index3][][];
+									System.arraycopy(node3, index3, newNode3, 0, newNode3.length);
+								} else {
+									newNode3 = new «type.javaName»[node3.length - index3 + lastNode3.length][][];
+									System.arraycopy(node3, index3, newNode3, 0, node3.length - index3);
+									System.arraycopy(lastNode3, 0, newNode3, node3.length - index3, lastNode3.length);
+								}
+								newNode3[0] = newNode2;
+								final int newStartIndex = calculateSeq3StartIndex(newNode3, newInit);
+								return new «diamondName(3)»(newNode3, newInit, tail, newStartIndex, newSize);
+							} else {
+								final «type.javaName»[][][] newNode3 = new «type.javaName»[node3.length - index3][][];
+								System.arraycopy(node3, index3, newNode3, 0, newNode3.length);
+								newNode3[0] = newNode2;
+
+								if (newSize <= (1 << 20) - calculateSeq4EndIndex(lastNode3, tail)) {
+									final «type.javaName»[][][][] newNode4;
+									if (index5 == node5.length - 1) {
+										newNode4 = new «type.javaName»[node4.length - index4][][][];
+										System.arraycopy(node4, index4, newNode4, 0, newNode4.length);
+									} else {
+										newNode4 = new «type.javaName»[node4.length - index4 + lastNode4.length][][][];
+										System.arraycopy(node4, index4, newNode4, 0, node4.length - index4);
+										System.arraycopy(lastNode4, 0, newNode4, node4.length - index4, lastNode4.length);
+									}
+									newNode4[0] = newNode3;
+									final int newStartIndex = calculateSeq4StartIndex(newNode4, newInit);
+									return new «diamondName(4)»(newNode4, newInit, tail, newStartIndex, newSize);
+								} else {
+									final «type.javaName»[][][][] newNode4 = new «type.javaName»[node4.length - index4][][][];
+									System.arraycopy(node4, index4, newNode4, 0, newNode4.length);
+									newNode4[0] = newNode3;
+									final «type.javaName»[][][][][] newNode5 = new «type.javaName»[node5.length - index5][][][][];
+									System.arraycopy(node5, index5, newNode5, 0, newNode5.length);
+									newNode5[0] = newNode4;
+									final int newStartIndex = calculateSeq5StartIndex(newNode5, newInit);
+									return new «diamondName(5)»(newNode5, newInit, tail, newStartIndex, newSize);
+								}
+							}
+						}
+					}
+				}
+			}
 
 			@Override
 			public «genericName» prepend(final «type.genericName» value) {
@@ -6165,6 +6555,152 @@ final class SeqGenerator implements ClassGenerator {
 										System.arraycopy(node6, 0, newNode6, 0, index6);
 										newNode6[index6] = newNode5;
 										return new «diamondName(6)»(newNode6, init, newTail, startIndex, n);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			@Override
+			public «genericName» drop(final int n) {
+				if (n >= size) {
+					return empty«shortName»();
+				} else if (n > size - tail.length) {
+					final «type.javaName»[] node1 = new «type.javaName»[size - n];
+					System.arraycopy(tail, n - size + tail.length, node1, 0, node1.length);
+					return new «diamondName(1)»(node1);
+				} else if (n == size - tail.length) {
+					return new «diamondName(1)»(tail);
+				} else if (n <= 0) {
+					return this;
+				} else if (n < init.length) {
+					final «type.javaName»[] newInit = new «type.javaName»[init.length - n];
+					System.arraycopy(init, n, newInit, 0, newInit.length);
+					return new «diamondName(6)»(node6, newInit, tail, startIndex + n, size - n);
+				} else {
+					final int idx = n + startIndex;
+					final int index6 = index6(idx);
+					final «type.javaName»[][][][][] node5 = node6[index6];
+					final int index5 = index5(idx, index6, node5);
+					final «type.javaName»[][][][] node4 = node5[index5];
+					final int index4 = index4(idx, index5, index6, node4);
+					final «type.javaName»[][][] node3 = node4[index4];
+					final int index3 = index3(idx, index4, index5, index6, node3);
+					final «type.javaName»[][] node2 = node3[index3];
+					final int index2 = index2(idx, index3, index4, index5, index6, node2);
+					final «type.javaName»[] node1 = node2[index2];
+					final int index1 = index1(idx);
+					final int newSize = size - n;
+
+					if (newSize <= 32) {
+						final «type.javaName»[] newNode1 = new «type.javaName»[newSize];
+						System.arraycopy(node1, index1, newNode1, 0, 32 - index1);
+						System.arraycopy(tail, 0, newNode1, 32 - index1, tail.length);
+						return new «diamondName(1)»(newNode1);
+					} else {
+						final «type.javaName»[] newInit;
+						if (index1 == 0) {
+							newInit = node1;
+						} else {
+							newInit = new «type.javaName»[32 - index1];
+							System.arraycopy(node1, index1, newInit, 0, newInit.length);
+						}
+
+						if (newSize <= 1024 - 32 + tail.length) {
+							final «type.javaName»[][] newNode2;
+							if (index6 == node6.length - 1 && index5 == node5.length - 1 && index4 == node4.length - 1 && index3 == node3.length - 1) {
+								if (index2 == node2.length - 1) {
+									newNode2 = EMPTY_NODE2;
+								} else {
+									newNode2 = new «type.javaName»[node2.length - index2 - 1][];
+									System.arraycopy(node2, index2 + 1, newNode2, 0, newNode2.length);
+								}
+							} else {
+								final «type.javaName»[][][][][] lastNode5 = node6[node6.length - 1];
+								final «type.javaName»[][][][] lastNode4 = lastNode5[lastNode5.length - 1];
+								final «type.javaName»[][][] lastNode3 = lastNode4[lastNode4.length - 1];
+								final «type.javaName»[][] lastNode2 = lastNode3[lastNode3.length - 1];
+								if (lastNode2.length == 0 && index2 == node2.length - 1) {
+									newNode2 = EMPTY_NODE2;
+								} else {
+									newNode2 = new «type.javaName»[node2.length - index2 - 1 + lastNode2.length][];
+									System.arraycopy(node2, index2 + 1, newNode2, 0, node2.length - index2 - 1);
+									System.arraycopy(lastNode2, 0, newNode2, node2.length - index2 - 1, lastNode2.length);
+								}
+							}
+							return new «diamondName(2)»(newNode2, newInit, tail, newSize);
+						} else {
+							final «type.javaName»[][] newNode2;
+							if (index2 == node2.length - 1) {
+								newNode2 = EMPTY_NODE2;
+							} else {
+								newNode2 = new «type.javaName»[node2.length - index2 - 1][];
+								System.arraycopy(node2, index2 + 1, newNode2, 0, newNode2.length);
+							}
+
+							final «type.javaName»[][][][][] lastNode5 = node6[node6.length - 1];
+							final «type.javaName»[][][][] lastNode4 = lastNode5[lastNode5.length - 1];
+							final «type.javaName»[][][] lastNode3 = lastNode4[lastNode4.length - 1];
+							if (newSize <= (1 << 15) - calculateSeq3EndIndex(lastNode3, tail)) {
+								final «type.javaName»[][][] newNode3;
+								if (index6 == node6.length - 1 && index5 == node5.length - 1 && index4 == node4.length - 1) {
+									newNode3 = new «type.javaName»[node3.length - index3][][];
+									System.arraycopy(node3, index3, newNode3, 0, newNode3.length);
+								} else {
+									newNode3 = new «type.javaName»[node3.length - index3 + lastNode3.length][][];
+									System.arraycopy(node3, index3, newNode3, 0, node3.length - index3);
+									System.arraycopy(lastNode3, 0, newNode3, node3.length - index3, lastNode3.length);
+								}
+								newNode3[0] = newNode2;
+								final int newStartIndex = calculateSeq3StartIndex(newNode3, newInit);
+								return new «diamondName(3)»(newNode3, newInit, tail, newStartIndex, newSize);
+							} else {
+								final «type.javaName»[][][] newNode3 = new «type.javaName»[node3.length - index3][][];
+								System.arraycopy(node3, index3, newNode3, 0, newNode3.length);
+								newNode3[0] = newNode2;
+
+								if (newSize <= (1 << 20) - calculateSeq4EndIndex(lastNode3, tail)) {
+									final «type.javaName»[][][][] newNode4;
+									if (index6 == node6.length - 1 && index5 == node5.length - 1) {
+										newNode4 = new «type.javaName»[node4.length - index4][][][];
+										System.arraycopy(node4, index4, newNode4, 0, newNode4.length);
+									} else {
+										newNode4 = new «type.javaName»[node4.length - index4 + lastNode4.length][][][];
+										System.arraycopy(node4, index4, newNode4, 0, node4.length - index4);
+										System.arraycopy(lastNode4, 0, newNode4, node4.length - index4, lastNode4.length);
+									}
+									newNode4[0] = newNode3;
+									final int newStartIndex = calculateSeq4StartIndex(newNode4, newInit);
+									return new «diamondName(4)»(newNode4, newInit, tail, newStartIndex, newSize);
+								} else {
+									final «type.javaName»[][][][] newNode4 = new «type.javaName»[node4.length - index4][][][];
+									System.arraycopy(node4, index4, newNode4, 0, newNode4.length);
+									newNode4[0] = newNode3;
+
+									if (newSize <= (1 << 25) - calculateSeq5EndIndex(lastNode4, lastNode3, tail)) {
+										final «type.javaName»[][][][][] newNode5;
+										if (index6 == node6.length - 1) {
+											newNode5 = new «type.javaName»[node5.length - index5][][][][];
+											System.arraycopy(node5, index5, newNode5, 0, newNode5.length);
+										} else {
+											newNode5 = new «type.javaName»[node5.length - index5 + lastNode5.length][][][][];
+											System.arraycopy(node5, index5, newNode5, 0, node5.length - index5);
+											System.arraycopy(lastNode5, 0, newNode5, node5.length - index5, lastNode5.length);
+										}
+										newNode5[0] = newNode4;
+										final int newStartIndex = calculateSeq5StartIndex(newNode5, newInit);
+										return new «diamondName(5)»(newNode5, newInit, tail, newStartIndex, newSize);
+									} else {
+										final «type.javaName»[][][][][] newNode5 = new «type.javaName»[node5.length - index5][][][][];
+										System.arraycopy(node5, index5, newNode5, 0, newNode5.length);
+										newNode5[0] = newNode4;
+										final «type.javaName»[][][][][][] newNode6 = new «type.javaName»[node6.length - index6][][][][][];
+										System.arraycopy(node6, index6, newNode6, 0, newNode6.length);
+										newNode6[0] = newNode5;
+										final int newStartIndex = calculateSeq6StartIndex(newNode6, newInit);
+										return new «diamondName(6)»(newNode6, newInit, tail, newStartIndex, newSize);
 									}
 								}
 							}

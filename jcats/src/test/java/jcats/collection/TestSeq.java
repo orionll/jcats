@@ -548,7 +548,7 @@ public class TestSeq {
 					throw new AssertionError("seq.size = " + seq.size() + ", n = " + n, t);
 				}
 			}
-			seq = seq.prepend(i % 63);
+			seq = (i % 3 == 0) ? seq.prepend(i % 63) : seq.append(i % 63);
 		}
 	}
 
@@ -567,6 +567,45 @@ public class TestSeq {
 					final Seq<Integer> take = seq.take(n);
 					assertEquals(n, take.size());
 					assertTrue(Iterables.elementsEqual(Iterables.limit(seq, n), take));
+				} catch (final Throwable t) {
+					throw new AssertionError("seq.size = " + seq.size() + ", n = " + n, t);
+				}
+			}
+		}
+	}
+
+	@Test
+	public void testDrop() {
+		Seq<Integer> seq = emptySeq();
+		for (int i = 0; i < 1500; i++) {
+			for (int n = 0; n <= i; n++) {
+				try {
+					final Seq<Integer> drop = seq.drop(n);
+					assertEquals(seq.size() - n, drop.size());
+					assertTrue(Iterables.elementsEqual(Iterables.skip(seq, n), drop));
+				} catch (final Throwable t) {
+					throw new AssertionError("seq.size = " + seq.size() + ", n = " + n, t);
+				}
+			}
+			seq = (i % 3 == 0) ? seq.prepend(i % 63) : seq.append(i % 63);
+		}
+	}
+
+	@Test
+	public void testDropRandom() {
+		final Random random = new Random();
+		for (int i = 0; i < 10; i++) {
+			// Seq.EA = false;
+			final Seq<Integer> seq = randomSeq(random, 0, 1<<15);
+
+			// Seq.EA = true;
+			for (int j = 0; j < 100; j++) {
+				final int n = randInt(random, seq.size() - seq.size() / (j + 1), seq.size());
+
+				try {
+					final Seq<Integer> drop = seq.drop(n);
+					assertEquals(seq.size() - n, drop.size());
+					assertTrue(Iterables.elementsEqual(Iterables.skip(seq, n), drop));
 				} catch (final Throwable t) {
 					throw new AssertionError("seq.size = " + seq.size() + ", n = " + n, t);
 				}
