@@ -33,6 +33,35 @@ interface Generator {
 		}
 	''' }
 
+	def static String spliterator(Type type) {'''
+		@Override
+		«IF type == Type.OBJECT»
+			public Spliterator<A> spliterator() {
+				if (isEmpty()) {
+					return Spliterators.emptySpliterator();
+				} else {
+					return Spliterators.spliterator(iterator(), size(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
+				}
+			}
+		«ELSEIF type == Type.BOOL»
+			public Spliterator<Boolean> spliterator() {
+				if (isEmpty()) {
+					return Spliterators.emptySpliterator();
+				} else {
+					return Spliterators.spliterator(iterator(), size(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
+				}
+			}
+		«ELSE»
+			public Spliterator.Of«type.javaPrefix» spliterator() {
+				if (isEmpty()) {
+					return Spliterators.empty«type.javaPrefix»Spliterator();
+				} else {
+					return Spliterators.spliterator(iterator(), size(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
+				}
+			}
+		«ENDIF»
+	'''}
+
 	def static String stream(Type type) { '''
 		public «type.streamGenericName» stream() {
 			return StreamSupport.«type.streamFunction»(spliterator(), false);
@@ -85,6 +114,41 @@ interface Generator {
 				hashCode = 31 * hashCode + value.hashCode();
 			}
 			return hashCode;
+		}
+	'''}
+
+	def static equals(Type type, String wildcardName) {'''
+		@Override
+		public boolean equals(final Object obj) {
+			if (obj == this) {
+				return true;
+			} else if (obj instanceof «wildcardName») {
+				final «wildcardName» other = («wildcardName») obj;
+				if (size() == other.size()) {
+					final «type.iteratorWildcardName» iterator1 = iterator();
+					final «type.iteratorWildcardName» iterator2 = other.iterator();
+					while (iterator1.hasNext()) {
+						«IF type == Type.OBJECT»
+							final Object o1 = iterator1.next();
+							final Object o2 = iterator2.next();
+							if (!o1.equals(o2)) {
+								return false;
+							}
+						«ELSE»
+							final «type.javaName» o1 = iterator1.«type.iteratorNext»();
+							final «type.javaName» o2 = iterator2.«type.iteratorNext»();
+							if (o1 != o2) {
+								return false;
+							}
+						«ENDIF»
+					}
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
 		}
 	'''}
 

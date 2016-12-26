@@ -1153,32 +1153,7 @@ final class SeqGenerator implements ClassGenerator {
 				public abstract «type.iteratorGenericName» iterator();
 
 			«ENDIF»
-			@Override
-			«IF type == Type.OBJECT»
-				public Spliterator<A> spliterator() {
-					if (isEmpty()) {
-						return Spliterators.emptySpliterator();
-					} else {
-						return Spliterators.spliterator(iterator(), size(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
-					}
-				}
-			«ELSEIF type == Type.BOOL»
-				public Spliterator<Boolean> spliterator() {
-					if (isEmpty()) {
-						return Spliterators.emptySpliterator();
-					} else {
-						return Spliterators.spliterator(iterator(), size(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
-					}
-				}
-			«ELSE»
-				public Spliterator.Of«type.javaPrefix» spliterator() {
-					if (isEmpty()) {
-						return Spliterators.empty«type.javaPrefix»Spliterator();
-					} else {
-						return Spliterators.spliterator(iterator(), size(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
-					}
-				}
-			«ENDIF»
+			«spliterator(type)»
 
 			«stream(type)»
 
@@ -1186,38 +1161,7 @@ final class SeqGenerator implements ClassGenerator {
 
 			«hashcode(type.genericBoxedName)»
 
-			@Override
-			public boolean equals(final Object obj) {
-				if (obj == this) {
-					return true;
-				} else if (obj instanceof «wildcardName») {
-					final «wildcardName» seq = («wildcardName») obj;
-					if (size() == seq.size()) {
-						final «type.iteratorWildcardName» iterator1 = iterator();
-						final «type.iteratorWildcardName» iterator2 = seq.iterator();
-						while (iterator1.hasNext()) {
-							«IF type == Type.OBJECT»
-								final Object o1 = iterator1.next();
-								final Object o2 = iterator2.next();
-								if (!o1.equals(o2)) {
-									return false;
-								}
-							«ELSE»
-								final «type.javaName» o1 = iterator1.«type.iteratorNext»();
-								final «type.javaName» o2 = iterator2.«type.iteratorNext»();
-								if (o1 != o2) {
-									return false;
-								}
-							«ENDIF»
-						}
-						return true;
-					} else {
-						return false;
-					}
-				} else {
-					return false;
-				}
-			}
+			«equals(type, wildcardName)»
 
 			«toStr(type)»
 

@@ -36,13 +36,7 @@ final class CommonGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 
 		«FOR type : Type.values»
-			«IF type == Type.OBJECT»
-				final class ArrayIterator<A> implements Iterator<A> {
-			«ELSEIF type == Type.BOOL»
-				final class BoolArrayIterator implements Iterator<Boolean> {
-			«ELSE»
-				final class «type.typeName»ArrayIterator implements PrimitiveIterator.Of«type.javaPrefix» {
-			«ENDIF»
+			final class «IF type == Type.OBJECT»ArrayIterator<A>«ELSE»«type.typeName»ArrayIterator«ENDIF» implements «type.iteratorGenericName» {
 				private int i;
 				private final «type.javaName»[] array;
 
@@ -56,18 +50,31 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 				@Override
-				«IF type == Type.OBJECT»
-					public A next() {
-				«ELSEIF type == Type.BOOL»
-					public Boolean next() {
-				«ELSE»
-					public «type.javaName» next«type.javaPrefix»() {
-				«ENDIF»
-					if (i >= array.length) {
-						throw new NoSuchElementException();
-					} else {
-						return «IF type == Type.OBJECT»(«type.genericName») «ENDIF»array[i++];
-					}
+				public «type.genericJavaUnboxedName» «type.iteratorNext»() {
+					return «type.genericCast»array[i++];
+				}
+			}
+
+		«ENDFOR»
+		«FOR type : Type.values»
+			final class Reversed«IF type == Type.OBJECT»ArrayIterator<A>«ELSE»«type.typeName»ArrayIterator«ENDIF» implements «type.iteratorGenericName» {
+				private int i;
+				private final «type.javaName»[] array;
+
+				Reversed«IF type != Type.OBJECT»«type.typeName»«ENDIF»ArrayIterator(final «type.javaName»[] array) {
+					assert array.length > 0;
+					this.array = array;
+					this.i = array.length - 1;
+				}
+
+				@Override
+				public boolean hasNext() {
+					return (i >= 0);
+				}
+
+				@Override
+				public «type.genericJavaUnboxedName» «type.iteratorNext»() {
+					return «type.genericCast»array[i--];
 				}
 			}
 

@@ -22,6 +22,7 @@ import jcats.generator.function.FsGenerator
 
 import static extension java.nio.file.Files.*
 import java.util.Arrays
+import jcats.generator.collection.FListGenerator
 
 class Main {
 	def static void main(String[] args) {
@@ -83,6 +84,7 @@ class Main {
 			ArrayBuilderGenerator.generators,
 			SeqGenerator.generators,
 			SeqBuilderGenerator.generators,
+			FListGenerator.generators,
 			PNGenerators.generators,
 			IndexedGenerator.generators,
 			VNGenerators.generators

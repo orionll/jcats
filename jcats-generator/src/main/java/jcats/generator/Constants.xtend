@@ -28,5 +28,6 @@ final class Constants {
 	val public static STACK = "jcats.collection.Stack"
 	val public static ARRAY = "jcats.collection.Array"
 	val public static SEQ = "jcats.collection.Seq"
+	val public static FLIST = "jcats.collection.FList"
 	val public static V = "jcats.collection.V"
 }

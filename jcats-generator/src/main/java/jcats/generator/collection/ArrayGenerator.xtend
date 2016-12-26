@@ -24,6 +24,7 @@ final class ArrayGenerator implements ClassGenerator {
 	def paramGenericName() { if (type == Type.OBJECT) "<A> Array<A>" else shortName }
 	def arrayBuilderName() { if (type == Type.OBJECT) "ArrayBuilder<A>" else shortName + "Builder" }
 	def arrayBuilderDiamondName() { if (type == Type.OBJECT) "ArrayBuilder<>" else shortName + "Builder" }
+	def fListGenericName() { if (type == Type.OBJECT) "FList<A>" else type.typeName + "FList" }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -91,6 +92,11 @@ final class ArrayGenerator implements ClassGenerator {
 		«FOR toType : Type.primitives.filter[it != type]»
 			import static «Constants.COLLECTION».«toType.typeName»Array.empty«toType.typeName»Array;
 		«ENDFOR»
+		«IF type == Type.OBJECT»
+			import static «Constants.FLIST».emptyFList;
+		«ELSE»
+			import static «Constants.COLLECTION».«type.typeName»FList.empty«type.typeName»FList;
+		«ENDIF»
 		import static «Constants.F».id;
 		import static «Constants.P».p;
 
@@ -293,6 +299,24 @@ final class ArrayGenerator implements ClassGenerator {
 					return new «diamondName»(newArray);
 				}
 			}
+
+			«IF type == Type.OBJECT»
+				public FList<A> reversed() {
+					if (array.length == 0) {
+						return emptyFList();
+					} else {
+						return new FList<>(array.length, i -> (A) array[array.length - i - 1], () -> new ReversedArrayIterator<>(array));
+					}
+				}
+			«ELSE»
+				public «type.typeName»FList reversed() {
+					if (array.length == 0) {
+						return empty«type.typeName»FList();
+					} else {
+						return new «type.typeName»FList(array.length, i -> array[array.length - i - 1], () -> new Reversed«type.typeName»ArrayIterator(array));
+					}
+				}
+			«ENDIF»
 
 			«IF type == Type.OBJECT»
 				public <B> Array<B> map(final F<A, B> f) {
