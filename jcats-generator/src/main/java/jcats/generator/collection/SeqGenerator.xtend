@@ -387,7 +387,7 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			«replicate(type, paramGenericName)»
+			«repeat(type, paramGenericName)»
 
 			«fill(type, paramGenericName)»
 

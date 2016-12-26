@@ -88,8 +88,8 @@ interface Generator {
 		}
 	'''}
 
-	def static replicate(Type type, String paramGenericName) { '''
-		public static «paramGenericName» replicate(final int size, final «type.genericName» value) {
+	def static repeat(Type type, String paramGenericName) { '''
+		public static «paramGenericName» repeat(final int size, final «type.genericName» value) {
 			return tabulate(size, Int«type.typeName»F.constant(value));
 		}
 	'''}

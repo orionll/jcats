@@ -465,7 +465,7 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			«replicate(type, paramGenericName)»
+			«repeat(type, paramGenericName)»
 
 			«fill(type, paramGenericName)»
 
