@@ -152,7 +152,7 @@ class FListGenerator implements ClassGenerator {
 			«ENDIF»
 		}
 		
-		class «shortName»Iterator«IF type == Type.OBJECT»<A>«ENDIF» implements «type.iteratorGenericName» {
+		final class «shortName»Iterator«IF type == Type.OBJECT»<A>«ENDIF» implements «type.iteratorGenericName» {
 			private final «fName» f;
 			private final int size;
 			private int i;

@@ -25,6 +25,9 @@ final class VNGenerators {
 				import java.util.Iterator;
 				import java.util.HashSet;
 				import java.util.List;
+				import java.util.NoSuchElementException;
+				import java.util.Spliterator;
+				import java.util.Spliterators;
 				import java.util.stream.Stream;
 				import java.util.stream.StreamSupport;
 
@@ -196,7 +199,12 @@ final class VNGenerators {
 
 					@Override
 					public Iterator<A> iterator() {
-						return Arrays.asList(«(1 .. arity).map["a" + it].join(", ")»).iterator();
+						return new V«arity»Iterator<>(«(1 .. arity).map["a" + it].join(", ")»);
+					}
+
+					@Override
+					public Spliterator<A> spliterator() {
+						return Spliterators.spliterator(iterator(), «arity», Spliterator.ORDERED | Spliterator.IMMUTABLE);
 					}
 
 					«stream(Type.OBJECT)»
@@ -235,6 +243,32 @@ final class VNGenerators {
 						return new V«arity»<>(«(1 .. arity).map["b" + it].join(", ")»);
 					''']»
 					«cast(#["A"], #[], #["A"])»
+				}
+
+				final class V«arity»Iterator<A> implements Iterator<A> {
+					private final A «(1 .. arity).map["a" + it].join(", ")»;
+					private int i;
+
+					V«arity»Iterator(«(1 .. arity).map["final A a" + it].join(", ")») {
+						«FOR i : 1 .. arity»
+							this.a«i» = a«i»;
+						«ENDFOR»
+					}
+
+					@Override
+					public boolean hasNext() {
+						return (i < «arity»);
+					}
+
+					@Override
+					public A next() {
+						switch (i) {
+							«FOR i : 1 .. arity»
+								case «i-1»: i++; return a«i»;
+							«ENDFOR»
+							default: throw new NoSuchElementException();
+						}
+					}
 				}
 			''' }
 		}
