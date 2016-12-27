@@ -99,6 +99,9 @@ final class ArrayGenerator implements ClassGenerator {
 		«ENDIF»
 		import static «Constants.F».id;
 		import static «Constants.P».p;
+		import static «Constants.COMMON».iterableToString;
+		import static «Constants.COMMON».iterableHashCode;
+
 
 		public final class «genericName» implements Iterable<«type.genericBoxedName»>, Equatable<«genericName»>, Sized, «IF type == Type.OBJECT»Indexed<A>«ELSE»«type.typeName»Indexed«ENDIF», Serializable {
 			static final «shortName» EMPTY = new «shortName»(new «type.javaName»[0]);
@@ -299,24 +302,6 @@ final class ArrayGenerator implements ClassGenerator {
 					return new «diamondName»(newArray);
 				}
 			}
-
-			«IF type == Type.OBJECT»
-				public FList<A> reversed() {
-					if (array.length == 0) {
-						return emptyFList();
-					} else {
-						return new FList<>(array.length, i -> (A) array[array.length - i - 1], () -> new ReversedArrayIterator<>(array));
-					}
-				}
-			«ELSE»
-				public «type.typeName»FList reversed() {
-					if (array.length == 0) {
-						return empty«type.typeName»FList();
-					} else {
-						return new «type.typeName»FList(array.length, i -> array[array.length - i - 1], () -> new Reversed«type.typeName»ArrayIterator(array));
-					}
-				}
-			«ENDIF»
 
 			«IF type == Type.OBJECT»
 				public <B> Array<B> map(final F<A, B> f) {

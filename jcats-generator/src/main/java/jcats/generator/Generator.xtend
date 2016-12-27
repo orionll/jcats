@@ -79,16 +79,7 @@ interface Generator {
 	def toStr(Type type) { '''
 		@Override
 		public String toString() {
-			final StringBuilder builder = new StringBuilder("«name»(");
-			final «type.iteratorGenericName» iterator = iterator();
-			while (iterator.hasNext()) {
-				builder.append(iterator.«type.iteratorNext»());
-				if (iterator.hasNext()) {
-					builder.append(", ");
-				}
-			}
-			builder.append(")");
-			return builder.toString();
+			return iterableToString(this, "«name»");
 		}
 	'''}
 
@@ -109,11 +100,7 @@ interface Generator {
 	def static hashcode(String paramBoxedName) { '''
 		@Override
 		public int hashCode() {
-			int hashCode = 1;
-			for (final «paramBoxedName» value : this) {
-				hashCode = 31 * hashCode + value.hashCode();
-			}
-			return hashCode;
+			return iterableHashCode(this);
 		}
 	'''}
 

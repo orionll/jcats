@@ -65,6 +65,9 @@ class FListGenerator implements ClassGenerator {
 
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.COMMON».iterableToString;
+		import static «Constants.COMMON».iterableHashCode;
+
 
 		public final class «genericName» implements Iterable<«type.genericBoxedName»>, Equatable<«genericName»>, «IF type == Type.OBJECT»Indexed<A>«ELSE»«type.typeName»Indexed«ENDIF», Sized, RandomAccess {
 			private static final «shortName» EMPTY = new «shortName»(0, (__) -> { throw new NoSuchElementException(); }, () -> «IF Type.javaUnboxedTypes.contains(type)»Empty«type.typeName»Iterator.empty«type.javaPrefix»«ELSE»empty«ENDIF»Iterator());

@@ -35,6 +35,34 @@ final class CommonGenerator implements ClassGenerator {
 
 		import static java.util.Objects.requireNonNull;
 
+
+		final class Common {
+			private Common() {
+			}
+
+			static String iterableToString(final Iterable<?> iterable, final String name) {
+				final StringBuilder builder = new StringBuilder(name);
+				builder.append("(");
+				final Iterator<?> iterator = iterable.iterator();
+				while (iterator.hasNext()) {
+					builder.append(iterator.next());
+					if (iterator.hasNext()) {
+						builder.append(", ");
+					}
+				}
+				builder.append(")");
+				return builder.toString();
+			}
+
+			static int iterableHashCode(final Iterable<?> iterable) {
+				int hashCode = 1;
+				for (final Object value : iterable) {
+					hashCode = 31 * hashCode + value.hashCode();
+				}
+				return hashCode;
+			}
+		}
+
 		«FOR type : Type.values»
 			final class «IF type == Type.OBJECT»ArrayIterator<A>«ELSE»«type.typeName»ArrayIterator«ENDIF» implements «type.iteratorGenericName» {
 				private int i;

@@ -39,6 +39,9 @@ final class StackGenerator implements ClassGenerator {
 		import static «Constants.OPTION».none;
 		import static «Constants.OPTION».some;
 		import static «Constants.P».p;
+		import static «Constants.COMMON».iterableToString;
+		import static «Constants.COMMON».iterableHashCode;
+
 
 		public final class Stack<A> implements Iterable<A>, Equatable<Stack<A>>, Serializable {
 			private static final Stack NIL = new Stack(null, null);

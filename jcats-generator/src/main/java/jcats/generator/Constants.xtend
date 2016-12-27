@@ -30,4 +30,5 @@ final class Constants {
 	val public static SEQ = "jcats.collection.Seq"
 	val public static FLIST = "jcats.collection.FList"
 	val public static V = "jcats.collection.V"
+	val public static COMMON = "jcats.collection.Common"
 }

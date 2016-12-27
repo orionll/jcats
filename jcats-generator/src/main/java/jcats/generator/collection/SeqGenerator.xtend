@@ -97,6 +97,9 @@ final class SeqGenerator implements ClassGenerator {
 		«ENDIF»
 		import static «Constants.F».id;
 		import static «Constants.P».p;
+		import static «Constants.COMMON».iterableToString;
+		import static «Constants.COMMON».iterableHashCode;
+
 
 		public abstract class «genericName» implements Iterable<«type.genericBoxedName»>, Equatable<«genericName»>, Sized, «IF type == Type.OBJECT»Indexed<A>«ELSE»«type.typeName»Indexed«ENDIF», Serializable {
 			private static final «shortName» EMPTY = new «shortName»0();
