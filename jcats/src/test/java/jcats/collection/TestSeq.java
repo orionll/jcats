@@ -4,6 +4,7 @@ import static jcats.collection.Seq.emptySeq;
 import static org.junit.Assert.*;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import org.junit.Test;
 
@@ -622,5 +623,19 @@ public class TestSeq {
 		}
 
 		seq.get(max);
+	}
+
+	@Test
+	public void testReverse() {
+		final Random random = new Random();
+		for (int i = 0; i < 50; i++) {
+			Seq<Integer> seq = randomSeq(random, 1 << 10, (1 << 21) + (1 << 15));
+			List<Integer> list1 =  Lists.newArrayList();
+			Iterators.addAll(list1, seq.reversedIterator());
+			assertEquals(seq.size(), list1.size());
+			List<Integer> list2 = Lists.newArrayList(seq);
+			Collections.reverse(list2);
+			assertTrue(Iterables.elementsEqual(list1, list2));
+		}
 	}
 }

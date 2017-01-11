@@ -30,6 +30,8 @@ final class SeqGenerator implements ClassGenerator {
 	def iteratorName(int index) { shortName + index + "Iterator" + (if (type == Type.OBJECT) "<A>" else "") }
 	def iteratorDiamondName(int index) { shortName + index + "Iterator" + (if (type == Type.OBJECT) "<>" else "") }
 	def iteratorReturnType() { if (type == Type.OBJECT) "A" else if (type == Type.BOOL) "Boolean" else type.javaName }
+	def reversedIteratorName(int index) { shortName + index + "ReversedIterator" + (if (type == Type.OBJECT) "<A>" else "") }
+	def reversedIteratorDiamondName(int index) { shortName + index + "ReversedIterator" + (if (type == Type.OBJECT) "<>" else "") }
 	def bufferedListName() { if (type == Type.OBJECT) "BufferedList<A>" else if (type == Type.BOOL) "BufferedList<Boolean>" else "Buffered" + type.typeName + "List" }
 	def bufferedListDiamondName() { if (type == Type.OBJECT) "BufferedList<>" else if (type == Type.BOOL) "BufferedList<>" else "Buffered" + type.typeName + "List" }
 	def index() { if (type == Type.OBJECT) "index" else "Seq.index" }
@@ -263,6 +265,10 @@ final class SeqGenerator implements ClassGenerator {
 						return this;
 					}
 				}
+			}
+
+			public final «genericName» reverse() {
+				return sizedToSeq(reversedIterator(), size());
 			}
 
 			«IF type == Type.OBJECT»
@@ -1168,6 +1174,8 @@ final class SeqGenerator implements ClassGenerator {
 
 			«toStr(type)»
 
+			abstract «type.iteratorGenericName» reversedIterator();
+
 			«IF type == Type.OBJECT»
 				«zip»
 
@@ -1756,6 +1764,533 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 		}
+
+		final class «reversedIteratorName(2)» implements «type.iteratorGenericName» {
+			private final «type.javaName»[][] node2;
+			private final «type.javaName»[] init;
+
+			private int index2;
+			private int index1;
+			private «type.javaName»[] node1;
+
+			«shortName»2ReversedIterator(final «type.javaName»[][] node2, final «type.javaName»[] init, final «type.javaName»[] tail) {
+				this.node2 = node2;
+				this.init = init;
+				node1 = tail;
+				index2 = node2.length - 1;
+				index1 = tail.length - 1;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (index1 >= 0 || index2 >= -1);
+			}
+
+			@Override
+			public «iteratorReturnType» «type.iteratorNext»() {
+				if (index1 >= 0) {
+					return «type.genericCast»node1[index1--];
+				} else if (index2 >= 0) {
+					node1 = node2[index2--];
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (index2 == -1) {
+					node1 = init;
+					index2--;
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+		}
+
+		final class «reversedIteratorName(3)» implements «type.iteratorGenericName» {
+			private final «type.javaName»[][][] node3;
+			private final «type.javaName»[] init;
+
+			private int index3;
+			private int index2;
+			private int index1;
+			private «type.javaName»[][] node2;
+			private «type.javaName»[] node1;
+
+			«shortName»3ReversedIterator(final «type.javaName»[][][] node3, final «type.javaName»[] init, final «type.javaName»[] tail) {
+				this.node3 = node3;
+				this.init = init;
+				node1 = tail;
+				index3 = node3.length - 1;
+				index1 = node1.length - 1;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (index1 >= 0 || (node2 != null && index2 >= 0) || index3 >= -1);
+			}
+
+			@Override
+			public «iteratorReturnType» «type.iteratorNext»() {
+				if (index1 >= 0) {
+					return «type.genericCast»node1[index1--];
+				} else if (node2 != null && index2 >= 0) {
+					node1 = node2[index2--];
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (index3 >= 0) {
+					if (node3[index3].length == 0) {
+						if (index3 == 0) {
+							node2 = null;
+							node1 = init;
+							index3 -= 2;
+						} else {
+							node2 = node3[node3.length - 2];
+							node1 = node2[node2.length - 1];
+							index3 -= 2;
+							index2 = node2.length - 2;
+						}
+					} else {
+						node2 = node3[index3--];
+						node1 = node2[node2.length - 1];
+						index2 = node2.length - 2;
+					}
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (index3 == -1) {
+					node2 = null;
+					node1 = init;
+					index3--;
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+		}
+
+		final class «reversedIteratorName(4)» implements «type.iteratorGenericName» {
+			private final «type.javaName»[][][][] node4;
+			private final «type.javaName»[] init;
+
+			private int index4;
+			private int index3;
+			private int index2;
+			private int index1;
+			private «type.javaName»[][][] node3;
+			private «type.javaName»[][] node2;
+			private «type.javaName»[] node1;
+
+			«shortName»4ReversedIterator(final «type.javaName»[][][][] node4, final «type.javaName»[] init, final «type.javaName»[] tail) {
+				this.node4 = node4;
+				this.init = init;
+				node1 = tail;
+				index4 = node4.length - 1;
+				index1 = node1.length - 1;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (index1 >= 0 || (node2 != null && index2 >= 0) ||
+						(node3 != null && index3 >= 0) || index4 >= -1);
+			}
+
+			@Override
+			public «iteratorReturnType» «type.iteratorNext»() {
+				if (index1 >= 0) {
+					return «type.genericCast»node1[index1--];
+				} else if (node2 != null && index2 >= 0) {
+					node1 = node2[index2--];
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (node3 != null && index3 >= 0) {
+					if (node3[index3].length == 0) {
+						node3 = null;
+						node2 = null;
+						node1 = init;
+						index4 -= 2;
+					} else {
+						node2 = node3[index3--];
+						node1 = node2[node2.length - 1];
+						index2 = node2.length - 2;
+					}
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (index4 >= 0) {
+					final «type.javaName»[][][] nextNode3 = node4[index4];
+					final «type.javaName»[][] nextNode2 = nextNode3[nextNode3.length - 1];
+					if (nextNode2.length == 0) {
+						if (nextNode3.length == 1) {
+							if (index4 == 0) {
+								node3 = null;
+								node2 = null;
+								node1 = init;
+								index4 -= 2;
+							} else {
+								index4--;
+								node3 = node4[index4--];
+								node2 = node3[node3.length - 1];
+								node1 = node2[node2.length - 1];
+								index3 = node3.length - 2;
+								index2 = node2.length - 2;
+							}
+						} else {
+							node3 = nextNode3;
+							node2 = node3[node3.length - 2];
+							node1 = node2[node2.length - 1];
+							index4--;
+							index3 = node3.length - 3;
+							index2 = node2.length - 2;
+						}
+					} else {
+						node3 = nextNode3;
+						node2 = nextNode2;
+						node1 = node2[node2.length - 1];
+						index4--;
+						index3 = node3.length - 2;
+						index2 = node2.length - 2;
+					}
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (index4 == -1) {
+					node3 = null;
+					node2 = null;
+					node1 = init;
+					index4--;
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+		}
+
+		final class «reversedIteratorName(5)» implements «type.iteratorGenericName» {
+			private final «type.javaName»[][][][][] node5;
+			private final «type.javaName»[] init;
+
+			private int index5;
+			private int index4;
+			private int index3;
+			private int index2;
+			private int index1;
+			private «type.javaName»[][][][] node4;
+			private «type.javaName»[][][] node3;
+			private «type.javaName»[][] node2;
+			private «type.javaName»[] node1;
+
+			«shortName»5ReversedIterator(final «type.javaName»[][][][][] node5, final «type.javaName»[] init, final «type.javaName»[] tail) {
+				this.node5 = node5;
+				this.init = init;
+				node1 = tail;
+				index5 = node5.length - 1;
+				index1 = node1.length - 1;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (index1 >= 0 || (node2 != null && index2 >= 0) ||
+						(node3 != null && index3 >= 0) || (node4 != null && index4 >= 0) ||
+						index5 >= - 1);
+			}
+
+			@Override
+			public «iteratorReturnType» «type.iteratorNext»() {
+				if (index1 >= 0) {
+					return «type.genericCast»node1[index1--];
+				} else if (node2 != null && index2 >= 0) {
+					node1 = node2[index2--];
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (node3 != null && index3 >= 0) {
+					if (node3[index3].length == 0) {
+						node4 = null;
+						node3 = null;
+						node2 = null;
+						node1 = init;
+						index5 -= 2;
+					} else {
+						node2 = node3[index3--];
+						node1 = node2[node2.length - 1];
+						index2 = node2.length - 2;
+					}
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (node4 != null && index4 >= 0) {
+					final «type.javaName»[][][] nextNode3 = node4[index4];
+					final «type.javaName»[][] nextNode2 = nextNode3[nextNode3.length - 1];
+					if (nextNode2.length == 0) {
+						node4 = null;
+						node3 = null;
+						node2 = null;
+						node1 = init;
+						index5 -= 2;
+					} else {
+						node3 = nextNode3;
+						node2 = nextNode2;
+						node1 = node2[node2.length - 1];
+						index4--;
+						index3 = node3.length - 2;
+						index2 = node2.length - 2;
+					}
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (index5 >= 0) {
+					final «type.javaName»[][][][] nextNode4 = node5[index5];
+					final «type.javaName»[][][] nextNode3 = nextNode4[nextNode4.length - 1];
+					final «type.javaName»[][] nextNode2 = nextNode3[nextNode3.length - 1];
+					if (nextNode2.length == 0) {
+						if (nextNode3.length == 1) {
+							if (nextNode4.length == 1) {
+								if (index5 == 0) {
+									node4 = null;
+									node3 = null;
+									node2 = null;
+									node1 = init;
+									index5 -= 2;
+								} else {
+									index5--;
+									node4 = node5[index5--];
+									node3 = node4[node4.length - 1];
+									node2 = node3[node3.length - 1];
+									node1 = node2[node2.length - 1];
+									index4 = node4.length - 2;
+									index3 = node3.length - 2;
+									index2 = node2.length - 2;
+								}
+							} else {
+								node4 = nextNode4;
+								node3 = node4[node4.length - 2];
+								node2 = node3[node3.length - 1];
+								node1 = node2[node2.length - 1];
+								index5--;
+								index4 = node4.length - 3;
+								index3 = node3.length - 2;
+								index2 = node2.length - 2;
+							}
+						} else {
+							node4 = nextNode4;
+							node3 = nextNode3;
+							node2 = node3[node3.length - 2];
+							node1 = node2[node2.length - 1];
+							index5--;
+							index4 = node4.length - 2;
+							index3 = node3.length - 3;
+							index2 = node2.length - 2;
+						}
+					} else {
+						node4 = nextNode4;
+						node3 = nextNode3;
+						node2 = nextNode2;
+						node1 = node2[node2.length - 1];
+						index5--;
+						index4 = node4.length - 2;
+						index3 = node3.length - 2;
+						index2 = node2.length - 2;
+					}
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (index5 == -1) {
+					node4 = null;
+					node3 = null;
+					node2 = null;
+					node1 = init;
+					index5--;
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+		}
+
+		final class «reversedIteratorName(6)» implements «type.iteratorGenericName» {
+			private final «type.javaName»[][][][][][] node6;
+			private final «type.javaName»[] init;
+
+			private int index6;
+			private int index5;
+			private int index4;
+			private int index3;
+			private int index2;
+			private int index1;
+			private «type.javaName»[][][][][] node5;
+			private «type.javaName»[][][][] node4;
+			private «type.javaName»[][][] node3;
+			private «type.javaName»[][] node2;
+			private «type.javaName»[] node1;
+
+			«shortName»6ReversedIterator(final «type.javaName»[][][][][][] node6, final «type.javaName»[] init, final «type.javaName»[] tail) {
+				this.node6 = node6;
+				this.init = init;
+				node1 = tail;
+				index6 = node6.length - 1;
+				index1 = node1.length - 1;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (index1 >= 0 || (node2 != null && index2 >= 0) ||
+						(node3 != null && index3 >= 0) || (node4 != null && index4 >= 0) ||
+						(node5 != null && index5 >= 0) || index6 >= -1);
+			}
+
+			@Override
+			public «iteratorReturnType» «type.iteratorNext»() {
+				if (index1 >= 0) {
+					return «type.genericCast»node1[index1--];
+				} else if (node2 != null && index2 >= 0) {
+					node1 = node2[index2--];
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (node3 != null && index3 >= 0) {
+					if (node3[index3].length == 0) {
+						node5 = null;
+						node4 = null;
+						node3 = null;
+						node2 = null;
+						node1 = init;
+						index6 -= 2;
+					} else {
+						node2 = node3[index3--];
+						node1 = node2[node2.length - 1];
+						index2 = node2.length - 2;
+					}
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (node4 != null && index4 >= 0) {
+					final «type.javaName»[][][] nextNode3 = node4[index4];
+					final «type.javaName»[][] nextNode2 = nextNode3[nextNode3.length - 1];
+					if (nextNode2.length == 0) {
+						node5 = null;
+						node4 = null;
+						node3 = null;
+						node2 = null;
+						node1 = init;
+						index6 -= 2;
+					} else {
+						node3 = nextNode3;
+						node2 = nextNode2;
+						node1 = node2[node2.length - 1];
+						index4--;
+						index3 = node3.length - 2;
+						index2 = node2.length - 2;
+					}
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (node5 != null && index5 >= 0) {
+					final «type.javaName»[][][][] nextNode4 = node5[index5];
+					final «type.javaName»[][][] nextNode3 = nextNode4[nextNode4.length - 1];
+					final «type.javaName»[][] nextNode2 = nextNode3[nextNode3.length - 1];
+					if (nextNode2.length == 0) {
+						node5 = null;
+						node4 = null;
+						node3 = null;
+						node2 = null;
+						node1 = init;
+						index6 -= 2;
+					} else {
+						node4 = nextNode4;
+						node3 = nextNode3;
+						node2 = nextNode2;
+						node1 = node2[node2.length - 1];
+						index5--;
+						index4 = node4.length - 2;
+						index3 = node3.length - 2;
+						index2 = node2.length - 2;
+					}
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (index6 >= 0) {
+					final «type.javaName»[][][][][] nextNode5 = node6[index6];
+					final «type.javaName»[][][][] nextNode4 = nextNode5[nextNode5.length - 1];
+					final «type.javaName»[][][] nextNode3 = nextNode4[nextNode4.length - 1];
+					final «type.javaName»[][] nextNode2 = nextNode3[nextNode3.length - 1];
+					if (nextNode2.length == 0) {
+						if (nextNode3.length == 1) {
+							if (nextNode4.length == 1) {
+								if (nextNode5.length == 1) {
+									if (index6 == 0) {
+										node5 = null;
+										node4 = null;
+										node3 = null;
+										node2 = null;
+										node1 = init;
+										index6 -= 2;
+									} else {
+										index6--;
+										node5 = node6[index6--];
+										node4 = node5[node5.length - 1];
+										node3 = node4[node4.length - 1];
+										node2 = node3[node3.length - 1];
+										node1 = node2[node2.length - 1];
+										index5 = node5.length - 2;
+										index4 = node4.length - 2;
+										index3 = node3.length - 2;
+										index2 = node2.length - 2;
+									}
+								} else {
+									node5 = nextNode5;
+									node4 = node5[node5.length - 2];
+									node3 = node4[node4.length - 1];
+									node2 = node3[node3.length - 1];
+									node1 = node2[node2.length - 1];
+									index6--;
+									index5 = node5.length - 3;
+									index4 = node4.length - 2;
+									index3 = node3.length - 2;
+									index2 = node2.length - 2;
+								}
+							} else {
+								node5 = nextNode5;
+								node4 = nextNode4;
+								node3 = node4[node4.length - 2];
+								node2 = node3[node3.length - 1];
+								node1 = node2[node2.length - 1];
+								index6--;
+								index5 = node5.length - 2;
+								index4 = node4.length - 3;
+								index3 = node3.length - 2;
+								index2 = node2.length - 2;
+							}
+						} else {
+							node5 = nextNode5;
+							node4 = nextNode4;
+							node3 = nextNode3;
+							node2 = node3[node3.length - 2];
+							node1 = node2[node2.length - 1];
+							index6--;
+							index5 = node5.length - 2;
+							index4 = node4.length - 2;
+							index3 = node3.length - 3;
+							index2 = node2.length - 2;
+						}
+					} else {
+						node5 = nextNode5;
+						node4 = nextNode4;
+						node3 = nextNode3;
+						node2 = nextNode2;
+						node1 = node2[node2.length - 1];
+						index6--;
+						index5 = node5.length - 2;
+						index4 = node4.length - 2;
+						index3 = node3.length - 2;
+						index2 = node2.length - 2;
+					}
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else if (index6 == -1) {
+					node5 = null;
+					node4 = null;
+					node3 = null;
+					node2 = null;
+					node1 = init;
+					index6--;
+					index1 = node1.length - 2;
+					return «type.genericCast»node1[node1.length - 1];
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+		}
 		«IF type == Type.OBJECT»
 
 			final class SeqAsList<A> extends IndexedIterableAsList<A, Seq<A>> {
@@ -1855,6 +2390,15 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public «type.iteratorGenericName» iterator() {
+				«IF !Type.javaUnboxedTypes.contains(type)»
+					return emptyIterator();
+				«ELSE»
+					return Empty«type.typeName»Iterator.empty«type.typeName»Iterator();
+				«ENDIF»
+			}
+
+			@Override
+			«type.iteratorGenericName» reversedIterator() {
 				«IF !Type.javaUnboxedTypes.contains(type)»
 					return emptyIterator();
 				«ELSE»
@@ -2160,6 +2704,15 @@ final class SeqGenerator implements ClassGenerator {
 					return new ArrayIterator<>(node1);
 				«ELSE»
 					return new «type.typeName»ArrayIterator(node1);
+				«ENDIF»
+			}
+
+			@Override
+			«type.iteratorGenericName» reversedIterator() {
+				«IF type == Type.OBJECT»
+					return new ArrayReversedIterator<>(node1);
+				«ELSE»
+					return new «type.typeName»ArrayReversedIterator(node1);
 				«ENDIF»
 			}
 		}
@@ -2858,6 +3411,11 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public «type.iteratorGenericName» iterator() {
 				return new «iteratorDiamondName(2)»(node2, init, tail);
+			}
+
+			@Override
+			«type.iteratorGenericName» reversedIterator() {
+				return new «reversedIteratorDiamondName(2)»(node2, init, tail);
 			}
 		}
 	''' }
@@ -3711,6 +4269,11 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public «type.iteratorGenericName» iterator() {
 				return new «iteratorDiamondName(3)»(node3, init, tail);
+			}
+
+			@Override
+			«type.iteratorGenericName» reversedIterator() {
+				return new «reversedIteratorDiamondName(3)»(node3, init, tail);
 			}
 		}
 	''' }
@@ -4707,6 +5270,11 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public «type.iteratorGenericName» iterator() {
 				return new «iteratorDiamondName(4)»(node4, init, tail);
+			}
+
+			@Override
+			«type.iteratorGenericName» reversedIterator() {
+				return new «reversedIteratorDiamondName(4)»(node4, init, tail);
 			}
 		}
 	''' }
@@ -5861,6 +6429,11 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public «type.iteratorGenericName» iterator() {
 				return new «iteratorDiamondName(5)»(node5, init, tail);
+			}
+
+			@Override
+			«type.iteratorGenericName» reversedIterator() {
+				return new «reversedIteratorDiamondName(5)»(node5, init, tail);
 			}
 		}
 	''' }
@@ -7149,6 +7722,11 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			public «type.iteratorGenericName» iterator() {
 				return new «iteratorDiamondName(6)»(node6, init, tail);
+			}
+
+			@Override
+			«type.iteratorGenericName» reversedIterator() {
+				return new «reversedIteratorDiamondName(6)»(node6, init, tail);
 			}
 		}
 	''' }

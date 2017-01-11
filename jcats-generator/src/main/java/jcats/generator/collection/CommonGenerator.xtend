@@ -85,11 +85,11 @@ final class CommonGenerator implements ClassGenerator {
 
 		«ENDFOR»
 		«FOR type : Type.values»
-			final class Reversed«IF type == Type.OBJECT»ArrayIterator<A>«ELSE»«type.typeName»ArrayIterator«ENDIF» implements «type.iteratorGenericName» {
+			final class «IF type == Type.OBJECT»ArrayReversedIterator<A>«ELSE»«type.typeName»ArrayReversedIterator«ENDIF» implements «type.iteratorGenericName» {
 				private int i;
 				private final «type.javaName»[] array;
 
-				Reversed«IF type != Type.OBJECT»«type.typeName»«ENDIF»ArrayIterator(final «type.javaName»[] array) {
+				«IF type != Type.OBJECT»«type.typeName»«ENDIF»ArrayReversedIterator(final «type.javaName»[] array) {
 					assert array.length > 0;
 					this.array = array;
 					this.i = array.length - 1;
