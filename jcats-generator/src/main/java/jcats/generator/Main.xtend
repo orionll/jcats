@@ -86,6 +86,7 @@ class Main {
 			SeqBuilderGenerator.generators,
 			FListGenerator.generators,
 			PNGenerators.generators,
+			PGenerator.generators,
 			IndexedGenerator.generators,
 			VNGenerators.generators
 		].flatten.toList

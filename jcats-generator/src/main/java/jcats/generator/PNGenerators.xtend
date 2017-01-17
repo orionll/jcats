@@ -8,20 +8,12 @@ import java.util.Collections
 
 final class PNGenerators {
 	def static List<Generator> generators() {
-		(2 .. Constants.MAX_ARITY).map[generator(it)].toList
+		(3 .. Constants.MAX_ARITY).map[generator(it)].toList
 	}
 
-	def static fullName(int arity) {
-		if (arity == 2) Constants.P else Constants.P + arity
-	}
-
-	def static shortName(int arity) {
-		fullName(arity).substring(fullName(arity).lastIndexOf('.') + 1)
-	}
-
-	def static parameters(int arity) {
-		'''<«(1 .. arity).map["A" + it].join(", ")»>'''
-	}
+	def static fullName(int arity) { Constants.P + arity }
+	def static shortName(int arity) { if (arity == 2) "P" else "P" + arity }
+	def static parameters(int arity) { '''<«(1 .. arity).map["A" + it].join(", ")»>''' }
 
 	private def static Generator generator(int arity) {
 		new ClassGenerator {
@@ -77,12 +69,6 @@ final class PNGenerators {
 						return new «shortName»<>(«(arity .. 1).map["a" + it].join(", ")»);
 					}
 
-					«IF arity == 2»
-						public <B1, B2> «shortName»<B1, B2> biMap(final F<A1, B1> f1, final F<A2, B2> f2) {
-							return «shortName.toLowerCase»(f1.apply(a1), f2.apply(a2));
-						}
-
-					«ENDIF»
 					public static «parameters(arity)» «shortName»«parameters(arity)» «shortName.toLowerCase»(«(1 .. arity).map["final A" + it + " a" + it].join(", ")») {
 						«FOR i : 1 .. arity»
 							requireNonNull(a«i»);
