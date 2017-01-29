@@ -23,6 +23,7 @@ import jcats.generator.function.FsGenerator
 import static extension java.nio.file.Files.*
 import java.util.Arrays
 import jcats.generator.collection.FListGenerator
+import jcats.generator.collection.DictGenerator
 
 class Main {
 	def static void main(String[] args) {
@@ -73,6 +74,8 @@ class Main {
 			new OrdGenerator,
 			new StackGenerator,
 			new StackBuilderGenerator,
+			new KeyValueGenerator,
+			new DictGenerator,
 			new CommonGenerator
 		],
 			FGenerator.generators,

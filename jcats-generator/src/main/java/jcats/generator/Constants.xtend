@@ -19,6 +19,7 @@ final class Constants {
 	val public static EFF = "jcats.function.Eff"
 	val public static EFF0 = "jcats.function.Eff0"
 	val public static EITHER = "jcats.Either"
+	val public static KEY_VALUE = "jcats.KeyValue"
 	val public static OPTION = "jcats.Option"
 	val public static ORDER = "jcats.Order"
 	val public static ORD = "jcats.Ord"
