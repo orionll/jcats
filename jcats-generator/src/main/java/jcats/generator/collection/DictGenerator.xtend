@@ -31,24 +31,31 @@ class DictGenerator implements ClassGenerator {
 		import static jcats.collection.Common.iterableToString;
 
 
-		public final class Dict<K, A> implements KeyValue<K, A>, Iterable<P<K, A>>, Serializable {
+		public final class Dict<K, A> implements KeyValue<K, A>, Iterable<P<K, A>>, Sized, Serializable {
 
-			private static final Dict EMPTY = new Dict(0, 0, Array.EMPTY.array);
+			private static final Dict EMPTY = new Dict(0, 0, Array.EMPTY.array, 0);
 
 			static final int VOID = 0, LEAF = 1, TREE = 2, COLLISION = 3;
 
 			private final int treeMap;
 			private final int leafMap;
 			private final Object[] slots;
+			private final int size;
 
-			private Dict(final int treeMap, final int leafMap, final Object[] slots) {
+			private Dict(final int treeMap, final int leafMap, final Object[] slots, final int size) {
 				this.treeMap = treeMap;
 				this.leafMap = leafMap;
 				this.slots = slots;
+				this.size = size;
 			}
 
 			public static <K, A> Dict<K, A> empty() {
 				return EMPTY;
+			}
+
+			@Override
+			public int size() {
+				return size;
 			}
 
 			public boolean isEmpty() {
@@ -161,35 +168,32 @@ class DictGenerator implements ClassGenerator {
 				return (P<K, A>) slots[0];
 			}
 
-			private Dict<K, A> remap(final int treeMap, final int leafMap) {
+			private Dict<K, A> remap(final int treeMap, final int leafMap, final int size) {
 				if (this.leafMap == leafMap && this.treeMap == treeMap) {
-					return new Dict<>(treeMap, leafMap, slots.clone());
-				} else {
+					return new Dict<>(treeMap, leafMap, slots.clone(), size);
+				} else if (size == 0) {
+					return empty();
+				} else  {
 					int oldSlotMap = this.treeMap | this.leafMap;
 					int newSlotMap = treeMap | leafMap;
 					int i = 0;
 					int j = 0;
-					final int size = Integer.bitCount(newSlotMap);
-					if (size == 0) {
-						return empty();
-					} else {
-						final Object[] slots = new Object[size];
-						while (newSlotMap != 0) {
-							if ((oldSlotMap & newSlotMap & 1) == 1) {
-								slots[j] = this.slots[i];
-							}
-							if ((oldSlotMap & 1) == 1) {
-								i++;
-							}
-							if ((newSlotMap & 1) == 1) {
-								j++;
-							}
-
-							oldSlotMap >>>= 1;
-							newSlotMap >>>= 1;
+					final Object[] slots = new Object[Integer.bitCount(newSlotMap)];
+					while (newSlotMap != 0) {
+						if ((oldSlotMap & newSlotMap & 1) == 1) {
+							slots[j] = this.slots[i];
 						}
-						return new Dict<>(treeMap, leafMap, slots);
+						if ((oldSlotMap & 1) == 1) {
+							i++;
+						}
+						if ((newSlotMap & 1) == 1) {
+							j++;
+						}
+
+						oldSlotMap >>>= 1;
+						newSlotMap >>>= 1;
 					}
+					return new Dict<>(treeMap, leafMap, slots, size);
 				}
 			}
 
@@ -210,7 +214,7 @@ class DictGenerator implements ClassGenerator {
 
 				switch (follow(branch)) {
 					case VOID:
-						return remap(treeMap, leafMap | branch).setEntry(branch, p(key, value));
+						return remap(treeMap, leafMap | branch, size + 1).setEntry(branch, p(key, value));
 
 					case LEAF:
 						final P<K, A> leaf = getEntry(branch);
@@ -221,16 +225,16 @@ class DictGenerator implements ClassGenerator {
 								if (value == leaf.get2()) {
 									return this;
 								} else {
-									return remap(treeMap, leafMap).setEntry(branch, p(key, value));
+									return remap(treeMap, leafMap, size).setEntry(branch, p(key, value));
 								}
 							} else {
 								final ListDict<K, A> listDict = new ListDict<>(p(key, value), new ListDict<>(leaf, null));
-								return remap(treeMap | branch, leafMap).setCollision(branch, listDict);
+								return remap(treeMap | branch, leafMap, size + 1).setCollision(branch, listDict);
 							}
 						} else {
 							final P<K, A> entry = p(key, value);
 							final Dict<K, A> tree = merge(leaf, leafKeyHash, entry, keyHash, shift + 5);
-							return remap(treeMap | branch, leafMap ^ branch).setTree(branch, tree);
+							return remap(treeMap | branch, leafMap ^ branch, size + 1).setTree(branch, tree);
 						}
 
 					case TREE:
@@ -239,7 +243,7 @@ class DictGenerator implements ClassGenerator {
 						if (newTree == oldTree) {
 							return this;
 						} else {
-							return remap(treeMap, leafMap).setTree(branch, newTree);
+							return remap(treeMap, leafMap, size + newTree.size - oldTree.size).setTree(branch, newTree);
 						}
 
 					case COLLISION:
@@ -247,8 +251,10 @@ class DictGenerator implements ClassGenerator {
 						final ListDict<K, A> newDict = oldDict.update(key, value);
 						if (newDict == oldDict) {
 							return this;
+						} else if (newDict.next == oldDict) {
+							return remap(treeMap, leafMap, size + 1).setCollision(branch, newDict);
 						} else {
-							return remap(treeMap, leafMap).setCollision(branch, newDict);
+							return remap(treeMap, leafMap, size).setCollision(branch, newDict);
 						}
 
 					default:
@@ -266,7 +272,7 @@ class DictGenerator implements ClassGenerator {
 					case LEAF:
 						final P<K, A> entry = getEntry(branch);
 						if (entry.get1().equals(key)) {
-							return remap(treeMap, leafMap ^ branch);
+							return remap(treeMap, leafMap ^ branch, size - 1);
 						} else {
 							return this;
 						}
@@ -277,11 +283,11 @@ class DictGenerator implements ClassGenerator {
 						if (oldTree == newTree) {
 							return this;
 						} else if (newTree.isEmpty()) {
-							return remap(treeMap ^ branch, leafMap);
+							return remap(treeMap ^ branch, leafMap, size - 1);
 						} else if (newTree.isSingle()) {
-							return remap(treeMap ^ branch, leafMap | branch).setEntry(branch, newTree.singleEntry());
+							return remap(treeMap ^ branch, leafMap | branch, size + 1 - oldTree.size).setEntry(branch, newTree.singleEntry());
 						} else {
-							return remap(treeMap, leafMap).setTree(branch, newTree);
+							return remap(treeMap, leafMap, size + newTree.size - oldTree.size).setTree(branch, newTree);
 						}
 
 					case COLLISION:
@@ -289,12 +295,10 @@ class DictGenerator implements ClassGenerator {
 						final ListDict<K, A> newDict = oldDict.remove(key);
 						if (newDict == oldDict) {
 							return this;
-						} else if (newDict == null) {
-							return remap(treeMap ^ branch, leafMap);
 						} else if (newDict.next == null) {
-							return remap(treeMap ^ branch, leafMap | branch).setEntry(branch, newDict.entry);
+							return remap(treeMap ^ branch, leafMap | branch, size - 1).setEntry(branch, newDict.entry);
 						} else {
-							return remap(treeMap, leafMap).setCollision(branch, newDict);
+							return remap(treeMap, leafMap, size - 1).setCollision(branch, newDict);
 						}
 
 					default:
@@ -302,14 +306,14 @@ class DictGenerator implements ClassGenerator {
 				}
 			}
 
-			private Dict<K, A> merge(final P<K, A> entry0, final int hash0, final P<K, A> entry1, final int hash1, final int shift) {
+			private static <K, A> Dict<K, A> merge(final P<K, A> entry0, final int hash0, final P<K, A> entry1, final int hash1, final int shift) {
 				// assume(hash0 != hash1)
 				final int branch0 = choose(hash0, shift);
 				final int branch1 = choose(hash1, shift);
 				final int slotMap = branch0 | branch1;
 				if (branch0 == branch1) {
 					final Object[] slots = { merge(entry0, hash0, entry1, hash1, shift + 5) };
-					return new Dict<>(slotMap, 0, slots);
+					return new Dict<>(slotMap, 0, slots, 2);
 				} else {
 					final Object[] slots = new Object[2];
 					if (((branch0 - 1) & branch1) == 0) {
@@ -319,7 +323,7 @@ class DictGenerator implements ClassGenerator {
 						slots[0] = entry1;
 						slots[1] = entry0;
 					}
-					return new Dict<>(0, slotMap, slots);
+					return new Dict<>(0, slotMap, slots, 2);
 				}
 			}
 

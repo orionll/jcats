@@ -25,10 +25,10 @@ public class TestDict {
 		assertTrue(Dict.empty().isEmpty());
 	}
 
-/*	@Test
+	@Test
 	public void emptyZeroSize() {
 		assertEquals(0, Dict.empty().size());
-	}*/
+	}
 
 	@Test
 	public void emptyContainsNothing() {
@@ -50,11 +50,11 @@ public class TestDict {
 		assertFalse(Dict.empty().put("a", 1).isEmpty());
 	}
 
-/*	@Test
+	@Test
 	public void singleElementSize() {
 		assertEquals(1, Dict.empty().put("a", 1).size());
 		assertEquals(1, Dict.empty().put("a", 1).put("a", 1).size());
-	}*/
+	}
 
 	@Test
 	public void singleElementContains() {
@@ -75,20 +75,15 @@ public class TestDict {
 		assertEquals(some(1), Dict.empty().put("a", 1).remove("A").get("a"));
 	}
 
-/*	@Test
+	@Test
 	public void singleElementRemoveAbsent() {
 		assertEquals(some(1), Dict.empty().put("a", 1).remove("b").get("a"));
 		assertEquals(1, Dict.empty().put("a", 1).remove("b").size());
-	}*/
+	}
 
 	/*@Test
 	public void singleElementKeySet() {
 		assertTrue(Dict.empty().put("a", 1).keySet().contains("a"));
-	}*/
-
-/*	@Test
-	public void hashCodeClashSize() {
-		assertEquals(2, Dict.empty().put("Aa", 1).put("BB", 2).size());
 	}*/
 
 	@Test
@@ -103,6 +98,7 @@ public class TestDict {
 		assertEquals(some(1), dict1.get("Aa"));
 		assertEquals(some(2), dict1.get("BB"));
 		assertEquals(none(), dict1.get("XX"));
+		assertEquals(2, dict1.size());
 
 		final Dict<String, Integer> dict2 = Dict.<String, Integer>empty()
 				.put("a", 1).put("b", 2).put("c", 3).put("Aa", 4).put("BB", 5);
@@ -112,11 +108,13 @@ public class TestDict {
 		assertEquals(some(4), dict2.get("Aa"));
 		assertEquals(some(5), dict2.get("BB"));
 		assertEquals(none(), dict2.get("XX"));
+		assertEquals(5, dict2.size());
 
 		Dict<String, Integer> dict3 = Dict.<String, Integer> empty()
-				.put("Aa", 1).put("BB", 2).put("Aa", 3);
+				.put("Aa", 1).put("BB", 2).put("BB", 2).put("Aa", 3);
 		assertEquals(some(3), dict3.get("Aa"));
 		assertEquals(some(2), dict3.get("BB"));
+		assertEquals(2, dict3.size());
 	}
 
 	@Test
@@ -125,6 +123,7 @@ public class TestDict {
 				.put("Aa", 1).put("BB", 2).remove("Aa");
 		assertFalse(dict.containsKey("Aa"));
 		assertEquals(some(2), dict.get("BB"));
+		assertEquals(1, dict.size());
 	}
 
 	/*@Test
@@ -132,10 +131,10 @@ public class TestDict {
 		assertEquals(2, Dict.empty().put("Aa", 1).put("BB", 2).keySet().size());
 	}*/
 
-/*	@Test
+	@Test
 	public void largeMapSize() {
 		assertEquals(LARGE_MAP_SIZE, getLargeMap().size());
-	}*/
+	}
 
 	@Test
 	public void largeMapContains() {
@@ -147,10 +146,19 @@ public class TestDict {
 		assertEquals(some(LARGE_MAP_SIZE - 1), getLargeMap().get(Character.toString((char) ('A' + LARGE_MAP_SIZE - 1))));
 	}
 
-/*	@Test
+	@Test
 	public void largeMapRemove() {
 		assertEquals(LARGE_MAP_SIZE - 1, getLargeMap().remove(Character.toString((char) ('A' + LARGE_MAP_SIZE - 1))).size());
-	}*/
+	}
+
+	@Test
+	public void sameTree() {
+		final Dict<String, Integer> dict = Dict.<String, Integer> empty().put("!", 1).put("a", 2).put("A", 3);
+		assertEquals(some(1), dict.get("!"));
+		assertEquals(some(2), dict.get("a"));
+		assertEquals(some(3), dict.get("A"));
+		assertEquals(3, dict.size());
+	}
 
 	/*@Test
 	public void largeMapKeySet() {
@@ -184,4 +192,3 @@ public class TestDict {
 		assertEquals(expected, actual);
 	}
 }
-
