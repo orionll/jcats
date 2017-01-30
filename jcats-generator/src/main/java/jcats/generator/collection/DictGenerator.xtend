@@ -13,6 +13,7 @@ class DictGenerator implements ClassGenerator {
 		package «Constants.COLLECTION»;
 
 		import «Constants.EFF»2;
+		import «Constants.EQUATABLE»;
 		import «Constants.F»;
 		import «Constants.KEY_VALUE»;
 		import «Constants.OPTION»;
@@ -31,7 +32,7 @@ class DictGenerator implements ClassGenerator {
 		import static jcats.collection.Common.iterableToString;
 
 
-		public final class Dict<K, A> implements KeyValue<K, A>, Iterable<P<K, A>>, Sized, Serializable {
+		public final class Dict<K, A> implements KeyValue<K, A>, Iterable<P<K, A>>, Equatable<Dict<K, A>>, Sized, Serializable {
 
 			private static final Dict EMPTY = new Dict(0, 0, Array.EMPTY.array, 0);
 
@@ -331,6 +332,60 @@ class DictGenerator implements ClassGenerator {
 				return new DictIterator<>(leafMap, treeMap, slots);
 			}
 
+			public void traverse(final Eff2<K, A> f) {
+				requireNonNull(f);
+				forEach(entry -> f.apply(entry.get1(), entry.get2()));
+			}
+
+			@Override
+			public void forEach(final Consumer<? super P<K, A>> action) {
+				requireNonNull(action);
+				int i = 0;
+				int treeMap = this.treeMap;
+				int leafMap = this.leafMap;
+				while ((treeMap | leafMap) != 0) {
+					switch ((leafMap & 1 | (treeMap & 1) << 1)) {
+						case VOID: break;
+						case LEAF: action.accept(entryAt(i++)); break;
+						case TREE: treeAt(i++).forEach(action); break;
+						case COLLISION: collisionAt(i++).forEach(action); break;
+					}
+					treeMap >>>= 1;
+					leafMap >>>= 1;
+				}
+			}
+
+			@Override
+			public boolean equals(final Object obj) {
+				if (obj == this) {
+					return true;
+				} else if (obj instanceof Dict) {
+					final Dict<?, ?> other = (Dict<?, ?>) obj;
+					if (size() == other.size()) {
+						for (final P<?, ?> entry : other) {
+							final A value = getOrNull((K) entry.get1());
+							if (value == null || !value.equals(entry.get2())) {
+								return false;
+							}
+						}
+						return true;
+					} else {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			}
+
+			@Override
+			public int hashCode() {
+				int result = 0;
+				for (final P<K, A> entry : this) {
+					result += entry.hashCode();
+				}
+				return result;
+			}
+
 			@Override
 			public String toString() {
 				return iterableToString(this, "Dict");
@@ -484,6 +539,12 @@ class DictGenerator implements ClassGenerator {
 
 			Iterator<P<K, A>> iterator() {
 				return new ListDictIterator<>(this);
+			}
+
+			void forEach(final Consumer<? super P<K, A>> action) {
+				for (ListDict<K, A> dict = this; dict != null; dict = dict.next) {
+					action.accept(dict.entry);
+				}
 			}
 		}
 
