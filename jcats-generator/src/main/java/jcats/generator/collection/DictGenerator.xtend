@@ -50,10 +50,20 @@ class DictGenerator implements ClassGenerator {
 				this.size = size;
 			}
 
-			public static <K, A> Dict<K, A> empty() {
+			public static <K, A> Dict<K, A> emptyDict() {
 				return EMPTY;
 			}
 
+			public static <K, A> Dict<K, A> dict(final K key, final A value) {
+				return Dict.<K, A> emptyDict().put(key, value);
+			}
+
+			«FOR i : 2 .. Constants.MAX_ARITY»
+				public static <K, A> Dict<K, A> dict«i»(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
+					return Dict.<K, A> emptyDict()«(1..i).map[".put(key" + it + ", value" + it + ")"].join»;
+				}
+
+			«ENDFOR»
 			@Override
 			public int size() {
 				return size;
@@ -173,7 +183,7 @@ class DictGenerator implements ClassGenerator {
 				if (this.leafMap == leafMap && this.treeMap == treeMap) {
 					return new Dict<>(treeMap, leafMap, slots.clone(), size);
 				} else if (size == 0) {
-					return empty();
+					return emptyDict();
 				} else  {
 					int oldSlotMap = this.treeMap | this.leafMap;
 					int newSlotMap = treeMap | leafMap;
