@@ -432,7 +432,7 @@ final class ArrayGenerator implements ClassGenerator {
 					} else {
 						return «type.typeName»Seq.seqFromArray(array);
 					}
-				}				
+				}
 			«ENDIF»
 
 			public «type.javaName»[] to«type.javaPrefix»Array() {
@@ -472,6 +472,16 @@ final class ArrayGenerator implements ClassGenerator {
 					System.arraycopy(values, 0, array, 0, values.length);
 					return new «diamondName»(array);
 				}
+			}
+
+			/**
+			 * Synonym for {@link #«shortName.firstToLowerCase»}
+			 */
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			public static «paramGenericName» of(final «type.genericName»... values) {
+				return «shortName.firstToLowerCase»(values);
 			}
 
 			«repeat(type, paramGenericName)»
@@ -536,6 +546,13 @@ final class ArrayGenerator implements ClassGenerator {
 						return empty«shortName»();
 					}
 				}
+			}
+
+			/**
+			 * Synonym for {@link #iterableTo«shortName»}
+			 */
+			public static «paramGenericName» fromIterable(final Iterable<«type.genericBoxedName»> iterable) {
+				return iterableTo«shortName»(iterable);
 			}
 
 			«IF type == Type.OBJECT»

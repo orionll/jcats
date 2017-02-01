@@ -42,6 +42,13 @@ final class OrderGenerator implements ClassGenerator {
 				return (cmp == 0) ? EQ : (cmp > 0) ? GT : LT;
 			}
 
+			/**
+			 * Synonym for {@link #intToOrder}
+			 */
+			public static Order fromInt(final int cmp) {
+				return intToOrder(cmp);
+			}
+
 			static final Ord ORD = (Ord<Comparable>) (Comparable x, Comparable y) -> {
 				requireNonNull(x);
 				requireNonNull(y);

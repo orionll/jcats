@@ -180,10 +180,24 @@ final class F0Generator implements InterfaceGenerator {
 					return () -> requireNonNull(s.get());
 				}
 
+				/**
+				 * Synonym for {@link #supplierToF0}
+				 */
+				static <A> F0<A> fromSupplier(final Supplier<A> s) {
+					return supplierToF0(s);
+				}
+				
 			«ELSE»
-				static «shortName» «type.typeName.firstToLowerCase»SupplierToF0(final «type.javaPrefix»Supplier s) {
+				static «shortName» «type.javaPrefix.firstToLowerCase»SupplierToF0(final «type.javaPrefix»Supplier s) {
 					requireNonNull(s);
 					return s::getAs«type.javaPrefix»;
+				}
+
+				/**
+				 * Synonym for {@link #«type.javaPrefix.firstToLowerCase»SupplierToF0}
+				 */
+				static «shortName» from«type.javaPrefix»Supplier(final «type.javaPrefix»Supplier s) {
+					return «type.javaPrefix.firstToLowerCase»SupplierToF0(s);
 				}
 			«ENDIF»
 			«IF type == Type.OBJECT»

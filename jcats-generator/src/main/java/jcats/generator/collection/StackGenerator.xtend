@@ -270,30 +270,23 @@ final class StackGenerator implements ClassGenerator {
 				return stack;
 			}
 
-			«FOR primitive : PRIMITIVES»
-				public static Stack<«primitive.boxedName»> «primitive.shortName»Stack(final «primitive»... values) {
-					Stack<«primitive.boxedName»> stack = nil();
-					for (int i = values.length - 1; i >= 0; i--) {
-						stack = new Stack<>(values[i], stack);
-					}
-					return stack;
-				}
-
-			«ENDFOR»
-			public static Stack<Character> stringToCharStack(final String str) {
-				if (str.isEmpty()) {
-					return nil();
-				} else {
-					final StackBuilder<Character> builder = new StackBuilder<>();
-					for (int i = 0; i < str.length(); i++) {
-						builder.append(str.charAt(i));
-					}
-					return builder.build();
-				}
+			/**
+			 * Synonym for {@link #stack}
+			 */
+			@SafeVarargs
+			public static <A> Stack<A> of(final A... values) {
+				return stack(values);
 			}
 
 			public static <A> Stack<A> iterableToStack(final Iterable<A> values) {
 				return new StackBuilder<A>().appendAll(values).build();
+			}
+
+			/**
+			 * Synonym for {@link #iterableToStack}
+			 */
+			public static <A> Stack<A> fromIterable(final Iterable<A> values) {
+				return iterableToStack(values);
 			}
 
 			«join»

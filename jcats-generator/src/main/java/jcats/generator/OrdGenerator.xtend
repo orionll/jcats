@@ -89,6 +89,13 @@ final class OrdGenerator implements ClassGenerator {
 				};
 			}
 
+			/**
+			 * Synonym for {@link #fToOrd}
+			 */
+			static <A> Ord<A> fromF(final F2<A, A, Order> f2) {
+				return fToOrd(f2);
+			}
+
 			static <A> Ord<A> comparatorToOrd(final Comparator<A> comparator) {
 				requireNonNull(comparator);
 				return (x, y) -> {
@@ -96,6 +103,13 @@ final class OrdGenerator implements ClassGenerator {
 					requireNonNull(y);
 					return intToOrder(comparator.compare(x, y));
 				};
+			}
+
+			/**
+			 * Synonym for {@link #comparatorToOrd}
+			 */
+			static <A> Ord<A> fromComparator(final Comparator<A> comparator) {
+				return comparatorToOrd(comparator);
 			}
 
 			static <A extends Comparable<A>> Ord<A> ord() {

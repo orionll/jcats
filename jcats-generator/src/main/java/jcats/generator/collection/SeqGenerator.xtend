@@ -396,6 +396,16 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
+			/**
+			 * Synonym for {@link #«shortName.firstToLowerCase»}
+			 */
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			public static «paramGenericName» of(final «type.genericName»... values) {
+				return «shortName.firstToLowerCase»(values);
+			}
+
 			«repeat(type, paramGenericName)»
 
 			«fill(type, paramGenericName)»
@@ -589,6 +599,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			static «paramGenericName» seqFromArray(final «type.javaName»[] values) {
+				// Assume values.length != 0
 				if (values.length <= 32) {
 					return seq1FromArray(values);
 				} else if (values.length <= (1 << 10)) {
@@ -716,7 +727,7 @@ final class SeqGenerator implements ClassGenerator {
 				return tail;
 			}
 
-			public static «paramGenericName» iterableToSeq(final Iterable<«type.genericBoxedName»> iterable) {
+			public static «paramGenericName» iterableTo«shortName»(final Iterable<«type.genericBoxedName»> iterable) {
 				requireNonNull(iterable);
 				if (iterable instanceof «wildcardName») {
 					return («genericName») iterable;
@@ -736,6 +747,13 @@ final class SeqGenerator implements ClassGenerator {
 						return empty«shortName»();
 					}
 				}
+			}
+
+			/**
+			 * Synonym for {@link #iterableTo«shortName»}
+			 */
+			public static «paramGenericName» fromIterable(final Iterable<«type.genericBoxedName»> iterable) {
+				return iterableTo«shortName»(iterable);
 			}
 
 			static «paramGenericName» sizedToSeq(final «type.iteratorGenericName» iterator, final int size) {

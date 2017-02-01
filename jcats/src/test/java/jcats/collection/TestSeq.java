@@ -1,6 +1,7 @@
 package jcats.collection;
 
 import static jcats.collection.Seq.emptySeq;
+import static jcats.collection.Seq.iterableToSeq;
 import static org.junit.Assert.*;
 
 import com.google.common.collect.Iterables;
@@ -301,7 +302,7 @@ public class TestSeq {
 
 		for (int i = 0; i < MAX; i++) {
 			if (isTestIndex(i)) {
-				final Seq<Integer> seq = Seq.iterableToSeq(list);
+				final Seq<Integer> seq = iterableToSeq(list);
 				assertEquals(list.size(), Iterables.size(seq));
 				assertEquals(list.size(), seq.size());
 				assertTrue("Elements not equal for size = " + list.size(), Iterables.elementsEqual(list, seq));
@@ -629,11 +630,11 @@ public class TestSeq {
 	public void testReverse() {
 		final Random random = new Random();
 		for (int i = 0; i < 50; i++) {
-			Seq<Integer> seq = randomSeq(random, 1 << 10, (1 << 21) + (1 << 15));
-			List<Integer> list1 =  Lists.newArrayList();
+			final Seq<Integer> seq = randomSeq(random, 1 << 10, (1 << 21) + (1 << 15));
+			final List<Integer> list1 =  Lists.newArrayList();
 			Iterators.addAll(list1, seq.reversedIterator());
 			assertEquals(seq.size(), list1.size());
-			List<Integer> list2 = Lists.newArrayList(seq);
+			final List<Integer> list2 = Lists.newArrayList(seq);
 			Collections.reverse(list2);
 			assertTrue(Iterables.elementsEqual(list1, list2));
 		}

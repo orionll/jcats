@@ -64,11 +64,28 @@ class DictGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
+			/**
+			 * Synonym for {@link #emptyDict}
+			 */
+			public static <K, A> Dict<K, A> of() {
+				return emptyDict();
+			}
+
+			«FOR i : 2 .. Constants.MAX_ARITY»
+				/**
+				 * Synonym for {@link #dict«i»}
+				 */
+				public static <K, A> Dict<K, A> of(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
+					return dict«i»(«(1..i).map["key" + it + ", value" + it].join(", ")»);
+				}
+
+			«ENDFOR»
 			@Override
 			public int size() {
 				return size;
 			}
 
+			@Override
 			public boolean isEmpty() {
 				return (this == EMPTY);
 			}
@@ -79,7 +96,7 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public Option<A> get(K key) {
+			public Option<A> get(final K key) {
 				return nullableToOption(getOrNull(key));
 			}
 
@@ -338,6 +355,7 @@ class DictGenerator implements ClassGenerator {
 				}
 			}
 
+			@Override
 			public Iterator<P<K, A>> iterator() {
 				return new DictIterator<>(leafMap, treeMap, slots);
 			}

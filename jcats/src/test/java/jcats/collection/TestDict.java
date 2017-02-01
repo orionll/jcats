@@ -165,7 +165,7 @@ public class TestDict {
 	}*/
 
 	@Test
-	public void immutabiluty() {
+	public void immutability() {
 		final Dict<Object, Object> map = dict("Aa", 1);
 		map.put("BB", 2);
 		map.remove("Aa");

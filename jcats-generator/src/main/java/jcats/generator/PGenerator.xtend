@@ -250,6 +250,13 @@ class PGenerator implements ClassGenerator {
 				«ENDIF»
 				return new «diamondName»(a1, a2);
 			}
+
+			/**
+			 * Synonym for {@link #«shortName.firstToLowerCase»}
+			 */
+			public static «paramGenericName» of(final «type1Name» a1, final «type2Name» a2) {
+				return «shortName.firstToLowerCase»(a1, a2);
+			}
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 
 				«cast(#["A1", "A2"], #[], #["A1", "A2"])»
