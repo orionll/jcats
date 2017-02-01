@@ -1,14 +1,11 @@
 package jcats.collection;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import jcats.P;
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import static jcats.Option.none;
@@ -233,5 +230,21 @@ public class TestDict {
 	@Test(expected = NullPointerException.class)
 	public void nullKey() {
 		dict(null, 1);
+	}
+
+	@Test
+	public void random() {
+		final Random random = new Random();
+		final int size = random.nextInt(1000);
+		Dict<Integer, Integer> dict = emptyDict();
+		for (int i = 0; i < size; i++) {
+			dict = dict.put(i, i);
+			assertEquals(i + 1, dict.size());
+		}
+		for (int i = 0; i < size; i++) {
+			dict = dict.remove(i);
+			assertEquals(size - i - 1, dict.size());
+		}
+		assertTrue(dict.isEmpty());
 	}
 }

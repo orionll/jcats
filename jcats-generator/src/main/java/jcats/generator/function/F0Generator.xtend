@@ -27,10 +27,6 @@ final class F0Generator implements InterfaceGenerator {
 		}
 	}
 
-	def typeName() {
-		if (type == Type.OBJECT) "A" else type.javaName
-	}
-
 	override sourceCode() { '''
 		package «Constants.FUNCTION»;
 
@@ -49,7 +45,7 @@ final class F0Generator implements InterfaceGenerator {
 
 		@FunctionalInterface
 		public interface «shortName»«if (type == Type.OBJECT) "<A>" else ""» {
-			«typeName» apply();
+			«type.genericName» apply();
 
 			«IF type == Type.OBJECT»
 				default <B> F0<B> map(final F<A, B> f) {
@@ -63,7 +59,7 @@ final class F0Generator implements InterfaceGenerator {
 				default <A> F0<A> map(final «type.typeName»ObjectF<A> f) {
 					requireNonNull(f);
 					return () -> {
-						final «typeName» value = apply();
+						final «type.genericName» value = apply();
 						return requireNonNull(f.apply(value));
 					};
 				}
@@ -85,7 +81,7 @@ final class F0Generator implements InterfaceGenerator {
 					default «primitive.typeName»F0 mapTo«primitive.typeName»(final «type.typeName»«primitive.typeName»F f) {
 						requireNonNull(f);
 						return () -> {
-							final «typeName» value = apply();
+							final «type.genericName» value = apply();
 							return f.apply(value);
 						};
 					}
@@ -104,7 +100,7 @@ final class F0Generator implements InterfaceGenerator {
 				default <A> F0<A> flatMap(final «type.typeName»ObjectF<F0<A>> f) {
 					requireNonNull(f);
 					return () -> {
-						final «typeName» value = apply();
+						final «type.genericName» value = apply();
 						return requireNonNull(f.apply(value).apply());
 					};
 				}
@@ -149,7 +145,7 @@ final class F0Generator implements InterfaceGenerator {
 					return () -> requireNonNull(apply());
 				}
 			«ELSE»
-				default «type.javaPrefix»Supplier toSupplier() {
+				default «type.javaPrefix»Supplier to«type.javaPrefix»Supplier() {
 					return this::apply;
 				}
 			«ENDIF»
@@ -159,9 +155,23 @@ final class F0Generator implements InterfaceGenerator {
 					requireNonNull(a);
 					return () -> a;
 				}
+
+				/**
+				 * Synonym for {@link #value}
+				 */
+				static <A> F0<A> of(final A a) {
+					return value(a);
+				}
 			«ELSE»
-				static «shortName» value(final «typeName» value) {
+				static «shortName» «type.typeName.firstToLowerCase»Value(final «type.genericName» value) {
 					return () -> value;
+				}
+
+				/**
+				 * Synonym for {@link #«type.typeName.firstToLowerCase»Value}
+				 */
+				static «shortName» of(final «type.genericName» value) {
+					return «type.typeName.firstToLowerCase»Value(value);
 				}
 			«ENDIF»
 
@@ -175,29 +185,15 @@ final class F0Generator implements InterfaceGenerator {
 			«ENDIF»
 
 			«IF type == Type.OBJECT»
-				static <A> F0<A> supplierToF0(final Supplier<A> s) {
+				static <A> F0<A> fromSupplier(final Supplier<A> s) {
 					requireNonNull(s);
 					return () -> requireNonNull(s.get());
 				}
 
-				/**
-				 * Synonym for {@link #supplierToF0}
-				 */
-				static <A> F0<A> fromSupplier(final Supplier<A> s) {
-					return supplierToF0(s);
-				}
-				
 			«ELSE»
-				static «shortName» «type.javaPrefix.firstToLowerCase»SupplierToF0(final «type.javaPrefix»Supplier s) {
+				static «shortName» from«type.javaPrefix»Supplier(final «type.javaPrefix»Supplier s) {
 					requireNonNull(s);
 					return s::getAs«type.javaPrefix»;
-				}
-
-				/**
-				 * Synonym for {@link #«type.javaPrefix.firstToLowerCase»SupplierToF0}
-				 */
-				static «shortName» from«type.javaPrefix»Supplier(final «type.javaPrefix»Supplier s) {
-					return «type.javaPrefix.firstToLowerCase»SupplierToF0(s);
 				}
 			«ENDIF»
 			«IF type == Type.OBJECT»

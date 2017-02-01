@@ -14,7 +14,6 @@ final class EitherGenerator implements ClassGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.F».id;
-		import static «Constants.OPTION».nullableToOption;
 
 		public final class Either<X, A> implements Equatable<Either<X, A>>, Serializable {
 			private final X left;
@@ -112,7 +111,7 @@ final class EitherGenerator implements ClassGenerator {
 			}
 
 			public Option<A> toOption() {
-				return nullableToOption(right);
+				return Option.fromNullable(right);
 			}
 
 			@Override

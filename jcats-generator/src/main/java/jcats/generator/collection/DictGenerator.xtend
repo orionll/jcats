@@ -27,7 +27,6 @@ class DictGenerator implements ClassGenerator {
 		import java.util.function.Consumer;
 
 		import static java.util.Objects.requireNonNull;
-		import static «Constants.OPTION».nullableToOption;
 		import static «Constants.P».p;
 		import static jcats.collection.Common.iterableToString;
 
@@ -97,7 +96,7 @@ class DictGenerator implements ClassGenerator {
 
 			@Override
 			public Option<A> get(final K key) {
-				return nullableToOption(getOrNull(key));
+				return Option.fromNullable(getOrNull(key));
 			}
 
 			public A getOrNull(final K key) {

@@ -414,19 +414,19 @@ final class FGenerator implements InterfaceGenerator {
 			«ENDIF»
 
 			«IF from == Type.OBJECT && to == Type.OBJECT»
-				static <A, B> F<A, B> f0ToConstF(final F0<B> b) {
+				static <A, B> F<A, B> fromF0(final F0<B> b) {
 					return b.toConstF();
 				}
 			«ELSEIF from == Type.OBJECT»
-				static <A> «shortName»<A> f0ToConstF(final «to.typeName»F0 f) {
+				static <A> «shortName»<A> from«to.typeName»F0(final «to.typeName»F0 f) {
 					return f.toConstF();
 				}
 			«ELSEIF to == Type.OBJECT»
-				static <A> «shortName»<A> f0ToConstF(final F0<A> a) {
+				static <A> «shortName»<A> fromF0(final F0<A> a) {
 					return a.toConst«shortName»();
 				}
 			«ELSE»
-				static «shortName» f0ToConstF(final «to.typeName»F0 f) {
+				static «shortName» from«to.typeName»F0(final «to.typeName»F0 f) {
 					return f.toConst«shortName»();
 				}
 			«ENDIF»
@@ -451,7 +451,7 @@ final class FGenerator implements InterfaceGenerator {
 			«ENDIF»
 
 			«IF from == Type.OBJECT && to == Type.OBJECT»
-				static <A, B> F<A, B> functionToF(final Function<A, B> f) {
+				static <A, B> F<A, B> fromFunction(final Function<A, B> f) {
 					requireNonNull(f);
 					return a -> {
 						requireNonNull(a);
@@ -460,56 +460,56 @@ final class FGenerator implements InterfaceGenerator {
 				}
 
 			«ELSEIF from != Type.BOOL && to == Type.OBJECT»
-				static <A> «shortName»<A> «from.typeName.firstToLowerCase»FunctionToF(final «from.javaPrefix»Function<A> f) {
+				static <A> «shortName»<A> from«from.javaPrefix»Function(final «from.javaPrefix»Function<A> f) {
 					requireNonNull(f);
 					return value -> requireNonNull(f.apply(value));
 				}
 
 			«ELSEIF from == Type.BOOL && to == Type.OBJECT»
-				static <A> «shortName»<A> boolFunctionToF(final Function<Boolean, A> f) {
+				static <A> «shortName»<A> fromFunction(final Function<Boolean, A> f) {
 					requireNonNull(f);
 					return value -> requireNonNull(f.apply(value));
 				}
 
 			«ELSEIF from == Type.OBJECT && to != Type.BOOL»
-				static <A> «shortName»<A> to«to.typeName»FunctionToF(final To«to.javaPrefix»Function<A> f) {
+				static <A> «shortName»<A> fromTo«to.javaPrefix»Function(final To«to.javaPrefix»Function<A> f) {
 					requireNonNull(f);
 					return a -> f.applyAs«to.typeName»(requireNonNull(a));
 				}
 
 			«ELSEIF from == Type.OBJECT && to == Type.BOOL»
-				static <A> «shortName»<A> predicateToF(final Predicate<A> p) {
+				static <A> «shortName»<A> fromPredicate(final Predicate<A> p) {
 					requireNonNull(p);
 					return a -> p.test(requireNonNull(a));
 				}
 
 			«ELSEIF from == to && to != Type.BOOL»
-				static «shortName» «from.typeName.firstToLowerCase»UnaryOperatorToF(final «from.typeName»UnaryOperator op) {
+				static «shortName» from«from.javaPrefix»UnaryOperator(final «from.javaPrefix»UnaryOperator op) {
 					requireNonNull(op);
 					return op::applyAs«from.typeName»;
 				}
 			«ELSEIF from == Type.BOOL && to == Type.BOOL»
-				static «shortName» boolUnaryOperatorToF(final UnaryOperator<Boolean> op) {
+				static «shortName» fromUnaryOperator(final UnaryOperator<Boolean> op) {
 					requireNonNull(op);
 					return op::apply;
 				}
 
-				static «shortName» boolPredicateToF(final Predicate<Boolean> p) {
+				static «shortName» fromPredicate(final Predicate<Boolean> p) {
 					requireNonNull(p);
 					return p::test;
 				}
 			«ELSEIF to == Type.BOOL»
-				static «shortName» «from.typeName.firstToLowerCase»PredicateToF(final «from.javaPrefix»Predicate p) {
+				static «shortName» from«from.javaPrefix»Predicate(final «from.javaPrefix»Predicate p) {
 					requireNonNull(p);
 					return p::test;
 				}
 			«ELSEIF from != Type.BOOL && to != Type.BOOL»
-				static «shortName» «from.typeName.firstToLowerCase»To«to.typeName»FunctionToF(final «from.javaPrefix»To«to.javaPrefix»Function f) {
+				static «shortName» from«from.javaPrefix»To«to.javaPrefix»Function(final «from.javaPrefix»To«to.javaPrefix»Function f) {
 					requireNonNull(f);
 					return f::applyAs«to.typeName»;
 				}
 			«ELSEIF from == Type.BOOL»
-				static «shortName» boolTo«to.typeName»FunctionToF(final To«to.javaPrefix»Function<Boolean> f) {
+				static «shortName» fromTo«to.javaPrefix»Function(final To«to.javaPrefix»Function<Boolean> f) {
 					requireNonNull(f);
 					return f::applyAs«to.typeName»;
 				}

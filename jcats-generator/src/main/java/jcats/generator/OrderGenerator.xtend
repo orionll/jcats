@@ -38,21 +38,14 @@ final class OrderGenerator implements ClassGenerator {
 				return ordinal() - 1 ;
 			}
 
-			public static Order intToOrder(final int cmp) {
-				return (cmp == 0) ? EQ : (cmp > 0) ? GT : LT;
-			}
-
-			/**
-			 * Synonym for {@link #intToOrder}
-			 */
 			public static Order fromInt(final int cmp) {
-				return intToOrder(cmp);
+				return (cmp == 0) ? EQ : (cmp > 0) ? GT : LT;
 			}
 
 			static final Ord ORD = (Ord<Comparable>) (Comparable x, Comparable y) -> {
 				requireNonNull(x);
 				requireNonNull(y);
-				return intToOrder(x.compareTo(y));
+				return fromInt(x.compareTo(y));
 			};
 		}
 	''' }

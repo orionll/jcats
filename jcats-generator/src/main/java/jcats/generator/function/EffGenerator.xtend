@@ -73,7 +73,7 @@ final class EffGenerator implements InterfaceGenerator {
 					return (A a) -> apply(requireNonNull(a));
 				}
 			«ELSEIF type != Type.BOOL»
-				default «type.typeName»Consumer toConsumer() {
+				default «type.typeName»Consumer to«type.typeName»Consumer() {
 					return this::apply;
 				}
 			«ELSE»
@@ -83,18 +83,18 @@ final class EffGenerator implements InterfaceGenerator {
 			«ENDIF»
 
 			«IF type == Type.OBJECT»
-				static <A> Eff<A> consumerToEff(final Consumer<A> c) {
+				static <A> Eff<A> fromConsumer(final Consumer<A> c) {
 					requireNonNull(c);
 					return (A a) -> c.accept(requireNonNull(a));
 				}
 
 			«ELSEIF type != Type.BOOL»
-				default «shortName» «type.typeName.firstToLowerCase»ConsumerToEff(final «type.typeName»Consumer c) {
+				default «shortName» from«type.javaPrefix»Consumer(final «type.typeName»Consumer c) {
 					requireNonNull(c);
 					return c::accept;
 				}
 			«ELSE»
-				static «shortName» consumerToEff(final Consumer<Boolean> c) {
+				static «shortName» fromConsumer(final Consumer<Boolean> c) {
 					requireNonNull(c);
 					return c::accept;
 				}

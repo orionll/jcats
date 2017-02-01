@@ -1,9 +1,5 @@
 package jcats.collection;
 
-import static jcats.collection.Seq.emptySeq;
-import static jcats.collection.Seq.iterableToSeq;
-import static org.junit.Assert.*;
-
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
@@ -14,6 +10,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import static jcats.collection.Seq.emptySeq;
+import static org.junit.Assert.*;
 
 public class TestSeq {
 
@@ -59,7 +58,7 @@ public class TestSeq {
 	private static <A> void assertSeqsDeepEqual(final String msg, final Seq<A> expectedSeq, final Seq<A> seq) {
 		try {
 			if (expectedSeq instanceof Seq0<?>) {
-				assertTrue(Seq.emptySeq() == seq);
+				assertTrue(emptySeq() == seq);
 			} else if (expectedSeq instanceof Seq1<?>) {
 				assertArrayEquals(msg, ((Seq1<?>) expectedSeq).node1, ((Seq1<?>) seq).node1);
 			} else if (expectedSeq instanceof Seq2<?>) {
@@ -302,7 +301,7 @@ public class TestSeq {
 
 		for (int i = 0; i < MAX; i++) {
 			if (isTestIndex(i)) {
-				final Seq<Integer> seq = iterableToSeq(list);
+				final Seq<Integer> seq = Seq.fromIterable(list);
 				assertEquals(list.size(), Iterables.size(seq));
 				assertEquals(list.size(), seq.size());
 				assertTrue("Elements not equal for size = " + list.size(), Iterables.elementsEqual(list, seq));
@@ -313,7 +312,7 @@ public class TestSeq {
 
 	@Test
 	public void testInit() {
-		Seq<Integer> seq = Seq.emptySeq();
+		Seq<Integer> seq = emptySeq();
 		for (int i = 0; i < MAX; i++) {
 			if (i == 40) {
 				seq = seq.prepend(-1);
@@ -329,7 +328,7 @@ public class TestSeq {
 			seq = newSeq;
 		}
 
-		seq = Seq.emptySeq();
+		seq = emptySeq();
 		for (int i = 0; i < MAX; i++) {
 			final Seq<Integer> newSeq = seq.append(i % 61);
 			if (isTestIndex(i)) {
@@ -342,7 +341,7 @@ public class TestSeq {
 
 	@Test
 	public void testTail() {
-		Seq<Integer> seq = Seq.emptySeq();
+		Seq<Integer> seq = emptySeq();
 		for (int i = 0; i < MAX; i++) {
 			if (i == 40) {
 				seq = seq.append(-1);
@@ -355,7 +354,7 @@ public class TestSeq {
 			seq = newSeq;
 		}
 
-		seq = Seq.emptySeq();
+		seq = emptySeq();
 		for (int i = 0; i < MAX; i++) {
 			final Seq<Integer> newSeq = seq.prepend(i % 61);
 			if (isTestIndex(i)) {
@@ -390,7 +389,7 @@ public class TestSeq {
 
 	@Test
 	public void testConcat() {
-		Seq<Integer> seq = Seq.emptySeq();
+		Seq<Integer> seq = emptySeq();
 		for (int i = 0; i < MAX; i++) {
 			if (i == 40) {
 				seq = seq.prepend(-1);
@@ -409,7 +408,7 @@ public class TestSeq {
 			seq = seq.append(i % 61);
 		}
 
-		seq = Seq.emptySeq();
+		seq = emptySeq();
 		for (int i = 0; i < MAX; i++) {
 			if (isTestIndex(i)) {
 				Seq<Integer> concat = seq.concat(Seq.seq(-1));
@@ -444,7 +443,7 @@ public class TestSeq {
 
 	private static Seq<Integer> randomSeq(final Random random, final int minSize, final int maxSize) {
 		final int size = randInt(random, minSize, maxSize);
-		Seq<Integer> seq = Seq.emptySeq();
+		Seq<Integer> seq = emptySeq();
 		for (int i = 0; i < size; i++) {
 			if (random.nextBoolean()) {
 				seq = seq.prepend(random.nextInt() % 63);

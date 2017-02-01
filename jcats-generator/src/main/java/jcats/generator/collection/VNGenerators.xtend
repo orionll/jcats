@@ -238,15 +238,8 @@ final class VNGenerators {
 						return v«arity»(«(1 .. arity).map["a" + it].join(", ")»);
 					}
 
-					public static <A> V«arity»<A> p«if (arity == 2) "" else arity»ToV«arity»(final «PNGenerators.shortName(arity)»<«(1 .. arity).map["A"].join(", ")»> p«arity») {
-						return new V«arity»<>(«(1 .. arity).map["p" + arity + ".get" + it + "()"].join(", ")»);
-					}
-
-					/**
-					 * Synonym for {@link #p«if (arity == 2) "" else arity»ToV«arity»}
-					 */
 					public static <A> V«arity»<A> fromP«if (arity == 2) "" else arity»(final «PNGenerators.shortName(arity)»<«(1 .. arity).map["A"].join(", ")»> p«arity») {
-						return p«if (arity == 2) "" else arity»ToV«arity»(p«arity»);
+						return new V«arity»<>(«(1 .. arity).map["p" + arity + ".get" + it + "()"].join(", ")»);
 					}
 
 					«zipN(false)»

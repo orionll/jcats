@@ -727,7 +727,7 @@ final class SeqGenerator implements ClassGenerator {
 				return tail;
 			}
 
-			public static «paramGenericName» iterableTo«shortName»(final Iterable<«type.genericBoxedName»> iterable) {
+			public static «paramGenericName» fromIterable(final Iterable<«type.genericBoxedName»> iterable) {
 				requireNonNull(iterable);
 				if (iterable instanceof «wildcardName») {
 					return («genericName») iterable;
@@ -747,13 +747,6 @@ final class SeqGenerator implements ClassGenerator {
 						return empty«shortName»();
 					}
 				}
-			}
-
-			/**
-			 * Synonym for {@link #iterableTo«shortName»}
-			 */
-			public static «paramGenericName» fromIterable(final Iterable<«type.genericBoxedName»> iterable) {
-				return iterableTo«shortName»(iterable);
 			}
 
 			static «paramGenericName» sizedToSeq(final «type.iteratorGenericName» iterator, final int size) {
@@ -1270,14 +1263,12 @@ final class SeqGenerator implements ClassGenerator {
 
 			«ENDIF»
 			«IF type == Type.OBJECT»
-				public static <A> SeqBuilder<A> seqBuilder() {
-					return new SeqBuilder<>();
-				}
+				public static <A> SeqBuilder<A> builder() {
 			«ELSE»
-				public static «seqBuilderName» «seqBuilderName.firstToLowerCase»() {
-					return new «seqBuilderDiamondName»();
-				}
+				public static «seqBuilderName» builder() {
 			«ENDIF»
+				return new «seqBuilderDiamondName»();
+			}
 		}
 
 		«seq0SourceCode»

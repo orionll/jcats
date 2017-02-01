@@ -278,15 +278,8 @@ final class StackGenerator implements ClassGenerator {
 				return stack(values);
 			}
 
-			public static <A> Stack<A> iterableToStack(final Iterable<A> values) {
-				return new StackBuilder<A>().appendAll(values).build();
-			}
-
-			/**
-			 * Synonym for {@link #iterableToStack}
-			 */
 			public static <A> Stack<A> fromIterable(final Iterable<A> values) {
-				return iterableToStack(values);
+				return new StackBuilder<A>().appendAll(values).build();
 			}
 
 			«join»
@@ -393,7 +386,7 @@ final class StackGenerator implements ClassGenerator {
 			''']»
 			«cast(#["A"], #[], #["A"])»
 
-			public static <A> StackBuilder<A> stackBuilder() {
+			public static <A> StackBuilder<A> builder() {
 				return new StackBuilder<>();
 			}
 		}

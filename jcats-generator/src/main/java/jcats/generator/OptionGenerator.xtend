@@ -130,26 +130,12 @@ final class OptionGenerator implements ClassGenerator {
 				return new Option<>(value);
 			}
 
-			public static <A> Option<A> nullableToOption(final A value) {
+			public static <A> Option<A> fromNullable(final A value) {
 				return (value == null) ? none() : new Option<>(value);
 			}
 
-			/**
-			 * Synonym for {@link #nullableToOption}
-			 */
-			public static <A> Option<A> fromNullable(final A value) {
-				return nullableToOption(value);
-			}
-
-			public static <A> Option<A> optionalToOption(final Optional<A> optional) {
-				return optional.isPresent() ? some(optional.get()) : none();
-			}
-
-			/**
-			 * Synonym for {@link #optionalToOption}
-			 */
 			public static <A> Option<A> fromOptional(final Optional<A> optional) {
-				return optionalToOption(optional);
+				return optional.isPresent() ? some(optional.get()) : none();
 			}
 
 			«productN»

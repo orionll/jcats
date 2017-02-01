@@ -525,7 +525,7 @@ final class ArrayGenerator implements ClassGenerator {
 				return new «diamondName»(array);
 			}
 
-			public static «paramGenericName» iterableTo«shortName»(final Iterable<«type.genericBoxedName»> iterable) {
+			public static «paramGenericName» fromIterable(final Iterable<«type.genericBoxedName»> iterable) {
 				requireNonNull(iterable);
 				if (iterable instanceof «shortName») {
 					return («genericName») iterable;
@@ -546,13 +546,6 @@ final class ArrayGenerator implements ClassGenerator {
 						return empty«shortName»();
 					}
 				}
-			}
-
-			/**
-			 * Synonym for {@link #iterableTo«shortName»}
-			 */
-			public static «paramGenericName» fromIterable(final Iterable<«type.genericBoxedName»> iterable) {
-				return iterableTo«shortName»(iterable);
 			}
 
 			«IF type == Type.OBJECT»
@@ -671,11 +664,11 @@ final class ArrayGenerator implements ClassGenerator {
 			«cast(#["A"], #[], #["A"])»
 
 			«ENDIF»
-			public static «IF type == Type.OBJECT»<A> «ENDIF»«arrayBuilderName» «shortName.firstToLowerCase»Builder() {
+			public static «IF type == Type.OBJECT»<A> «ENDIF»«arrayBuilderName» builder() {
 				return new «arrayBuilderDiamondName»();
 			}
 
-			public static «IF type == Type.OBJECT»<A> «ENDIF»«arrayBuilderName» «shortName.firstToLowerCase»WithCapacity(final int initialCapacity) {
+			public static «IF type == Type.OBJECT»<A> «ENDIF»«arrayBuilderName» builderWithCapacity(final int initialCapacity) {
 				return new «arrayBuilderDiamondName»(initialCapacity);
 			}
 		}
