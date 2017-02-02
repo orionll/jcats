@@ -5,7 +5,6 @@ import jcats.generator.ClassGenerator
 import jcats.generator.Constants
 import jcats.generator.Generator
 import jcats.generator.PNGenerators
-import jcats.generator.Type
 
 final class VNGenerators {
 	def static List<Generator> generators() {
@@ -49,7 +48,7 @@ final class VNGenerators {
 					import static «Constants.P»«arity».p«arity»;
 				«ENDIF»
 
-				public final class V«arity»<A> implements Iterable<A>, Equatable<V«arity»<A>>, Sized, Indexed<A>, Serializable {
+				public final class V«arity»<A> implements Container<A>, Equatable<V«arity»<A>>, Indexed<A>, Serializable {
 					private final A «(1 .. arity).map["a" + it].join(", ")»;
 
 					private V«arity»(«(1 .. arity).map["final A a" + it].join(", ")») {
@@ -206,10 +205,6 @@ final class VNGenerators {
 					public Spliterator<A> spliterator() {
 						return Spliterators.spliterator(iterator(), «arity», Spliterator.ORDERED | Spliterator.IMMUTABLE);
 					}
-
-					«stream(Type.OBJECT)»
-
-					«parallelStream(Type.OBJECT)»
 
 					«zip(false)»
 

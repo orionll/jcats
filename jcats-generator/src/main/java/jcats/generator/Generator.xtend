@@ -62,18 +62,6 @@ interface Generator {
 		«ENDIF»
 	'''}
 
-	def static String stream(Type type) { '''
-		public «type.streamGenericName» stream() {
-			return StreamSupport.«type.streamFunction»(spliterator(), false);
-		}
-	''' }
-
-	def static String parallelStream(Type type) { '''
-		public «type.streamGenericName» parallelStream() {
-			return StreamSupport.«type.streamFunction»(spliterator(), true);
-		}
-	'''}
-
 	def toStr() { return toStr(Type.OBJECT) }
 
 	def toStr(Type type) { '''

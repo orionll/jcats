@@ -54,6 +54,30 @@ public enum Type {
 		return (this == OBJECT) ? "(A) " : "";
 	}
 
+	public String effShortName() {
+		if (this == Type.OBJECT) {
+			return "Eff";
+		} else {
+			return typeName() + "Eff";
+		}
+	}
+
+	public String effGenericName() {
+		if (this == Type.OBJECT) {
+			return "Eff<A>";
+		} else {
+			return typeName() + "Eff";
+		}
+	}
+
+	public String containerGenericName() {
+		if (this == Type.OBJECT) {
+			return "Container<A>";
+		} else {
+			return typeName() + "Container";
+		}
+	}
+
 	public String iteratorGenericName() {
 		if (this == Type.OBJECT) {
 			return "Iterator<A>";
@@ -64,6 +88,16 @@ public enum Type {
 		}
 	}
 
+	public String spliteratorGenericName() {
+		if (this == Type.OBJECT) {
+			return "Spliterator<A>";
+		} else if (this == Type.BOOL) {
+			return "Spliterator<Boolean>";
+		} else {
+			return "Spliterator.Of" + javaPrefix();
+		}
+	}
+
 	public String streamGenericName() {
 		if (this == Type.OBJECT) {
 			return "Stream<A>";
@@ -71,6 +105,14 @@ public enum Type {
 			return "Stream<Boolean>";
 		} else {
 			return javaPrefix() + "Stream";
+		}
+	}
+
+	public String streamName() {
+		if (Type.javaUnboxedTypes().contains(this)) {
+			return javaPrefix() + "Stream";
+		} else {
+			return "Stream";
 		}
 	}
 

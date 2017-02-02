@@ -103,7 +103,7 @@ final class SeqGenerator implements ClassGenerator {
 		import static «Constants.COMMON».iterableHashCode;
 
 
-		public abstract class «genericName» implements Iterable<«type.genericBoxedName»>, Equatable<«genericName»>, Sized, «IF type == Type.OBJECT»Indexed<A>«ELSE»«type.typeName»Indexed«ENDIF», Serializable {
+		public abstract class «genericName» implements «type.containerGenericName», Equatable<«genericName»>, «IF type == Type.OBJECT»Indexed<A>«ELSE»«type.typeName»Indexed«ENDIF», Serializable {
 			private static final «shortName» EMPTY = new «shortName»0();
 
 			static final «type.javaName»[][] EMPTY_NODE2 = new «type.javaName»[0][];
@@ -1174,10 +1174,6 @@ final class SeqGenerator implements ClassGenerator {
 
 			«ENDIF»
 			«spliterator(type)»
-
-			«stream(type)»
-
-			«parallelStream(type)»
 
 			«hashcode(type.genericBoxedName)»
 

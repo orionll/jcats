@@ -24,7 +24,6 @@ final class ArrayGenerator implements ClassGenerator {
 	def paramGenericName() { if (type == Type.OBJECT) "<A> Array<A>" else shortName }
 	def arrayBuilderName() { if (type == Type.OBJECT) "ArrayBuilder<A>" else shortName + "Builder" }
 	def arrayBuilderDiamondName() { if (type == Type.OBJECT) "ArrayBuilder<>" else shortName + "Builder" }
-	def fListGenericName() { if (type == Type.OBJECT) "FList<A>" else type.typeName + "FList" }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -53,6 +52,7 @@ final class ArrayGenerator implements ClassGenerator {
 		«ENDIF»
 		import java.util.stream.StreamSupport;
 
+		import «Constants.FUNCTION».«type.effShortName»;
 		import «Constants.F»;
 		«IF type == Type.OBJECT»
 			import «Constants.F0»;
@@ -92,18 +92,13 @@ final class ArrayGenerator implements ClassGenerator {
 		«FOR toType : Type.primitives.filter[it != type]»
 			import static «Constants.COLLECTION».«toType.typeName»Array.empty«toType.typeName»Array;
 		«ENDFOR»
-		«IF type == Type.OBJECT»
-			import static «Constants.FLIST».emptyFList;
-		«ELSE»
-			import static «Constants.COLLECTION».«type.typeName»FList.empty«type.typeName»FList;
-		«ENDIF»
 		import static «Constants.F».id;
 		import static «Constants.P».p;
 		import static «Constants.COMMON».iterableToString;
 		import static «Constants.COMMON».iterableHashCode;
 
 
-		public final class «genericName» implements Iterable<«type.genericBoxedName»>, Equatable<«genericName»>, Sized, «IF type == Type.OBJECT»Indexed<A>«ELSE»«type.typeName»Indexed«ENDIF», Serializable {
+		public final class «genericName» implements «type.containerGenericName», Equatable<«genericName»>, «IF type == Type.OBJECT»Indexed<A>«ELSE»«type.typeName»Indexed«ENDIF», Serializable {
 			static final «shortName» EMPTY = new «shortName»(new «type.javaName»[0]);
 
 			final «type.javaName»[] array;
@@ -387,6 +382,7 @@ final class ArrayGenerator implements ClassGenerator {
 
 			«takeWhile(false, type)»
 
+			@Override
 			public boolean contains(final «type.genericName» value) {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
@@ -401,6 +397,14 @@ final class ArrayGenerator implements ClassGenerator {
 					}
 				}
 				return false;
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				requireNonNull(eff);
+				for (final «type.javaName» value : array) {
+					eff.apply(«type.genericCast»value);
+				}
 			}
 
 			«IF type == Type.OBJECT»
@@ -575,10 +579,6 @@ final class ArrayGenerator implements ClassGenerator {
 					return Spliterators.spliterator(«IF type == Type.BOOL»new BoolArrayIterator(array), size()«ELSE»array«ENDIF», Spliterator.ORDERED | Spliterator.IMMUTABLE);
 				}
 			}
-
-			«stream(type)»
-
-			«parallelStream(type)»
 
 			@Override
 			public int hashCode() {

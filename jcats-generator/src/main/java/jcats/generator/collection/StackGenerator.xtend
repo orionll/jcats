@@ -2,7 +2,6 @@ package jcats.generator.collection
 
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
-import jcats.generator.Type
 
 final class StackGenerator implements ClassGenerator {
 	override className() { Constants.STACK }
@@ -43,7 +42,7 @@ final class StackGenerator implements ClassGenerator {
 		import static «Constants.COMMON».iterableHashCode;
 
 
-		public final class Stack<A> implements Iterable<A>, Equatable<Stack<A>>, Serializable {
+		public final class Stack<A> implements Container<A>, Equatable<Stack<A>>, Serializable {
 			private static final Stack NIL = new Stack(null, null);
 
 			final A head;
@@ -57,6 +56,7 @@ final class StackGenerator implements ClassGenerator {
 			/**
 			 * O(size)
 			 */
+			@Override
 			public int size() {
 				int len = 0;
 				Stack<A> stack = this;
@@ -73,6 +73,7 @@ final class StackGenerator implements ClassGenerator {
 			/**
 			 * O(1)
 			 */
+			@Override
 			public boolean isEmpty() {
 				return (this == NIL);
 			}
@@ -80,6 +81,7 @@ final class StackGenerator implements ClassGenerator {
 			/**
 			 * O(1)
 			 */
+			@Override
 			public boolean isNotEmpty() {
 				return (this != NIL);
 			}
@@ -293,10 +295,6 @@ final class StackGenerator implements ClassGenerator {
 			public Spliterator<A> spliterator() {
 				return isEmpty() ? emptySpliterator() : spliteratorUnknownSize(iterator(),  Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
-
-			«stream(Type.OBJECT)»
-
-			«parallelStream(Type.OBJECT)»
 
 			«hashcode»
 
