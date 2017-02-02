@@ -213,7 +213,7 @@ public class TestDict {
 		final Dict<String, Integer> dict = dict5("a", 1, "b", 2, "c", 3, "Aa", 4, "BB", 5);
 		final Set<String> keys = Sets.newHashSet();
 		final Set<Integer> values = Sets.newHashSet();
-		dict.traverse((key, value) -> {
+		dict.foreach((key, value) -> {
 			keys.add(key);
 			values.add(value);
 		});

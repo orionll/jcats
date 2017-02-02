@@ -40,7 +40,7 @@ interface Generator {
 				if (isEmpty()) {
 					return Spliterators.emptySpliterator();
 				} else {
-					return Spliterators.spliterator(iterator(), size(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
+					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 				}
 			}
 		«ELSEIF type == Type.BOOL»
@@ -48,7 +48,7 @@ interface Generator {
 				if (isEmpty()) {
 					return Spliterators.emptySpliterator();
 				} else {
-					return Spliterators.spliterator(iterator(), size(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
+					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 				}
 			}
 		«ELSE»

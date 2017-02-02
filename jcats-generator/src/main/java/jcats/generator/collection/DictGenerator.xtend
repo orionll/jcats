@@ -15,7 +15,6 @@ class DictGenerator implements ClassGenerator {
 		import «Constants.EFF»2;
 		import «Constants.EQUATABLE»;
 		import «Constants.F»;
-		import «Constants.KEY_VALUE»;
 		import «Constants.OPTION»;
 		import «Constants.P»;
 		import «Constants.SIZED»;
@@ -24,6 +23,8 @@ class DictGenerator implements ClassGenerator {
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
 		import java.util.Objects;
+		import java.util.Spliterator;
+		import java.util.Spliterators;
 		import java.util.function.Consumer;
 
 		import static java.util.Objects.requireNonNull;
@@ -31,7 +32,7 @@ class DictGenerator implements ClassGenerator {
 		import static jcats.collection.Common.iterableToString;
 
 
-		public final class Dict<K, A> implements KeyValue<K, A>, Iterable<P<K, A>>, Equatable<Dict<K, A>>, Sized, Serializable {
+		public final class Dict<K, A> implements KeyValue<K, A>, Equatable<Dict<K, A>>, Serializable {
 
 			private static final Dict EMPTY = new Dict(0, 0, Array.EMPTY.array, 0);
 
@@ -359,11 +360,6 @@ class DictGenerator implements ClassGenerator {
 				return new DictIterator<>(leafMap, treeMap, slots);
 			}
 
-			public void traverse(final Eff2<K, A> f) {
-				requireNonNull(f);
-				forEach(entry -> f.apply(entry.get1(), entry.get2()));
-			}
-
 			@Override
 			public void forEach(final Consumer<? super P<K, A>> action) {
 				requireNonNull(action);
@@ -379,6 +375,15 @@ class DictGenerator implements ClassGenerator {
 					}
 					treeMap >>>= 1;
 					leafMap >>>= 1;
+				}
+			}
+
+			@Override
+			public Spliterator<P<K, A>> spliterator() {
+				if (isEmpty()) {
+					return Spliterators.emptySpliterator();
+				} else {
+					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE);
 				}
 			}
 

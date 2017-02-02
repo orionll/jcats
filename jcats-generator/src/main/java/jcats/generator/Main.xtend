@@ -24,6 +24,7 @@ import static extension java.nio.file.Files.*
 import java.util.Arrays
 import jcats.generator.collection.DictGenerator
 import jcats.generator.collection.ContainerGenerator
+import jcats.generator.collection.KeyValueGenerator
 
 class Main {
 	def static void main(String[] args) {
@@ -50,7 +51,7 @@ class Main {
 		for (generator : allGenerators) {
 			val srcFile = generator.className.replace('.', '/') + ".java"
 			val srcFilePath = new File(srcDir, srcFile).toPath
-			println('''Generating «srcFilePath.fileName»''')
+			println('''Generating «srcFile»''')
 			srcFilePath.parent.createDirectories
 			val sourceCode = generator.sourceCode
 			validate(sourceCode, srcFilePath.fileName)

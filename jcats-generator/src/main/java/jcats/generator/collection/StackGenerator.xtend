@@ -293,7 +293,7 @@ final class StackGenerator implements ClassGenerator {
 
 			@Override
 			public Spliterator<A> spliterator() {
-				return isEmpty() ? emptySpliterator() : spliteratorUnknownSize(iterator(),  Spliterator.ORDERED | Spliterator.IMMUTABLE);
+				return isEmpty() ? emptySpliterator() : spliteratorUnknownSize(iterator(), Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 
 			«hashcode»
