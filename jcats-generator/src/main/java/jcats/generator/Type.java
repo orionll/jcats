@@ -42,6 +42,18 @@ public enum Type {
 		return (this == OBJECT) ? "A" : javaName();
 	}
 
+	public String genericName(String clazz) {
+		return (this == OBJECT) ? clazz + "<A>" : typeName() + clazz;
+	}
+
+	public String shortName(String clazz) {
+		return (this == OBJECT) ? clazz : typeName() + clazz;
+	}
+
+	public String diamondName(String clazz) {
+		return (this == OBJECT) ? clazz + "<>" : typeName() + clazz;
+	}
+
 	public String genericBoxedName() {
 		return (this == OBJECT) ? "A" : boxedName();
 	}
@@ -54,28 +66,48 @@ public enum Type {
 		return (this == OBJECT) ? "(A) " : "";
 	}
 
+	public String arrayShortName() {
+		return shortName("Array");
+	}
+
+	public String arrayGenericName() {
+		return genericName("Array");
+	}
+
+	public String seqShortName() {
+		return shortName("Seq");
+	}
+	
+	public String seqGenericName() {
+		return genericName("Seq");
+	}
+
+	public String seqBuilderGenericName() {
+		return genericName("SeqBuilder");
+	}
+
 	public String effShortName() {
-		if (this == Type.OBJECT) {
-			return "Eff";
-		} else {
-			return typeName() + "Eff";
-		}
+		return shortName("Eff");
 	}
 
 	public String effGenericName() {
-		if (this == Type.OBJECT) {
-			return "Eff<A>";
-		} else {
-			return typeName() + "Eff";
-		}
+		return genericName("Eff");
+	}
+
+	public String containerShortName() {
+		return shortName("Container");
 	}
 
 	public String containerGenericName() {
-		if (this == Type.OBJECT) {
-			return "Container<A>";
-		} else {
-			return typeName() + "Container";
-		}
+		return genericName("Container");
+	}
+
+	public String indexedContainerGenericName() {
+		return genericName("IndexedContainer");
+	}
+
+	public String indexedGenericName() {
+		return genericName("Indexed");
 	}
 
 	public String iteratorGenericName() {
@@ -136,6 +168,10 @@ public enum Type {
 
 	public String iteratorNext() {
 		return javaUnboxedTypes().contains(this) ? "next" + javaPrefix() : "next";
+	}
+	
+	public String toArrayName() {
+		return (this == Type.OBJECT) ? "toObjectArray" : "toPrimitiveArray"; 
 	}
 
 	public String getIterator(String iterator) {

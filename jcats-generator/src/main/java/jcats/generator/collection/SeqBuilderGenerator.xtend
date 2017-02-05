@@ -156,9 +156,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 			}
 
 			public «genericName» appendAll(final Iterable<«type.genericBoxedName»> iterable) {
-				for (final «type.javaName» value : iterable) {
-					append(value);
-				}
+				iterable.forEach(this::append);
 				return this;
 			}
 

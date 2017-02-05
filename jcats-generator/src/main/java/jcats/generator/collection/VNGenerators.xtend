@@ -58,8 +58,21 @@ final class VNGenerators {
 					}
 
 					@Override
+					@Deprecated
 					public int size() {
 						return «arity»;
+					}
+
+					@Override
+					@Deprecated
+					public boolean isEmpty() {
+						return false;
+					}
+
+					@Override
+					@Deprecated
+					public boolean isNotEmpty() {
+						return true;
 					}
 
 					«FOR i : 1 .. arity»
@@ -125,6 +138,7 @@ final class VNGenerators {
 						return new V«arity»<>(«(arity .. 1).map["a" + it].join(", ")»);
 					}
 
+					@Override
 					public boolean contains(final A value) {
 						requireNonNull(value);
 						«FOR i : 1 .. arity»
@@ -135,14 +149,11 @@ final class VNGenerators {
 						return false;
 					}
 
-					public List<A> asList() {
-						return new IndexedIterableAsList<>(this);
-					}
-
 					public «PNGenerators.shortName(arity)»<«(1 .. arity).map["A"].join(", ")»> toP«if (arity == 2) "" else arity»() {
 						return «PNGenerators.shortName(arity).toLowerCase»(«(1 .. arity).map["a" + it].join(", ")»);
 					}
 
+					@Override
 					public ArrayList<A> toArrayList() {
 						final ArrayList<A> result = new ArrayList<>(«arity»);
 						«FOR index : 1 .. arity»
@@ -151,6 +162,7 @@ final class VNGenerators {
 						return result;
 					}
 
+					@Override
 					public HashSet<A> toHashSet() {
 						final HashSet<A> result = new HashSet<>(«Math.ceil(arity / 0.75) as int»);
 						«FOR index : 1 .. arity»
@@ -159,15 +171,13 @@ final class VNGenerators {
 						return result;
 					}
 
-					public Array<A> toArray() {
-						return new Array<>(toObjectArray());
-					}
-
+					@Override
 					public Seq<A> toSeq() {
 						final Object[] node1 = { «(1 .. arity).map["a" + it].join(", ")» };
 						return new Seq1<>(node1);
 					}
 
+					@Override
 					public Object[] toObjectArray() {
 						return new Object[] { «(1 .. arity).map["a" + it].join(", ")» };
 					}

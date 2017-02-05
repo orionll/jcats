@@ -45,9 +45,7 @@ final class StackBuilderGenerator implements ClassGenerator {
 			}
 
 			public StackBuilder<A> appendAll(final Iterable<A> iterable) {
-				for (final A value : iterable) {
-					append(value);
-				}
+				iterable.forEach(this::append);
 				return this;
 			}
 

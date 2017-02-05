@@ -25,7 +25,7 @@ final class SeqGenerator implements ClassGenerator {
 	def paramGenericName() { if (type == Type.OBJECT) "<A> Seq<A>" else shortName }
 	def paramGenericName(int index) { if (type == Type.OBJECT) "<A> Seq" + index + "<A>" else shortName + index }
 	def updateFunction() { if (type == Type.OBJECT) "F<A, A>" else type.typeName + type.typeName + "F" }
-	def seqBuilderName() { if (type == Type.OBJECT) "SeqBuilder<A>" else shortName + "Builder" }
+	def seqBuilderName() { type.seqBuilderGenericName }
 	def seqBuilderDiamondName() { if (type == Type.OBJECT) "SeqBuilder<>" else shortName + "Builder" }
 	def iteratorName(int index) { shortName + index + "Iterator" + (if (type == Type.OBJECT) "<A>" else "") }
 	def iteratorDiamondName(int index) { shortName + index + "Iterator" + (if (type == Type.OBJECT) "<>" else "") }
@@ -103,7 +103,7 @@ final class SeqGenerator implements ClassGenerator {
 		import static «Constants.COMMON».iterableHashCode;
 
 
-		public abstract class «genericName» implements «type.containerGenericName», Equatable<«genericName»>, «IF type == Type.OBJECT»Indexed<A>«ELSE»«type.typeName»Indexed«ENDIF», Serializable {
+		public abstract class «genericName» implements «type.indexedContainerGenericName», Equatable<«genericName»>, Serializable {
 			private static final «shortName» EMPTY = new «shortName»0();
 
 			static final «type.javaName»[][] EMPTY_NODE2 = new «type.javaName»[0][];
@@ -174,8 +174,10 @@ final class SeqGenerator implements ClassGenerator {
 			/**
 			 * O(min(this.size, suffix.size))
 			 */
-			public «genericName» concat(final «genericName» suffix) {
-				if (suffix.isEmpty()) {
+			public final «genericName» concat(final «genericName» suffix) {
+				if (isEmpty()) {
+					return suffix;
+				} else if (suffix.isEmpty()) {
 					return this;
 				} else {
 					final int prefixSize = size();
@@ -188,21 +190,17 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
+			// Assume suffixSize > 0
 			abstract «genericName» appendSized(final «type.iteratorGenericName» suffix, final int suffixSize);
 
+			// Assume prefixSize > 0
 			abstract «genericName» prependSized(final «type.iteratorGenericName» prefix, final int prefixSize);
 
 			public final «genericName» appendAll(final Iterable<«type.genericBoxedName»> suffix) {
-				requireNonNull(suffix);
-				if (suffix instanceof «wildcardName») {
+				if (isEmpty()) {
+					return fromIterable(suffix);
+				} else if (suffix instanceof «shortName») {
 					return concat((«genericName») suffix);
-				} else if (suffix instanceof Collection<?> && suffix instanceof RandomAccess) {
-					final int suffixSize = ((Collection<«type.genericBoxedName»>) suffix).size();
-					if (suffixSize == 0) {
-						return this;
-					} else {
-						return appendSized(«type.getIterator("suffix.iterator()")», suffixSize);
-					}
 				} else if (suffix instanceof Sized) {
 					final int suffixSize = ((Sized) suffix).size();
 					if (suffixSize == 0) {
@@ -210,31 +208,20 @@ final class SeqGenerator implements ClassGenerator {
 					} else {
 						return appendSized(«type.getIterator("suffix.iterator()")», suffixSize);
 					}
+				} else if (suffix instanceof Collection && ((Collection<?>) suffix).isEmpty()) {
+					return this;
 				} else {
-					final «type.iteratorGenericName» iterator = «type.getIterator("suffix.iterator()")»;
-					if (iterator.hasNext()) {
-						final «IF (type == Type.OBJECT)»SeqBuilder<A>«ELSE»«shortName»Builder«ENDIF» builder = new «IF (type == Type.OBJECT)»SeqBuilder<>«ELSE»«shortName»Builder«ENDIF»(this);
-						while (iterator.hasNext()) {
-							builder.append(iterator.«type.iteratorNext»());
-						}
-						return builder.build();
-					} else {
-						return this;
-					}
+					final «seqBuilderName» builder = new «seqBuilderDiamondName»(this);
+					builder.appendAll(suffix);
+					return builder.build();
 				}
 			}
 
 			public final «genericName» prependAll(final Iterable<«type.genericBoxedName»> prefix) {
-				requireNonNull(prefix);
-				if (prefix instanceof «wildcardName») {
+				if (isEmpty()) {
+					return fromIterable(prefix);
+				} else if (prefix instanceof «shortName») {
 					return ((«genericName») prefix).concat(this);
-				} else if (prefix instanceof Collection<?> && prefix instanceof RandomAccess) {
-					final int prefixSize = ((Collection<«type.genericBoxedName»>) prefix).size();
-					if (prefixSize == 0) {
-						return this;
-					} else {
-						return prependSized(«type.getIterator("prefix.iterator()")», prefixSize);
-					}
 				} else if (prefix instanceof Sized) {
 					final int prefixSize = ((Sized) prefix).size();
 					if (prefixSize == 0) {
@@ -243,27 +230,9 @@ final class SeqGenerator implements ClassGenerator {
 						return prependSized(«type.getIterator("prefix.iterator()")», prefixSize);
 					}
 				} else {
-					final «type.iteratorGenericName» iterator = «type.getIterator("prefix.iterator()")»;
-					if (iterator.hasNext()) {
-						if (isEmpty()) {
-							final «IF (type == Type.OBJECT)»SeqBuilder<A>«ELSE»«shortName»Builder«ENDIF» builder = new «IF (type == Type.OBJECT)»SeqBuilder<>«ELSE»«shortName»Builder«ENDIF»();
-							while (iterator.hasNext()) {
-								builder.append(iterator.«type.iteratorNext»());
-							}
-							return builder.build();
-						} else {
-							// We must know exact size, so use a temporary list
-							final «bufferedListName» tempList = new «bufferedListDiamondName»();
-							int size = 0;
-							while (iterator.hasNext()) {
-								tempList.append(iterator.«type.iteratorNext»());
-								size++;
-							}
-							return prependSized(tempList.iterator(), size);
-						}
-					} else {
-						return this;
-					}
+					final «seqBuilderName» builder = new «seqBuilderDiamondName»();
+					prefix.forEach(builder::append);
+					return builder.build().concat(this);
 				}
 			}
 
@@ -345,34 +314,17 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			«IF type == Type.OBJECT»
-				public final List<A> asList() {
-					return new SeqAsList<>(this);
-				}
-			«ELSE»
-				public final List<«type.genericBoxedName»> asList() {
-					return new «type.typeName»IndexedIterableAsList<>(this);
-				}
-			«ENDIF»
+			@Override
+			@Deprecated
+			public final «type.seqGenericName» to«type.seqShortName»() {
+				return this;
+			}
 
-			«toArrayList(type, true)»
-
-			«toHashSet(type, true)»
-
-			«IF type == Type.OBJECT»
-				public final Array<A> toArray() {
-					if (isEmpty()) {
-						return Array.emptyArray();
-					} else {
-						return new Array<>(toObjectArray());
-					}
-				}
-
-			«ENDIF»
-			public abstract «type.javaName»[] to«type.javaPrefix»Array();
+			@Override
+			public abstract «type.javaName»[] «type.toArrayName»();
 
 			public static «paramGenericName» empty«shortName»() {
-				return «shortName».EMPTY;
+				return EMPTY;
 			}
 
 			public static «paramGenericName» single«shortName»(final «type.genericName» value) {
@@ -731,21 +683,12 @@ final class SeqGenerator implements ClassGenerator {
 				requireNonNull(iterable);
 				if (iterable instanceof «wildcardName») {
 					return («genericName») iterable;
-				} else if (iterable instanceof Collection<?> && iterable instanceof RandomAccess) {
-					return sizedToSeq(«type.getIterator("iterable.iterator()")», ((Collection<«type.genericBoxedName»>) iterable).size());
 				} else if (iterable instanceof Sized) {
 					return sizedToSeq(«type.getIterator("iterable.iterator()")», ((Sized) iterable).size());
 				} else {
-					final «type.iteratorGenericName» iterator = «type.getIterator("iterable.iterator()")»;
-					if (iterator.hasNext()) {
-						final «seqBuilderName» builder = new «seqBuilderDiamondName»();
-						while (iterator.hasNext()) {
-							builder.append(iterator.«type.iteratorNext»());
-						}
-						return builder.build();
-					} else {
-						return empty«shortName»();
-					}
+					final «seqBuilderName» builder = new «seqBuilderDiamondName»();
+					builder.appendAll(iterable);
+					return builder.build();
 				}
 			}
 
@@ -2296,19 +2239,6 @@ final class SeqGenerator implements ClassGenerator {
 				}
 			}
 		}
-		«IF type == Type.OBJECT»
-
-			final class SeqAsList<A> extends IndexedIterableAsList<A, Seq<A>> {
-				SeqAsList(final «shortName»«IF type == Type.OBJECT»<A>«ENDIF» seq) {
-					super(seq);
-				}
-
-				@Override
-				public Object[] toArray() {
-					return iterable.toObjectArray();
-				}
-			}
-		«ENDIF»
 	''' }
 
 	def seq0SourceCode() { '''
@@ -2370,11 +2300,6 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «genericName» concat(final «genericName» suffix) {
-				return requireNonNull(suffix);
-			}
-
-			@Override
 			«genericName» appendSized(final «type.iteratorGenericName» suffix, final int suffixSize) {
 				return sizedToSeq(suffix, suffixSize);
 			}
@@ -2389,7 +2314,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.javaName»[] to«type.javaPrefix»Array() {
+			public «type.javaName»[] «type.toArrayName»() {
 				return «IF type != Type.OBJECT»«type.typeName»«ENDIF»Array.EMPTY.array;
 			}
 
@@ -2525,15 +2450,6 @@ final class SeqGenerator implements ClassGenerator {
 					System.arraycopy(node1, 0, newNode1, 0, node1.length);
 					newNode1[node1.length] = value;
 					return new «diamondName(1)»(newNode1);
-				}
-			}
-
-			@Override
-			public «genericName» concat(final «genericName» suffix) {
-				if (suffix.size() <= 32) {
-					return appendSized(suffix.iterator(), suffix.size());
-				} else {
-					return suffix.prependSized(iterator(), node1.length);
 				}
 			}
 
@@ -2697,7 +2613,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.javaName»[] to«type.javaPrefix»Array() {
+			public «type.javaName»[] «type.toArrayName»() {
 				final «type.javaName»[] array = new «type.javaName»[node1.length];
 				System.arraycopy(node1, 0, array, 0, node1.length);
 				return array;
@@ -3401,7 +3317,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.javaName»[] to«type.javaPrefix»Array() {
+			public «type.javaName»[] «type.toArrayName»() {
 				final «type.javaName»[] array = new «type.javaName»[size];
 				System.arraycopy(init, 0, array, 0, init.length);
 				int index = init.length;
@@ -4257,7 +4173,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.javaName»[] to«type.javaPrefix»Array() {
+			public «type.javaName»[] «type.toArrayName»() {
 				final «type.javaName»[] array = new «type.javaName»[size];
 				System.arraycopy(init, 0, array, 0, init.length);
 				int index = init.length;
@@ -5256,7 +5172,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.javaName»[] to«type.javaPrefix»Array() {
+			public «type.javaName»[] «type.toArrayName»() {
 				final «type.javaName»[] array = new «type.javaName»[size];
 				System.arraycopy(init, 0, array, 0, init.length);
 				int index = init.length;
@@ -6413,7 +6329,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.javaName»[] to«type.javaPrefix»Array() {
+			public «type.javaName»[] «type.toArrayName»() {
 				final «type.javaName»[] array = new «type.javaName»[size];
 				System.arraycopy(init, 0, array, 0, init.length);
 				int index = init.length;
@@ -7704,7 +7620,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.javaName»[] to«type.javaPrefix»Array() {
+			public «type.javaName»[] «type.toArrayName»() {
 				final «type.javaName»[] array = new «type.javaName»[size];
 				System.arraycopy(init, 0, array, 0, init.length);
 				int index = init.length;

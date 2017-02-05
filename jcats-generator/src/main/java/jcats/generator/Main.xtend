@@ -25,6 +25,7 @@ import java.util.Arrays
 import jcats.generator.collection.DictGenerator
 import jcats.generator.collection.ContainerGenerator
 import jcats.generator.collection.KeyValueGenerator
+import jcats.generator.collection.IndexedContainerGenerator
 
 class Main {
 	def static void main(String[] args) {
@@ -85,6 +86,7 @@ class Main {
 			FNGenerators.generators,
 			EffNGenerators.generators,
 			ContainerGenerator.generators,
+			IndexedContainerGenerator.generators,
 			ArrayGenerator.generators,
 			ArrayBuilderGenerator.generators,
 			SeqGenerator.generators,

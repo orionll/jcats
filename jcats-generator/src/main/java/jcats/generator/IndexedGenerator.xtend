@@ -18,7 +18,7 @@ final class IndexedGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
-		public interface «shortName»«IF type == Type.OBJECT»<A>«ENDIF» {
+		public interface «type.indexedGenericName» {
 			«type.genericName» get(final int index);
 		}
 	''' }

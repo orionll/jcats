@@ -110,7 +110,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			/**
 			 * O(1)
 			 */
-			public «genericName» append(final «type.javaName» value) {
+			public «genericName» append(final «type.genericName» value) {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
@@ -139,24 +139,22 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			 */
 			public «genericName» appendAll(final Iterable<«type.genericBoxedName»> iterable) {
 				requireNonNull(iterable);
-				if (iterable instanceof «IF type == Type.OBJECT»Array<?>«ELSE»«type.typeName»Array«ENDIF») {
+				if (iterable instanceof «type.arrayShortName») {
 					return appendArray(((«arrayGenericName») iterable).array);
-				}
-
-				if (iterable instanceof Collection<?>) {
-					final Collection<«type.genericBoxedName»> col = (Collection<«type.genericBoxedName»>) iterable;
-					if (!col.isEmpty()) {
-						return appendSized(iterable, col.size());
-					}
 				} else if (iterable instanceof Sized) {
 					return appendSized(iterable, ((Sized) iterable).size());
 				} else {
-					for (final «type.genericName» value : iterable) {
-						append(value);
+					if (iterable instanceof Collection) {
+						final Collection<«type.genericBoxedName»> col = (Collection<«type.genericBoxedName»>) iterable;
+						if (col.isEmpty()) {
+							return this;
+						} else {
+							ensureCapacity(size + col.size());
+						}
 					}
+					iterable.forEach(this::append);
+					return this;
 				}
-
-				return this;
 			}
 
 			public boolean isEmpty() {

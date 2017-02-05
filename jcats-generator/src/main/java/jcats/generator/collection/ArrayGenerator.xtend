@@ -17,8 +17,8 @@ final class ArrayGenerator implements ClassGenerator {
 
 	override className() { Constants.COLLECTION + "." + shortName }
 
-	def shortName() { if (type == Type.OBJECT) "Array" else type.typeName + "Array" }
-	def genericName() { if (type == Type.OBJECT) shortName + "<A>" else shortName }
+	def shortName() { type.arrayShortName }
+	def genericName() { type.arrayGenericName }
 	def genericCast() { if (type == Type.OBJECT) "(A) " else "" }
 	def diamondName() { if (type == Type.OBJECT) "Array<>" else shortName }
 	def paramGenericName() { if (type == Type.OBJECT) "<A> Array<A>" else shortName }
@@ -98,7 +98,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import static «Constants.COMMON».iterableHashCode;
 
 
-		public final class «genericName» implements «type.containerGenericName», Equatable<«genericName»>, «IF type == Type.OBJECT»Indexed<A>«ELSE»«type.typeName»Indexed«ENDIF», Serializable {
+		public final class «genericName» implements «type.indexedContainerGenericName», Equatable<«genericName»>, Serializable {
 			static final «shortName» EMPTY = new «shortName»(new «type.javaName»[0]);
 
 			final «type.javaName»[] array;
@@ -240,24 +240,28 @@ final class ArrayGenerator implements ClassGenerator {
 			 * O(this.size + suffix.size)
 			 */
 			public «genericName» appendAll(final Iterable<«type.genericBoxedName»> suffix) {
-				if (suffix instanceof «shortName») {
+				if (array.length == 0) {
+					return fromIterable(suffix);
+				} else if (suffix instanceof «shortName») {
 					return concat((«genericName») suffix);
-				} else if (suffix instanceof Collection<?> && suffix instanceof RandomAccess) {
-					final Collection<«type.genericBoxedName»> col = (Collection<«type.genericBoxedName»>) suffix;
-					return col.isEmpty() ? this : appendSized(suffix, col.size());
 				} else if (suffix instanceof Sized) {
 					return appendSized(suffix, ((Sized) suffix).size());
 				} else {
-					final «type.iteratorGenericName» iterator = «type.getIterator("suffix.iterator()")»;
-					if (iterator.hasNext()) {
-						final «arrayBuilderName» builder = new «arrayBuilderDiamondName»(array);
-						while (iterator.hasNext()) {
-							builder.append(iterator.«type.iteratorNext»());
+					final «arrayBuilderName» builder;
+					if (suffix instanceof Collection) {
+						final Collection<?> col = (Collection<?>) suffix;
+						if (col.isEmpty()) {
+							return this;
+						} else {
+							final int suffixSize = col.size();
+							builder = new «arrayBuilderDiamondName»(array.length + suffixSize);
+							builder.appendArray(array);
 						}
-						return builder.build();
 					} else {
-						return this;
+						builder = new «arrayBuilderDiamondName»(array);
 					}
+					suffix.forEach(builder::append);
+					return builder.build();
 				}
 			}
 
@@ -265,24 +269,28 @@ final class ArrayGenerator implements ClassGenerator {
 			 * O(prefix.size + this.size)
 			 */
 			public «genericName» prependAll(final Iterable<«type.genericBoxedName»> prefix) {
-				if (prefix instanceof «shortName») {
+				if (array.length == 0) {
+					return fromIterable(prefix);
+				} else if (prefix instanceof «shortName») {
 					return ((«genericName») prefix).concat(this);
-				} else if (prefix instanceof Collection<?> && prefix instanceof RandomAccess) {
-					final Collection<«type.genericBoxedName»> col = (Collection<«type.genericBoxedName»>) prefix;
-					return col.isEmpty() ? this : prependSized(prefix, col.size());
 				} else if (prefix instanceof Sized) {
 					return prependSized(prefix, ((Sized) prefix).size());
 				} else {
-					final «type.iteratorGenericName» iterator = «type.getIterator("prefix.iterator()")»;
-					if (iterator.hasNext()) {
-						final «arrayBuilderName» builder = new «arrayBuilderDiamondName»();
-						while (iterator.hasNext()) {
-							builder.append(iterator.«type.iteratorNext»());
+					final «arrayBuilderName» builder;
+					if (prefix instanceof Collection) {
+						final Collection<?> col = (Collection<?>) prefix;
+						if (col.isEmpty()) {
+							return this;
+						} else {
+							final int prefixSize = col.size();
+							builder = new «arrayBuilderDiamondName»(prefixSize + array.length);
 						}
-						return builder.build().concat(this);
 					} else {
-						return this;
+						builder = new «arrayBuilderDiamondName»();
 					}
+					prefix.forEach(builder::append);
+					builder.appendArray(array);
+					return builder.build();
 				}
 			}
 
@@ -407,21 +415,14 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			«IF type == Type.OBJECT»
-				public List<A> asList() {
-					return new ArrayAsList<>(this);
-				}
-			«ELSE»
-				public List<«type.genericBoxedName»> asList() {
-					return new «type.typeName»IndexedIterableAsList<>(this);
-				}
-			«ENDIF»
-
-			«toArrayList(type, false)»
-
-			«toHashSet(type, false)»
+			@Override
+			@Deprecated
+			public «type.arrayGenericName» to«type.arrayShortName»() {
+				return this;
+			}
 
 			«IF type == Type.OBJECT»
+				@Override
 				public Seq<A> toSeq() {
 					if (array.length == 0) {
 						return Seq.emptySeq();
@@ -430,6 +431,7 @@ final class ArrayGenerator implements ClassGenerator {
 					}
 				}
 			«ELSE»
+				@Override
 				public «type.typeName»Seq to«type.typeName»Seq() {
 					if (array.length == 0) {
 						return «type.typeName»Seq.empty«type.typeName»Seq();
@@ -439,7 +441,8 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			«ENDIF»
 
-			public «type.javaName»[] to«type.javaPrefix»Array() {
+			@Override
+			public «type.javaName»[] «type.toArrayName»() {
 				if (array.length == 0) {
 					return array;
 				} else {
@@ -523,32 +526,37 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 
 			«ENDIF»
-			private static «paramGenericName» sizedToArray(final Iterable<«type.genericBoxedName»> iterable, final int iterableSize) {
-				final «type.javaName»[] array = new «type.javaName»[iterableSize];
-				fillArray(array, 0, iterable);
-				return new «diamondName»(array);
+			private static «paramGenericName» sizedToArray(final Iterable<«type.genericBoxedName»> iterable, final int size) {
+				if (size == 0) {
+					return empty«shortName»();
+				} else {
+					final «type.javaName»[] array = new «type.javaName»[size];
+					fillArray(array, 0, iterable);
+					return new «diamondName»(array);
+				}
 			}
 
 			public static «paramGenericName» fromIterable(final Iterable<«type.genericBoxedName»> iterable) {
-				requireNonNull(iterable);
-				if (iterable instanceof «shortName») {
-					return («genericName») iterable;
-				} else if (iterable instanceof Collection<?>) {
-					final Collection<«type.genericBoxedName»> col = (Collection<«type.genericBoxedName»>) iterable;
-					return col.isEmpty() ? empty«shortName»() : sizedToArray(iterable, col.size());
+				if (iterable instanceof «type.containerShortName») {
+					return ((«type.containerGenericName») iterable).to«type.arrayShortName»();
 				} else if (iterable instanceof Sized) {
 					return sizedToArray(iterable, ((Sized) iterable).size());
-				} else {
-					final «type.iteratorGenericName» iterator = «type.getIterator("iterable.iterator()")»;
-					if (iterator.hasNext()) {
-						final «arrayBuilderName» builder = new «arrayBuilderDiamondName»();
-						while (iterator.hasNext()) {
-							builder.append(iterator.«type.iteratorNext»());
+				«IF type == Type.OBJECT»
+					} else if (iterable instanceof Collection) {
+						final Object[] array = ((Collection<?>) iterable).toArray();
+						if (array.length == 0) {
+							return emptyArray();
+						} else {
+							for (final Object value : array) {
+								requireNonNull(value);
+							}
+							return new Array<>(array);
 						}
-						return builder.build();
-					} else {
-						return empty«shortName»();
-					}
+				«ENDIF»
+				} else {
+					final «arrayBuilderName» builder = new «arrayBuilderDiamondName»();
+					iterable.forEach(builder::append);
+					return builder.build();
 				}
 			}
 
@@ -672,18 +680,5 @@ final class ArrayGenerator implements ClassGenerator {
 				return new «arrayBuilderDiamondName»(initialCapacity);
 			}
 		}
-		«IF type == Type.OBJECT»
-
-			final class ArrayAsList<A> extends IndexedIterableAsList<A, Array<A>> {
-				ArrayAsList(final Array<A> array) {
-					super(array);
-				}
-
-				@Override
-				public Object[] toArray() {
-					return iterable.toObjectArray();
-				}
-			}
-		«ENDIF»
 	''' }
 }

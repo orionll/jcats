@@ -23,6 +23,11 @@ class ContainerGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
+		import java.util.AbstractCollection;
+		import java.util.ArrayList;
+		import java.util.Collection;
+		import java.util.HashSet;
+		import java.util.Iterator;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
@@ -76,12 +81,95 @@ class ContainerGenerator implements InterfaceGenerator {
 				«type.spliteratorGenericName» spliterator();
 
 			«ENDIF»
+			default «type.arrayGenericName» to«type.arrayShortName»() {
+				if (isEmpty()) {
+					return «type.arrayShortName».empty«type.arrayShortName»();
+				} else {
+					return new «type.diamondName("Array")»(«type.toArrayName»());
+				}
+			}
+
+			default «type.seqGenericName» to«type.seqShortName»() {
+				if (isEmpty()) {
+					return «type.seqShortName».empty«type.seqShortName»();
+				} else {
+					final «type.genericName("SeqBuilder")» builder = «type.seqShortName».builder();
+					«IF Type.javaUnboxedTypes.contains(type)»
+						final «type.iteratorGenericName» iterator = iterator();
+						while (iterator.hasNext()) {
+							builder.append(iterator.«type.iteratorNext»());
+						} 
+					«ELSE»
+						builder.appendAll(this);
+					«ENDIF»
+					return builder.build();		
+				}
+			}
+
+			default «type.javaName»[] «type.toArrayName»() {
+				final «type.javaName»[] array = new «type.javaName»[size()];
+				int i = 0;
+				«IF Type.javaUnboxedTypes.contains(type)»
+					final «type.iteratorGenericName» iterator = iterator();
+					while (iterator.hasNext()) {
+						array[i++] = iterator.«type.iteratorNext»();
+					} 
+				«ELSE»
+					for (final «type.javaName» value : this) {
+						array[i++] = value;
+					}
+				«ENDIF»
+				return array;
+			}
+
+			default Collection<«type.genericBoxedName»> asCollection() {
+				return new «shortName»AsCollection«IF type == Type.OBJECT»<>«ENDIF»(this);
+			}
+
+			default ArrayList<«type.genericBoxedName»> toArrayList() {
+				return new ArrayList<>(asCollection());
+			}
+
+			default HashSet<«type.genericBoxedName»> toHashSet() {
+				return new HashSet<>(asCollection());
+			}
+
 			default «type.streamGenericName» stream() {
 				return StreamSupport.«type.streamFunction»(spliterator(), false);
 			}
 
 			default «type.streamGenericName» parallelStream() {
 				return StreamSupport.«type.streamFunction»(spliterator(), true);
+			}
+		}
+
+		class «type.genericName("ContainerAsCollection")» extends AbstractCollection<«type.genericBoxedName»> {
+			final «genericName» container;
+
+			«shortName»AsCollection(final «genericName» container) {
+				this.container = container;
+			}
+
+			@Override
+			public int size() {
+				return container.size();
+			}
+
+			«IF type == Type.OBJECT»
+				@Override
+				public Object[] toArray() {
+					return container.toObjectArray();
+				}
+
+			«ENDIF»
+			@Override
+			public Iterator<«type.genericBoxedName»> iterator() {
+				return container.iterator();
+			}
+
+			@Override
+			public Spliterator<«type.genericBoxedName»> spliterator() {
+				return container.spliterator();
 			}
 		}
 	''' }
