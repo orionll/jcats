@@ -10,33 +10,20 @@ final class CommonGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		import java.util.AbstractList;
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
 		import java.util.PrimitiveIterator;
-		import java.util.RandomAccess;
-		import java.util.Spliterator;
 
-		«FOR type : Type.values»
-			import jcats.«IF type != Type.OBJECT»«type.typeName»«ENDIF»Indexed;
-		«ENDFOR»
-		import jcats.Sized;
-		import «Constants.F»;
-		«FOR arity : 2 .. Constants.MAX_FUNCTIONS_ARITY»
-			import «Constants.F»«arity»;
-		«ENDFOR»
-		«FOR type : Type.primitives»
-			import «Constants.FUNCTION».«type.typeName»ObjectF;
-			import «Constants.FUNCTION».«type.typeName»F;
-			«FOR toType : Type.primitives»
-				import «Constants.FUNCTION».«type.typeName»«toType.typeName»F;
-			«ENDFOR»
-		«ENDFOR»
+		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
 
 
 		final class Common {
+			«FOR type : Type.values»
+				static final «type.javaName»[] «type.emptyArrayName» = new «type.javaName»[0];
+			«ENDFOR»
+
 			private Common() {
 			}
 

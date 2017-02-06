@@ -7,21 +7,13 @@ final class OptionGenerator implements ClassGenerator {
 		package «Constants.JCATS»;
 
 		import java.io.Serializable;
-		import java.util.ArrayList;
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
 		import java.util.Objects;
 		import java.util.Optional;
 
-		import «Constants.FUNCTION».BoolF;
-		import «Constants.F»;
-		«FOR arity : 2 .. Constants.MAX_ARITY»
-			import «Constants.F»«arity»;
-		«ENDFOR»
-		import «Constants.P»;
-		«FOR arity : 3 .. Constants.MAX_ARITY»
-			import «Constants.P»«arity»;
-		«ENDFOR»
+		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;

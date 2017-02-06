@@ -1,11 +1,11 @@
 package jcats.generator.collection
 
+import java.util.List
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
+import jcats.generator.Generator
 import jcats.generator.Type
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
-import java.util.List
-import jcats.generator.Generator
 
 @FinalFieldsConstructor
 final class ArrayGenerator implements ClassGenerator {
@@ -19,75 +19,31 @@ final class ArrayGenerator implements ClassGenerator {
 
 	def shortName() { type.arrayShortName }
 	def genericName() { type.arrayGenericName }
-	def genericCast() { if (type == Type.OBJECT) "(A) " else "" }
 	def diamondName() { if (type == Type.OBJECT) "Array<>" else shortName }
-	def paramGenericName() { if (type == Type.OBJECT) "<A> Array<A>" else shortName }
-	def arrayBuilderName() { if (type == Type.OBJECT) "ArrayBuilder<A>" else shortName + "Builder" }
-	def arrayBuilderDiamondName() { if (type == Type.OBJECT) "ArrayBuilder<>" else shortName + "Builder" }
+	def paramGenericName() { type.paramGenericName("Array") }
+	def arrayBuilderName() { type.genericName("ArrayBuilder") }
+	def arrayBuilderDiamondName() { type.diamondName("ArrayBuilder") }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
 		import java.io.Serializable;
-		import java.util.AbstractList;
-		import java.util.ArrayList;
 		import java.util.Arrays;
 		import java.util.Collection;
-		import java.util.Collections;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.PrimitiveIterator;
 		«ELSE»
 			import java.util.Iterator;
 		«ENDIF»
-		import java.util.HashSet;
-		import java.util.List;
-		import java.util.NoSuchElementException;
-		import java.util.RandomAccess;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
-		«IF Type.javaUnboxedTypes.contains(type)»
-			import java.util.stream.«type.javaPrefix»Stream;
-		«ELSE»
-			import java.util.stream.Stream;
-		«ENDIF»
-		import java.util.stream.StreamSupport;
 
-		import «Constants.FUNCTION».«type.effShortName»;
-		import «Constants.F»;
-		«IF type == Type.OBJECT»
-			import «Constants.F0»;
-		«ELSE»
-			import «Constants.FUNCTION».«type.typeName»F0;
-		«ENDIF»
-		«IF type == Type.OBJECT»
-			«FOR toType : Type.primitives»
-				import «Constants.FUNCTION».«toType.typeName»F;
-			«ENDFOR»
-			import «Constants.FUNCTION».IntObjectF;
-		«ELSE»
-			«FOR toType : Type.primitives»
-				import «Constants.FUNCTION».«type.typeName»«toType.typeName»F;
-			«ENDFOR»
-			import «Constants.FUNCTION».«type.typeName»ObjectF;
-			«IF type != Type.INT»
-				import «Constants.FUNCTION».Int«type.typeName»F;
-			«ENDIF»
-		«ENDIF»
-		«FOR arity : 2 .. Constants.MAX_ARITY»
-			import «Constants.F»«arity»;
-		«ENDFOR»
-		import «Constants.EQUATABLE»;
-		import «Constants.JCATS».«IF type != Type.OBJECT»«type.typeName»«ENDIF»Indexed;
-		import «Constants.P»;
-		«FOR arity : 3 .. Constants.MAX_ARITY»
-			import «Constants.P»«arity»;
-		«ENDFOR»
-		import «Constants.SIZED»;
+		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
 		import static java.lang.Math.min;
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
-		import static java.util.Spliterators.emptySpliterator;
 		import static «Constants.ARRAY».emptyArray;
 		«FOR toType : Type.primitives.filter[it != type]»
 			import static «Constants.COLLECTION».«toType.typeName»Array.empty«toType.typeName»Array;
@@ -95,11 +51,10 @@ final class ArrayGenerator implements ClassGenerator {
 		import static «Constants.F».id;
 		import static «Constants.P».p;
 		import static «Constants.COMMON».iterableToString;
-		import static «Constants.COMMON».iterableHashCode;
 
 
 		public final class «genericName» implements «type.indexedContainerGenericName», Equatable<«genericName»>, Serializable {
-			static final «shortName» EMPTY = new «shortName»(new «type.javaName»[0]);
+			static final «shortName» EMPTY = new «shortName»(Common.«type.emptyArrayName»);
 
 			final «type.javaName»[] array;
 
@@ -134,7 +89,7 @@ final class ArrayGenerator implements ClassGenerator {
 			 */
 			@Override
 			public «type.genericName» get(final int index) {
-				return «genericCast»array[index];
+				return «type.genericCast»array[index];
 			}
 
 			/**

@@ -2,6 +2,7 @@ package jcats.generator.collection
 
 import jcats.generator.Constants
 import jcats.generator.ClassGenerator
+import jcats.generator.Type
 
 class DictGenerator implements ClassGenerator {
 
@@ -12,20 +13,15 @@ class DictGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		import «Constants.EFF»2;
-		import «Constants.EQUATABLE»;
-		import «Constants.F»;
-		import «Constants.OPTION»;
-		import «Constants.P»;
-		import «Constants.SIZED»;
-
 		import java.io.Serializable;
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
-		import java.util.Objects;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.function.Consumer;
+
+		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.P».p;
@@ -34,7 +30,7 @@ class DictGenerator implements ClassGenerator {
 
 		public final class Dict<K, A> implements KeyValue<K, A>, Equatable<Dict<K, A>>, Serializable {
 
-			private static final Dict EMPTY = new Dict(0, 0, Array.EMPTY.array, 0);
+			private static final Dict EMPTY = new Dict(0, 0, Common.«Type.OBJECT.emptyArrayName», 0);
 
 			static final int VOID = 0, LEAF = 1, TREE = 2, COLLISION = 3;
 

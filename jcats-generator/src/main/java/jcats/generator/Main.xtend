@@ -3,14 +3,19 @@ package jcats.generator
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
+import java.util.Arrays
 import java.util.List
 import jcats.generator.collection.ArrayBuilderGenerator
 import jcats.generator.collection.ArrayGenerator
 import jcats.generator.collection.CommonGenerator
+import jcats.generator.collection.ContainerGenerator
+import jcats.generator.collection.DictGenerator
+import jcats.generator.collection.IndexedContainerGenerator
+import jcats.generator.collection.KeyValueGenerator
+import jcats.generator.collection.SeqBuilderGenerator
+import jcats.generator.collection.SeqGenerator
 import jcats.generator.collection.StackBuilderGenerator
 import jcats.generator.collection.StackGenerator
-import jcats.generator.collection.SeqGenerator
-import jcats.generator.collection.SeqBuilderGenerator
 import jcats.generator.collection.VNGenerators
 import jcats.generator.function.Eff0Generator
 import jcats.generator.function.EffGenerator
@@ -21,11 +26,6 @@ import jcats.generator.function.FNGenerators
 import jcats.generator.function.FsGenerator
 
 import static extension java.nio.file.Files.*
-import java.util.Arrays
-import jcats.generator.collection.DictGenerator
-import jcats.generator.collection.ContainerGenerator
-import jcats.generator.collection.KeyValueGenerator
-import jcats.generator.collection.IndexedContainerGenerator
 
 class Main {
 	def static void main(String[] args) {

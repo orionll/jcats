@@ -10,25 +10,12 @@ final class StackGenerator implements ClassGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.io.Serializable;
-		import java.util.ArrayList;
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
 		import java.util.Spliterator;
-		import java.util.stream.Stream;
-		import java.util.stream.StreamSupport;
 
-		import «Constants.FUNCTION».BoolF;
-		import «Constants.F»;
-		«FOR arity : 2 .. Constants.MAX_ARITY»
-			import «Constants.F»«arity»;
-		«ENDFOR»
-		import «Constants.EQUATABLE»;
-		import «Constants.OPTION»;
-		import «Constants.ORD»;
-		import «Constants.P»;
-		«FOR arity : 3 .. Constants.MAX_ARITY»
-			import «Constants.P»«arity»;
-		«ENDFOR»
+		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;

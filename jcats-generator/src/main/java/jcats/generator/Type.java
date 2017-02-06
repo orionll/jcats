@@ -46,12 +46,20 @@ public enum Type {
 		return (this == OBJECT) ? clazz + "<A>" : typeName() + clazz;
 	}
 
+	public String paramGenericName(String clazz) {
+		return (this == OBJECT) ? "<A> " + clazz + "<A>" : typeName() + clazz;
+	}
+
 	public String shortName(String clazz) {
 		return (this == OBJECT) ? clazz : typeName() + clazz;
 	}
 
 	public String diamondName(String clazz) {
 		return (this == OBJECT) ? clazz + "<>" : typeName() + clazz;
+	}
+
+	public String wildcardName(String clazz) {
+		return (this == OBJECT) ? clazz + "<?>" : typeName() + clazz;
 	}
 
 	public String genericBoxedName() {
@@ -111,33 +119,35 @@ public enum Type {
 	}
 
 	public String iteratorGenericName() {
-		if (this == Type.OBJECT) {
-			return "Iterator<A>";
-		} else if (this == Type.BOOL) {
-			return "Iterator<Boolean>";
-		} else {
-			return "PrimitiveIterator.Of" + javaPrefix();
+	    switch (this) {
+	        case OBJECT: return "Iterator<A>";
+	        case BOOL: return "Iterator<Boolean>";
+	        default: return "PrimitiveIterator.Of" + javaPrefix();
+	    }
+	}
+
+	public String iteratorReturnType() {
+		switch (this) {
+    		case OBJECT: return "A";
+    		case BOOL: return "Boolean";
+    		default: return javaName();
 		}
 	}
 
 	public String spliteratorGenericName() {
-		if (this == Type.OBJECT) {
-			return "Spliterator<A>";
-		} else if (this == Type.BOOL) {
-			return "Spliterator<Boolean>";
-		} else {
-			return "Spliterator.Of" + javaPrefix();
+		switch (this) {
+		    case OBJECT: return "Spliterator<A>";
+		    case BOOL: return "Spliterator<Boolean>";
+		    default: return "Spliterator.Of" + javaPrefix();
 		}
 	}
 
 	public String streamGenericName() {
-		if (this == Type.OBJECT) {
-			return "Stream<A>";
-		} else if (this == Type.BOOL) {
-			return "Stream<Boolean>";
-		} else {
-			return javaPrefix() + "Stream";
-		}
+	    switch (this) {
+	        case OBJECT: return "Stream<A>";
+	        case BOOL: return "Stream<Boolean>";
+	        default: return javaPrefix() + "Stream";
+	    }
 	}
 
 	public String streamName() {
@@ -157,13 +167,11 @@ public enum Type {
 	}
 
 	public String iteratorWildcardName() {
-		if (this == Type.OBJECT) {
-			return "Iterator<?>";
-		} else if (this == Type.BOOL) {
-			return "Iterator<Boolean>";
-		} else {
-			return "PrimitiveIterator.Of" + javaPrefix();
-		}
+	    switch (this) {
+	        case OBJECT: return "Iterator<?>";
+	        case BOOL: return "Iterator<Boolean>";
+	        default: return "PrimitiveIterator.Of" + javaPrefix();
+	    }
 	}
 
 	public String iteratorNext() {
@@ -176,6 +184,10 @@ public enum Type {
 
 	public String getIterator(String iterator) {
 		return javaUnboxedTypes().contains(this) ? typeName() + "Iterator.getIterator(" + iterator + ")" : iterator;
+	}
+
+	public String emptyArrayName() {
+	    return "EMPTY_" + javaName().toUpperCase() + "_ARRAY";
 	}
 
 	public static ImmutableList<Type> javaUnboxedTypes() {

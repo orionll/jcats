@@ -17,10 +17,9 @@ final class SeqBuilderGenerator implements ClassGenerator {
 
 	override className() { Constants.COLLECTION + "." + shortName }
 
-	def shortName() { if (type == Type.OBJECT) "SeqBuilder" else type.typeName + "SeqBuilder" }
+	def shortName() { type.shortName("SeqBuilder") }
 	def shortSeqName() { if (type == Type.OBJECT) "Seq" else type.typeName + "Seq" }
-	def genericName() { if (type == Type.OBJECT) shortName + "<A>" else shortName }
-	def seqGenericName() { if (type == Type.OBJECT) "Seq<A>" else type.typeName + "Seq" }
+	def genericName() { type.genericName("SeqBuilder") }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -53,7 +52,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 
 			«shortName»() {}
 
-			«shortName»(final «seqGenericName» seq) {
+			«shortName»(final «type.seqGenericName» seq) {
 				seq.initSeqBuilder(this);
 			}
 
@@ -168,7 +167,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 				return size;
 			}
 
-			public «seqGenericName» build() {
+			public «type.seqGenericName» build() {
 				if (node1 == null) {
 					return empty«shortSeqName»();
 				} else if (node2 == null) {

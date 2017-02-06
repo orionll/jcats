@@ -1,10 +1,10 @@
 package jcats.generator.collection
 
+import java.util.List
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
-import jcats.generator.Type
-import java.util.List
 import jcats.generator.Generator
+import jcats.generator.Type
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 
 @FinalFieldsConstructor
@@ -17,88 +17,53 @@ final class SeqGenerator implements ClassGenerator {
 
 	override className() { Constants.COLLECTION + "." + shortName }
 
-	def shortName() { if (type == Type.OBJECT) "Seq" else type.typeName + "Seq" }
-	def genericName() { if (type == Type.OBJECT) "Seq<A>" else shortName }
-	def genericName(int index) { if (type == Type.OBJECT) "Seq" + index + "<A>" else shortName + index }
-	def diamondName(int index) { if (type == Type.OBJECT) "Seq" + index + "<>" else shortName + index }
-	def wildcardName() { if (type == Type.OBJECT) "Seq<?>" else shortName }
-	def paramGenericName() { if (type == Type.OBJECT) "<A> Seq<A>" else shortName }
-	def paramGenericName(int index) { if (type == Type.OBJECT) "<A> Seq" + index + "<A>" else shortName + index }
+	def shortName() { type.seqShortName }
+	def genericName() { type.seqGenericName }
+	def genericName(int index) { type.genericName("Seq" + index) }
+	def diamondName(int index) { type.diamondName("Seq" + index) }
+	def wildcardName() { type.wildcardName("Seq") }
+	def paramGenericName() { type.paramGenericName("Seq") }
+	def paramGenericName(int index) { type.paramGenericName("Seq" + index) }
 	def updateFunction() { if (type == Type.OBJECT) "F<A, A>" else type.typeName + type.typeName + "F" }
 	def seqBuilderName() { type.seqBuilderGenericName }
-	def seqBuilderDiamondName() { if (type == Type.OBJECT) "SeqBuilder<>" else shortName + "Builder" }
-	def iteratorName(int index) { shortName + index + "Iterator" + (if (type == Type.OBJECT) "<A>" else "") }
-	def iteratorDiamondName(int index) { shortName + index + "Iterator" + (if (type == Type.OBJECT) "<>" else "") }
-	def iteratorReturnType() { if (type == Type.OBJECT) "A" else if (type == Type.BOOL) "Boolean" else type.javaName }
-	def reversedIteratorName(int index) { shortName + index + "ReversedIterator" + (if (type == Type.OBJECT) "<A>" else "") }
-	def reversedIteratorDiamondName(int index) { shortName + index + "ReversedIterator" + (if (type == Type.OBJECT) "<>" else "") }
-	def bufferedListName() { if (type == Type.OBJECT) "BufferedList<A>" else if (type == Type.BOOL) "BufferedList<Boolean>" else "Buffered" + type.typeName + "List" }
-	def bufferedListDiamondName() { if (type == Type.OBJECT) "BufferedList<>" else if (type == Type.BOOL) "BufferedList<>" else "Buffered" + type.typeName + "List" }
+	def seqBuilderDiamondName() { type.diamondName("SeqBuilder") }
+	def iteratorName(int index) { type.genericName("Seq" + index + "Iterator") }
+	def iteratorDiamondName(int index) { type.diamondName("Seq" + index + "Iterator") }
+	def reversedIteratorName(int index) { type.genericName("Seq" + index + "ReversedIterator") }
+	def reversedIteratorDiamondName(int index) { type.diamondName("Seq" + index + "ReversedIterator") }
 	def index() { if (type == Type.OBJECT) "index" else "Seq.index" }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
 		import java.io.Serializable;
-		import java.util.ArrayList;
 		import java.util.Collection;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.PrimitiveIterator;
 		«ELSE»
 			import java.util.Iterator;
 		«ENDIF»
-		import java.util.HashSet;
-		import java.util.List;
 		import java.util.NoSuchElementException;
-		import java.util.RandomAccess;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
-		«IF Type.javaUnboxedTypes.contains(type)»
-			import java.util.stream.«type.javaPrefix»Stream;
-		«ELSE»
-			import java.util.stream.Stream;
-		«ENDIF»
-		import java.util.stream.StreamSupport;
 
-		import «Constants.F»;
-		«IF type == Type.OBJECT»
-			import «Constants.F0»;
-		«ELSE»
-			import «Constants.FUNCTION».«type.typeName»F0;
-		«ENDIF»
-		«FOR arity : 2 .. Constants.MAX_ARITY»
-			import «Constants.F»«arity»;
-		«ENDFOR»
-		«IF type == Type.OBJECT»
-			«FOR toType : Type.primitives»
-				import «Constants.FUNCTION».«toType.typeName»F;
-			«ENDFOR»
-			import «Constants.FUNCTION».IntObjectF;
-		«ELSE»
-			«FOR toType : Type.primitives»
-				import «Constants.FUNCTION».«type.typeName»«toType.typeName»F;
-			«ENDFOR»
-			import «Constants.FUNCTION».«type.typeName»ObjectF;
-			«IF type != Type.INT»
-				import «Constants.FUNCTION».Int«type.typeName»F;
-			«ENDIF»
-		«ENDIF»
-		import «Constants.EQUATABLE»;
-		import «Constants.JCATS».«IF type != Type.OBJECT»«type.typeName»«ENDIF»Indexed;
-		import «Constants.P»;
-		«FOR arity : 3 .. Constants.MAX_ARITY»
-			import «Constants.P»«arity»;
-		«ENDFOR»
-		import «Constants.SIZED»;
+		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
-		import static java.lang.Math.min;
-		import static java.util.Collections.emptyIterator;
+		«IF type == Type.OBJECT»
+			import static java.lang.Math.min;
+		«ENDIF»
+		«IF !Type.javaUnboxedTypes.contains(type)»
+			import static java.util.Collections.emptyIterator;
+		«ENDIF»
 		import static java.util.Objects.requireNonNull;
 		«IF type != Type.OBJECT»
 			import static jcats.collection.Seq.*;
 		«ENDIF»
-		import static «Constants.F».id;
-		import static «Constants.P».p;
+		«IF type == Type.OBJECT»
+			import static «Constants.F».id;
+			import static «Constants.P».p;
+		«ENDIF»
 		import static «Constants.COMMON».iterableToString;
 		import static «Constants.COMMON».iterableHashCode;
 
@@ -1244,7 +1209,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «iteratorReturnType» «type.iteratorNext»() {
+			public «type.iteratorReturnType» «type.iteratorNext»() {
 				if (index1 < node1.length) {
 					return «type.genericCast»node1[index1++];
 				} else if (index2 < node2.length) {
@@ -1284,7 +1249,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «iteratorReturnType» «type.iteratorNext»() {
+			public «type.iteratorReturnType» «type.iteratorNext»() {
 				if (index1 < node1.length) {
 					return «type.genericCast»node1[index1++];
 				} else if (node2 != null && index2 < node2.length) {
@@ -1347,7 +1312,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «iteratorReturnType» «type.iteratorNext»() {
+			public «type.iteratorReturnType» «type.iteratorNext»() {
 				if (index1 < node1.length) {
 					return «type.genericCast»node1[index1++];
 				} else if (node2 != null && index2 < node2.length) {
@@ -1440,7 +1405,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «iteratorReturnType» «type.iteratorNext»() {
+			public «type.iteratorReturnType» «type.iteratorNext»() {
 				if (index1 < node1.length) {
 					return «type.genericCast»node1[index1++];
 				} else if (node2 != null && index2 < node2.length) {
@@ -1570,7 +1535,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «iteratorReturnType» «type.iteratorNext»() {
+			public «type.iteratorReturnType» «type.iteratorNext»() {
 				if (index1 < node1.length) {
 					return «type.genericCast»node1[index1++];
 				} else if (node2 != null && index2 < node2.length) {
@@ -1735,7 +1700,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «iteratorReturnType» «type.iteratorNext»() {
+			public «type.iteratorReturnType» «type.iteratorNext»() {
 				if (index1 >= 0) {
 					return «type.genericCast»node1[index1--];
 				} else if (index2 >= 0) {
@@ -1777,7 +1742,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «iteratorReturnType» «type.iteratorNext»() {
+			public «type.iteratorReturnType» «type.iteratorNext»() {
 				if (index1 >= 0) {
 					return «type.genericCast»node1[index1--];
 				} else if (node2 != null && index2 >= 0) {
@@ -1842,7 +1807,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «iteratorReturnType» «type.iteratorNext»() {
+			public «type.iteratorReturnType» «type.iteratorNext»() {
 				if (index1 >= 0) {
 					return «type.genericCast»node1[index1--];
 				} else if (node2 != null && index2 >= 0) {
@@ -1941,7 +1906,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «iteratorReturnType» «type.iteratorNext»() {
+			public «type.iteratorReturnType» «type.iteratorNext»() {
 				if (index1 >= 0) {
 					return «type.genericCast»node1[index1--];
 				} else if (node2 != null && index2 >= 0) {
@@ -2082,7 +2047,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «iteratorReturnType» «type.iteratorNext»() {
+			public «type.iteratorReturnType» «type.iteratorNext»() {
 				if (index1 >= 0) {
 					return «type.genericCast»node1[index1--];
 				} else if (node2 != null && index2 >= 0) {
@@ -2315,7 +2280,7 @@ final class SeqGenerator implements ClassGenerator {
 
 			@Override
 			public «type.javaName»[] «type.toArrayName»() {
-				return «IF type != Type.OBJECT»«type.typeName»«ENDIF»Array.EMPTY.array;
+				return Common.«type.emptyArrayName»;
 			}
 
 			@Override

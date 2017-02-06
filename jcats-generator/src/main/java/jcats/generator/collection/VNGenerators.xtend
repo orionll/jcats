@@ -20,27 +20,14 @@ final class VNGenerators {
 
 				import java.io.Serializable;
 				import java.util.ArrayList;
-				import java.util.Arrays;
 				import java.util.Iterator;
 				import java.util.HashSet;
-				import java.util.List;
 				import java.util.NoSuchElementException;
 				import java.util.Spliterator;
 				import java.util.Spliterators;
-				import java.util.stream.Stream;
-				import java.util.stream.StreamSupport;
 
-				import «Constants.EQUATABLE»;
-				import «Constants.INDEXED»;
-				import «Constants.P»;
-				«FOR arity : 3 .. Constants.MAX_ARITY»
-					import «Constants.P»«arity»;
-				«ENDFOR»
-				import «Constants.SIZED»;
-				import «Constants.F»;
-				«FOR arity : 2 .. Constants.MAX_ARITY»
-					import «Constants.F»«arity»;
-				«ENDFOR»
+				import «Constants.JCATS».*;
+				import «Constants.FUNCTION».*;
 
 				import static java.util.Objects.requireNonNull;
 				import static «Constants.P».p;

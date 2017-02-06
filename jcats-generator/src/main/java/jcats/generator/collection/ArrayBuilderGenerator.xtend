@@ -17,9 +17,9 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 
 	override className() { Constants.COLLECTION + "." + shortName }
 
-	def shortName() { if (type == Type.OBJECT) "ArrayBuilder" else type.typeName + "ArrayBuilder" }
-	def genericName() { if (type == Type.OBJECT) shortName + "<A>" else shortName }
-	def arrayGenericName() { if (type == Type.OBJECT) "Array<A>" else type.typeName + "Array" }
+	def shortName() { type.shortName("ArrayBuilder") }
+	def genericName() { type.genericName("ArrayBuilder") }
+	def arrayGenericName() { type.arrayGenericName }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -32,12 +32,12 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 
 		import «Constants.SIZED»;
 
+		import static java.util.Objects.requireNonNull;
 		«IF type != Type.OBJECT»
 			import static «Constants.ARRAY»Builder.expandedCapacity;
 		«ENDIF»
 		import static «Constants.COLLECTION».«IF type != Type.OBJECT»«type.typeName»«ENDIF»Array.empty«IF type != Type.OBJECT»«type.typeName»«ENDIF»Array;
 
-		import static java.util.Objects.requireNonNull;
 
 		public final class «genericName» {
 			private «type.javaName»[] array;
