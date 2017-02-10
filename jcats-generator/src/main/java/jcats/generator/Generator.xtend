@@ -33,10 +33,10 @@ interface Generator {
 		}
 	''' }
 
-	def static String spliterator(Type type) {'''
+	def static String spliterator(Type type, boolean isFinal) {'''
 		@Override
 		«IF type == Type.OBJECT»
-			public Spliterator<A> spliterator() {
+			public «IF isFinal»final «ENDIF»Spliterator<A> spliterator() {
 				if (isEmpty()) {
 					return Spliterators.emptySpliterator();
 				} else {
@@ -44,7 +44,7 @@ interface Generator {
 				}
 			}
 		«ELSEIF type == Type.BOOL»
-			public Spliterator<Boolean> spliterator() {
+			public «IF isFinal»final «ENDIF»Spliterator<Boolean> spliterator() {
 				if (isEmpty()) {
 					return Spliterators.emptySpliterator();
 				} else {
@@ -52,7 +52,7 @@ interface Generator {
 				}
 			}
 		«ELSE»
-			public Spliterator.Of«type.javaPrefix» spliterator() {
+			public «IF isFinal»final «ENDIF»Spliterator.Of«type.javaPrefix» spliterator() {
 				if (isEmpty()) {
 					return Spliterators.empty«type.javaPrefix»Spliterator();
 				} else {
@@ -62,39 +62,27 @@ interface Generator {
 		«ENDIF»
 	'''}
 
-	def toStr() { return toStr(Type.OBJECT) }
+	def toStr() { return toStr(Type.OBJECT, false) }
 
-	def toStr(Type type) { '''
+	def toStr(Type type, boolean isFinal) { '''
 		@Override
-		public String toString() {
+		public «IF isFinal»final «ENDIF»String toString() {
 			return iterableToString(this, "«name»");
 		}
 	'''}
 
-	def toArrayList(Type type, boolean isFinal) { '''
-		public «if (isFinal) "final " else ""»ArrayList<«type.genericBoxedName»> toArrayList() {
-			return new ArrayList<>(asList());
-		}
-	'''}
+	def static hashcode() { return hashcode("A", false) }
 
-	def toHashSet(Type type, boolean isFinal) { '''
-		public «if (isFinal) "final " else ""»HashSet<«type.genericBoxedName»> toHashSet() {
-			return new HashSet<>(asList());
-		}
-	'''}
-
-	def static hashcode() { return hashcode("A") }
-
-	def static hashcode(String paramBoxedName) { '''
+	def static hashcode(String paramBoxedName, boolean isFinal) { '''
 		@Override
-		public int hashCode() {
+		public «IF isFinal»final «ENDIF»int hashCode() {
 			return iterableHashCode(this);
 		}
 	'''}
 
-	def static equals(Type type, String wildcardName) {'''
+	def static equals(Type type, String wildcardName, boolean isFinal) {'''
 		@Override
-		public boolean equals(final Object obj) {
+		public «IF isFinal»final «ENDIF»boolean equals(final Object obj) {
 			if (obj == this) {
 				return true;
 			} else if (obj instanceof «wildcardName») {
@@ -147,28 +135,28 @@ interface Generator {
 		}
 	'''}
 
-	def zip() { zip(true) }
+	def zip() { zip(true, false) }
 
-	def zip(boolean javadocComplexity) { '''
+	def zip(boolean javadocComplexity, boolean isFinal) { '''
 		«IF javadocComplexity»
 			/**
 			 * O(min(this.size, that.size))
 			 */
 		«ENDIF»
-		public <B> «name»<P<A, B>> zip(final «name»<B> that) {
+		public «IF isFinal»final «ENDIF»<B> «name»<P<A, B>> zip(final «name»<B> that) {
 			return zip2(this, that);
 		}
 	'''}
 
-	def zipWith() { zipWith(true) }
+	def zipWith() { zipWith(true, false) }
 
-	def zipWith(boolean javadocComplexity) { '''
+	def zipWith(boolean javadocComplexity, boolean isFinal) { '''
 		«IF javadocComplexity»
 			/**
 			 * O(min(this.size, that.size))
 			 */
 		«ENDIF»
-		public <B, C> «name»<C> zipWith(final «name»<B> that, final F2<A, B, C> f) {
+		public «IF isFinal»final «ENDIF»<B, C> «name»<C> zipWith(final «name»<B> that, final F2<A, B, C> f) {
 			return zipWith2(this, that, f);
 		}
 	'''}

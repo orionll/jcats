@@ -1081,25 +1081,25 @@ final class SeqGenerator implements ClassGenerator {
 				public abstract «type.iteratorGenericName» iterator();
 
 			«ENDIF»
-			«spliterator(type)»
+			«spliterator(type, true)»
 
-			«hashcode(type.genericBoxedName)»
+			«hashcode(type.genericBoxedName, true)»
 
-			«equals(type, wildcardName)»
+			«equals(type, wildcardName, true)»
 
-			«toStr(type)»
+			«toStr(type, true)»
 
 			abstract «type.iteratorGenericName» reversedIterator();
 
 			«IF type == Type.OBJECT»
-				«zip»
+				«zip(true, true)»
 
-				«zipWith»
+				«zipWith(true, true)»
 
 				/**
 				 * O(size)
 				 */
-				public Seq<P<A, Integer>> zipWithIndex() {
+				public final Seq<P<A, Integer>> zipWithIndex() {
 					if (isEmpty()) {
 						return emptySeq();
 					} else {

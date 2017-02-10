@@ -203,9 +203,9 @@ final class VNGenerators {
 						return Spliterators.spliterator(iterator(), «arity», Spliterator.ORDERED | Spliterator.IMMUTABLE);
 					}
 
-					«zip(false)»
+					«zip(false, false)»
 
-					«zipWith(false)»
+					«zipWith(false, false)»
 
 					public V«arity»<P<A, Integer>> zipWithIndex() {
 						return new V«arity»<>(«(1 .. arity).map["p(a" + it + ", " + (it-1) + ")"].join(", ")»);

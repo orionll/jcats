@@ -559,7 +559,7 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			«toStr(type)»
+			«toStr(type, false)»
 
 			«IF type == Type.OBJECT»
 			«zip»
