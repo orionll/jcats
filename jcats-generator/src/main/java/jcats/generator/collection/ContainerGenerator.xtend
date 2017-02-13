@@ -32,6 +32,7 @@ class ContainerGenerator implements InterfaceGenerator {
 			import java.util.PrimitiveIterator;
 		«ENDIF»
 		import java.util.Spliterator;
+		import java.util.function.Consumer;
 		import java.util.stream.«type.streamName»;
 		import java.util.stream.StreamSupport;
 
@@ -71,6 +72,12 @@ class ContainerGenerator implements InterfaceGenerator {
 						eff.apply(value);
 					}
 				«ENDIF»
+			}
+
+			@Override
+			default void forEach(final Consumer<? super «type.genericBoxedName»> action) {
+				requireNonNull(action);
+				foreach(action::accept);
 			}
 
 			«IF Type.javaUnboxedTypes.contains(type)»

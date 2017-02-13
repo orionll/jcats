@@ -285,9 +285,6 @@ final class SeqGenerator implements ClassGenerator {
 				return this;
 			}
 
-			@Override
-			public abstract «type.javaName»[] «type.toArrayName»();
-
 			public static «paramGenericName» empty«shortName»() {
 				return EMPTY;
 			}
@@ -2300,6 +2297,11 @@ final class SeqGenerator implements ClassGenerator {
 					return Empty«type.typeName»Iterator.empty«type.typeName»Iterator();
 				«ENDIF»
 			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				requireNonNull(eff);
+			}
 		}
 	''' }
 
@@ -2600,6 +2602,13 @@ final class SeqGenerator implements ClassGenerator {
 				«ELSE»
 					return new «type.typeName»ArrayReversedIterator(node1);
 				«ENDIF»
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				for (final «type.javaName» value : node1) {
+					eff.apply(«type.genericCast»value);
+				}
 			}
 		}
 	''' }
@@ -3302,6 +3311,15 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			«type.iteratorGenericName» reversedIterator() {
 				return new «reversedIteratorDiamondName(2)»(node2, init, tail);
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				for (final «type.javaName»[] node1 : node2) {
+					for (final «type.javaName» value : node1) {
+						eff.apply(«type.genericCast»value);
+					}
+				}
 			}
 		}
 	''' }
@@ -4160,6 +4178,17 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			«type.iteratorGenericName» reversedIterator() {
 				return new «reversedIteratorDiamondName(3)»(node3, init, tail);
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				for (final «type.javaName»[][] node2 : node3) {
+					for (final «type.javaName»[] node1 : node2) {
+						for (final «type.javaName» value : node1) {
+							eff.apply(«type.genericCast»value);
+						}
+					}
+				}
 			}
 		}
 	''' }
@@ -5161,6 +5190,19 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			«type.iteratorGenericName» reversedIterator() {
 				return new «reversedIteratorDiamondName(4)»(node4, init, tail);
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				for (final «type.javaName»[][][] node3 : node4) {
+					for (final «type.javaName»[][] node2 : node3) {
+						for (final «type.javaName»[] node1 : node2) {
+							for (final «type.javaName» value : node1) {
+								eff.apply(«type.genericCast»value);
+							}
+						}
+					}
+				}
 			}
 		}
 	''' }
@@ -6320,6 +6362,21 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			«type.iteratorGenericName» reversedIterator() {
 				return new «reversedIteratorDiamondName(5)»(node5, init, tail);
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				for (final «type.javaName»[][][][] node4 : node5) {
+					for (final «type.javaName»[][][] node3 : node4) {
+						for (final «type.javaName»[][] node2 : node3) {
+							for (final «type.javaName»[] node1 : node2) {
+								for (final «type.javaName» value : node1) {
+									eff.apply(«type.genericCast»value);
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	''' }
@@ -7613,6 +7670,23 @@ final class SeqGenerator implements ClassGenerator {
 			@Override
 			«type.iteratorGenericName» reversedIterator() {
 				return new «reversedIteratorDiamondName(6)»(node6, init, tail);
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				for (final «type.javaName»[][][][][] node5 : node6) {
+					for (final «type.javaName»[][][][] node4 : node5) {
+						for (final «type.javaName»[][][] node3 : node4) {
+							for (final «type.javaName»[][] node2 : node3) {
+								for (final «type.javaName»[] node1 : node2) {
+									for (final «type.javaName» value : node1) {
+										eff.apply(«type.genericCast»value);
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	''' }

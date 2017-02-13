@@ -10,7 +10,7 @@ class KeyValueGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		import java.util.Spliterator;
+		import java.util.Iterator;
 		import java.util.stream.Stream;
 		import java.util.stream.StreamSupport;
 
@@ -41,16 +41,6 @@ class KeyValueGenerator implements InterfaceGenerator {
 			default void foreach(final Eff2<K, A> eff) {
 				requireNonNull(eff);
 				forEach(entry -> eff.apply(entry.get1(), entry.get2()));
-			}
-
-			default void forEachKey(final Eff<K> eff) {
-				requireNonNull(eff);
-				forEach(entry -> eff.apply(entry.get1()));
-			}
-
-			default void forEachValue(final Eff<A> eff) {
-				requireNonNull(eff);
-				forEach(entry -> eff.apply(entry.get2()));
 			}
 
 			default Container<K> keys() {
