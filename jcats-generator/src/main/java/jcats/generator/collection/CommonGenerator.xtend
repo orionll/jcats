@@ -61,7 +61,7 @@ final class CommonGenerator implements ClassGenerator {
 
 				@Override
 				public boolean hasNext() {
-					return (i != array.length);
+					return (i < array.length);
 				}
 
 				@Override
