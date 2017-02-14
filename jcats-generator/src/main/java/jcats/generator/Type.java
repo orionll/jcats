@@ -119,35 +119,43 @@ public enum Type {
 	}
 
 	public String iteratorGenericName() {
-	    switch (this) {
-	        case OBJECT: return "Iterator<A>";
-	        case BOOL: return "Iterator<Boolean>";
-	        default: return "PrimitiveIterator.Of" + javaPrefix();
-	    }
+		switch (this) {
+			case OBJECT: return "Iterator<A>";
+			case BOOL: return "Iterator<Boolean>";
+			default: return "PrimitiveIterator.Of" + javaPrefix();
+		}
 	}
 
 	public String iteratorReturnType() {
 		switch (this) {
-    		case OBJECT: return "A";
-    		case BOOL: return "Boolean";
-    		default: return javaName();
+			case OBJECT: return "A";
+			case BOOL: return "Boolean";
+			default: return javaName();
 		}
 	}
 
 	public String spliteratorGenericName() {
 		switch (this) {
-		    case OBJECT: return "Spliterator<A>";
-		    case BOOL: return "Spliterator<Boolean>";
-		    default: return "Spliterator.Of" + javaPrefix();
+			case OBJECT: return "Spliterator<A>";
+			case BOOL: return "Spliterator<Boolean>";
+			default: return "Spliterator.Of" + javaPrefix();
+		}
+	}
+
+	public String emptySpliteratorName() {
+		switch (this) {
+			case OBJECT:
+			case BOOL: return "emptySpliterator";
+			default: return "empty" + javaPrefix() + "Spliterator";
 		}
 	}
 
 	public String streamGenericName() {
-	    switch (this) {
-	        case OBJECT: return "Stream<A>";
-	        case BOOL: return "Stream<Boolean>";
-	        default: return javaPrefix() + "Stream";
-	    }
+		switch (this) {
+			case OBJECT: return "Stream<A>";
+			case BOOL: return "Stream<Boolean>";
+			default: return javaPrefix() + "Stream";
+		}
 	}
 
 	public String streamName() {
@@ -167,11 +175,11 @@ public enum Type {
 	}
 
 	public String iteratorWildcardName() {
-	    switch (this) {
-	        case OBJECT: return "Iterator<?>";
-	        case BOOL: return "Iterator<Boolean>";
-	        default: return "PrimitiveIterator.Of" + javaPrefix();
-	    }
+		switch (this) {
+			case OBJECT: return "Iterator<?>";
+			case BOOL: return "Iterator<Boolean>";
+			default: return "PrimitiveIterator.Of" + javaPrefix();
+		}
 	}
 
 	public String iteratorNext() {
@@ -187,7 +195,7 @@ public enum Type {
 	}
 
 	public String emptyArrayName() {
-	    return "EMPTY_" + javaName().toUpperCase() + "_ARRAY";
+		return "EMPTY_" + javaName().toUpperCase() + "_ARRAY";
 	}
 
 	public String updateFunction() {

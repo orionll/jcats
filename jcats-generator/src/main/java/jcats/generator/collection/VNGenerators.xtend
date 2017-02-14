@@ -207,6 +207,13 @@ final class VNGenerators {
 					}
 
 					@Override
+					public void foreach(final «type.effGenericName» eff) {
+						«FOR index : 1 .. arity»
+							eff.apply(a«index»);
+						«ENDFOR»
+					}
+
+					@Override
 					public int hashCode() {
 						int result = 1;
 						«FOR index : 1 .. arity»

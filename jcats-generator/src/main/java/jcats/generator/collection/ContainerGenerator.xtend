@@ -32,6 +32,7 @@ class ContainerGenerator implements InterfaceGenerator {
 			import java.util.PrimitiveIterator;
 		«ENDIF»
 		import java.util.Spliterator;
+		import java.util.Spliterators;
 		import java.util.function.Consumer;
 		import java.util.stream.«type.streamName»;
 		import java.util.stream.StreamSupport;
@@ -48,15 +49,24 @@ class ContainerGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				for (final «type.genericName» a : this) {
-					«IF type == Type.OBJECT»
-						if (a.equals(value)) {
-					«ELSE»
-						if (a == value) {
-					«ENDIF»
-						return true;
+				«IF Type.javaUnboxedTypes.contains(type)»
+					final «type.iteratorGenericName» iterator = iterator();
+					while (iterator.hasNext()) {
+						if (iterator.«type.iteratorNext»() == value) {
+							return true;
+						}
 					}
-				}
+				«ELSE»
+					for (final «type.genericName» a : this) {
+						«IF type == Type.OBJECT»
+							if (a.equals(value)) {
+						«ELSE»
+							if (a == value) {
+						«ENDIF»
+							return true;
+						}
+					}
+				«ENDIF»
 				return false;
 			}
 
@@ -84,10 +94,16 @@ class ContainerGenerator implements InterfaceGenerator {
 				@Override
 				«type.iteratorGenericName» iterator();
 
-				@Override
-				«type.spliteratorGenericName» spliterator();
-
 			«ENDIF»
+			@Override
+			default «type.spliteratorGenericName» spliterator() {
+				if (isEmpty()) {
+					return Spliterators.«type.emptySpliteratorName»();
+				} else {
+					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
+				}
+			}
+
 			default «type.arrayGenericName» to«type.arrayShortName»() {
 				if (isEmpty()) {
 					return «type.arrayShortName».empty«type.arrayShortName»();

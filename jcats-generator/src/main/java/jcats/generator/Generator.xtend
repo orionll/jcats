@@ -33,35 +33,6 @@ interface Generator {
 		}
 	''' }
 
-	def static String spliterator(Type type, boolean isFinal) {'''
-		@Override
-		«IF type == Type.OBJECT»
-			public «IF isFinal»final «ENDIF»Spliterator<A> spliterator() {
-				if (isEmpty()) {
-					return Spliterators.emptySpliterator();
-				} else {
-					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
-				}
-			}
-		«ELSEIF type == Type.BOOL»
-			public «IF isFinal»final «ENDIF»Spliterator<Boolean> spliterator() {
-				if (isEmpty()) {
-					return Spliterators.emptySpliterator();
-				} else {
-					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
-				}
-			}
-		«ELSE»
-			public «IF isFinal»final «ENDIF»Spliterator.Of«type.javaPrefix» spliterator() {
-				if (isEmpty()) {
-					return Spliterators.empty«type.javaPrefix»Spliterator();
-				} else {
-					return Spliterators.spliterator(iterator(), size(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
-				}
-			}
-		«ENDIF»
-	'''}
-
 	def toStr() { return toStr(Type.OBJECT, false) }
 
 	def toStr(Type type, boolean isFinal) { '''

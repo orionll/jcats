@@ -43,8 +43,6 @@ final class SeqGenerator implements ClassGenerator {
 			import java.util.Iterator;
 		«ENDIF»
 		import java.util.NoSuchElementException;
-		import java.util.Spliterator;
-		import java.util.Spliterators;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -1077,8 +1075,6 @@ final class SeqGenerator implements ClassGenerator {
 				public abstract «type.iteratorGenericName» iterator();
 
 			«ENDIF»
-			«spliterator(type, true)»
-
 			«hashcode(type.genericBoxedName, true)»
 
 			«equals(type, wildcardName, true)»
