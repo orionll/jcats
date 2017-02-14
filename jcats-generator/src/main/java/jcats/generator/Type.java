@@ -85,7 +85,7 @@ public enum Type {
 	public String seqShortName() {
 		return shortName("Seq");
 	}
-	
+
 	public String seqGenericName() {
 		return genericName("Seq");
 	}
@@ -177,9 +177,9 @@ public enum Type {
 	public String iteratorNext() {
 		return javaUnboxedTypes().contains(this) ? "next" + javaPrefix() : "next";
 	}
-	
+
 	public String toArrayName() {
-		return (this == Type.OBJECT) ? "toObjectArray" : "toPrimitiveArray"; 
+		return (this == Type.OBJECT) ? "toObjectArray" : "toPrimitiveArray";
 	}
 
 	public String getIterator(String iterator) {
@@ -188,6 +188,10 @@ public enum Type {
 
 	public String emptyArrayName() {
 	    return "EMPTY_" + javaName().toUpperCase() + "_ARRAY";
+	}
+
+	public String updateFunction() {
+		return (this == Type.OBJECT) ? "F<A, A>" : typeName() + typeName() + "F";
 	}
 
 	public static ImmutableList<Type> javaUnboxedTypes() {

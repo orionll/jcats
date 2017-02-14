@@ -5,7 +5,7 @@ import static extension java.lang.Character.toLowerCase
 interface Generator {
 	def String className()
 	def String name() { className.substring(className.lastIndexOf('.') + 1) }
-	
+
 	val public static PRIMITIVES = #["int", "long", "boolean", "double", "float", "short", "byte"]
 
 	def String sourceCode()

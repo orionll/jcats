@@ -24,7 +24,6 @@ final class SeqGenerator implements ClassGenerator {
 	def wildcardName() { type.wildcardName("Seq") }
 	def paramGenericName() { type.paramGenericName("Seq") }
 	def paramGenericName(int index) { type.paramGenericName("Seq" + index) }
-	def updateFunction() { if (type == Type.OBJECT) "F<A, A>" else type.typeName + type.typeName + "F" }
 	def seqBuilderName() { type.seqBuilderGenericName }
 	def seqBuilderDiamondName() { type.diamondName("SeqBuilder") }
 	def iteratorName(int index) { type.genericName("Seq" + index + "Iterator") }
@@ -118,7 +117,7 @@ final class SeqGenerator implements ClassGenerator {
 			/**
 			 * O(log(size))
 			 */
-			public abstract «genericName» update(final int index, final «updateFunction» f);
+			public abstract «genericName» update(final int index, final «type.updateFunction» f);
 
 			public abstract «genericName» take(final int n);
 
@@ -2236,7 +2235,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «genericName» update(final int index, final «updateFunction» __) {
+			public «genericName» update(final int index, final «type.updateFunction» __) {
 				throw new IndexOutOfBoundsException(Integer.toString(index));
 			}
 
@@ -2357,7 +2356,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «genericName» update(final int index, final «updateFunction» f) {
+			public «genericName» update(final int index, final «type.updateFunction» f) {
 				requireNonNull(f);
 				final «type.javaName»[] newNode1 = node1.clone();
 				final «type.genericName» oldValue = «type.genericCast»node1[index];
@@ -2730,7 +2729,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «genericName» update(final int index, final «updateFunction» f) {
+			public «genericName» update(final int index, final «type.updateFunction» f) {
 				requireNonNull(f);
 				try {
 					if (index < init.length) {
@@ -3519,7 +3518,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «genericName» update(final int index, final «updateFunction» f) {
+			public «genericName» update(final int index, final «type.updateFunction» f) {
 				requireNonNull(f);
 				try {
 					if (index < init.length) {
@@ -4462,7 +4461,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «genericName» update(final int index, final «updateFunction» f) {
+			public «genericName» update(final int index, final «type.updateFunction» f) {
 				requireNonNull(f);
 				try {
 					if (index < init.length) {
@@ -5561,7 +5560,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «genericName» update(final int index, final «updateFunction» f) {
+			public «genericName» update(final int index, final «type.updateFunction» f) {
 				requireNonNull(f);
 				try {
 					if (index < init.length) {
@@ -6837,7 +6836,7 @@ final class SeqGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «genericName» update(final int index, final «updateFunction» f) {
+			public «genericName» update(final int index, final «type.updateFunction» f) {
 				requireNonNull(f);
 				try {
 					if (index < init.length) {

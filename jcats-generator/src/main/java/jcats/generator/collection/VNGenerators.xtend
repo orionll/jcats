@@ -5,22 +5,33 @@ import jcats.generator.ClassGenerator
 import jcats.generator.Constants
 import jcats.generator.Generator
 import jcats.generator.PNGenerators
+import jcats.generator.Type
 
 final class VNGenerators {
 	def static List<Generator> generators() {
-		(2 .. Constants.MAX_ARITY).map[generator(it)].toList
+		(2 .. Constants.MAX_ARITY).map[int arity | Type.values.map[generator(arity, it)]].flatten.toList;
 	}
 
-	private def static Generator generator(int arity) {
+	private def static Generator generator(int arity, Type type) {
 		new ClassGenerator {
-			override className() { Constants.V + arity }
+			override className() { Constants.COLLECTION + "." + shortName }
+
+			def baseName() { "V" + arity }
+			def shortName() { type.shortName(baseName) }
+			def genericName() { type.genericName(baseName) }
+			def diamondName() { type.diamondName(baseName) }
+			def factoryMethodName() { if (type == Type.OBJECT) "v" + arity else type.typeName.toLowerCase + "V" + arity }
 
 			override sourceCode() { '''
 				package «Constants.COLLECTION»;
 
 				import java.io.Serializable;
 				import java.util.ArrayList;
-				import java.util.Iterator;
+				«IF Type.javaUnboxedTypes.contains(type)»
+					import java.util.PrimitiveIterator;
+				«ELSE»
+					import java.util.Iterator;
+				«ENDIF»
 				import java.util.HashSet;
 				import java.util.NoSuchElementException;
 				import java.util.Spliterator;
@@ -30,15 +41,20 @@ final class VNGenerators {
 				import «Constants.FUNCTION».*;
 
 				import static java.util.Objects.requireNonNull;
-				import static «Constants.P».p;
+				«IF type == Type.OBJECT»
+					import static «Constants.P».p;
+				«ELSE»
+					import static «Constants.JCATS».«type.typeName»«type.typeName»P.«type.typeName.toLowerCase»«type.typeName»P;
+					import static «Constants.COLLECTION».V«arity».v«arity»;
+				«ENDIF»
 				«IF arity > 2»
 					import static «Constants.P»«arity».p«arity»;
 				«ENDIF»
 
-				public final class V«arity»<A> implements Container<A>, Equatable<V«arity»<A>>, Indexed<A>, Serializable {
-					private final A «(1 .. arity).map["a" + it].join(", ")»;
+				public final class «genericName» implements «type.containerGenericName», Equatable<«genericName»>, «type.indexedGenericName», Serializable {
+					private final «type.genericName» «(1 .. arity).map["a" + it].join(", ")»;
 
-					private V«arity»(«(1 .. arity).map["final A a" + it].join(", ")») {
+					private «shortName»(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {
 						«FOR i : 1 .. arity»
 							this.a«i» = a«i»;
 						«ENDFOR»
@@ -63,13 +79,13 @@ final class VNGenerators {
 					}
 
 					«FOR i : 1 .. arity»
-						public A get«i»() {
+						public «type.genericName» get«i»() {
 							return a«i»;
 						}
 
 					«ENDFOR»
 					@Override
-					public A get(final int index) {
+					public «type.genericName» get(final int index) {
 						switch (index) {
 							«FOR i : 1 .. arity»
 								case «i-1»: return a«i»;
@@ -79,70 +95,91 @@ final class VNGenerators {
 					}
 
 					«FOR i : 1 .. arity»
-						public V«arity»<A> set«i»(final A a«i») {
-							return new V«arity»<>(«(1 .. arity).map[if (it == i) '''requireNonNull(a«i»)''' else "a" + it].join(", ")»);
+						public «genericName» set«i»(final «type.genericName» a«i») {
+							return new «diamondName»(«(1 .. arity).map[if (type == Type.OBJECT && it == i) '''requireNonNull(a«i»)''' else "a" + it].join(", ")»);
 						}
 
 					«ENDFOR»
-					public V«arity»<A> set(final int index, final A value) {
+					public «genericName» set(final int index, final «type.genericName» value) {
 						switch (index) {
 							«FOR i : 1 .. arity»
-								case «i-1»: return new V«arity»<>(«(1 .. arity).map[if (it == i) '''requireNonNull(value)''' else "a" + it].join(", ")»);
+								case «i-1»: return new «diamondName»(«(1 .. arity).map[if (it == i) '''«IF type == Type.OBJECT»requireNonNull(value)«ELSE»value«ENDIF»''' else "a" + it].join(", ")»);
 							«ENDFOR»
 							default: throw new IndexOutOfBoundsException(Integer.toString(index));
 						}
 					}
 
 					«FOR i : 1 .. arity»
-						public V«arity»<A> update«i»(final F<A, A> f) {
-							final A a = f.apply(a«i»);
-							return new V«arity»<>(«(1 .. arity).map[if (it == i) "requireNonNull(a)" else "a" + it].join(", ")»);
+						public «genericName» update«i»(final «type.updateFunction» f) {
+							final «type.genericName» a = f.apply(a«i»);
+							return new «diamondName»(«(1 .. arity).map[if (it == i) '''«IF type == Type.OBJECT»requireNonNull(a)«ELSE»a«ENDIF»''' else "a" + it].join(", ")»);
 						}
 
 					«ENDFOR»
-					public V«arity»<A> update(final int index, final F<A, A> f) {
+					public «genericName» update(final int index, final «type.updateFunction» f) {
 						switch (index) {
 							«FOR i : 1 .. arity»
 								case «i-1»: {
-									final A a = f.apply(a«i»);
-									return new V«arity»<>(«(1 .. arity).map[if (it == i) "requireNonNull(a)" else "a" + it].join(", ")»);
+									final «type.genericName» a = f.apply(a«i»);
+									return new «diamondName»(«(1 .. arity).map[if (it == i) '''«IF type == Type.OBJECT»requireNonNull(a)«ELSE»a«ENDIF»''' else "a" + it].join(", ")»);
 								}
 							«ENDFOR»
 							default: throw new IndexOutOfBoundsException(Integer.toString(index));
 						}
 					}
 
-					public <B> B match(final F«arity»<«(1 .. arity).map["A, "].join»B> f) {
-						final B b = f.apply(«(1 .. arity).map["a" + it].join(", ")»);
-						return requireNonNull(b);
-					}
+					«IF type == Type.OBJECT»
+						public <B> B match(final F«arity»<«(1 .. arity).map["A, "].join»B> f) {
+							final B b = f.apply(«(1 .. arity).map["a" + it].join(", ")»);
+							return requireNonNull(b);
+						}
 
-					public <B> V«arity»<B> map(final F<A, B> f) {
-						return v«arity»(«(1 .. arity).map["f.apply(a" + it + ")"].join(", ")»);
-					}
+						public <B> V«arity»<B> map(final F<A, B> f) {
+							return v«arity»(«(1 .. arity).map["f.apply(a" + it + ")"].join(", ")»);
+						}
+					«ELSE»
+						public <A> V«arity»<A> map(final «type.typeName»ObjectF<A> f) {
+							return v«arity»(«(1 .. arity).map["f.apply(a" + it + ")"].join(", ")»);
+						}
+					«ENDIF»
 
-					public V«arity»<A> reverse() {
-						return new V«arity»<>(«(arity .. 1).map["a" + it].join(", ")»);
+					public «genericName» reverse() {
+						return new «diamondName»(«(arity .. 1).map["a" + it].join(", ")»);
 					}
 
 					@Override
-					public boolean contains(final A value) {
-						requireNonNull(value);
+					public boolean contains(final «type.genericName» value) {
 						«FOR i : 1 .. arity»
-							if (a«i».equals(value)) {
+							«IF type == Type.OBJECT»
+								if (value.equals(a«i»)) {
+							«ELSE»
+								if (value == a«i») {
+							«ENDIF»
 								return true;
 							}
 						«ENDFOR»
 						return false;
 					}
 
-					public «PNGenerators.shortName(arity)»<«(1 .. arity).map["A"].join(", ")»> toP«if (arity == 2) "" else arity»() {
-						return «PNGenerators.shortName(arity).toLowerCase»(«(1 .. arity).map["a" + it].join(", ")»);
-					}
+					«IF arity == 2»
+						«IF type == Type.OBJECT»
+							public P<A, A> toP() {
+								return p(a1, a2);
+							}
+						«ELSE»
+							public «type.typeName»«type.typeName»P to«type.typeName»«type.typeName»P() {
+								return «type.typeName.toLowerCase»«type.typeName»P(a1, a2);
+							}
+						«ENDIF»
+					«ELSE»
+						public P«arity»<«(1 .. arity).map[type.genericBoxedName].join(", ")»> toP«arity»() {
+							return p«arity»(«(1 .. arity).map["a" + it].join(", ")»);
+						}
+					«ENDIF»
 
 					@Override
-					public ArrayList<A> toArrayList() {
-						final ArrayList<A> result = new ArrayList<>(«arity»);
+					public ArrayList<«type.genericBoxedName»> toArrayList() {
+						final ArrayList<«type.genericBoxedName»> result = new ArrayList<>(«arity»);
 						«FOR index : 1 .. arity»
 							result.add(a«index»);
 						«ENDFOR»
@@ -150,8 +187,8 @@ final class VNGenerators {
 					}
 
 					@Override
-					public HashSet<A> toHashSet() {
-						final HashSet<A> result = new HashSet<>(«Math.ceil(arity / 0.75) as int»);
+					public HashSet<«type.genericBoxedName»> toHashSet() {
+						final HashSet<«type.genericBoxedName»> result = new HashSet<>(«Math.ceil(arity / 0.75) as int»);
 						«FOR index : 1 .. arity»
 							result.add(a«index»);
 						«ENDFOR»
@@ -159,21 +196,25 @@ final class VNGenerators {
 					}
 
 					@Override
-					public Seq<A> toSeq() {
-						final Object[] node1 = { «(1 .. arity).map["a" + it].join(", ")» };
-						return new Seq1<>(node1);
+					public «type.seqGenericName» to«type.seqShortName»() {
+						final «type.javaName»[] node1 = { «(1 .. arity).map["a" + it].join(", ")» };
+						return new «type.diamondName("Seq1")»(node1);
 					}
 
 					@Override
-					public Object[] toObjectArray() {
-						return new Object[] { «(1 .. arity).map["a" + it].join(", ")» };
+					public «type.javaName»[] «type.toArrayName»() {
+						return new «type.javaName»[] { «(1 .. arity).map["a" + it].join(", ")» };
 					}
 
 					@Override
 					public int hashCode() {
 						int result = 1;
 						«FOR index : 1 .. arity»
-							result = 31 * result + a«index».hashCode();
+							«IF type == Type.OBJECT»
+								result = 31 * result + a«index».hashCode();
+							«ELSE»
+								result = 31 * result + «type.genericBoxedName».hashCode(a«index»);
+							«ENDIF»
 						«ENDFOR»
 						return result;
 					}
@@ -182,11 +223,11 @@ final class VNGenerators {
 					public boolean equals(final Object obj) {
 						if (obj == this) {
 							return true;
-						} else if (obj instanceof V«arity»<?>) {
-							final V«arity»<?> v«arity» = (V«arity»<?>) obj;
-							return a1.equals(v«arity».a1)
+						} else if (obj instanceof «shortName») {
+							final «type.wildcardName(baseName)» v«arity» = («type.wildcardName(baseName)») obj;
+							return «IF type == Type.OBJECT»a1.equals(v«arity».a1)«ELSE»a1 == v«arity».a1«ENDIF»
 								«FOR index : 2 .. arity»
-									&& a«index».equals(v«arity».a«index»)«IF index == arity»;«ENDIF»
+									&& «IF type == Type.OBJECT»a«index».equals(v«arity».a«index»)«ELSE»a«index» == v«arity».a«index»«ENDIF»«IF index == arity»;«ENDIF»
 								«ENDFOR»
 						} else {
 							return false;
@@ -194,61 +235,77 @@ final class VNGenerators {
 					}
 
 					@Override
-					public Iterator<A> iterator() {
-						return new V«arity»Iterator<>(«(1 .. arity).map["a" + it].join(", ")»);
+					public «type.iteratorGenericName» iterator() {
+						return new «type.diamondName("V" + arity + "Iterator")»(«(1 .. arity).map["a" + it].join(", ")»);
 					}
 
 					@Override
-					public Spliterator<A> spliterator() {
-						return Spliterators.spliterator(iterator(), «arity», Spliterator.ORDERED | Spliterator.IMMUTABLE);
+					public «type.spliteratorGenericName» spliterator() {
+						return Spliterators.spliterator(iterator(), «arity», Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 					}
 
-					«zip(false, false)»
+					«IF type == Type.OBJECT»
+						«zip(false, false)»
 
-					«zipWith(false, false)»
+						«zipWith(false, false)»
 
-					public V«arity»<P<A, Integer>> zipWithIndex() {
-						return new V«arity»<>(«(1 .. arity).map["p(a" + it + ", " + (it-1) + ")"].join(", ")»);
-					}
+						public V«arity»<P<A, Integer>> zipWithIndex() {
+							return new V«arity»<>(«(1 .. arity).map["p(a" + it + ", " + (it-1) + ")"].join(", ")»);
+						}
 
+					«ENDIF»
 					@Override
 					public String toString() {
-						return "V«arity»(" + «(1 .. arity).map["a" + it].join(''' + ", " + ''')» + ")";
+						return "«shortName»(" + «(1 .. arity).map["a" + it].join(''' + ", " + ''')» + ")";
 					}
 
-					public static <A> V«arity»<A> v«arity»(«(1 .. arity).map["final A a" + it].join(", ")») {
-						«FOR i : 1 .. arity»
-							requireNonNull(a«i»);
-						«ENDFOR»
-						return new V«arity»<>(«(1 .. arity).map["a" + it].join(", ")»);
+					public static «type.paramGenericName(baseName)» «factoryMethodName»(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {
+						«IF type == Type.OBJECT»
+							«FOR i : 1 .. arity»
+								requireNonNull(a«i»);
+							«ENDFOR»
+						«ENDIF»
+						return new «diamondName»(«(1 .. arity).map["a" + it].join(", ")»);
 					}
 
 					/**
-					 * Synonym for {@link #v«arity»}
+					 * Synonym for {@link #«factoryMethodName»}
 					 */
-					public static <A> V«arity»<A> of(«(1 .. arity).map["final A a" + it].join(", ")») {
-						return v«arity»(«(1 .. arity).map["a" + it].join(", ")»);
+					public static «type.paramGenericName(baseName)» of(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {
+						return «factoryMethodName»(«(1 .. arity).map["a" + it].join(", ")»);
 					}
 
-					public static <A> V«arity»<A> fromP«if (arity == 2) "" else arity»(final «PNGenerators.shortName(arity)»<«(1 .. arity).map["A"].join(", ")»> p«arity») {
-						return new V«arity»<>(«(1 .. arity).map["p" + arity + ".get" + it + "()"].join(", ")»);
-					}
+					«IF arity == 2»
+						«IF type == Type.OBJECT»
+							public static <A> «genericName» fromP(final P<A, A> p) {
+						«ELSE»
+							public static «shortName» from«type.typeName»«type.typeName»P(final «type.typeName»«type.typeName»P p) {
+						«ENDIF»
+							return new «diamondName»(p.get1(), p.get2());
+						}
+					«ELSE»
+						public static «type.paramGenericName(baseName)» fromP«arity»(final P«arity»<«(1 .. arity).map[type.genericBoxedName].join(", ")»> p«arity») {
+							return new «diamondName»(«(1 .. arity).map["p" + arity + ".get" + it + "()"].join(", ")»);
+						}
+					«ENDIF»
+					«IF type == Type.OBJECT»
 
-					«zipN(false)»
-					«zipWithN(false)[i | '''
-						«FOR j : 1 .. arity»
-							final B b«j» = requireNonNull(f.apply(«(1 .. i).map['''v«it».a«j»'''].join(", ")»));
-						«ENDFOR»
-						return new V«arity»<>(«(1 .. arity).map["b" + it].join(", ")»);
-					''']»
-					«cast(#["A"], #[], #["A"])»
+						«zipN(false)»
+						«zipWithN(false)[i | '''
+							«FOR j : 1 .. arity»
+								final B b«j» = requireNonNull(f.apply(«(1 .. i).map['''v«it».a«j»'''].join(", ")»));
+							«ENDFOR»
+							return new V«arity»<>(«(1 .. arity).map["b" + it].join(", ")»);
+						''']»
+						«cast(#["A"], #[], #["A"])»
+					«ENDIF»
 				}
 
-				final class V«arity»Iterator<A> implements Iterator<A> {
-					private final A «(1 .. arity).map["a" + it].join(", ")»;
+				final class «type.genericName("V" + arity + "Iterator")» implements «type.iteratorGenericName» {
+					private final «type.genericName» «(1 .. arity).map["a" + it].join(", ")»;
 					private int i;
 
-					V«arity»Iterator(«(1 .. arity).map["final A a" + it].join(", ")») {
+					«type.shortName("V" + arity + "Iterator")»(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {
 						«FOR i : 1 .. arity»
 							this.a«i» = a«i»;
 						«ENDFOR»
@@ -260,7 +317,7 @@ final class VNGenerators {
 					}
 
 					@Override
-					public A next() {
+					public «type.iteratorReturnType» «type.iteratorNext»() {
 						switch (i) {
 							«FOR i : 1 .. arity»
 								case «i-1»: i++; return a«i»;
