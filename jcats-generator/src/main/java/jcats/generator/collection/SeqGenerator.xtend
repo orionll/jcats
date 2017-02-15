@@ -61,11 +61,10 @@ final class SeqGenerator implements ClassGenerator {
 			import static «Constants.F».id;
 			import static «Constants.P».p;
 		«ENDIF»
-		import static «Constants.COMMON».iterableToString;
-		import static «Constants.COMMON».iterableHashCode;
+		import static «Constants.COMMON».*;
 
 
-		public abstract class «genericName» implements «type.indexedContainerGenericName», Equatable<«genericName»>, Serializable {
+		public abstract class «genericName» implements «type.indexedContainerGenericName», Serializable {
 			private static final «shortName» EMPTY = new «shortName»0();
 
 			static final «type.javaName»[][] EMPTY_NODE2 = new «type.javaName»[0][];
@@ -1077,7 +1076,15 @@ final class SeqGenerator implements ClassGenerator {
 			«ENDIF»
 			«hashcode(type.genericBoxedName, true)»
 
-			«equals(type, wildcardName, true)»
+			«equals(type, type.indexedContainerWildcardName, true)»
+
+			public final boolean isStrictlyEqualTo(final «genericName» other) {
+				if (other == this) {
+					return true;
+				} else {
+					return «type.indexedContainerShortName.firstToLowerCase»sEqual(this, other);
+				}
+			}
 
 			«toStr(type, true)»
 

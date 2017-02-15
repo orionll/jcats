@@ -19,7 +19,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 	def shortName() { if (type == Type.OBJECT) "IndexedContainer" else type.typeName + "IndexedContainer" }
 	def genericName() { if (type == Type.OBJECT) shortName + "<A>" else shortName }
-	
+
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 		
@@ -30,9 +30,9 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		import java.util.RandomAccess;
 		import java.util.Spliterator;
 
-		import «Constants.JCATS».«IF type != Type.OBJECT»«type.typeName»«ENDIF»Indexed;
+		import «Constants.JCATS».*;
 
-		public interface «genericName» extends «type.containerGenericName», «type.indexedGenericName» {
+		public interface «genericName» extends «type.containerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
 
 			@Override
 			default Collection<«type.genericBoxedName»> asCollection() {

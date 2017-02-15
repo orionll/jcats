@@ -50,8 +50,9 @@ final class VNGenerators {
 				«IF arity > 2»
 					import static «Constants.P»«arity».p«arity»;
 				«ENDIF»
+				import static «Constants.COMMON».*;
 
-				public final class «genericName» implements «type.containerGenericName», Equatable<«genericName»>, «type.indexedGenericName», Serializable {
+				public final class «genericName» implements «type.indexedContainerGenericName», Serializable {
 					private final «type.genericName» «(1 .. arity).map["a" + it].join(", ")»;
 
 					private «shortName»(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {
@@ -226,18 +227,16 @@ final class VNGenerators {
 						return result;
 					}
 
-					@Override
-					public boolean equals(final Object obj) {
-						if (obj == this) {
+					«equals(type, type.indexedContainerWildcardName, false)»
+
+					public boolean isStrictlyEqualTo(final «genericName» other) {
+						if (other == this) {
 							return true;
-						} else if (obj instanceof «shortName») {
-							final «type.wildcardName(baseName)» v«arity» = («type.wildcardName(baseName)») obj;
-							return «IF type == Type.OBJECT»a1.equals(v«arity».a1)«ELSE»a1 == v«arity».a1«ENDIF»
-								«FOR index : 2 .. arity»
-									&& «IF type == Type.OBJECT»a«index».equals(v«arity».a«index»)«ELSE»a«index» == v«arity».a«index»«ENDIF»«IF index == arity»;«ENDIF»
-								«ENDFOR»
 						} else {
-							return false;
+							return «IF type == Type.OBJECT»a1.equals(other.a1)«ELSE»a1 == other.a1«ENDIF»
+								«FOR index : 2 .. arity»
+									&& «IF type == Type.OBJECT»a«index».equals(other.a«index»)«ELSE»a«index» == other.a«index»«ENDIF»«IF index == arity»;«ENDIF»
+								«ENDFOR»
 						}
 					}
 

@@ -50,10 +50,10 @@ final class ArrayGenerator implements ClassGenerator {
 		«ENDFOR»
 		import static «Constants.F».id;
 		import static «Constants.P».p;
-		import static «Constants.COMMON».iterableToString;
+		import static «Constants.COMMON».*;
 
 
-		public final class «genericName» implements «type.indexedContainerGenericName», Equatable<«genericName»>, Serializable {
+		public final class «genericName» implements «type.indexedContainerGenericName», Serializable {
 			static final «shortName» EMPTY = new «shortName»(Common.«type.emptyArrayName»);
 
 			final «type.javaName»[] array;
@@ -548,14 +548,13 @@ final class ArrayGenerator implements ClassGenerator {
 				return Arrays.hashCode(array);
 			}
 
-			@Override
-			public boolean equals(final Object obj) {
-				if (obj == this) {
+			«equals(type, type.indexedContainerWildcardName, false)»
+
+			public boolean isStrictlyEqualTo(final «genericName» other) {
+				if (other == this) {
 					return true;
-				} else if (obj instanceof «shortName») {
-					return Arrays.equals(array, ((«shortName») obj).array);
 				} else {
-					return false;
+					return Arrays.equals(array, other.array);
 				}
 			}
 

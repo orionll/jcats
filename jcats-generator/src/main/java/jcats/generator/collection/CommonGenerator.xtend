@@ -27,6 +27,33 @@ final class CommonGenerator implements ClassGenerator {
 			private Common() {
 			}
 
+			«FOR type : Type.values»
+				static boolean «type.indexedContainerShortName.firstToLowerCase»sEqual(final «type.indexedContainerWildcardName» c1, final «type.indexedContainerWildcardName» c2) {
+					if (c1.size() == c2.size()) {
+						final «type.iteratorWildcardName» iterator1 = c1.iterator();
+						final «type.iteratorWildcardName» iterator2 = c2.iterator();
+						while (iterator1.hasNext()) {
+							«IF type == Type.OBJECT»
+								final Object o1 = iterator1.next();
+								final Object o2 = iterator2.next();
+								if (!o1.equals(o2)) {
+									return false;
+								}
+							«ELSE»
+								final «type.javaName» o1 = iterator1.«type.iteratorNext»();
+								final «type.javaName» o2 = iterator2.«type.iteratorNext»();
+								if (o1 != o2) {
+									return false;
+								}
+							«ENDIF»
+						}
+						return true;
+					} else {
+						return false;
+					}
+				}
+
+			«ENDFOR»
 			static String iterableToString(final Iterable<?> iterable, final String name) {
 				final StringBuilder builder = new StringBuilder(name);
 				builder.append("(");

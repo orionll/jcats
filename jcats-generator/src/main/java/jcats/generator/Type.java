@@ -114,6 +114,14 @@ public enum Type {
 		return genericName("IndexedContainer");
 	}
 
+	public String indexedContainerShortName() {
+		return shortName("IndexedContainer");
+	}
+
+	public String indexedContainerWildcardName() {
+		return wildcardName("IndexedContainer");
+	}
+
 	public String indexedGenericName() {
 		return genericName("Indexed");
 	}

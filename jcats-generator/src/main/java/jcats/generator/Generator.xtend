@@ -56,30 +56,8 @@ interface Generator {
 		public «IF isFinal»final «ENDIF»boolean equals(final Object obj) {
 			if (obj == this) {
 				return true;
-			} else if (obj instanceof «wildcardName») {
-				final «wildcardName» other = («wildcardName») obj;
-				if (size() == other.size()) {
-					final «type.iteratorWildcardName» iterator1 = iterator();
-					final «type.iteratorWildcardName» iterator2 = other.iterator();
-					while (iterator1.hasNext()) {
-						«IF type == Type.OBJECT»
-							final Object o1 = iterator1.next();
-							final Object o2 = iterator2.next();
-							if (!o1.equals(o2)) {
-								return false;
-							}
-						«ELSE»
-							final «type.javaName» o1 = iterator1.«type.iteratorNext»();
-							final «type.javaName» o2 = iterator2.«type.iteratorNext»();
-							if (o1 != o2) {
-								return false;
-							}
-						«ENDIF»
-					}
-					return true;
-				} else {
-					return false;
-				}
+			} else if (obj instanceof «wildcardName.replaceAll("<\\?>", "")») {
+				return «type.indexedContainerShortName.firstToLowerCase»sEqual(this, («wildcardName») obj);
 			} else {
 				return false;
 			}
