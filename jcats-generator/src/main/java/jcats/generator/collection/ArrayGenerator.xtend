@@ -111,10 +111,10 @@ final class ArrayGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				final «type.javaName»[] newArray = new «type.javaName»[array.length + 1];
-				System.arraycopy(array, 0, newArray, 1, array.length);
-				newArray[0] = value;
-				return new «diamondName»(newArray);
+				final «type.javaName»[] result = new «type.javaName»[array.length + 1];
+				System.arraycopy(array, 0, result, 1, array.length);
+				result[0] = value;
+				return new «diamondName»(result);
 			}
 
 			/**
@@ -124,12 +124,26 @@ final class ArrayGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				final «type.javaName»[] newArray = Arrays.copyOf(array, array.length + 1);
-				newArray[array.length] = value;
-				return new «diamondName»(newArray);
+				final «type.javaName»[] result = new «type.javaName»[array.length + 1];
+				System.arraycopy(array, 0, result, 0, array.length);
+				result[array.length] = value;
+				return new «diamondName»(result);
 			}
 
-			static «type.javaName»[] concatArrays(final «type.javaName»[] prefix, final «type.javaName»[] suffix) {
+			public «genericName» removeAt(final int index) {
+				if (index < 0 || index >= array.length) {
+					throw new IndexOutOfBoundsException(Integer.toString(index));
+				} else if (array.length == 1) {
+					return empty«shortName»();
+				} else {
+					final «type.javaName»[] result = new «type.javaName»[array.length - 1];
+					System.arraycopy(array, 0, result, 0, index);
+					System.arraycopy(array, index + 1, result, index, array.length - index - 1);
+					return new «diamondName»(result);
+				}
+			}
+
+			private static «type.javaName»[] concatArrays(final «type.javaName»[] prefix, final «type.javaName»[] suffix) {
 				final «type.javaName»[] result = new «type.javaName»[prefix.length + suffix.length];
 				System.arraycopy(prefix, 0, result, 0, prefix.length);
 				System.arraycopy(suffix, 0, result, prefix.length, suffix.length);
@@ -174,7 +188,8 @@ final class ArrayGenerator implements ClassGenerator {
 				if (suffixSize == 0) {
 					return this;
 				} else {
-					final «type.javaName»[] result = Arrays.copyOf(array, array.length + suffixSize);
+					final «type.javaName»[] result = new «type.javaName»[array.length + suffixSize];
+					System.arraycopy(array, 0, result, 0, array.length);
 					fillArray(result, array.length, suffix);
 					return new «diamondName»(result);
 				}
@@ -253,11 +268,11 @@ final class ArrayGenerator implements ClassGenerator {
 				if (array.length == 0 || array.length == 1) {
 					return this;
 				} else {
-					final «type.javaName»[] newArray = new «type.javaName»[array.length];
+					final «type.javaName»[] result = new «type.javaName»[array.length];
 					for (int i = 0; i < array.length; i++) {
-						newArray[array.length - i - 1] = array[i];
+						result[array.length - i - 1] = array[i];
 					}
-					return new «diamondName»(newArray);
+					return new «diamondName»(result);
 				}
 			}
 
@@ -274,11 +289,11 @@ final class ArrayGenerator implements ClassGenerator {
 						return (Array<B>) this;
 				«ENDIF»
 				} else {
-					final Object[] newArray = new Object[array.length];
+					final Object[] result = new Object[array.length];
 					for (int i = 0; i < array.length; i++) {
-						newArray[i] = requireNonNull(f.apply(«type.genericCast»array[i]));
+						result[i] = requireNonNull(f.apply(«type.genericCast»array[i]));
 					}
-					return new Array<>(newArray);
+					return new Array<>(result);
 				}
 			}
 
@@ -292,11 +307,11 @@ final class ArrayGenerator implements ClassGenerator {
 						return this;
 					«ENDIF»
 					} else {
-						final «toType.javaName»[] newArray = new «toType.javaName»[array.length];
+						final «toType.javaName»[] result = new «toType.javaName»[array.length];
 						for (int i = 0; i < array.length; i++) {
-							newArray[i] = f.apply(«type.genericCast»array[i]);
+							result[i] = f.apply(«type.genericCast»array[i]);
 						}
-						return new «toType.typeName»Array(newArray);
+						return new «toType.typeName»Array(result);
 					}
 				}
 
@@ -339,7 +354,9 @@ final class ArrayGenerator implements ClassGenerator {
 				} else if (n >= array.length) {
 					return this;
 				} else {
-					return new «diamondName»(Arrays.copyOf(array, n));
+					final «type.javaName»[] result = new «type.javaName»[n];
+					System.arraycopy(array, 0, result, 0, n);
+					return new «diamondName»(result);
 				}
 			}
 
@@ -401,9 +418,9 @@ final class ArrayGenerator implements ClassGenerator {
 				if (array.length == 0) {
 					return array;
 				} else {
-					final «type.javaName»[] newArray = new «type.javaName»[array.length];
-					System.arraycopy(array, 0, newArray, 0, array.length);
-					return newArray;
+					final «type.javaName»[] result = new «type.javaName»[array.length];
+					System.arraycopy(array, 0, result, 0, array.length);
+					return result;
 				}
 			}
 
