@@ -4,7 +4,6 @@ import java.util.List
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
 import jcats.generator.Generator
-import jcats.generator.PNGenerators
 import jcats.generator.Type
 
 final class VNGenerators {

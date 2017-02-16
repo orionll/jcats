@@ -12,6 +12,13 @@ import jcats.generator.collection.ContainerGenerator
 import jcats.generator.collection.DictGenerator
 import jcats.generator.collection.IndexedContainerGenerator
 import jcats.generator.collection.KeyValueGenerator
+import jcats.generator.collection.Seq0Generator
+import jcats.generator.collection.Seq1Generator
+import jcats.generator.collection.Seq2Generator
+import jcats.generator.collection.Seq3Generator
+import jcats.generator.collection.Seq4Generator
+import jcats.generator.collection.Seq5Generator
+import jcats.generator.collection.Seq6Generator
 import jcats.generator.collection.SeqBuilderGenerator
 import jcats.generator.collection.SeqGenerator
 import jcats.generator.collection.StackBuilderGenerator
@@ -90,6 +97,13 @@ class Main {
 			ArrayGenerator.generators,
 			ArrayBuilderGenerator.generators,
 			SeqGenerator.generators,
+			Seq0Generator.generators,
+			Seq1Generator.generators,
+			Seq2Generator.generators,
+			Seq3Generator.generators,
+			Seq4Generator.generators,
+			Seq5Generator.generators,
+			Seq6Generator.generators,
 			SeqBuilderGenerator.generators,
 			PNGenerators.generators,
 			PGenerator.generators,
