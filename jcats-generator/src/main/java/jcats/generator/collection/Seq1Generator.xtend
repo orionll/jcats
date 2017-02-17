@@ -31,6 +31,7 @@ final class Seq1Generator extends SeqGenerator {
 		«IF type != Type.OBJECT»
 			import static jcats.collection.Seq.*;
 		«ENDIF»
+		import static «Constants.COMMON».*;
 
 		final class «genericName(1)» extends «genericName» {
 			final «type.javaName»[] node1;
@@ -84,12 +85,7 @@ final class Seq1Generator extends SeqGenerator {
 
 			@Override
 			public «genericName» update(final int index, final «type.updateFunction» f) {
-				requireNonNull(f);
-				final «type.javaName»[] newNode1 = node1.clone();
-				final «type.genericName» oldValue = «type.genericCast»node1[index];
-				final «type.genericName» newValue = f.apply(oldValue);
-				newNode1[index] = newValue;
-				return new «diamondName(1)»(newNode1);
+				return new «diamondName(1)»(«type.updateArray("node1", "index")»);
 			}
 
 			@Override

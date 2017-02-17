@@ -210,6 +210,14 @@ public enum Type {
 		return (this == Type.OBJECT) ? "F<A, A>" : typeName() + typeName() + "F";
 	}
 
+	public String requireNonNull(String expr) {
+		return (this == Type.OBJECT) ? "requireNonNull(" + expr + ")" : expr;
+	}
+
+	public String updateArray(String array, String index) {
+		return "update" + shortName("Array") + "(" + array + ", " + index + ", f)";
+	}
+
 	public static ImmutableList<Type> javaUnboxedTypes() {
 		return ImmutableList.of(Type.INT, Type.LONG, Type.DOUBLE);
 	}

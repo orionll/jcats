@@ -32,6 +32,7 @@ final class Seq3Generator extends SeqGenerator {
 		«IF type != Type.OBJECT»
 			import static jcats.collection.Seq.*;
 		«ENDIF»
+		import static «Constants.COMMON».*;
 
 		final class «genericName(3)» extends «genericName» {
 			final «type.javaName»[][][] node3;
@@ -228,34 +229,29 @@ final class Seq3Generator extends SeqGenerator {
 
 			@Override
 			public «genericName» update(final int index, final «type.updateFunction» f) {
-				requireNonNull(f);
 				try {
 					if (index < init.length) {
-						final «type.javaName»[] newInit = init.clone();
-						final «type.genericName» oldValue = «type.genericCast»init[index];
-						final «type.genericName» newValue = f.apply(oldValue);
-						newInit[index] = newValue;
+						final «type.javaName»[] newInit = «type.updateArray("init", "index")»;
 						return new «diamondName(3)»(node3, newInit, tail, startIndex, size);
 					} else if (index >= size - tail.length) {
-						final «type.javaName»[] newTail = tail.clone();
 						final int tailIndex = index + tail.length - size;
-						final «type.genericName» oldValue = «type.genericCast»tail[tailIndex];
-						final «type.genericName» newValue = f.apply(oldValue);
-						newTail[tailIndex] = newValue;
+						final «type.javaName»[] newTail = «type.updateArray("tail", "tailIndex")»;
 						return new «diamondName(3)»(node3, init, newTail, startIndex, size);
 					} else {
-						final «type.javaName»[][][] newNode3 = node3.clone();
 						final int idx = index + startIndex;
 						final int index3 = index3(idx);
-						final «type.javaName»[][] newNode2 = newNode3[index3].clone();
-						final int index2 = index2(idx, index3, newNode2);
-						final «type.javaName»[] newNode1 = newNode2[index2].clone();
+						final «type.javaName»[][] node2 = node3[index3];
+						final int index2 = index2(idx, index3, node2);
+						final «type.javaName»[] node1 = node2[index2];
 						final int index1 = index1(idx);
-						final «type.genericName» oldValue = «type.genericCast»newNode1[index1];
-						final «type.genericName» newValue = f.apply(oldValue);
+
+						final «type.javaName»[][][] newNode3 = new «type.javaName»[node3.length][][];
+						System.arraycopy(node3, 0, newNode3, 0, node3.length);
+						final «type.javaName»[][] newNode2 = new «type.javaName»[node2.length][];
+						System.arraycopy(node2, 0, newNode2, 0, node2.length);
+						final «type.javaName»[] newNode1 = «type.updateArray("node1", "index1")»;
 						newNode3[index3] = newNode2;
 						newNode2[index2] = newNode1;
-						newNode1[index1] = newValue;
 						return new «diamondName(3)»(newNode3, init, tail, startIndex, size);
 					}
 				} catch (final ArrayIndexOutOfBoundsException __) {

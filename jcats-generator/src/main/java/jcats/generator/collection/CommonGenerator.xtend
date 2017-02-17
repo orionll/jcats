@@ -28,6 +28,17 @@ final class CommonGenerator implements ClassGenerator {
 			}
 
 			«FOR type : Type.values»
+				static «type.javaName»[] update«type.shortName("Array")»(final «type.javaName»[] array, final int index, final «type.updateFunction.replaceAll("<A, A>", "")» f) {
+					final «type.javaName»[] result = new «type.javaName»[array.length];
+					System.arraycopy(array, 0, result, 0, array.length);
+					final «type.javaName» oldValue = array[index];
+					final «type.javaName» newValue = f.apply(oldValue);
+					result[index] = «type.requireNonNull("newValue")»;
+					return result;
+				}
+
+			«ENDFOR»
+			«FOR type : Type.values»
 				static boolean «type.indexedContainerShortName.firstToLowerCase»sEqual(final «type.indexedContainerWildcardName» c1, final «type.indexedContainerWildcardName» c2) {
 					if (c1.size() == c2.size()) {
 						final «type.iteratorWildcardName» iterator1 = c1.iterator();

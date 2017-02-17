@@ -32,6 +32,7 @@ class Seq2Generator extends SeqGenerator {
 		«IF type != Type.OBJECT»
 			import static jcats.collection.Seq.*;
 		«ENDIF»
+		import static «Constants.COMMON».*;
 
 		final class «genericName(2)» extends «genericName» {
 			final «type.javaName»[][] node2;
@@ -150,31 +151,24 @@ class Seq2Generator extends SeqGenerator {
 
 			@Override
 			public «genericName» update(final int index, final «type.updateFunction» f) {
-				requireNonNull(f);
 				try {
 					if (index < init.length) {
-						final «type.javaName»[] newInit = init.clone();
-						final «type.genericName» oldValue = «type.genericCast»init[index];
-						final «type.genericName» newValue = f.apply(oldValue);
-						newInit[index] = newValue;
+						final «type.javaName»[] newInit = «type.updateArray("init", "index")»;
 						return new «diamondName(2)»(node2, newInit, tail, size);
 					} else if (index >= size - tail.length) {
-						final «type.javaName»[] newTail = tail.clone();
 						final int tailIndex = index + tail.length - size;
-						final «type.genericName» oldValue = «type.genericCast»tail[tailIndex];
-						final «type.genericName» newValue = f.apply(oldValue);
-						newTail[tailIndex] = newValue;
+						final «type.javaName»[] newTail = «type.updateArray("tail", "tailIndex")»;
 						return new «diamondName(2)»(node2, init, newTail, size);
 					} else {
-						final «type.javaName»[][] newNode2 = node2.clone();
 						final int idx = index + 32 - init.length;
 						final int index2 = index2(idx) - 1;
-						final «type.javaName»[] newNode1 = newNode2[index2].clone();
 						final int index1 = index1(idx);
-						final «type.genericName» oldValue = «type.genericCast»newNode1[index1];
-						final «type.genericName» newValue = f.apply(oldValue);
+						final «type.javaName»[] node1 = node2[index2];
+
+						final «type.javaName»[][] newNode2 = new «type.javaName»[node2.length][];
+						System.arraycopy(node2, 0, newNode2, 0, node2.length);
+						final «type.javaName»[] newNode1 = «type.updateArray("node1", "index1")»;
 						newNode2[index2] = newNode1;
-						newNode1[index1] = newValue;
 						return new «diamondName(2)»(newNode2, init, tail, size);
 					}
 				} catch (final ArrayIndexOutOfBoundsException __) {

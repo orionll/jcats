@@ -104,7 +104,11 @@ class SeqGenerator implements ClassGenerator {
 			 * O(log(size))
 			 */
 			public final «genericName» set(final int index, final «type.genericName» value) {
-				return update(index, «IF type == Type.OBJECT»F«ELSE»«type.typeName»«type.typeName»F«ENDIF».constant(value));
+				«IF type == Type.OBJECT»
+					return update(index, __ -> value);
+				«ELSE»
+					return update(index, «type.typeName»«type.typeName»F.constant(value));
+				«ENDIF»
 			}
 
 			/**
