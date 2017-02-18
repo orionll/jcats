@@ -132,6 +132,17 @@ class SeqGenerator implements ClassGenerator {
 			 */
 			public abstract «genericName» append(final «type.genericName» value);
 
+			public final «genericName» removeAt(final int index) {
+				final int size = size();
+				if (index < 0 || index >= size) {
+					throw new IndexOutOfBoundsException(Integer.toString(index));
+				} else {
+					final «genericName» prefix = take(index);
+					final «genericName» suffix = drop(index + 1);
+					return prefix.concat(suffix);
+				}
+			}
+
 			/**
 			 * O(min(this.size, suffix.size))
 			 */
