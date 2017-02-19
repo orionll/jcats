@@ -224,11 +224,11 @@ final class ArrayGenerator implements ClassGenerator {
 							return this;
 						} else {
 							final int suffixSize = col.size();
-							builder = new «arrayBuilderDiamondName»(array.length + suffixSize);
+							builder = builderWithCapacity(array.length + suffixSize);
 							builder.appendArray(array);
 						}
 					} else {
-						builder = new «arrayBuilderDiamondName»(array);
+						builder = new «arrayBuilderDiamondName»(array, array.length);
 					}
 					suffix.forEach(builder::append);
 					return builder.build();
@@ -253,10 +253,10 @@ final class ArrayGenerator implements ClassGenerator {
 							return this;
 						} else {
 							final int prefixSize = col.size();
-							builder = new «arrayBuilderDiamondName»(prefixSize + array.length);
+							builder = builderWithCapacity(prefixSize + array.length);
 						}
 					} else {
-						builder = new «arrayBuilderDiamondName»();
+						builder = builder();
 					}
 					prefix.forEach(builder::append);
 					builder.appendArray(array);
@@ -325,7 +325,11 @@ final class ArrayGenerator implements ClassGenerator {
 				if (isEmpty()) {
 					return emptyArray();
 				} else {
-					final ArrayBuilder<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> builder = new ArrayBuilder<>();
+					«IF type == Type.OBJECT»
+						final ArrayBuilder<B> builder = builder();
+					«ELSE»
+						final ArrayBuilder<A> builder = Array.builder();
+					«ENDIF»
 					for (final «type.javaName» value : array) {
 						builder.appendArray(f.apply(«type.genericCast»value).array);
 					}
@@ -338,7 +342,7 @@ final class ArrayGenerator implements ClassGenerator {
 				if (isEmpty()) {
 					return empty«shortName»();
 				} else {
-					final «arrayBuilderName» builder = new «arrayBuilderDiamondName»();
+					final «arrayBuilderName» builder = builder();
 					for (final «type.javaName» value : array) {
 						if (predicate.apply(«type.genericCast»value)) {
 							builder.append(«type.genericCast»value);
@@ -526,7 +530,7 @@ final class ArrayGenerator implements ClassGenerator {
 						}
 				«ENDIF»
 				} else {
-					final «arrayBuilderName» builder = new «arrayBuilderDiamondName»();
+					final «arrayBuilderName» builder = builder();
 					iterable.forEach(builder::append);
 					return builder.build();
 				}
@@ -644,11 +648,15 @@ final class ArrayGenerator implements ClassGenerator {
 
 			«ENDIF»
 			public static «IF type == Type.OBJECT»<A> «ENDIF»«arrayBuilderName» builder() {
-				return new «arrayBuilderDiamondName»();
+				return new «arrayBuilderDiamondName»(«type.emptyArrayName», 0);
 			}
 
 			public static «IF type == Type.OBJECT»<A> «ENDIF»«arrayBuilderName» builderWithCapacity(final int initialCapacity) {
-				return new «arrayBuilderDiamondName»(initialCapacity);
+				if (initialCapacity == 0) {
+					return builder();
+				} else {
+					return new «arrayBuilderDiamondName»(new «type.javaName»[initialCapacity], 0);
+				}
 			}
 		}
 	''' }

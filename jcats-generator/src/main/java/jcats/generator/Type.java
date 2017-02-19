@@ -82,6 +82,10 @@ public enum Type {
 		return genericName("Array");
 	}
 
+	public String arrayDiamondName() {
+		return diamondName("Array");
+	}
+
 	public String seqShortName() {
 		return shortName("Seq");
 	}

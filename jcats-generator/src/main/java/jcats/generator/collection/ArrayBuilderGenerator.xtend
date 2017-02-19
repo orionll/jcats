@@ -24,7 +24,6 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		import java.util.Arrays;
 		import java.util.Collection;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.PrimitiveIterator;
@@ -34,55 +33,68 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		«IF type != Type.OBJECT»
-			import static «Constants.ARRAY»Builder.expandedCapacity;
+			import static «Constants.ARRAY»Builder.*;
 		«ENDIF»
 		import static «Constants.COLLECTION».«IF type != Type.OBJECT»«type.typeName»«ENDIF»Array.empty«IF type != Type.OBJECT»«type.typeName»«ENDIF»Array;
+		«IF type == Type.OBJECT»
+			import static «Constants.COMMON».*;
+		«ENDIF»
 
 
 		public final class «genericName» {
+			«IF type == Type.OBJECT»
+				static final int MIN_CAPACITY = 16;
+
+			«ENDIF»
 			private «type.javaName»[] array;
 			private int size;
 
-			«shortName»(final int initialCapacity) {
-				array = new «type.javaName»[initialCapacity];
-				size = 0;
-			}
-
-			«shortName»() {
-				this(10);
-			}
-
-			«shortName»(final «type.javaName»[] values) {
-				array = values;
-				size = values.length;
+			«shortName»(final «type.javaName»[] array, final int size) {
+				this.array = array;
+				this.size = size;
 			}
 
 			«IF type == Type.OBJECT»
 				static int expandedCapacity(final int arrayLength, final int minCapacity) {
-					// careful of overflow!
-					int newCapacity = arrayLength + (arrayLength >> 1) + 1;
-					if (newCapacity < minCapacity) {
-						newCapacity = Integer.highestOneBit(minCapacity - 1) << 1;
+					// Assume minCapacity > 0
+					if (arrayLength == 0 && minCapacity < MIN_CAPACITY) {
+						return MIN_CAPACITY;
+					} else {
+						int newCapacity = arrayLength << 1;
+						if (newCapacity - minCapacity < 0) {
+							newCapacity = minCapacity;
+						}
+						if (newCapacity - MAX_ARRAY_SIZE > 0) {
+							newCapacity = hugeCapacity(minCapacity);
+						}
+						return newCapacity;
 					}
-					if (newCapacity < 0) {
-						newCapacity = Integer.MAX_VALUE;
-						// guaranteed to be >= newCapacity
-					}
-					return newCapacity;
+				}
+
+				private static int hugeCapacity(final int minCapacity) {
+					return (minCapacity > MAX_ARRAY_SIZE) ? Integer.MAX_VALUE : MAX_ARRAY_SIZE;
 				}
 
 			«ENDIF»
-			private void ensureCapacity(final int minCapacity) {
-				if (minCapacity < 0) {
-					throw new Error("Cannot store more than " + Integer.MAX_VALUE + " elements");
+			public void ensureCapacity(final int minCapacity) {
+				if (minCapacity > 0 && (minCapacity > MIN_CAPACITY || array.length != 0)) {
+					ensureCapacityInternal(minCapacity);
 				}
-				if (array.length < minCapacity) {
-					array = Arrays.copyOf(array, expandedCapacity(array.length, minCapacity));
+			}
+
+			private void ensureCapacityInternal(final int minCapacity) {
+				if (minCapacity < 0) {
+					throw new OutOfMemoryError("ArrayBuilder size limit exceeded");
+				} else if (minCapacity > array.length) {
+					final int newCapacity = expandedCapacity(array.length, minCapacity);
+					final «type.javaName»[] newArray = new «type.javaName»[newCapacity];
+					System.arraycopy(array, 0, newArray, 0, array.length);
+					array = newArray;
 				}
 			}
 
 			«genericName» appendArray(final «type.javaName»[] values) {
-				ensureCapacity(size + values.length);
+				ensureCapacityInternal(size + values.length);
 				System.arraycopy(values, 0, array, size, values.length);
 				size += values.length;
 				return this;
@@ -92,7 +104,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				if (iterableLength == 0) {
 					return this;
 				} else {
-					ensureCapacity(size + iterableLength);
+					ensureCapacityInternal(size + iterableLength);
 					«IF Type.javaUnboxedTypes.contains(type)»
 						final PrimitiveIterator.Of«type.javaPrefix» iterator = «type.typeName»Iterator.getIterator(iterable.iterator());
 						while (iterator.hasNext()) {
@@ -114,7 +126,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				ensureCapacity(size + 1);
+				ensureCapacityInternal(size + 1);
 				array[size++] = value;
 				return this;
 			}
@@ -149,7 +161,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 						if (col.isEmpty()) {
 							return this;
 						} else {
-							ensureCapacity(size + col.size());
+							ensureCapacityInternal(size + col.size());
 						}
 					}
 					iterable.forEach(this::append);
@@ -167,11 +179,13 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 
 			public «arrayGenericName» build() {
 				if (size == 0) {
-					return empty«IF type != Type.OBJECT»«type.typeName»«ENDIF»Array();
+					return empty«type.arrayShortName»();
 				} else if (size < array.length) {
-					return new «IF type != Type.OBJECT»«type.typeName»«ENDIF»Array«IF type == Type.OBJECT»<>«ENDIF»(Arrays.copyOf(array, size));
+					final «type.javaName»[] result = new «type.javaName»[size];
+					System.arraycopy(array, 0, result, 0, size);
+					return new «type.arrayDiamondName»(result);
 				} else {
-					return new «IF type != Type.OBJECT»«type.typeName»«ENDIF»Array«IF type == Type.OBJECT»<>«ENDIF»(array);
+					return new «type.arrayDiamondName»(array);
 				}
 			}
 

@@ -24,6 +24,14 @@ final class CommonGenerator implements ClassGenerator {
 				static final «type.javaName»[] «type.emptyArrayName» = new «type.javaName»[0];
 			«ENDFOR»
 
+			/**
+			 * The maximum size of array to allocate.
+			 * Some VMs reserve some header words in an array.
+			 * Attempts to allocate larger arrays may result in
+			 * OutOfMemoryError: Requested array size exceeds VM limit
+			 */
+			static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
+
 			private Common() {
 			}
 
