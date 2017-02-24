@@ -76,6 +76,18 @@ interface Generator {
 		}
 	'''}
 
+	def static fillUntil(Type type, String paramGenericName, String builderName) { '''
+		public static «paramGenericName» fillUntil(final F0<Option<A>> f) {
+			final «builderName» builder = builder();
+			Option<A> value = f.apply();
+			while (value.isNotEmpty()) {
+				builder.append(value.get());
+				value = f.apply();
+			}
+			return builder.build();
+		}
+	''' }
+
 	def join() { joinMultiple(#[], "A") }
 
 	def joinMultiple(Iterable<String> typeParams, String typeParam) { '''

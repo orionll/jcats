@@ -331,6 +331,10 @@ class SeqGenerator implements ClassGenerator {
 
 			«fill(type, paramGenericName)»
 
+			«IF type == Type.OBJECT»
+				«fillUntil(type, paramGenericName, seqBuilderName)»
+
+			«ENDIF»
 			public static «paramGenericName» tabulate(final int size, final Int«type.typeName»F«IF type == Type.OBJECT»<A>«ENDIF» f) {
 				requireNonNull(f);
 				if (size <= 0) {
