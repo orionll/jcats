@@ -170,7 +170,7 @@ class SeqGenerator implements ClassGenerator {
 
 			public final «genericName» appendAll(final Iterable<«type.genericBoxedName»> suffix) {
 				if (isEmpty()) {
-					return fromIterable(suffix);
+					return ofAll(suffix);
 				} else if (suffix instanceof «shortName») {
 					return concat((«genericName») suffix);
 				} else if (suffix instanceof Sized) {
@@ -191,7 +191,7 @@ class SeqGenerator implements ClassGenerator {
 
 			public final «genericName» prependAll(final Iterable<«type.genericBoxedName»> prefix) {
 				if (isEmpty()) {
-					return fromIterable(prefix);
+					return ofAll(prefix);
 				} else if (prefix instanceof «shortName») {
 					return ((«genericName») prefix).concat(this);
 				} else if (prefix instanceof Sized) {
@@ -648,7 +648,7 @@ class SeqGenerator implements ClassGenerator {
 				return tail;
 			}
 
-			public static «paramGenericName» fromIterable(final Iterable<«type.genericBoxedName»> iterable) {
+			public static «paramGenericName» ofAll(final Iterable<«type.genericBoxedName»> iterable) {
 				requireNonNull(iterable);
 				if (iterable instanceof «wildcardName») {
 					return («genericName») iterable;

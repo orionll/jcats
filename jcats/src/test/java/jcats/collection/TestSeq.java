@@ -301,7 +301,7 @@ public class TestSeq {
 
 		for (int i = 0; i < MAX; i++) {
 			if (isTestIndex(i)) {
-				final Seq<Integer> seq = Seq.fromIterable(list);
+				final Seq<Integer> seq = Seq.ofAll(list);
 				assertEquals(list.size(), Iterables.size(seq));
 				assertEquals(list.size(), seq.size());
 				assertTrue("Elements not equal for size = " + list.size(), Iterables.elementsEqual(list, seq));

@@ -211,7 +211,7 @@ final class ArrayGenerator implements ClassGenerator {
 			 */
 			public «genericName» appendAll(final Iterable<«type.genericBoxedName»> suffix) {
 				if (array.length == 0) {
-					return fromIterable(suffix);
+					return ofAll(suffix);
 				} else if (suffix instanceof «shortName») {
 					return concat((«genericName») suffix);
 				} else if (suffix instanceof Sized) {
@@ -240,7 +240,7 @@ final class ArrayGenerator implements ClassGenerator {
 			 */
 			public «genericName» prependAll(final Iterable<«type.genericBoxedName»> prefix) {
 				if (array.length == 0) {
-					return fromIterable(prefix);
+					return ofAll(prefix);
 				} else if (prefix instanceof «shortName») {
 					return ((«genericName») prefix).concat(this);
 				} else if (prefix instanceof Sized) {
@@ -512,7 +512,7 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			public static «paramGenericName» fromIterable(final Iterable<«type.genericBoxedName»> iterable) {
+			public static «paramGenericName» ofAll(final Iterable<«type.genericBoxedName»> iterable) {
 				if (iterable instanceof «type.containerShortName») {
 					return ((«type.containerGenericName») iterable).to«type.arrayShortName»();
 				} else if (iterable instanceof Sized) {

@@ -267,7 +267,7 @@ final class StackGenerator implements ClassGenerator {
 				return stack(values);
 			}
 
-			public static <A> Stack<A> fromIterable(final Iterable<A> values) {
+			public static <A> Stack<A> ofAll(final Iterable<A> values) {
 				return new StackBuilder<A>().appendAll(values).build();
 			}
 
