@@ -72,9 +72,7 @@ class Main {
 
 	private def static List<Generator> allGenerators() {
 		#[#[
-			new OptionGenerator,
 			new EitherGenerator,
-			new SingletonIteratorGenerator,
 			new FsGenerator,
 			new Eff0Generator,
 			new EquatableGenerator,
@@ -85,8 +83,10 @@ class Main {
 			new StackBuilderGenerator,
 			new KeyValueGenerator,
 			new DictGenerator,
-			new CommonGenerator
+			new CommonGenerator,
+			new jcats.generator.CommonGenerator
 		],
+			OptionGenerator.generators,
 			FGenerator.generators,
 			F0Generator.generators,
 			EffGenerator.generators,

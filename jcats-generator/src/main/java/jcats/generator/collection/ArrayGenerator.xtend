@@ -19,7 +19,7 @@ final class ArrayGenerator implements ClassGenerator {
 
 	def shortName() { type.arrayShortName }
 	def genericName() { type.arrayGenericName }
-	def diamondName() { if (type == Type.OBJECT) "Array<>" else shortName }
+	def diamondName() { type.diamondName("Array") }
 	def paramGenericName() { type.paramGenericName("Array") }
 	def arrayBuilderName() { type.genericName("ArrayBuilder") }
 	def arrayBuilderDiamondName() { type.diamondName("ArrayBuilder") }
@@ -51,10 +51,13 @@ final class ArrayGenerator implements ClassGenerator {
 		import static «Constants.F».id;
 		import static «Constants.P».p;
 		import static «Constants.COMMON».*;
+		«IF Type.javaUnboxedTypes.contains(type)»
+			import static «Constants.JCATS».«type.typeName»Option.«type.noneName»;
+		«ENDIF»
 
 
 		public final class «genericName» implements «type.indexedContainerGenericName», Serializable {
-			static final «shortName» EMPTY = new «shortName»(Common.«type.emptyArrayName»);
+			static final «shortName» EMPTY = new «shortName»(«type.emptyArrayName»);
 
 			final «type.javaName»[] array;
 
@@ -551,7 +554,7 @@ final class ArrayGenerator implements ClassGenerator {
 			@Override
 			public «type.iteratorGenericName» iterator() {
 				«IF Type.javaUnboxedTypes.contains(type)»
-					return isEmpty() ? Empty«type.typeName»Iterator.empty«type.typeName»Iterator() : new «shortName»Iterator(array);
+					return isEmpty() ? «type.noneName»().iterator() : new «shortName»Iterator(array);
 				«ELSE»
 					return isEmpty() ? emptyIterator() : new «shortName»Iterator«IF type == Type.OBJECT»<>«ENDIF»(array);
 				«ENDIF»

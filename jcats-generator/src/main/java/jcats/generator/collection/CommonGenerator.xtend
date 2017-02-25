@@ -265,27 +265,6 @@ final class CommonGenerator implements ClassGenerator {
 				}
 			}
 
-			final class Empty«type.typeName»Iterator implements PrimitiveIterator.Of«type.javaPrefix» {
-				private static final Empty«type.typeName»Iterator INSTANCE = new Empty«type.typeName»Iterator();
-
-				private Empty«type.javaPrefix»Iterator() {
-				}
-
-				@Override
-				public boolean hasNext() {
-					return false;
-				}
-
-				@Override
-				public «type.javaName» next«type.javaPrefix»() {
-					throw new NoSuchElementException();
-				}
-
-				static Empty«type.typeName»Iterator empty«type.typeName»Iterator() {
-					return INSTANCE;
-				}
-			}
-
 		«ENDFOR»
 		final class Product2Iterator<A1, A2, B> implements Iterator<B> {
 			private final Iterator<A1> iterator1;

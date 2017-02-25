@@ -38,6 +38,18 @@ public enum Type {
 		throw new IllegalStateException();
 	}
 
+	public String defaultValue() {
+		switch (this) {
+			case OBJECT: return "null";
+			case INT: return "0";
+			case LONG: return "0L";
+			case DOUBLE: return "0.0";
+			case BOOL: return "false";
+		}
+		throw new IllegalStateException();
+		
+	}
+
 	public String genericName() {
 		return (this == OBJECT) ? "A" : javaName();
 	}
@@ -72,6 +84,22 @@ public enum Type {
 
 	public String genericCast() {
 		return (this == OBJECT) ? "(A) " : "";
+	}
+
+	public String optionShortName() {
+		return shortName("Option");
+	}
+
+	public String optionGenericName() {
+		return genericName("Option");
+	}
+
+	public String someName() {
+		return Generator.firstToLowerCase(shortName("Some"));
+	}
+
+	public String noneName() {
+		return Generator.firstToLowerCase(shortName("None"));
 	}
 
 	public String arrayShortName() {
@@ -220,6 +248,10 @@ public enum Type {
 
 	public String updateArray(String array, String index) {
 		return "update" + shortName("Array") + "(" + array + ", " + index + ", f)";
+	}
+
+	public String boolFName() {
+		return (this == Type.OBJECT) ? "BoolF<A>" : typeName() + "BoolF";
 	}
 
 	public static ImmutableList<Type> javaUnboxedTypes() {
