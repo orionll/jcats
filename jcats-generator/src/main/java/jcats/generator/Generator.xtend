@@ -88,6 +88,20 @@ interface Generator {
 		}
 	''' }
 
+	def static iterate(Type type, String paramGenericName, String builderName) { '''
+		public static «paramGenericName» iterate(final A start, final F<A, Option<A>> f) {
+			final «builderName» builder = builder();
+			builder.append(start);
+			Option<A> option = f.apply(start);
+			while (option.isNotEmpty()) {
+				final A value = option.get();
+				builder.append(value);
+				option = f.apply(value);
+			}
+			return builder.build();
+		}
+	''' }
+
 	def join() { joinMultiple(#[], "A") }
 
 	def joinMultiple(Iterable<String> typeParams, String typeParam) { '''

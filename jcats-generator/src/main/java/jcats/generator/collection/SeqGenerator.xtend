@@ -350,6 +350,10 @@ class SeqGenerator implements ClassGenerator {
 				}
 			}
 
+			«IF type == Type.OBJECT»
+				«iterate(type, paramGenericName, seqBuilderName)»
+
+			«ENDIF»
 			static «IF type == Type.OBJECT»<A> «ENDIF»void fillArray(final «type.javaName»[] array, final int startIndex, final «type.iteratorGenericName» iterator) {
 				for (int i = startIndex; i < array.length; i++) {
 					«IF type == Type.OBJECT»
