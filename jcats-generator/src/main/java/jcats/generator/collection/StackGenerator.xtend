@@ -226,22 +226,6 @@ final class StackGenerator implements ClassGenerator {
 				}
 			}
 
-			public boolean contains(final A value) {
-				requireNonNull(value);
-				Stack<A> stack = this;
-				while (stack.isNotEmpty()) {
-					if (stack.head.equals(value)) {
-						return true;
-					}
-					stack = stack.tail;
-				}
-				return false;
-			}
-
-			public Stack<A> sortBy(final Ord<A> ord) {
-				throw new UnsupportedOperationException("Stack.sortBy");
-			}
-
 			public static <A> Stack<A> nil() {
 				return NIL;
 			}

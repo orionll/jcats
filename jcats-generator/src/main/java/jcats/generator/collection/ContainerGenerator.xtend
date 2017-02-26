@@ -37,10 +37,11 @@ class ContainerGenerator implements InterfaceGenerator {
 		import java.util.stream.«type.streamName»;
 		import java.util.stream.StreamSupport;
 
-		import «Constants.SIZED»;
+		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».«type.effShortName»;
 
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.JCATS».IntOption.*;
 
 
 		public interface «genericName» extends Iterable<«type.genericBoxedName»>, Sized {
@@ -68,6 +69,34 @@ class ContainerGenerator implements InterfaceGenerator {
 					}
 				«ENDIF»
 				return false;
+			}
+
+			default IntOption indexOf(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
+				int index = 0;
+				«IF Type.javaUnboxedTypes.contains(type)»
+					final «type.iteratorGenericName» iterator = iterator();
+					while (iterator.hasNext()) {
+						if (iterator.«type.iteratorNext»() == value) {
+							return intSome(index);
+						}
+						index++;
+					}
+				«ELSE»
+					for (final «type.genericName» a : this) {
+						«IF type == Type.OBJECT»
+							if (a.equals(value)) {
+						«ELSE»
+							if (a == value) {
+						«ENDIF»
+							return intSome(index);
+						}
+						index++;
+					}
+				«ENDIF»
+				return intNone();
 			}
 
 			default void foreach(final «type.effGenericName» eff) {

@@ -52,8 +52,9 @@ final class ArrayGenerator implements ClassGenerator {
 		import static «Constants.P».p;
 		import static «Constants.COMMON».*;
 		«IF Type.javaUnboxedTypes.contains(type)»
-			import static «Constants.JCATS».«type.typeName»Option.«type.noneName»;
+			import static «Constants.JCATS».«type.typeName»Option.*;
 		«ENDIF»
+		import static «Constants.JCATS».IntOption.*;
 
 
 		public final class «genericName» implements «type.indexedContainerGenericName», Serializable {
@@ -384,6 +385,25 @@ final class ArrayGenerator implements ClassGenerator {
 					}
 				}
 				return false;
+			}
+
+			@Override
+			public IntOption indexOf(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
+				int index = 0;
+				for (final «type.javaName» a : array) {
+					«IF type == Type.OBJECT»
+						if (a.equals(value)) {
+					«ELSE»
+						if (a == value) {
+					«ENDIF»
+						return intSome(index);
+					}
+					index++;
+				}
+				return intNone();
 			}
 
 			@Override
