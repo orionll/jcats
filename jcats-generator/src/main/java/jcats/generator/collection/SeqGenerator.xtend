@@ -208,6 +208,11 @@ class SeqGenerator implements ClassGenerator {
 				}
 			}
 
+			public final «genericName» slice(final int fromIndex, final int toIndex) {
+				sliceRangeCheck(fromIndex, toIndex, size());
+				return drop(fromIndex).take(toIndex - fromIndex);
+			}
+
 			public final «genericName» reverse() {
 				return sizedToSeq(reversedIterator(), size());
 			}

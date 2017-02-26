@@ -268,6 +268,17 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
+			public final «genericName» slice(final int fromIndex, final int toIndex) {
+				sliceRangeCheck(fromIndex, toIndex, array.length);
+				if (fromIndex == 0 && toIndex == array.length) {
+					return this;
+				} else {
+					final «type.javaName»[] result = new «type.javaName»[toIndex - fromIndex];
+					System.arraycopy(array, fromIndex, result, 0, toIndex - fromIndex);
+					return new «diamondName»(result);
+				}
+			}
+
 			public «genericName» reverse() {
 				if (array.length == 0 || array.length == 1) {
 					return this;

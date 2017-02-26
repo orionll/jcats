@@ -94,6 +94,17 @@ final class CommonGenerator implements ClassGenerator {
 				}
 				return hashCode;
 			}
+
+			static void sliceRangeCheck(final int fromIndex, final int toIndex, final int size) {
+				if (fromIndex < 0) {
+					throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
+				} else if (toIndex > size) {
+					throw new IndexOutOfBoundsException("toIndex = " + toIndex);
+				} else if (fromIndex > toIndex) {
+					throw new IllegalArgumentException(
+							"fromIndex (" + fromIndex + ") > toIndex (" + toIndex + ")");
+				}
+			}
 		}
 
 		«FOR type : Type.values»
