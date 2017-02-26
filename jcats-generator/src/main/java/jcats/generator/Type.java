@@ -86,6 +86,10 @@ public enum Type {
 		return (this == OBJECT) ? "(A) " : "";
 	}
 
+	public String f0GenericName() {
+		return genericName("F0");
+	}
+
 	public String optionShortName() {
 		return shortName("Option");
 	}

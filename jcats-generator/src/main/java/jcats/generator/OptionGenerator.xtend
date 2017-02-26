@@ -55,6 +55,10 @@ final class OptionGenerator implements ClassGenerator {
 			«ELSE»
 				private static final «shortName» NONE = new «shortName»(«type.defaultValue»);
 			«ENDIF»
+			«IF type == Type.BOOL»
+				private static final «shortName» FALSE = new «shortName»(false);
+				private static final «shortName» TRUE = new «shortName»(true);
+			«ENDIF»
 
 			private final «type.genericName» value;
 
@@ -93,9 +97,62 @@ final class OptionGenerator implements ClassGenerator {
 				return isEmpty() ? other : value;
 			}
 
+			public «type.genericName» getOrElse(final «type.f0GenericName» other) {
+				requireNonNull(other);
+				return isEmpty() ? other.apply() : value;
+			}
+
+			«IF type == Type.OBJECT»
+				public «type.genericName» getOrNull() {
+					return isEmpty() ? null : value;
+				}
+
+			«ENDIF»
+			public <X extends Throwable> «type.genericName» getOrThrow(final F0<X> f) throws X {
+				requireNonNull(f);
+				if (isEmpty()) {
+					throw f.apply();
+				} else {
+					return value;
+				}
+			}
+
 			public «genericName» or(final «genericName» other) {
 				requireNonNull(other);
 				return isEmpty() ? other : this;
+			}
+
+			public «genericName» orElse(final F0<«genericName»> other) {
+				requireNonNull(other);
+				return isEmpty() ? other.apply() : this;
+			}
+
+			public void ifEmpty(final Eff0 eff) {
+				requireNonNull(eff);
+				if (isEmpty()) {
+					eff.apply();
+				}
+			}
+
+			public void ifNotEmpty(final «type.effGenericName» eff) {
+				requireNonNull(eff);
+				if (isNotEmpty()) {
+					eff.apply(value);
+				}
+			}
+
+			«IF type == Type.OBJECT»
+				public <B> B match(final F0<B> ifEmpty, final F<A, B> ifNotEmpty) {
+			«ELSE»
+				public <A> A match(final F0<A> ifEmpty, final «type.typeName»ObjectF<A> ifNotEmpty) {
+			«ENDIF»
+				requireNonNull(ifEmpty);
+				requireNonNull(ifNotEmpty);
+				if (isEmpty()) {
+					return ifEmpty.apply();
+				} else {
+					return ifNotEmpty.apply(value);
+				}
 			}
 
 			«IF type == Type.OBJECT»
@@ -196,7 +253,11 @@ final class OptionGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				return new «diamondName»(value);
+				«IF type == Type.BOOL»
+					return value ? TRUE : FALSE;
+				«ELSE»
+					return new «diamondName»(value);
+				«ENDIF»
 			}
 
 			«IF type == Type.OBJECT»
