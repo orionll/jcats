@@ -352,7 +352,11 @@ final class ArrayGenerator implements ClassGenerator {
 							builder.append(«type.genericCast»value);
 						}
 					}
-					return builder.build();
+					if (builder.size() == array.length) {
+						return this;
+					} else {
+						return builder.build();
+					}
 				}
 			}
 

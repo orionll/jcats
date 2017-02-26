@@ -282,7 +282,11 @@ class SeqGenerator implements ClassGenerator {
 							builder.append(value);
 						}
 					}
-					return builder.build();
+					if (builder.size() == size()) {
+						return this;
+					} else {
+						return builder.build();
+					}
 				}
 			}
 
