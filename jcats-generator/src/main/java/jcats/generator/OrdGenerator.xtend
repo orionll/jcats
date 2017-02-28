@@ -63,6 +63,20 @@ final class OrdGenerator implements ClassGenerator {
 				};
 			}
 
+			default Ord<A> then(final Ord<A> ord) {
+				requireNonNull(ord);
+				return (x, y) -> {
+					requireNonNull(x);
+					requireNonNull(y);
+					final Order order = compare(x, y);
+					return (order == Order.EQ) ? ord.compare(x, y) : order;
+				};
+			}
+
+			default <B extends Comparable<B>> Ord<A> thenBy(final F<A, B> f) {
+				return then(Ord.<B>ord().contraMap(f));
+			}
+
 			default F2<A, A, Order> toF() {
 				return (x, y) -> {
 					requireNonNull(x);
@@ -99,6 +113,10 @@ final class OrdGenerator implements ClassGenerator {
 
 			static <A extends Comparable<A>> Ord<A> ord() {
 				return Order.ORD;
+			}
+
+			static <A, B extends Comparable<B>> Ord<A> by(final F<A, B> f) {
+				return Ord.<B>ord().contraMap(f);
 			}
 
 			«cast(#["A"], #["A"], #[])»
