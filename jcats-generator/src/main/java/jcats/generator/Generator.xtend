@@ -77,9 +77,9 @@ interface Generator {
 	'''}
 
 	def static fillUntil(Type type, String paramGenericName, String builderName) { '''
-		public static «paramGenericName» fillUntil(final F0<Option<A>> f) {
+		public static «paramGenericName» fillUntil(final F0<«type.optionGenericName»> f) {
 			final «builderName» builder = builder();
-			Option<A> value = f.apply();
+			«type.optionGenericName» value = f.apply();
 			while (value.isNotEmpty()) {
 				builder.append(value.get());
 				value = f.apply();
