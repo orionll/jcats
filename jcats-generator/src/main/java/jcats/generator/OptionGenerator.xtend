@@ -34,6 +34,9 @@ final class OptionGenerator implements ClassGenerator {
 		«ELSE»
 			import java.util.Optional;
 		«ENDIF»
+		import java.util.Spliterator;
+		import java.util.Spliterators;
+		import java.util.stream.«type.streamName»;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -238,6 +241,19 @@ final class OptionGenerator implements ClassGenerator {
 				«ELSE»
 					return isEmpty() ? emptyIterator() : new SingletonIterator<>(value);
 				«ENDIF»
+			}
+
+			@Override
+			public «type.spliteratorGenericName» spliterator() {
+				if (isEmpty()) {
+					return Spliterators.«type.emptySpliteratorName»();
+				} else {
+					return Spliterators.spliterator(new «type.javaUnboxedName»[] { value }, Spliterator.NONNULL | Spliterator.IMMUTABLE);
+				}
+			}
+
+			public «type.streamGenericName» stream() {
+				return isEmpty() ? «type.streamName».empty() : «type.streamName».of(value);
 			}
 
 			@Override

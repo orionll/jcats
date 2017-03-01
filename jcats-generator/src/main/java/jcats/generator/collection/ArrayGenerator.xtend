@@ -604,9 +604,9 @@ final class ArrayGenerator implements ClassGenerator {
 				public Spliterator.Of«type.javaPrefix» spliterator() {
 			«ENDIF»
 				if (isEmpty()) {
-					return Spliterators.empty«IF Type.javaUnboxedTypes.contains(type)»«type.javaPrefix»«ENDIF»Spliterator();
+					return Spliterators.«type.emptySpliteratorName»();
 				} else {
-					return Spliterators.spliterator(«IF type == Type.BOOL»new BoolArrayIterator(array), size()«ELSE»array«ENDIF», Spliterator.ORDERED | Spliterator.IMMUTABLE);
+					return Spliterators.spliterator(«IF type == Type.BOOL»new BoolArrayIterator(array), size()«ELSE»array«ENDIF», Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 				}
 			}
 

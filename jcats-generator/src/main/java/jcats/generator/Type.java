@@ -47,7 +47,6 @@ public enum Type {
 			case BOOL: return "false";
 		}
 		throw new IllegalStateException();
-		
 	}
 
 	public String genericName() {
@@ -80,6 +79,10 @@ public enum Type {
 
 	public String genericJavaUnboxedName() {
 		return (this == BOOL) ? "Boolean" : genericName();
+	}
+
+	public String javaUnboxedName() {
+		return (this == BOOL) ? "Boolean" : javaName();
 	}
 
 	public String genericCast() {
