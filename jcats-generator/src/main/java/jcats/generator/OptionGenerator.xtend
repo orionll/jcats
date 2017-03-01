@@ -276,6 +276,11 @@ final class OptionGenerator implements ClassGenerator {
 				«ENDIF»
 			}
 
+			«javadocSynonym(type.someName)»
+			public static «paramGenericName» of(final «type.genericName» value) {
+				return «type.someName»(value);
+			}
+
 			«IF type == Type.OBJECT»
 				public static <A> Option<A> fromNullable(final A value) {
 					return (value == null) ? none() : new Option<>(value);

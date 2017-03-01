@@ -243,9 +243,7 @@ final class StackGenerator implements ClassGenerator {
 				return stack;
 			}
 
-			/**
-			 * Synonym for {@link #stack}
-			 */
+			«javadocSynonym("stack")»
 			@SafeVarargs
 			public static <A> Stack<A> of(final A... values) {
 				return stack(values);

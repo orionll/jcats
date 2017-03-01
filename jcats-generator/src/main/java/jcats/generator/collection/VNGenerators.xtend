@@ -273,9 +273,7 @@ final class VNGenerators {
 						return new «diamondName»(«(1 .. arity).map["a" + it].join(", ")»);
 					}
 
-					/**
-					 * Synonym for {@link #«factoryMethodName»}
-					 */
+					«javadocSynonym(factoryMethodName)»
 					public static «type.paramGenericName(baseName)» of(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {
 						return «factoryMethodName»(«(1 .. arity).map["a" + it].join(", ")»);
 					}

@@ -326,9 +326,7 @@ class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			/**
-			 * Synonym for {@link #«shortName.firstToLowerCase»}
-			 */
+			«javadocSynonym(shortName.firstToLowerCase)»
 			«IF type == Type.OBJECT»
 				@SafeVarargs
 			«ENDIF»

@@ -495,9 +495,7 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			/**
-			 * Synonym for {@link #«shortName.firstToLowerCase»}
-			 */
+			«javadocSynonym(shortName.toLowerCase)»
 			«IF type == Type.OBJECT»
 				@SafeVarargs
 			«ENDIF»

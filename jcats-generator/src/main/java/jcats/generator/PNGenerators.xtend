@@ -76,9 +76,7 @@ final class PNGenerators {
 						return new «shortName»<>(«(1 .. arity).map["a" + it].join(", ")»);
 					}
 
-					/**
-					 * Synonym for {@link #«shortName.toLowerCase»}
-					 */
+					«javadocSynonym(shortName.toLowerCase)»
 					public static «parameters(arity)» «shortName»«parameters(arity)» of(«(1 .. arity).map["final A" + it + " a" + it].join(", ")») {
 						return «shortName.toLowerCase»(«(1 .. arity).map["a" + it].join(", ")»);
 					}

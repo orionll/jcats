@@ -251,9 +251,7 @@ class PGenerator implements ClassGenerator {
 				return new «diamondName»(a1, a2);
 			}
 
-			/**
-			 * Synonym for {@link #«shortName.firstToLowerCase»}
-			 */
+			«javadocSynonym(shortName.firstToLowerCase)»
 			public static «paramGenericName» of(final «type1Name» a1, final «type2Name» a2) {
 				return «shortName.firstToLowerCase»(a1, a2);
 			}

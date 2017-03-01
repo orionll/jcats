@@ -226,6 +226,14 @@ interface Generator {
 	def staticModifier() {
 		if (this instanceof InterfaceGenerator) "static" else "public static"
 	}
+
+	def javadocSynonym(String of) {
+		return '''
+			/**
+			 * Synonym for {@link #«of»}
+			 */
+		'''
+	}
 }
 
 interface InterfaceGenerator extends Generator {
