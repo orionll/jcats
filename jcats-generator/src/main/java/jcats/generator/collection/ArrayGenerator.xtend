@@ -372,13 +372,25 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			public «genericName» take(final int n) {
-				if (isEmpty() || n <= 0) {
+				if (n <= 0) {
 					return empty«shortName»();
 				} else if (n >= array.length) {
 					return this;
 				} else {
 					final «type.javaName»[] result = new «type.javaName»[n];
 					System.arraycopy(array, 0, result, 0, n);
+					return new «diamondName»(result);
+				}
+			}
+
+			public «genericName» drop(final int n) {
+				if (n >= array.length) {
+					return empty«shortName»();
+				} else if (n <= 0) {
+					return this;
+				} else {
+					final «type.javaName»[] result = new «type.javaName»[array.length - n];
+					System.arraycopy(array, n, result, 0, result.length);
 					return new «diamondName»(result);
 				}
 			}
