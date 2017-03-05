@@ -7,11 +7,11 @@ import java.util.Arrays
 import java.util.List
 import jcats.generator.collection.ArrayBuilderGenerator
 import jcats.generator.collection.ArrayGenerator
-import jcats.generator.collection.CommonGenerator
 import jcats.generator.collection.ContainerGenerator
 import jcats.generator.collection.DictGenerator
 import jcats.generator.collection.IndexedContainerGenerator
 import jcats.generator.collection.KeyValueGenerator
+import jcats.generator.collection.OrdDictGenerator
 import jcats.generator.collection.Seq0Generator
 import jcats.generator.collection.Seq1Generator
 import jcats.generator.collection.Seq2Generator
@@ -83,8 +83,9 @@ class Main {
 			new StackBuilderGenerator,
 			new KeyValueGenerator,
 			new DictGenerator,
+			new OrdDictGenerator,
 			new CommonGenerator,
-			new jcats.generator.CommonGenerator
+			new jcats.generator.collection.CommonGenerator
 		],
 			OptionGenerator.generators,
 			FGenerator.generators,
