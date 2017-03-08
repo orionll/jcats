@@ -73,6 +73,11 @@ class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public void foreach(final Eff<A> eff) {
+				keyValue.forEach(p -> eff.apply(p.get2()));
+			}
+
+			@Override
 			public Iterator<A> iterator() {
 				return new MappedIterator<>(keyValue.iterator(), P::get2);
 			}
@@ -88,6 +93,11 @@ class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public int size() {
 				return keyValue.size();
+			}
+
+			@Override
+			public void foreach(final Eff<K> eff) {
+				keyValue.forEach(p -> eff.apply(p.get1()));
 			}
 
 			@Override
