@@ -11,6 +11,7 @@ class OrdDictGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
+		import java.util.Collections;
 		import java.util.Iterator;
 		import java.util.function.Consumer;
 
@@ -159,19 +160,23 @@ class OrdDictGenerator implements ClassGenerator {
 
 			@Override
 			public Iterator<P<K, A>> iterator() {
-				throw new UnsupportedOperationException();
+				return (entry == null) ? Collections.emptyIterator() : new OrdDictIterator<>(this);
 			}
 
 			@Override
 			public void forEach(final Consumer<? super P<K, A>> action) {
 				if (entry != null) {
-					action.accept(entry);
-					if (left != null) {
-						left.forEach(action);
-					}
-					if (right != null) {
-						right.forEach(action);
-					}
+					traverse(action);
+				}
+			}
+
+			private void traverse(final Consumer<? super P<K, A>> action) {
+				if (left != null) {
+					left.traverse(action);
+				}
+				action.accept(entry);
+				if (right != null) {
+					right.traverse(action);
 				}
 			}
 
@@ -194,6 +199,41 @@ class OrdDictGenerator implements ClassGenerator {
 				if (right != null) {
 					right.print(prefix + "  ");
 				}
+			}
+		}
+
+		final class OrdDictIterator<K, A> implements Iterator<P<K, A>> {
+			private final OrdDict<K, A> root;
+			private Stack<OrdDict<K, A>> stack;
+
+			OrdDictIterator(final OrdDict<K, A> root) {
+				this.root = root;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (stack == null || !stack.isEmpty());
+			}
+
+			@Override
+			public P<K, A> next() {
+				if (stack == null) {
+					stack = Stack.nil();
+					for (OrdDict<K, A> dict = root; dict != null; dict = dict.left) {
+						stack = stack.prepend(dict);
+					}
+				}
+
+				final OrdDict<K, A> result = stack.head();
+				stack = stack.tail;
+
+				if (result.right != null) {
+					for (OrdDict<K, A> dict = result.right; dict != null; dict = dict.left) {
+						stack = stack.prepend(dict);
+					}
+				}
+
+				return result.entry;
 			}
 		}
 	''' }
