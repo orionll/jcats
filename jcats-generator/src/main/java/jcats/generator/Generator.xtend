@@ -51,6 +51,13 @@ interface Generator {
 		}
 	'''}
 
+	def static keyValueHashCode() { '''
+		@Override
+		public int hashCode() {
+			return keyValueHashCode(this);
+		}
+	'''}
+
 	def static equals(Type type, String wildcardName, boolean isFinal) {'''
 		@Override
 		public «IF isFinal»final «ENDIF»boolean equals(final Object obj) {
@@ -58,6 +65,19 @@ interface Generator {
 				return true;
 			} else if (obj instanceof «wildcardName.replaceAll("<\\?>", "")») {
 				return «type.indexedContainerShortName.firstToLowerCase»sEqual(this, («wildcardName») obj);
+			} else {
+				return false;
+			}
+		}
+	'''}
+
+	def static keyValueEquals() {'''
+		@Override
+		public boolean equals(final Object obj) {
+			if (obj == this) {
+				return true;
+			} else if (obj instanceof KeyValue) {
+				return keyValuesEqual((KeyValue) this, (KeyValue) obj);
 			} else {
 				return false;
 			}

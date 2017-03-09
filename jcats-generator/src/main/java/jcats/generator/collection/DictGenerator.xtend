@@ -25,10 +25,10 @@ class DictGenerator implements ClassGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.P».p;
-		import static jcats.collection.Common.iterableToString;
+		import static jcats.collection.Common.*;
 
 
-		public final class Dict<K, A> implements KeyValue<K, A>, Equatable<Dict<K, A>>, Serializable {
+		public final class Dict<K, A> implements KeyValue<K, A>, Serializable {
 
 			private static final Dict EMPTY = new Dict(0, 0, Common.«Type.OBJECT.emptyArrayName», 0);
 
@@ -88,10 +88,6 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public Option<A> get(final K key) {
-				return Option.fromNullable(getOrNull(key));
-			}
-
 			public A getOrNull(final K key) {
 				return get(key, key.hashCode(), 0);
 			}
@@ -379,36 +375,9 @@ class DictGenerator implements ClassGenerator {
 				}
 			}
 
-			@Override
-			public boolean equals(final Object obj) {
-				if (obj == this) {
-					return true;
-				} else if (obj instanceof Dict) {
-					final Dict<?, ?> other = (Dict<?, ?>) obj;
-					if (size() == other.size()) {
-						for (final P<?, ?> entry : other) {
-							final A value = getOrNull((K) entry.get1());
-							if (value == null || !value.equals(entry.get2())) {
-								return false;
-							}
-						}
-						return true;
-					} else {
-						return false;
-					}
-				} else {
-					return false;
-				}
-			}
+			«keyValueEquals»
 
-			@Override
-			public int hashCode() {
-				int result = 0;
-				for (final P<K, A> entry : this) {
-					result += entry.hashCode();
-				}
-				return result;
-			}
+			«keyValueHashCode»
 
 			@Override
 			public String toString() {

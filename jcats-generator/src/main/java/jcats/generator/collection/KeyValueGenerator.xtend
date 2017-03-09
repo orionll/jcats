@@ -14,17 +14,18 @@ class KeyValueGenerator implements InterfaceGenerator {
 		import java.util.stream.Stream;
 		import java.util.stream.StreamSupport;
 
-		import «Constants.OPTION»;
-		import «Constants.P»;
-		import «Constants.SIZED»;
-		import «Constants.EFF»;
-		import «Constants.EFF»2;
+		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
 
-		public interface KeyValue<K, A> extends Iterable<P<K, A>>, Sized {
+		public interface KeyValue<K, A> extends Iterable<P<K, A>>, Equatable<KeyValue<K, A>>, Sized {
 
-			Option<A> get(final K key);
+			default Option<A> get(final K key) {
+				return Option.fromNullable(getOrNull(key));
+			}
+
+			A getOrNull(final K key);
 
 			boolean containsKey(final K key);
 

@@ -21,6 +21,7 @@ class OrdDictGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static jcats.Order.*;
 		import static jcats.P.p;
+		import static jcats.collection.Common.*;
 
 		public final class OrdDict<K, A> implements KeyValue<K, A> {
 			static final boolean RED = false;
@@ -50,10 +51,6 @@ class OrdDictGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public Option<A> get(final K key) {
-				return Option.fromNullable(getOrNull(key));
-			}
-
 			public A getOrNull(final K key) {
 				if (entry == null) {
 					return null;
@@ -199,6 +196,15 @@ class OrdDictGenerator implements ClassGenerator {
 				if (right != null) {
 					right.print(prefix + "  ");
 				}
+			}
+
+			«keyValueEquals»
+
+			«keyValueHashCode»
+
+			@Override
+			public String toString() {
+				return iterableToString(this, "OrdDict");
 			}
 		}
 

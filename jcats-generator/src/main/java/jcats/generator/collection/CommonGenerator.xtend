@@ -14,6 +14,7 @@ final class CommonGenerator implements ClassGenerator {
 		import java.util.NoSuchElementException;
 		import java.util.PrimitiveIterator;
 
+		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
@@ -73,6 +74,20 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
+			static boolean keyValuesEqual(final KeyValue<Object, ?> keyValue1, final KeyValue<Object, ?> keyValue2) {
+				if (keyValue1.size() == keyValue2.size()) {
+					for (final P<?, ?> entry : keyValue1) {
+						final Object value = keyValue2.getOrNull(entry.get1());
+						if (value == null || !value.equals(entry.get2())) {
+							return false;
+						}
+					}
+					return true;
+				} else {
+					return false;
+				}
+			}
+
 			static String iterableToString(final Iterable<?> iterable, final String name) {
 				final StringBuilder builder = new StringBuilder(name);
 				builder.append("(");
@@ -93,6 +108,14 @@ final class CommonGenerator implements ClassGenerator {
 					hashCode = 31 * hashCode + value.hashCode();
 				}
 				return hashCode;
+			}
+
+			static int keyValueHashCode(final KeyValue<?, ?> keyValue) {
+				int result = 0;
+				for (final P<?, ?> entry : keyValue) {
+					result += entry.hashCode();
+				}
+				return result;
 			}
 
 			static void sliceRangeCheck(final int fromIndex, final int toIndex, final int size) {
