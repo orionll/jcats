@@ -11,6 +11,7 @@ class KeyValueGenerator implements InterfaceGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.util.Iterator;
+		import java.util.function.Consumer;
 		import java.util.stream.Stream;
 		import java.util.stream.StreamSupport;
 
@@ -79,6 +80,11 @@ class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public void forEach(final Consumer<? super A> consumer) {
+				keyValue.forEach(p -> consumer.accept(p.get2()));
+			}
+
+			@Override
 			public Iterator<A> iterator() {
 				return new MappedIterator<>(keyValue.iterator(), P::get2);
 			}
@@ -99,6 +105,11 @@ class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public void foreach(final Eff<K> eff) {
 				keyValue.forEach(p -> eff.apply(p.get1()));
+			}
+
+			@Override
+			public void forEach(final Consumer<? super K> consumer) {
+				keyValue.forEach(p -> consumer.accept(p.get1()));
 			}
 
 			@Override
