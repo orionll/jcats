@@ -142,20 +142,7 @@ class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			default «type.seqGenericName» to«type.seqShortName»() {
-				if (isEmpty()) {
-					return «type.seqShortName».empty«type.seqShortName»();
-				} else {
-					final «type.genericName("SeqBuilder")» builder = «type.seqShortName».builder();
-					«IF Type.javaUnboxedTypes.contains(type)»
-						final «type.iteratorGenericName» iterator = iterator();
-						while (iterator.hasNext()) {
-							builder.append(iterator.«type.iteratorNext»());
-						} 
-					«ELSE»
-						builder.appendAll(this);
-					«ENDIF»
-					return builder.build();		
-				}
+				return «type.seqShortName».sizedToSeq(iterator(), size());
 			}
 
 			default «type.javaName»[] «type.toArrayName»() {
