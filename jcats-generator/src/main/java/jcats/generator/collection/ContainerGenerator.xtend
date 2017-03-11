@@ -99,6 +99,18 @@ class ContainerGenerator implements InterfaceGenerator {
 				return intNone();
 			}
 
+			«IF Type.javaUnboxedTypes.contains(type)»
+				default «type.javaName» sum() {
+					if (isEmpty()) {
+						return 0;
+					} else {
+						final «type.javaName»[] sum = { 0 };
+						foreach(value -> sum[0] += value);
+						return sum[0];
+					}
+				}
+
+			«ENDIF»
 			default void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
 				«IF Type.javaUnboxedTypes.contains(type)»
