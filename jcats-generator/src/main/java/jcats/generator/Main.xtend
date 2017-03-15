@@ -28,6 +28,7 @@ import jcats.generator.function.Eff0Generator
 import jcats.generator.function.EffGenerator
 import jcats.generator.function.EffNGenerators
 import jcats.generator.function.F0Generator
+import jcats.generator.function.F2Generator
 import jcats.generator.function.FGenerator
 import jcats.generator.function.FNGenerators
 import jcats.generator.function.FsGenerator
@@ -91,6 +92,7 @@ class Main {
 			FGenerator.generators,
 			F0Generator.generators,
 			EffGenerator.generators,
+			F2Generator.generators,
 			FNGenerators.generators,
 			EffNGenerators.generators,
 			ContainerGenerator.generators,

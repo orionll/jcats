@@ -8,7 +8,7 @@ import jcats.generator.InterfaceGenerator
 
 final class FNGenerators {
 	def static List<Generator> generators() {
-		(2 .. Constants.MAX_ARITY).map[generator(it)].toList
+		(3 .. Constants.MAX_ARITY).map[generator(it)].toList
 	}
 
 	private def static Generator generator(int arity) {
@@ -53,16 +53,6 @@ final class FNGenerators {
 						}
 
 					«ENDFOR»
-					«IF arity == 2»
-						default F2<A2, A1, B> flip() {
-							return (a2, a1) -> {
-								requireNonNull(a1);
-								requireNonNull(a2);
-								return requireNonNull(apply(a1, a2));
-							};
-						}
-					«ENDIF»
-
 					«FOR i : 1 ..< arity»
 						default «curryReturnType(i, arity)» curry«if (i == 1) "" else i»() {
 							return a1 -> {
@@ -102,29 +92,8 @@ final class FNGenerators {
 							apply(«(1 .. arity).map["a" + it].join(", ")»);
 						};
 					}
-					«IF arity == 2»
-
-						default BiFunction<A1, A2, B> toBiFunction() {
-							return (a1, a2) -> {
-								requireNonNull(a1);
-								requireNonNull(a2);
-								return requireNonNull(apply(a1, a2));
-							};
-						}
-					«ENDIF»
 
 					«joinMultiple((1 .. arity).map["A" + it], "B")»
-					«IF arity == 2»
-
-						static <A1, A2, B> F2<A1, A2, B> biFunctionToF2(final BiFunction<A1, A2, B> f) {
-							requireNonNull(f);
-							return (a1, a2) -> {
-								requireNonNull(a1);
-								requireNonNull(a2);
-								return requireNonNull(f.apply(a1, a2));
-							};
-						}
-					«ENDIF»
 
 					«cast(Iterables.concat((1 .. arity).map["A" + it], #["B"]), (1 .. arity).map["A" + it], #["B"])»
 				}
