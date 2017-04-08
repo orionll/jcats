@@ -26,6 +26,18 @@ class KeyValueGenerator implements InterfaceGenerator {
 				return Option.fromNullable(getOrNull(key));
 			}
 
+			default A getOr(final K key, final A other) {
+				requireNonNull(other);
+				final A value = getOrNull(key);
+				return (value == null) ? other : value;
+			}
+
+			default A getOrElse(final K key, final F0<A> other) {
+				requireNonNull(other);
+				final A value = getOrNull(key);
+				return (value == null) ? other.apply() : value;
+			}
+
 			A getOrNull(final K key);
 
 			boolean containsKey(final K key);
