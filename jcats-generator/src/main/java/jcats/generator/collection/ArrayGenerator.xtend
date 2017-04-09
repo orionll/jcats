@@ -371,6 +371,13 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
+			«IF type == Type.OBJECT»
+				public <B> Array<B> filterByClass(final Class<B> clazz) {
+					requireNonNull(clazz);
+					return filter(e -> clazz.isAssignableFrom(e.getClass())).map((F<A, B>) F.id());
+				}
+
+			«ENDIF»
 			public «genericName» take(final int n) {
 				if (n <= 0) {
 					return empty«shortName»();

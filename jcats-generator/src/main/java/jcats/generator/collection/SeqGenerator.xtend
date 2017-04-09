@@ -295,6 +295,13 @@ class SeqGenerator implements ClassGenerator {
 				}
 			}
 
+			«IF type == Type.OBJECT»
+				public final <B> Seq<B> filterByClass(final Class<B> clazz) {
+					requireNonNull(clazz);
+					return filter(e -> clazz.isAssignableFrom(e.getClass())).map((F<A, B>) F.id());
+				}
+
+			«ENDIF»
 			@Override
 			@Deprecated
 			public final «type.seqGenericName» to«type.seqShortName»() {
