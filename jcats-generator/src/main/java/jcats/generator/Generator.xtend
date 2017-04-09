@@ -250,7 +250,7 @@ interface Generator {
 	def javadocSynonym(String of) {
 		return '''
 			/**
-			 * Synonym for {@link #«of»}
+			 * Alias for {@link #«of»}
 			 */
 		'''
 	}
