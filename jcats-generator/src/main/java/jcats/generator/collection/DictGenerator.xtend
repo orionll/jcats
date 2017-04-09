@@ -84,7 +84,7 @@ class DictGenerator implements ClassGenerator {
 
 			@Override
 			public boolean containsKey(final K key) {
-				return containsKey(key, key.hashCode(), 0);
+				return (getOrNull(key) != null);
 			}
 
 			@Override
@@ -210,18 +210,6 @@ class DictGenerator implements ClassGenerator {
 						newSlotMap >>>= 1;
 					}
 					return new Dict<>(treeMap, leafMap, slots, size);
-				}
-			}
-
-			private boolean containsKey(final K key, final int keyHash, final int shift) {
-				final int branch = choose(keyHash, shift);
-
-				switch (follow(branch)) {
-					case VOID: return false;
-					case LEAF: return getEntry(branch).get1().equals(key);
-					case TREE: return getTree(branch).containsKey(key, keyHash, shift + 5);
-					case COLLISION: return getCollision(branch).containsKey(key);
-					default: throw new AssertionError();
 				}
 			}
 
@@ -468,15 +456,6 @@ class DictGenerator implements ClassGenerator {
 			ListDict(final P<K, A> entry, final ListDict<K, A> next) {
 				this.entry = entry;
 				this.next = next;
-			}
-
-			boolean containsKey(final K key) {
-				for (ListDict<K, A> dict = this; dict != null; dict = dict.next) {
-					if (dict.entry.get1().equals(key)) {
-						return true;
-					}
-				}
-				return false;
 			}
 
 			A get(final K key) {
