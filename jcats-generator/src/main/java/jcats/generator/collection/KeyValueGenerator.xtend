@@ -72,6 +72,8 @@ class KeyValueGenerator implements InterfaceGenerator {
 			default Stream<P<K, A>> parallelStream() {
 				return StreamSupport.stream(spliterator(), true);
 			}
+
+			«cast(#["K", "A"], #[], #["A"])»
 		}
 
 		final class Values<A> implements Container<A> {

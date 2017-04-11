@@ -32,6 +32,8 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 		import «Constants.JCATS».*;
 
+		import static java.util.Objects.requireNonNull;
+
 		public interface «genericName» extends «type.containerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
 
 			@Override
@@ -42,6 +44,10 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			default List<«type.genericBoxedName»> asList() {
 				return new «shortName»AsList«IF type == Type.OBJECT»<>«ENDIF»(this);
 			}
+			«IF type == Type.OBJECT»
+
+				«cast(#["A"], #[], #["A"])»
+			«ENDIF»
 		}
 
 		final class «type.genericName("IndexedContainerAsList")» extends AbstractList<«type.genericBoxedName»> implements RandomAccess {

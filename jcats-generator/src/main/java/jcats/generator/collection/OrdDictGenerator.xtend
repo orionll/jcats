@@ -206,6 +206,8 @@ class OrdDictGenerator implements ClassGenerator {
 			public String toString() {
 				return iterableToString(this, "OrdDict");
 			}
+
+			«cast(#["K", "A"], #[], #["A"])»
 		}
 
 		final class OrdDictIterator<K, A> implements Iterator<P<K, A>> {

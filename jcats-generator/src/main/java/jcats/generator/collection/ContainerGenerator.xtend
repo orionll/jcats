@@ -192,6 +192,10 @@ class ContainerGenerator implements InterfaceGenerator {
 			default «type.streamGenericName» parallelStream() {
 				return StreamSupport.«type.streamFunction»(spliterator(), true);
 			}
+			«IF type == Type.OBJECT»
+
+				«cast(#["A"], #[], #["A"])»
+			«ENDIF»
 		}
 
 		class «type.genericName("ContainerAsCollection")» extends AbstractCollection<«type.genericBoxedName»> {

@@ -65,6 +65,11 @@ class DictGenerator implements ClassGenerator {
 				return emptyDict();
 			}
 
+			«javadocSynonym("dict")»
+			public static <K, A> Dict<K, A> of(final K key, final A value) {
+				return dict(key, value);
+			}
+
 			«FOR i : 2 .. Constants.MAX_ARITY»
 				«javadocSynonym("dict" + i)»
 				public static <K, A> Dict<K, A> of(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
@@ -371,6 +376,8 @@ class DictGenerator implements ClassGenerator {
 			public String toString() {
 				return iterableToString(this, "Dict");
 			}
+
+			«cast(#["K", "A"], #[], #["A"])»
 		}
 
 		final class DictIterator<K, A> implements Iterator<P<K, A>> {

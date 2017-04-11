@@ -1,5 +1,8 @@
 package jcats.generator
 
+import com.google.common.collect.Sets
+
+import static extension com.google.common.collect.Iterables.contains
 import static extension java.lang.Character.toLowerCase
 
 interface Generator {
@@ -219,14 +222,19 @@ interface Generator {
 
 	def cast(Iterable<String> typeParams, Iterable<String> contravariantTypeParams, Iterable<String> covariantTypeParams) {
 		val argumentType = '''«name»<«typeParams.join(", ")»>'''
-		val returnType = '''«name»<«typeParams.map[it + "X"].join(", ")»>'''
+		val returnType = '''«name»<«typeParams.map[
+			if (contravariantTypeParams.contains(it) || covariantTypeParams.contains(it)) it + "X" else it].join(", ")»>'''
+
+		val invariantTypeParams = Sets.newHashSet(typeParams)
+		invariantTypeParams.removeAll(contravariantTypeParams)
+		invariantTypeParams.removeAll(covariantTypeParams)
 
 		val methodParams = new StringBuilder
 		if (!contravariantTypeParams.empty) {
 			methodParams.append(contravariantTypeParams.join(", "))
 			methodParams.append(", ")
 			methodParams.append(contravariantTypeParams.map[it + "X extends " + it].join(", "))
-			if (!covariantTypeParams.empty) {
+			if (!covariantTypeParams.empty || !invariantTypeParams.empty) {
 				methodParams.append(", ")
 			}
 		}
@@ -234,6 +242,12 @@ interface Generator {
 			methodParams.append(covariantTypeParams.map[it + "X"].join(", "))
 			methodParams.append(", ")
 			methodParams.append(covariantTypeParams.map[it + " extends " + it + "X"].join(", "))
+			if (!invariantTypeParams.empty) {
+				methodParams.append(", ")
+			}
+		}
+		if (!invariantTypeParams.empty) {
+			methodParams.append(invariantTypeParams.join(", "))
 		}
 
 		'''
