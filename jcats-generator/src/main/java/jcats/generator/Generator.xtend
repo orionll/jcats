@@ -221,8 +221,12 @@ interface Generator {
 	}
 
 	def cast(Iterable<String> typeParams, Iterable<String> contravariantTypeParams, Iterable<String> covariantTypeParams) {
-		val argumentType = '''«name»<«typeParams.join(", ")»>'''
-		val returnType = '''«name»<«typeParams.map[
+		cast(name, "cast", typeParams, contravariantTypeParams, covariantTypeParams)
+	}
+
+	def cast(String typeName, String methodName, Iterable<String> typeParams, Iterable<String> contravariantTypeParams, Iterable<String> covariantTypeParams) {
+		val argumentType = '''«typeName»<«typeParams.join(", ")»>'''
+		val returnType = '''«typeName»<«typeParams.map[
 			if (contravariantTypeParams.contains(it) || covariantTypeParams.contains(it)) it + "X" else it].join(", ")»>'''
 
 		val invariantTypeParams = Sets.newHashSet(typeParams)
@@ -251,8 +255,8 @@ interface Generator {
 		}
 
 		'''
-		«staticModifier» <«methodParams»> «returnType» cast(final «argumentType» «name.firstToLowerCase») {
-			return («name»)requireNonNull(«name.firstToLowerCase»);
+		«staticModifier» <«methodParams»> «returnType» «methodName»(final «argumentType» «typeName.firstToLowerCase») {
+			return («returnType») requireNonNull(«typeName.firstToLowerCase»);
 		}
 		'''
 	}

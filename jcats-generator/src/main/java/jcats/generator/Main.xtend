@@ -86,6 +86,7 @@ class Main {
 			new DictGenerator,
 			new OrdDictGenerator,
 			new CommonGenerator,
+			new CastsGenerator,
 			new jcats.generator.collection.CommonGenerator
 		],
 			OptionGenerator.generators,
