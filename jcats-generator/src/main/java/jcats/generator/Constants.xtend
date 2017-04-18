@@ -10,6 +10,7 @@ final class Constants {
 	val public static EQUATABLE = "jcats.Equatable"
 	val public static INDEXED = "jcats.Indexed"
 	val public static SIZED = "jcats.Sized"
+	val public static STRING1 = "jcats.String1"
 	val public static MAX_ARITY = 5
 	val public static MAX_FUNCTIONS_ARITY = 3
 	val public static EFFECT = "jcats.function.Effect"
