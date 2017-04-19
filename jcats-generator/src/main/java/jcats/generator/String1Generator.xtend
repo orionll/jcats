@@ -14,7 +14,9 @@ final class String1Generator implements ClassGenerator {
 		 * Nonempty string
 		 */
 		public final class String1 implements CharSequence, Equatable<String1>, Comparable<String1>, Serializable {
-			private final String str;
+			private static final String1CaseInsensitiveOrd CASE_INSENSITIVE_ORD = new String1CaseInsensitiveOrd();
+
+			final String str;
 
 			private String1(final String str) {
 				this.str = str;
@@ -158,6 +160,17 @@ final class String1Generator implements ClassGenerator {
 			«ENDFOR»
 			public static String1 fromFloat(final float value) {
 				return new String1(Float.toString(value));
+			}
+
+			public static Ord<String1> caseInsensitiveOrd() {
+				return CASE_INSENSITIVE_ORD;
+			}
+		}
+
+		final class String1CaseInsensitiveOrd implements Ord<String1> {
+			@Override
+			public Order compare(final String1 x, final String1 y) {
+				return Order.fromInt(String.CASE_INSENSITIVE_ORDER.compare(x.str, y.str));
 			}
 		}
 	''' }
