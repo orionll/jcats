@@ -129,17 +129,17 @@ class F2Generator implements InterfaceGenerator {
 
 			default «mapReturnType» map(final «mapFunction» f) {
 				requireNonNull(f);
-				return (final «type1GenericName» a1, final «type2GenericName» a2) -> {
+				return (final «type1GenericName» value1, final «type2GenericName» value2) -> {
 					«IF type1 == Type.OBJECT»
-						requireNonNull(a1);
+						requireNonNull(value1);
 					«ENDIF»
 					«IF type2 == Type.OBJECT»
-						requireNonNull(a2);
+						requireNonNull(value2);
 					«ENDIF»
 					«IF returnType == Type.OBJECT»
-						final «returnTypeGenericName» value = requireNonNull(apply(a1, a2));
+						final «returnTypeGenericName» value = requireNonNull(apply(value1, value2));
 					«ELSE»
-						final «returnTypeGenericName» value = apply(a1, a2);
+						final «returnTypeGenericName» value = apply(value1, value2);
 					«ENDIF»
 					return requireNonNull(f.apply(value));
 				};
@@ -148,10 +148,10 @@ class F2Generator implements InterfaceGenerator {
 			«IF returnType == Type.OBJECT»
 				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 					default F2<A2, A1, B> reverse() {
-						return (final A2 a2, final A1 a1) -> {
-							requireNonNull(a1);
-							requireNonNull(a2);
-							return requireNonNull(apply(a1, a2));
+						return (final A2 value2, final A1 value1) -> {
+							requireNonNull(value1);
+							requireNonNull(value2);
+							return requireNonNull(apply(value1, value2));
 						};
 					}
 				«ELSEIF type1 == Type.OBJECT»
@@ -170,16 +170,16 @@ class F2Generator implements InterfaceGenerator {
 					}
 				«ELSE»
 					default «type2.typeName»«type1.typeName»«returnType.typeName»F2<A> reverse() {
-						return (final «type2.javaName» a2, final «type1.javaName» a1) -> requireNonNull(apply(a1, a2));
+						return (final «type2.javaName» value2, final «type1.javaName» value1) -> requireNonNull(apply(value1, value2));
 					}
 				«ENDIF»
 			«ELSE»
 				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 					default «returnType.typeName»F2<A2, A1> reverse() {
-						return (final A2 a2, final A1 a1) -> {
-							requireNonNull(a1);
-							requireNonNull(a2);
-							return apply(a1, a2);
+						return (final A2 value2, final A1 value1) -> {
+							requireNonNull(value1);
+							requireNonNull(value2);
+							return apply(value1, value2);
 						};
 					}
 				«ELSEIF type1 == Type.OBJECT»
@@ -198,70 +198,70 @@ class F2Generator implements InterfaceGenerator {
 					}
 				«ELSE»
 					default «type2.typeName»«type1.typeName»«returnType.typeName»F2 reverse() {
-						return (final «type2.javaName» a2, final «type1.javaName» a1) -> apply(a1, a2);
+						return (final «type2.javaName» value2, final «type1.javaName» value1) -> apply(value1, value2);
 					}
 				«ENDIF»
 			«ENDIF»
 
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT && returnType == Type.OBJECT»
 				default BiFunction<A1, A2, B> toBiFunction() {
-					return (final A1 a1, final A2 a2) -> {
-						requireNonNull(a1);
-						requireNonNull(a2);
-						return requireNonNull(apply(a1, a2));
+					return (final A1 value1, final A2 value2) -> {
+						requireNonNull(value1);
+						requireNonNull(value2);
+						return requireNonNull(apply(value1, value2));
 					};
 				}
 
 				static <A> BinaryOperator<A> toBinaryOperator(final F2<A, A, A> f) {
 					requireNonNull(f);
-					return (final A a1, final A a2) -> {
-						requireNonNull(a1);
-						requireNonNull(a2);
-						return requireNonNull(f.apply(a1, a2));
+					return (final A value1, final A value2) -> {
+						requireNonNull(value1);
+						requireNonNull(value2);
+						return requireNonNull(f.apply(value1, value2));
 					};
 				}
 
 				static <A1, A2, B> F2<A1, A2, B> fromBiFunction(final BiFunction<A1, A2, B> f) {
 					requireNonNull(f);
-					return (final A1 a1, final A2 a2) -> {
-						requireNonNull(a1);
-						requireNonNull(a2);
-						return requireNonNull(f.apply(a1, a2));
+					return (final A1 value1, final A2 value2) -> {
+						requireNonNull(value1);
+						requireNonNull(value2);
+						return requireNonNull(f.apply(value1, value2));
 					};
 				}
 
 			«ELSEIF type1 == Type.OBJECT && type2 == Type.OBJECT && Type.javaUnboxedTypes.contains(returnType)»
 				default To«returnType.javaPrefix»BiFunction<A1, A2> toTo«returnType.javaPrefix»BiFunction() {
-					return (final A1 a1, final A2 a2) -> {
-						requireNonNull(a1);
-						requireNonNull(a2);
-						return apply(a1, a2);
+					return (final A1 value1, final A2 value2) -> {
+						requireNonNull(value1);
+						requireNonNull(value2);
+						return apply(value1, value2);
 					};
 				}
 
 				static <A1, A2> «returnType.typeName»F2<A1, A2> fromTo«returnType.javaPrefix»BiFunction(final To«returnType.javaPrefix»BiFunction<A1, A2> f) {
 					requireNonNull(f);
-					return (final A1 a1, final A2 a2) -> {
-						requireNonNull(a1);
-						requireNonNull(a2);
-						return f.applyAs«returnType.javaPrefix»(a1, a2);
+					return (final A1 value1, final A2 value2) -> {
+						requireNonNull(value1);
+						requireNonNull(value2);
+						return f.applyAs«returnType.javaPrefix»(value1, value2);
 					};
 				}
 			«ELSEIF type1 == Type.OBJECT && type2 == Type.OBJECT && returnType == Type.BOOL»
 				default BiPredicate<A1, A2> toBiPredicate() {
-					return (final A1 a1, final A2 a2) -> {
-						requireNonNull(a1);
-						requireNonNull(a2);
-						return apply(a1, a2);
+					return (final A1 value1, final A2 value2) -> {
+						requireNonNull(value1);
+						requireNonNull(value2);
+						return apply(value1, value2);
 					};
 				}
 
 				static <A1, A2> «returnType.typeName»F2<A1, A2> fromBiPredicate(final BiPredicate<A1, A2> p) {
 					requireNonNull(p);
-					return (final A1 a1, final A2 a2) -> {
-						requireNonNull(a1);
-						requireNonNull(a2);
-						return p.test(a1, a2);
+					return (final A1 value1, final A2 value2) -> {
+						requireNonNull(value1);
+						requireNonNull(value2);
+						return p.test(value1, value2);
 					};
 				}
 
