@@ -24,6 +24,9 @@ final class CommonGenerator implements ClassGenerator {
 			«FOR type : Type.values»
 				static final «type.javaName»[] «type.emptyArrayName» = new «type.javaName»[0];
 			«ENDFOR»
+			«FOR type : Type.javaUnboxedTypes»
+				static final «type.typeName»«type.typeName»«type.typeName»F2 SUM_«type.javaName.toUpperCase» = (a, b) -> a + b;
+			«ENDFOR»
 
 			/**
 			 * The maximum size of array to allocate.

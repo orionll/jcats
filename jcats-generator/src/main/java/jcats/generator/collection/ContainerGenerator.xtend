@@ -38,7 +38,7 @@ class ContainerGenerator implements InterfaceGenerator {
 		import java.util.stream.StreamSupport;
 
 		import «Constants.JCATS».*;
-		import «Constants.FUNCTION».«type.effShortName»;
+		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.JCATS».IntOption.*;
@@ -100,14 +100,81 @@ class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			«IF Type.javaUnboxedTypes.contains(type)»
-				default «type.javaName» sum() {
-					if (isEmpty()) {
-						return 0;
-					} else {
-						final «type.javaName»[] sum = { 0 };
-						foreach(value -> sum[0] += value);
-						return sum[0];
+				default <A> A foldLeft(final A start, final Object«type.typeName»ObjectF2<A, A> f2) {
+					requireNonNull(start);
+					requireNonNull(f2);
+					A result = start;
+					final «type.iteratorGenericName» iterator = iterator();
+					while (iterator.hasNext()) {
+						final «type.javaName» value = iterator.«type.iteratorNext»();
+						result = requireNonNull(f2.apply(result, value));
 					}
+					return result;
+				}
+			«ELSEIF type == Type.BOOL»
+				default <A> A foldLeft(final A start, final Object«type.typeName»ObjectF2<A, A> f2) {
+					requireNonNull(start);
+					requireNonNull(f2);
+					A result = start;
+					for (final boolean value : this) {
+						result = requireNonNull(f2.apply(result, value));
+					}
+					return result;
+				}
+			«ELSE»
+				default <B> B foldLeft(final B start, final F2<B, A, B> f2) {
+					requireNonNull(start);
+					requireNonNull(f2);
+					B result = start;
+					for (final A a : this) {
+						result = requireNonNull(f2.apply(result, a));
+					}
+					return result;
+				}
+			«ENDIF»
+
+			«IF Type.javaUnboxedTypes.contains(type)»
+				«FOR returnType : Type.primitives»
+					default «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»«type.typeName»«returnType.typeName»F2 f2) {
+						requireNonNull(f2);
+						«returnType.javaName» result = start;
+						final «type.iteratorGenericName» iterator = iterator();
+						while (iterator.hasNext()) {
+							final «type.javaName» value = iterator.«type.iteratorNext»();
+							result = f2.apply(result, value);
+						}
+						return result;
+					}
+
+				«ENDFOR»
+			«ELSEIF type == Type.BOOL»
+				«FOR returnType : Type.primitives»
+					default «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»«type.typeName»«returnType.typeName»F2 f2) {
+						requireNonNull(f2);
+						«returnType.javaName» result = start;
+						for (final boolean value : this) {
+							result = f2.apply(result, value);
+						}
+						return result;
+					}
+
+				«ENDFOR»
+			«ELSE»
+				«FOR returnType : Type.primitives»
+					default «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»Object«returnType.typeName»F2<A> f2) {
+						requireNonNull(f2);
+						«returnType.javaName» result = start;
+						for (final A a : this) {
+							result = f2.apply(result, a);
+						}
+						return result;
+					}
+
+				«ENDFOR»
+			«ENDIF»
+			«IF Type.javaUnboxedTypes.contains(type)»
+				default «type.javaName» sum() {
+					return foldLeftTo«type.typeName»(0, Common.SUM_«type.typeName.toUpperCase»);
 				}
 
 			«ENDIF»
