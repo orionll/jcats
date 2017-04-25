@@ -42,7 +42,9 @@ class ContainerGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.JCATS».IntOption.*;
-
+		«IF type != Type.INT»
+			import static «Constants.JCATS».«type.optionShortName».*;
+		«ENDIF»
 
 		public interface «genericName» extends Iterable<«type.genericBoxedName»>, Sized {
 
@@ -172,6 +174,24 @@ class ContainerGenerator implements InterfaceGenerator {
 
 				«ENDFOR»
 			«ENDIF»
+			default «type.optionGenericName» reduceLeft(final «IF type == Type.OBJECT»F2<A, A, A>«ELSE»«type.typeName»«type.typeName»«type.typeName»F2«ENDIF» f2) {
+				requireNonNull(f2);
+				final «type.iteratorGenericName» iterator = iterator();
+				if (iterator.hasNext()) {
+					«type.genericName» result = iterator.«type.iteratorNext»();
+					while (iterator.hasNext()) {
+						«IF type == Type.OBJECT»
+							result = requireNonNull(f2.apply(result, iterator.«type.iteratorNext»()));
+						«ELSE»
+							result = f2.apply(result, iterator.«type.iteratorNext»());
+						«ENDIF»
+					}
+					return «type.someName»(result);
+				} else {
+					return «type.noneName»();
+				}
+			}
+
 			«IF Type.javaUnboxedTypes.contains(type)»
 				default «type.javaName» sum() {
 					return foldLeftTo«type.typeName»(0, Common.SUM_«type.typeName.toUpperCase»);
