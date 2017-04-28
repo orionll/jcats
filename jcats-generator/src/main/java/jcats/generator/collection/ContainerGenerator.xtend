@@ -174,6 +174,42 @@ class ContainerGenerator implements InterfaceGenerator {
 
 				«ENDFOR»
 			«ENDIF»
+			«IF Type.javaUnboxedTypes.contains(type)»
+				default <A> A foldRight(final A start, final «type.typeName»ObjectObjectF2<A, A> f2) {
+			«ELSEIF type == Type.BOOL»
+				default <A> A foldRight(final A start, final «type.typeName»ObjectObjectF2<A, A> f2) {
+			«ELSE»
+				default <B> B foldRight(final B start, final F2<A, B, B> f2) {
+			«ENDIF»
+				requireNonNull(start);
+				requireNonNull(f2);
+				«IF type == Type.OBJECT»B«ELSE»A«ENDIF» result = start;
+				final «type.iteratorGenericName» iterator = reversedIterator();
+				while (iterator.hasNext()) {
+					final «type.genericName» value = iterator.«type.iteratorNext»();
+					result = requireNonNull(f2.apply(value, result));
+				}
+				return result;
+			}
+
+			«FOR returnType : Type.primitives»
+				«IF type == Type.OBJECT»
+					default «returnType.javaName» foldRightTo«returnType.typeName»(final «returnType.javaName» start, final Object«returnType.typeName»«returnType.typeName»F2<A> f2) {
+				«ELSE»
+					default «returnType.javaName» foldRightTo«returnType.typeName»(final «returnType.javaName» start, final «type.typeName»«returnType.typeName»«returnType.typeName»F2 f2) {
+				«ENDIF»
+					requireNonNull(f2);
+					«returnType.javaName» result = start;
+					final «type.iteratorGenericName» iterator = reversedIterator();
+					while (iterator.hasNext()) {
+						final «type.genericName» value = iterator.«type.iteratorNext»();
+						result = f2.apply(value, result);
+					}
+					return result;
+				}
+
+			«ENDFOR»
+
 			default «type.optionGenericName» reduceLeft(final «IF type == Type.OBJECT»F2<A, A, A>«ELSE»«type.typeName»«type.typeName»«type.typeName»F2«ENDIF» f2) {
 				requireNonNull(f2);
 				final «type.iteratorGenericName» iterator = iterator();
@@ -223,6 +259,10 @@ class ContainerGenerator implements InterfaceGenerator {
 				«type.iteratorGenericName» iterator();
 
 			«ENDIF»
+			default «type.iteratorGenericName» reversedIterator() {
+				return to«type.arrayShortName»().reversedIterator();
+			}
+
 			@Override
 			default «type.spliteratorGenericName» spliterator() {
 				if (isEmpty()) {

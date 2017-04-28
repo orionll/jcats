@@ -880,7 +880,7 @@ final class Seq3Generator extends SeqGenerator {
 			}
 
 			@Override
-			«type.iteratorGenericName» reversedIterator() {
+			public «type.iteratorGenericName» reversedIterator() {
 				return new «reversedIteratorDiamondName(3)»(node3, init, tail);
 			}
 

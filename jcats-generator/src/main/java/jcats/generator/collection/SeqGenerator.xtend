@@ -1119,8 +1119,6 @@ class SeqGenerator implements ClassGenerator {
 
 			«toStr(type, true)»
 
-			abstract «type.iteratorGenericName» reversedIterator();
-
 			«IF type == Type.OBJECT»
 				«zip(true, true)»
 

@@ -722,7 +722,7 @@ class Seq2Generator extends SeqGenerator {
 			}
 
 			@Override
-			«type.iteratorGenericName» reversedIterator() {
+			public «type.iteratorGenericName» reversedIterator() {
 				return new «reversedIteratorDiamondName(2)»(node2, init, tail);
 			}
 

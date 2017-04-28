@@ -1185,7 +1185,7 @@ final class Seq5Generator extends SeqGenerator {
 			}
 
 			@Override
-			«type.iteratorGenericName» reversedIterator() {
+			public «type.iteratorGenericName» reversedIterator() {
 				return new «reversedIteratorDiamondName(5)»(node5, init, tail);
 			}
 
