@@ -38,14 +38,22 @@ final class OptionGenerator implements ClassGenerator {
 		import java.util.Spliterators;
 		import java.util.stream.«type.streamName»;
 
-		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
-		import static «Constants.F».id;
+		«IF type == Type.OBJECT»
+			import static «Constants.F».id;
+		«ELSE»
+			import static «Constants.FUNCTION».«type.typeName»«type.typeName»F.id;
+		«ENDIF»
 		«IF type != Type.OBJECT»
 			import static «Constants.OPTION».*;
 		«ENDIF»
+		«FOR returnType : Type.primitives»
+			«IF type != returnType»
+				import static «Constants.JCATS».«returnType.optionShortName».*;
+			«ENDIF»
+		«ENDFOR»
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import static «Constants.JCATS».Empty«type.typeName»Iterator.empty«type.typeName»Iterator;
 		«ELSE»
@@ -167,7 +175,7 @@ final class OptionGenerator implements ClassGenerator {
 				if (isEmpty()) {
 					return none();
 				«IF type == Type.OBJECT»
-					} else if (f == F.id()) {
+					} else if (f == id()) {
 						return (Option) this;
 				«ENDIF»
 				} else {
@@ -175,6 +183,28 @@ final class OptionGenerator implements ClassGenerator {
 				}
 			}
 
+			«FOR returnType : Type.primitives»
+				«IF type == Type.OBJECT»
+					public «returnType.typeName»Option mapTo«returnType.typeName»(final «returnType.typeName»F<A> f) {
+						requireNonNull(f);
+						return isEmpty() ? «returnType.noneName»() : «returnType.someName»(f.apply(value));
+					}
+				«ELSE»
+					public «returnType.typeName»Option mapTo«returnType.typeName»(final «type.typeName»«returnType.typeName»F f) {
+						requireNonNull(f);
+						if (isEmpty()) {
+							return «returnType.noneName»();
+						«IF returnType == type»
+							} else if (f == id()) {
+								return this;
+						«ENDIF»
+						} else {
+							return «returnType.someName»(f.apply(value));
+						}
+					}
+				«ENDIF»
+
+			«ENDFOR»
 			«IF type == Type.OBJECT»
 				public <B> Option<B> flatMap(final F<A, Option<B>> f) {
 			«ELSE»
