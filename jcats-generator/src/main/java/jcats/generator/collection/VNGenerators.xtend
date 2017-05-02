@@ -245,6 +245,11 @@ final class VNGenerators {
 					}
 
 					@Override
+					public «type.iteratorGenericName» reversedIterator() {
+						return new «type.diamondName("V" + arity + "ReversedIterator")»(«(1 .. arity).map["a" + it].join(", ")»);
+					}
+
+					@Override
 					public «type.spliteratorGenericName» spliterator() {
 						return Spliterators.spliterator(iterator(), «arity», Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 					}
@@ -324,6 +329,33 @@ final class VNGenerators {
 						switch (i) {
 							«FOR i : 1 .. arity»
 								case «i-1»: i++; return a«i»;
+							«ENDFOR»
+							default: throw new NoSuchElementException();
+						}
+					}
+				}
+
+				final class «type.genericName("V" + arity + "ReversedIterator")» implements «type.iteratorGenericName» {
+					private final «type.genericName» «(1 .. arity).map["a" + it].join(", ")»;
+					private int i;
+
+					«type.shortName("V" + arity + "ReversedIterator")»(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {
+						«FOR i : 1 .. arity»
+							this.a«i» = a«i»;
+						«ENDFOR»
+						i = «arity-1»;
+					}
+
+					@Override
+					public boolean hasNext() {
+						return (i >= 0);
+					}
+
+					@Override
+					public «type.iteratorReturnType» «type.iteratorNext»() {
+						switch (i) {
+							«FOR i : arity .. 1»
+								case «i-1»: i--; return a«i»;
 							«ENDFOR»
 							default: throw new NoSuchElementException();
 						}
