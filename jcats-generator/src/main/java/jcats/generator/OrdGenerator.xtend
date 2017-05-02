@@ -6,6 +6,7 @@ final class OrdGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
+		import java.io.Serializable;
 		import java.util.Comparator;
 
 		import «Constants.F»;
@@ -112,7 +113,11 @@ final class OrdGenerator implements ClassGenerator {
 			}
 
 			static <A extends Comparable<A>> Ord<A> ord() {
-				return Order.ORD;
+				return (Ord) NaturalOrd.INSTANCE;
+			}
+
+			static <A extends Comparable<A>> Ord<A> reverseOrd() {
+				return (Ord) ReverseOrd.INSTANCE;
 			}
 
 			static <A, B extends Comparable<B>> Ord<A> by(final F<A, B> f) {
@@ -120,6 +125,48 @@ final class OrdGenerator implements ClassGenerator {
 			}
 
 			«cast(#["A"], #["A"], #[])»
+		}
+
+		final class NaturalOrd implements Ord<Comparable>, Serializable {
+			static final NaturalOrd INSTANCE = new NaturalOrd();
+
+			@Override
+			public Order compare(Comparable x, Comparable y) {
+				requireNonNull(x);
+				requireNonNull(y);
+				return Order.fromInt(x.compareTo(y));
+			}
+
+			@Override
+			public Comparator<Comparable> toComparator() {
+				return Comparator.naturalOrder();
+			}
+
+			@Override
+			public Ord<Comparable> reverse() {
+				return ReverseOrd.INSTANCE;
+			}
+		}
+
+		final class ReverseOrd implements Ord<Comparable>, Serializable {
+			static final ReverseOrd INSTANCE = new ReverseOrd();
+
+			@Override
+			public Order compare(Comparable x, Comparable y) {
+				requireNonNull(x);
+				requireNonNull(y);
+				return Order.fromInt(y.compareTo(x));
+			}
+
+			@Override
+			public Comparator<Comparable> toComparator() {
+				return Comparator.reverseOrder();
+			}
+
+			@Override
+			public Ord<Comparable> reverse() {
+				return NaturalOrd.INSTANCE;
+			}
 		}
 	''' }
 }

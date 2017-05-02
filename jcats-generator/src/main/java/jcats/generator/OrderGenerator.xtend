@@ -41,12 +41,6 @@ final class OrderGenerator implements ClassGenerator {
 			public static Order fromInt(final int cmp) {
 				return (cmp == 0) ? EQ : (cmp > 0) ? GT : LT;
 			}
-
-			static final Ord ORD = (Ord<Comparable>) (Comparable x, Comparable y) -> {
-				requireNonNull(x);
-				requireNonNull(y);
-				return fromInt(x.compareTo(y));
-			};
 		}
 	''' }
 }
