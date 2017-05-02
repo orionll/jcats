@@ -112,12 +112,16 @@ interface Generator {
 	''' }
 
 	def static iterate(Type type, String paramGenericName, String builderName) { '''
-		public static «paramGenericName» iterate(final A start, final F<A, Option<A>> f) {
+		«IF type == Type.OBJECT»
+			public static «paramGenericName» iterate(final A start, final F<A, Option<A>> f) {
+		«ELSE»
+			public static «paramGenericName» iterate(final «type.javaName» start, final «type.typeName»ObjectF<«type.optionShortName»> f) {
+		«ENDIF»
 			final «builderName» builder = builder();
 			builder.append(start);
-			Option<A> option = f.apply(start);
+			«type.optionGenericName» option = f.apply(start);
 			while (option.isNotEmpty()) {
-				final A value = option.get();
+				final «type.genericName» value = option.get();
 				builder.append(value);
 				option = f.apply(value);
 			}

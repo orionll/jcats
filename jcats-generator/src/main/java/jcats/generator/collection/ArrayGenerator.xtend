@@ -545,10 +545,8 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			«IF type == Type.OBJECT»
-				«iterate(type, paramGenericName, arrayBuilderName)»
+			«iterate(type, paramGenericName, arrayBuilderName)»
 
-			«ENDIF»
 			«IF type == Type.OBJECT»
 				public static Array<Character> stringToCharArray(final String str) {
 					if (str.isEmpty()) {
