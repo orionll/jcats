@@ -245,8 +245,8 @@ final class VNGenerators {
 					}
 
 					@Override
-					public «type.iteratorGenericName» reversedIterator() {
-						return new «type.diamondName("V" + arity + "ReversedIterator")»(«(1 .. arity).map["a" + it].join(", ")»);
+					public «type.iteratorGenericName» reverseIterator() {
+						return new «type.diamondName("V" + arity + "ReverseIterator")»(«(1 .. arity).map["a" + it].join(", ")»);
 					}
 
 					@Override
@@ -335,11 +335,11 @@ final class VNGenerators {
 					}
 				}
 
-				final class «type.genericName("V" + arity + "ReversedIterator")» implements «type.iteratorGenericName» {
+				final class «type.genericName("V" + arity + "ReverseIterator")» implements «type.iteratorGenericName» {
 					private final «type.genericName» «(1 .. arity).map["a" + it].join(", ")»;
 					private int i;
 
-					«type.shortName("V" + arity + "ReversedIterator")»(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {
+					«type.shortName("V" + arity + "ReverseIterator")»(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {
 						«FOR i : 1 .. arity»
 							this.a«i» = a«i»;
 						«ENDFOR»

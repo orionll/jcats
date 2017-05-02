@@ -1025,8 +1025,8 @@ final class Seq4Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «type.iteratorGenericName» reversedIterator() {
-				return new «reversedIteratorDiamondName(4)»(node4, init, tail);
+			public «type.iteratorGenericName» reverseIterator() {
+				return new «reverseIteratorDiamondName(4)»(node4, init, tail);
 			}
 
 			@Override
@@ -1133,7 +1133,7 @@ final class Seq4Generator extends SeqGenerator {
 			}
 		}
 
-		final class «reversedIteratorName(4)» implements «type.iteratorGenericName» {
+		final class «reverseIteratorName(4)» implements «type.iteratorGenericName» {
 			private final «type.javaName»[][][][] node4;
 			private final «type.javaName»[] init;
 
@@ -1145,7 +1145,7 @@ final class Seq4Generator extends SeqGenerator {
 			private «type.javaName»[][] node2;
 			private «type.javaName»[] node1;
 
-			«shortName»4ReversedIterator(final «type.javaName»[][][][] node4, final «type.javaName»[] init, final «type.javaName»[] tail) {
+			«shortName»4ReverseIterator(final «type.javaName»[][][][] node4, final «type.javaName»[] init, final «type.javaName»[] tail) {
 				this.node4 = node4;
 				this.init = init;
 				node1 = tail;

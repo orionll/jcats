@@ -880,8 +880,8 @@ final class Seq3Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «type.iteratorGenericName» reversedIterator() {
-				return new «reversedIteratorDiamondName(3)»(node3, init, tail);
+			public «type.iteratorGenericName» reverseIterator() {
+				return new «reverseIteratorDiamondName(3)»(node3, init, tail);
 			}
 
 			@Override
@@ -956,7 +956,7 @@ final class Seq3Generator extends SeqGenerator {
 			}
 		}
 
-		final class «reversedIteratorName(3)» implements «type.iteratorGenericName» {
+		final class «reverseIteratorName(3)» implements «type.iteratorGenericName» {
 			private final «type.javaName»[][][] node3;
 			private final «type.javaName»[] init;
 
@@ -966,7 +966,7 @@ final class Seq3Generator extends SeqGenerator {
 			private «type.javaName»[][] node2;
 			private «type.javaName»[] node1;
 
-			«shortName»3ReversedIterator(final «type.javaName»[][][] node3, final «type.javaName»[] init, final «type.javaName»[] tail) {
+			«shortName»3ReverseIterator(final «type.javaName»[][][] node3, final «type.javaName»[] init, final «type.javaName»[] tail) {
 				this.node3 = node3;
 				this.init = init;
 				node1 = tail;

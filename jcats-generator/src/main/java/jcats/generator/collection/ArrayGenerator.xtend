@@ -611,11 +611,11 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.iteratorGenericName» reversedIterator() {
+			public «type.iteratorGenericName» reverseIterator() {
 				«IF Type.javaUnboxedTypes.contains(type)»
-					return isEmpty() ? «type.noneName»().iterator() : new «shortName»ReversedIterator(array);
+					return isEmpty() ? «type.noneName»().iterator() : new «shortName»ReverseIterator(array);
 				«ELSE»
-					return isEmpty() ? emptyIterator() : new «shortName»ReversedIterator«IF type == Type.OBJECT»<>«ENDIF»(array);
+					return isEmpty() ? emptyIterator() : new «shortName»ReverseIterator«IF type == Type.OBJECT»<>«ENDIF»(array);
 				«ENDIF»
 			}
 

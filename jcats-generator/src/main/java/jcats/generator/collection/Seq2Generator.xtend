@@ -722,8 +722,8 @@ class Seq2Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «type.iteratorGenericName» reversedIterator() {
-				return new «reversedIteratorDiamondName(2)»(node2, init, tail);
+			public «type.iteratorGenericName» reverseIterator() {
+				return new «reverseIteratorDiamondName(2)»(node2, init, tail);
 			}
 
 			@Override
@@ -774,7 +774,7 @@ class Seq2Generator extends SeqGenerator {
 			}
 		}
 
-		final class «reversedIteratorName(2)» implements «type.iteratorGenericName» {
+		final class «reverseIteratorName(2)» implements «type.iteratorGenericName» {
 			private final «type.javaName»[][] node2;
 			private final «type.javaName»[] init;
 
@@ -782,7 +782,7 @@ class Seq2Generator extends SeqGenerator {
 			private int index1;
 			private «type.javaName»[] node1;
 
-			«shortName»2ReversedIterator(final «type.javaName»[][] node2, final «type.javaName»[] init, final «type.javaName»[] tail) {
+			«shortName»2ReverseIterator(final «type.javaName»[][] node2, final «type.javaName»[] init, final «type.javaName»[] tail) {
 				this.node2 = node2;
 				this.init = init;
 				node1 = tail;

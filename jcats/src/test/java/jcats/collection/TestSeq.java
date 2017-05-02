@@ -631,7 +631,7 @@ public class TestSeq {
 		for (int i = 0; i < 50; i++) {
 			final Seq<Integer> seq = randomSeq(random, 1 << 10, (1 << 21) + (1 << 15));
 			final List<Integer> list1 =  Lists.newArrayList();
-			Iterators.addAll(list1, seq.reversedIterator());
+			Iterators.addAll(list1, seq.reverseIterator());
 			assertEquals(seq.size(), list1.size());
 			final List<Integer> list2 = Lists.newArrayList(seq);
 			Collections.reverse(list2);

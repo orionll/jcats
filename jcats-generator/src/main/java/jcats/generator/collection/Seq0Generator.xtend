@@ -125,7 +125,7 @@ class Seq0Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «type.iteratorGenericName» reversedIterator() {
+			public «type.iteratorGenericName» reverseIterator() {
 				«IF Type.javaUnboxedTypes.contains(type)»
 					return «type.noneName»().iterator();
 				«ELSE»

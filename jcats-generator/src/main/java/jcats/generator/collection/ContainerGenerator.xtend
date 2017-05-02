@@ -184,7 +184,7 @@ class ContainerGenerator implements InterfaceGenerator {
 				requireNonNull(start);
 				requireNonNull(f2);
 				«IF type == Type.OBJECT»B«ELSE»A«ENDIF» result = start;
-				final «type.iteratorGenericName» iterator = reversedIterator();
+				final «type.iteratorGenericName» iterator = reverseIterator();
 				while (iterator.hasNext()) {
 					final «type.genericName» value = iterator.«type.iteratorNext»();
 					result = requireNonNull(f2.apply(value, result));
@@ -200,7 +200,7 @@ class ContainerGenerator implements InterfaceGenerator {
 				«ENDIF»
 					requireNonNull(f2);
 					«returnType.javaName» result = start;
-					final «type.iteratorGenericName» iterator = reversedIterator();
+					final «type.iteratorGenericName» iterator = reverseIterator();
 					while (iterator.hasNext()) {
 						final «type.genericName» value = iterator.«type.iteratorNext»();
 						result = f2.apply(value, result);
@@ -259,8 +259,8 @@ class ContainerGenerator implements InterfaceGenerator {
 				«type.iteratorGenericName» iterator();
 
 			«ENDIF»
-			default «type.iteratorGenericName» reversedIterator() {
-				return to«type.arrayShortName»().reversedIterator();
+			default «type.iteratorGenericName» reverseIterator() {
+				return to«type.arrayShortName»().reverseIterator();
 			}
 
 			@Override

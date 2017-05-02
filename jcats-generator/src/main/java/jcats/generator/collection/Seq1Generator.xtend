@@ -318,11 +318,11 @@ final class Seq1Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «type.iteratorGenericName» reversedIterator() {
+			public «type.iteratorGenericName» reverseIterator() {
 				«IF type == Type.OBJECT»
-					return new ArrayReversedIterator<>(node1);
+					return new ArrayReverseIterator<>(node1);
 				«ELSE»
-					return new «type.typeName»ArrayReversedIterator(node1);
+					return new «type.typeName»ArrayReverseIterator(node1);
 				«ENDIF»
 			}
 

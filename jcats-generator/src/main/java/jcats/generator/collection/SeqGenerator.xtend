@@ -28,8 +28,8 @@ class SeqGenerator implements ClassGenerator {
 	def seqBuilderDiamondName() { type.diamondName("SeqBuilder") }
 	def iteratorName(int index) { type.genericName("Seq" + index + "Iterator") }
 	def iteratorDiamondName(int index) { type.diamondName("Seq" + index + "Iterator") }
-	def reversedIteratorName(int index) { type.genericName("Seq" + index + "ReversedIterator") }
-	def reversedIteratorDiamondName(int index) { type.diamondName("Seq" + index + "ReversedIterator") }
+	def reverseIteratorName(int index) { type.genericName("Seq" + index + "ReverseIterator") }
+	def reverseIteratorDiamondName(int index) { type.diamondName("Seq" + index + "ReverseIterator") }
 	def index() { if (type == Type.OBJECT) "index" else "Seq.index" }
 
 	override sourceCode() { '''
@@ -214,7 +214,7 @@ class SeqGenerator implements ClassGenerator {
 			}
 
 			public final «genericName» reverse() {
-				return sizedToSeq(reversedIterator(), size());
+				return sizedToSeq(reverseIterator(), size());
 			}
 
 			«IF type == Type.OBJECT»
