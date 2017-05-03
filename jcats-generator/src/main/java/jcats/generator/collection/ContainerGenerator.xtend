@@ -45,6 +45,7 @@ class ContainerGenerator implements InterfaceGenerator {
 		«IF type != Type.INT»
 			import static «Constants.JCATS».«type.optionShortName».*;
 		«ENDIF»
+		import static «Constants.COLLECTION».Common.*;
 
 		public interface «genericName» extends Iterable<«type.genericBoxedName»>, Sized {
 
@@ -285,20 +286,36 @@ class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			default «type.javaName»[] «type.toArrayName»() {
-				final «type.javaName»[] array = new «type.javaName»[size()];
-				int i = 0;
-				«IF Type.javaUnboxedTypes.contains(type)»
-					final «type.iteratorGenericName» iterator = iterator();
-					while (iterator.hasNext()) {
-						array[i++] = iterator.«type.iteratorNext»();
-					} 
-				«ELSE»
-					for (final «type.javaName» value : this) {
+				if (isEmpty()) {
+					return «type.emptyArrayName»;
+				} else {
+					final «type.javaName»[] array = new «type.javaName»[size()];
+					int i = 0;
+					«IF Type.javaUnboxedTypes.contains(type)»
+						final «type.iteratorGenericName» iterator = iterator();
+						while (iterator.hasNext()) {
+							array[i++] = iterator.«type.iteratorNext»();
+						} 
+					«ELSE»
+						for (final «type.javaName» value : this) {
+							array[i++] = value;
+						}
+					«ENDIF»
+					return array;
+				}
+			}
+			«IF type == Type.OBJECT»
+
+				default A[] toPreciseArray(final IntObjectF<A[]> supplier) {
+					final A[] array = supplier.apply(size());
+					requireNonNull(array);
+					int i = 0;
+					for (final A value : this) {
 						array[i++] = value;
 					}
-				«ENDIF»
-				return array;
-			}
+					return array;
+				}
+			«ENDIF»
 
 			default Collection<«type.genericBoxedName»> asCollection() {
 				return new «shortName»AsCollection«IF type == Type.OBJECT»<>«ENDIF»(this);

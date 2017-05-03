@@ -484,6 +484,15 @@ final class ArrayGenerator implements ClassGenerator {
 					return result;
 				}
 			}
+			«IF type == Type.OBJECT»
+
+				@Override
+				public A[] toPreciseArray(final IntObjectF<A[]> supplier) {
+					final A[] result = supplier.apply(array.length);
+					System.arraycopy(array, 0, result, 0, array.length);
+					return result;
+				}
+			«ENDIF»
 
 			public static «paramGenericName» empty«shortName»() {
 				return EMPTY;

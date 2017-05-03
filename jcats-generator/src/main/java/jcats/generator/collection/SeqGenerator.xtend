@@ -301,6 +301,27 @@ class SeqGenerator implements ClassGenerator {
 					return (Seq<B>) filter(clazz::isInstance);
 				}
 
+				@Override
+				public final Object[] toObjectArray() {
+					if (isEmpty()) {
+						return EMPTY_OBJECT_ARRAY;
+					} else {
+						final Object[] array = new Object[size()];
+						copyToArray(array);
+						return array;
+					}
+				}
+
+				@Override
+				public final A[] toPreciseArray(final IntObjectF<A[]> supplier) {
+					final A[] array = supplier.apply(size());
+					requireNonNull(array);
+					copyToArray(array);
+					return array;
+				}
+
+				abstract void copyToArray(final Object[] array);
+
 			«ENDIF»
 			@Override
 			@Deprecated

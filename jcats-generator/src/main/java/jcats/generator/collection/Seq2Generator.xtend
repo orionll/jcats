@@ -704,8 +704,12 @@ class Seq2Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «type.javaName»[] «type.toArrayName»() {
-				final «type.javaName»[] array = new «type.javaName»[size];
+			«IF type == Type.OBJECT»
+				void copyToArray(final Object[] array) {
+			«ELSE»
+				public «type.javaName»[] «type.toArrayName»() {
+					final «type.javaName»[] array = new «type.javaName»[size];
+			«ENDIF»
 				System.arraycopy(init, 0, array, 0, init.length);
 				int index = init.length;
 				for (final «type.javaName»[] node1 : node2) {
@@ -713,7 +717,9 @@ class Seq2Generator extends SeqGenerator {
 					index += 32;
 				}
 				System.arraycopy(tail, 0, array, index, tail.length);
-				return array;
+				«IF type != Type.OBJECT»
+					return array;
+				«ENDIF»
 			}
 
 			@Override

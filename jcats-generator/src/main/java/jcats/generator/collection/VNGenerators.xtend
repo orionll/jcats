@@ -206,6 +206,17 @@ final class VNGenerators {
 						return new «type.javaName»[] { «(1 .. arity).map["a" + it].join(", ")» };
 					}
 
+					«IF type == Type.OBJECT»
+						@Override
+						public A[] toPreciseArray(final IntObjectF<A[]> supplier) {
+							final A[] array = supplier.apply(«arity»);
+							«FOR index : 1 .. arity»
+								array[«index - 1»] = a«index»;
+							«ENDFOR»
+							return array;
+						}
+
+					«ENDIF»
 					@Override
 					public void foreach(final «type.effGenericName» eff) {
 						«FOR index : 1 .. arity»

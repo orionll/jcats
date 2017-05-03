@@ -110,10 +110,16 @@ class Seq0Generator extends SeqGenerator {
 			void initSeqBuilder(final «seqBuilderName» builder) {
 			}
 
-			@Override
-			public «type.javaName»[] «type.toArrayName»() {
-				return «type.emptyArrayName»;
-			}
+			«IF type == Type.OBJECT»
+				@Override
+				void copyToArray(final Object[] array) {
+				}
+			«ELSE»
+				@Override
+				public «type.javaName»[] «type.toArrayName»() {
+					return «type.emptyArrayName»;
+				}
+			«ENDIF»
 
 			@Override
 			public «type.iteratorGenericName» iterator() {
