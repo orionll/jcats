@@ -30,7 +30,7 @@ final class OptionGenerator implements ClassGenerator {
 		import java.util.NoSuchElementException;
 		import java.util.Objects;
 		«IF Type.javaUnboxedTypes.contains(type)»
-			import java.util.Optional«type.javaPrefix»;
+			import java.util.Optional«type.typeName»;
 		«ELSE»
 			import java.util.Optional;
 		«ENDIF»
@@ -66,7 +66,7 @@ final class OptionGenerator implements ClassGenerator {
 			«ELSE»
 				private static final «shortName» NONE = new «shortName»(«type.defaultValue»);
 			«ENDIF»
-			«IF type == Type.BOOL»
+			«IF type == Type.BOOLEAN»
 				private static final «shortName» FALSE = new «shortName»(false);
 				private static final «shortName» TRUE = new «shortName»(true);
 			«ENDIF»
@@ -229,13 +229,13 @@ final class OptionGenerator implements ClassGenerator {
 				public Optional<A> toOptional() {
 					return Optional.ofNullable(value);
 				}
-			«ELSEIF type == Type.BOOL»
+			«ELSEIF type == Type.BOOLEAN»
 				public Optional<Boolean> toOptional() {
 					return isEmpty() ? Optional.empty() : Optional.of(value);
 				}
 			«ELSE»
-				public Optional«type.javaPrefix» toOptional«type.javaPrefix»() {
-					return isEmpty() ? Optional«type.javaPrefix».empty() : Optional«type.javaPrefix».of(value);
+				public Optional«type.typeName» toOptional«type.typeName»() {
+					return isEmpty() ? Optional«type.typeName».empty() : Optional«type.typeName».of(value);
 				}
 			«ENDIF»
 
@@ -299,7 +299,7 @@ final class OptionGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				«IF type == Type.BOOL»
+				«IF type == Type.BOOLEAN»
 					return value ? TRUE : FALSE;
 				«ELSE»
 					return new «diamondName»(value);
@@ -321,13 +321,13 @@ final class OptionGenerator implements ClassGenerator {
 				public static <A> Option<A> fromOptional(final Optional<A> optional) {
 					return optional.isPresent() ? some(optional.get()) : none();
 				}
-			«ELSEIF type == Type.BOOL»
+			«ELSEIF type == Type.BOOLEAN»
 				public static «genericName» fromOptional(final Optional<Boolean> optional) {
 					return optional.isPresent() ? «type.someName»(optional.get()) : «type.noneName»();
 				}
 			«ELSE»
-				public static «genericName» fromOptional«type.javaPrefix»(final Optional«type.javaPrefix» optional) {
-					return optional.isPresent() ? «type.someName»(optional.getAs«type.javaPrefix»()) : «type.noneName»();
+				public static «genericName» fromOptional«type.typeName»(final Optional«type.typeName» optional) {
+					return optional.isPresent() ? «type.someName»(optional.getAs«type.typeName»()) : «type.noneName»();
 				}
 			«ENDIF»
 			«IF type == Type.OBJECT»

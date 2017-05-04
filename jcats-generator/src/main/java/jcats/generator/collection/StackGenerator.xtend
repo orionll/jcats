@@ -193,7 +193,7 @@ final class StackGenerator implements ClassGenerator {
 				}
 			}
 
-			public Stack<A> filter(final BoolF<A> predicate) {
+			public Stack<A> filter(final BooleanF<A> predicate) {
 				requireNonNull(predicate);
 				if (isEmpty()) {
 					return nil();

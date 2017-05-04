@@ -23,7 +23,7 @@ interface Generator {
 	}
 
 	def String takeWhile(boolean isFinal, Type type) { '''
-		public «if (isFinal) "final " else ""»«name»«IF type == Type.OBJECT»<A>«ENDIF» takeWhile(final «IF type != Type.OBJECT»«type.typeName»«ENDIF»BoolF«IF type == Type.OBJECT»<A>«ENDIF» predicate) {
+		public «if (isFinal) "final " else ""»«name»«IF type == Type.OBJECT»<A>«ENDIF» takeWhile(final «type.boolFName» predicate) {
 			int n = 0;
 			for (final «type.genericName» value : this) {
 				if (predicate.apply(value)) {

@@ -113,11 +113,11 @@ class F2Generator implements InterfaceGenerator {
 			import java.util.function.BiFunction;
 			import java.util.function.BinaryOperator;
 		«ELSEIF type1 == Type.OBJECT && type2 == Type.OBJECT && Type.javaUnboxedTypes.contains(returnType)»
-			import java.util.function.To«returnType.javaPrefix»BiFunction;
-		«ELSEIF type1 == Type.OBJECT && type2 == Type.OBJECT && returnType == Type.BOOL»
+			import java.util.function.To«returnType.typeName»BiFunction;
+		«ELSEIF type1 == Type.OBJECT && type2 == Type.OBJECT && returnType == Type.BOOLEAN»
 			import java.util.function.BiPredicate;
 		«ELSEIF type1 == type2 && returnType == type2 && Type.javaUnboxedTypes.contains(returnType)»
-			import java.util.function.«returnType.javaPrefix»BinaryOperator;
+			import java.util.function.«returnType.typeName»BinaryOperator;
 		«ENDIF»
 
 		import static java.util.Objects.requireNonNull;
@@ -231,7 +231,7 @@ class F2Generator implements InterfaceGenerator {
 				}
 
 			«ELSEIF type1 == Type.OBJECT && type2 == Type.OBJECT && Type.javaUnboxedTypes.contains(returnType)»
-				default To«returnType.javaPrefix»BiFunction<A1, A2> toTo«returnType.javaPrefix»BiFunction() {
+				default To«returnType.typeName»BiFunction<A1, A2> toTo«returnType.typeName»BiFunction() {
 					return (final A1 value1, final A2 value2) -> {
 						requireNonNull(value1);
 						requireNonNull(value2);
@@ -239,15 +239,15 @@ class F2Generator implements InterfaceGenerator {
 					};
 				}
 
-				static <A1, A2> «returnType.typeName»F2<A1, A2> fromTo«returnType.javaPrefix»BiFunction(final To«returnType.javaPrefix»BiFunction<A1, A2> f) {
+				static <A1, A2> «returnType.typeName»F2<A1, A2> fromTo«returnType.typeName»BiFunction(final To«returnType.typeName»BiFunction<A1, A2> f) {
 					requireNonNull(f);
 					return (final A1 value1, final A2 value2) -> {
 						requireNonNull(value1);
 						requireNonNull(value2);
-						return f.applyAs«returnType.javaPrefix»(value1, value2);
+						return f.applyAs«returnType.typeName»(value1, value2);
 					};
 				}
-			«ELSEIF type1 == Type.OBJECT && type2 == Type.OBJECT && returnType == Type.BOOL»
+			«ELSEIF type1 == Type.OBJECT && type2 == Type.OBJECT && returnType == Type.BOOLEAN»
 				default BiPredicate<A1, A2> toBiPredicate() {
 					return (final A1 value1, final A2 value2) -> {
 						requireNonNull(value1);
@@ -266,12 +266,12 @@ class F2Generator implements InterfaceGenerator {
 				}
 
 			«ELSEIF type1 == type2 && returnType == type2 && Type.javaUnboxedTypes.contains(returnType)»
-				default «returnType.javaPrefix»BinaryOperator to«returnType.javaPrefix»BinaryOperator() {
+				default «returnType.typeName»BinaryOperator to«returnType.typeName»BinaryOperator() {
 					return this::apply;
 				}
 
-				static «type1.typeName»«type1.typeName»«type1.typeName»F2 from«returnType.javaPrefix»BinaryOperator(final «returnType.javaPrefix»BinaryOperator op) {
-					return op::applyAs«returnType.javaPrefix»;
+				static «type1.typeName»«type1.typeName»«type1.typeName»F2 from«returnType.typeName»BinaryOperator(final «returnType.typeName»BinaryOperator op) {
+					return op::applyAs«returnType.typeName»;
 				}
 			«ENDIF»
 		}

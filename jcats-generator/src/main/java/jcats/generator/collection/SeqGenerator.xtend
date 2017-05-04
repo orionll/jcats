@@ -229,7 +229,7 @@ class SeqGenerator implements ClassGenerator {
 			«ELSE»
 				public final <A> Seq<A> map(final «type.typeName»ObjectF<A> f) {
 					requireNonNull(f);
-					«IF type == Type.BOOL»
+					«IF type == Type.BOOLEAN»
 						return Seq.sizedToSeq(new MappedIterator<>(iterator(), f.toF()), size());
 					«ELSE»
 						return Seq.sizedToSeq(new Mapped«type.typeName»ObjectIterator<>(iterator(), f), size());
@@ -276,7 +276,7 @@ class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			public final «genericName» filter(final «IF type != Type.OBJECT»«type.typeName»«ENDIF»BoolF«IF type == Type.OBJECT»<A>«ENDIF» predicate) {
+			public final «genericName» filter(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
 				if (isEmpty()) {
 					return empty«shortName»();
@@ -375,7 +375,7 @@ class SeqGenerator implements ClassGenerator {
 				} else {
 					«IF type == Type.OBJECT»
 						return sizedToSeq(new TableIterator<>(size, f), size);
-					«ELSEIF type == Type.BOOL»
+					«ELSEIF type == Type.BOOLEAN»
 						return sizedToSeq(new TableIterator<>(size, f.toIntObjectF()), size);
 					«ELSE»
 						return sizedToSeq(new Table«type.typeName»Iterator(size, f), size);

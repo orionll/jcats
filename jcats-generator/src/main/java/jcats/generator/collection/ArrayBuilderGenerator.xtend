@@ -106,9 +106,9 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				} else {
 					ensureCapacityInternal(size + iterableLength);
 					«IF Type.javaUnboxedTypes.contains(type)»
-						final PrimitiveIterator.Of«type.javaPrefix» iterator = «type.typeName»Iterator.getIterator(iterable.iterator());
+						final PrimitiveIterator.Of«type.typeName» iterator = «type.typeName»Iterator.getIterator(iterable.iterator());
 						while (iterator.hasNext()) {
-							array[size++] = iterator.next«type.javaPrefix»();
+							array[size++] = iterator.next«type.typeName»();
 						}
 					«ELSE»
 						for (final «type.genericBoxedName» value : iterable) {

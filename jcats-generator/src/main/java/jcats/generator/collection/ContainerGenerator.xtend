@@ -114,7 +114,7 @@ class ContainerGenerator implements InterfaceGenerator {
 					}
 					return result;
 				}
-			«ELSEIF type == Type.BOOL»
+			«ELSEIF type == Type.BOOLEAN»
 				default <A> A foldLeft(final A start, final Object«type.typeName»ObjectF2<A, A> f2) {
 					requireNonNull(start);
 					requireNonNull(f2);
@@ -150,7 +150,7 @@ class ContainerGenerator implements InterfaceGenerator {
 					}
 
 				«ENDFOR»
-			«ELSEIF type == Type.BOOL»
+			«ELSEIF type == Type.BOOLEAN»
 				«FOR returnType : Type.primitives»
 					default «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»«type.typeName»«returnType.typeName»F2 f2) {
 						requireNonNull(f2);
@@ -177,7 +177,7 @@ class ContainerGenerator implements InterfaceGenerator {
 			«ENDIF»
 			«IF Type.javaUnboxedTypes.contains(type)»
 				default <A> A foldRight(final A start, final «type.typeName»ObjectObjectF2<A, A> f2) {
-			«ELSEIF type == Type.BOOL»
+			«ELSEIF type == Type.BOOLEAN»
 				default <A> A foldRight(final A start, final «type.typeName»ObjectObjectF2<A, A> f2) {
 			«ELSE»
 				default <B> B foldRight(final B start, final F2<A, B, B> f2) {

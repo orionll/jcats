@@ -33,7 +33,7 @@ final class F0Generator implements InterfaceGenerator {
 		«IF type == Type.OBJECT»
 			import java.util.function.Supplier;
 		«ELSE»
-			import java.util.function.«type.javaPrefix»Supplier;
+			import java.util.function.«type.typeName»Supplier;
 		«ENDIF»
 		import «Constants.P»;
 		«FOR arity : 3 .. Constants.MAX_ARITY»
@@ -145,7 +145,7 @@ final class F0Generator implements InterfaceGenerator {
 					return () -> requireNonNull(apply());
 				}
 			«ELSE»
-				default «type.javaPrefix»Supplier to«type.javaPrefix»Supplier() {
+				default «type.typeName»Supplier to«type.typeName»Supplier() {
 					return this::apply;
 				}
 			«ENDIF»
@@ -191,9 +191,9 @@ final class F0Generator implements InterfaceGenerator {
 				}
 
 			«ELSE»
-				static «shortName» from«type.javaPrefix»Supplier(final «type.javaPrefix»Supplier s) {
+				static «shortName» from«type.typeName»Supplier(final «type.typeName»Supplier s) {
 					requireNonNull(s);
-					return s::getAs«type.javaPrefix»;
+					return s::getAs«type.typeName»;
 				}
 			«ENDIF»
 			«IF type == Type.OBJECT»

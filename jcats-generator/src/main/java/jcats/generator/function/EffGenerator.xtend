@@ -34,7 +34,7 @@ final class EffGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.FUNCTION»;
 
-		«IF type == Type.OBJECT || type == Type.BOOL»
+		«IF type == Type.OBJECT || type == Type.BOOLEAN»
 			import java.util.function.Consumer;
 		«ELSE»
 			import java.util.function.«type.typeName»Consumer;
@@ -72,7 +72,7 @@ final class EffGenerator implements InterfaceGenerator {
 				default Consumer<A> toConsumer() {
 					return (A a) -> apply(requireNonNull(a));
 				}
-			«ELSEIF type != Type.BOOL»
+			«ELSEIF type != Type.BOOLEAN»
 				default «type.typeName»Consumer to«type.typeName»Consumer() {
 					return this::apply;
 				}
@@ -88,8 +88,8 @@ final class EffGenerator implements InterfaceGenerator {
 					return (A a) -> c.accept(requireNonNull(a));
 				}
 
-			«ELSEIF type != Type.BOOL»
-				default «shortName» from«type.javaPrefix»Consumer(final «type.typeName»Consumer c) {
+			«ELSEIF type != Type.BOOLEAN»
+				default «shortName» from«type.typeName»Consumer(final «type.typeName»Consumer c) {
 					requireNonNull(c);
 					return c::accept;
 				}

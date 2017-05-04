@@ -59,25 +59,25 @@ final class FGenerator implements InterfaceGenerator {
 
 		«IF from == Type.OBJECT && to == Type.OBJECT»
 			import java.util.function.Function;
-		«ELSEIF from != Type.BOOL && to == Type.OBJECT»
-			import java.util.function.«from.javaPrefix»Function;
-		«ELSEIF from == Type.OBJECT && to != Type.BOOL»
-			import java.util.function.To«to.javaPrefix»Function;
-		«ELSEIF from == Type.BOOL && to == Type.OBJECT»
+		«ELSEIF from != Type.BOOLEAN && to == Type.OBJECT»
+			import java.util.function.«from.typeName»Function;
+		«ELSEIF from == Type.OBJECT && to != Type.BOOLEAN»
+			import java.util.function.To«to.typeName»Function;
+		«ELSEIF from == Type.BOOLEAN && to == Type.OBJECT»
 			import java.util.function.Function;
-		«ELSEIF from == Type.OBJECT && to == Type.BOOL»
+		«ELSEIF from == Type.OBJECT && to == Type.BOOLEAN»
 			import java.util.function.Predicate;
-		«ELSEIF from == to && to != Type.BOOL»
-			import java.util.function.«from.javaPrefix»UnaryOperator;
-		«ELSEIF from == Type.BOOL && to == Type.BOOL»
+		«ELSEIF from == to && to != Type.BOOLEAN»
+			import java.util.function.«from.typeName»UnaryOperator;
+		«ELSEIF from == Type.BOOLEAN && to == Type.BOOLEAN»
 			import java.util.function.UnaryOperator;
 			import java.util.function.Predicate;
-		«ELSEIF to == Type.BOOL»
-			import java.util.function.«from.javaPrefix»Predicate;
-		«ELSEIF from != Type.BOOL && to != Type.BOOL»
-			import java.util.function.«from.javaPrefix»To«to.javaPrefix»Function;
-		«ELSEIF from == Type.BOOL»
-			import java.util.function.To«to.javaPrefix»Function;
+		«ELSEIF to == Type.BOOLEAN»
+			import java.util.function.«from.typeName»Predicate;
+		«ELSEIF from != Type.BOOLEAN && to != Type.BOOLEAN»
+			import java.util.function.«from.typeName»To«to.typeName»Function;
+		«ELSEIF from == Type.BOOLEAN»
+			import java.util.function.To«to.typeName»Function;
 		«ENDIF»
 
 		import static java.util.Objects.requireNonNull;
@@ -315,33 +315,33 @@ final class FGenerator implements InterfaceGenerator {
 						return requireNonNull(apply(a));
 					};
 				}
-			«ELSEIF from != Type.BOOL && to == Type.OBJECT»
-				default «from.javaPrefix»Function<A> toFunction() {
+			«ELSEIF from != Type.BOOLEAN && to == Type.OBJECT»
+				default «from.typeName»Function<A> toFunction() {
 					return value -> requireNonNull(apply(value));
 				}
-			«ELSEIF from == Type.BOOL && to == Type.OBJECT»
+			«ELSEIF from == Type.BOOLEAN && to == Type.OBJECT»
 				default Function<Boolean, A> toFunction() {
 					return value -> {
 						requireNonNull(value);
 						return requireNonNull(apply(value));
 					};
 				}
-			«ELSEIF from == Type.OBJECT && to != Type.BOOL»
-				default To«to.javaPrefix»Function<A> toFunction() {
+			«ELSEIF from == Type.OBJECT && to != Type.BOOLEAN»
+				default To«to.typeName»Function<A> toFunction() {
 					return a -> apply(requireNonNull(a));
 				}
-			«ELSEIF from == Type.OBJECT && to == Type.BOOL»
+			«ELSEIF from == Type.OBJECT && to == Type.BOOLEAN»
 				default Predicate<A> toPredicate() {
 					return a -> {
 						requireNonNull(a);
 						return apply(a);
 					};
 				}
-			«ELSEIF from == to && to != Type.BOOL»
-				default «from.javaPrefix»UnaryOperator toOperator() {
+			«ELSEIF from == to && to != Type.BOOLEAN»
+				default «from.typeName»UnaryOperator toOperator() {
 					return this::apply;
 				}
-			«ELSEIF from == Type.BOOL && to == Type.BOOL»
+			«ELSEIF from == Type.BOOLEAN && to == Type.BOOLEAN»
 				default UnaryOperator<Boolean> toOperator() {
 					return this::apply;
 				}
@@ -349,16 +349,16 @@ final class FGenerator implements InterfaceGenerator {
 				default Predicate<Boolean> toPredicate() {
 					return this::apply;
 				}
-			«ELSEIF to == Type.BOOL»
-				default «from.javaPrefix»Predicate toPredicate() {
+			«ELSEIF to == Type.BOOLEAN»
+				default «from.typeName»Predicate toPredicate() {
 					return this::apply;
 				}
-			«ELSEIF from != Type.BOOL && to != Type.BOOL»
-				default «from.javaPrefix»To«to.javaPrefix»Function toFunction() {
+			«ELSEIF from != Type.BOOLEAN && to != Type.BOOLEAN»
+				default «from.typeName»To«to.typeName»Function toFunction() {
 					return this::apply;
 				}
-			«ELSEIF from == Type.BOOL»
-				default To«to.javaPrefix»Function<Boolean> toFunction() {
+			«ELSEIF from == Type.BOOLEAN»
+				default To«to.typeName»Function<Boolean> toFunction() {
 					return this::apply;
 				}
 			«ENDIF»
@@ -459,36 +459,36 @@ final class FGenerator implements InterfaceGenerator {
 					};
 				}
 
-			«ELSEIF from != Type.BOOL && to == Type.OBJECT»
-				static <A> «shortName»<A> from«from.javaPrefix»Function(final «from.javaPrefix»Function<A> f) {
+			«ELSEIF from != Type.BOOLEAN && to == Type.OBJECT»
+				static <A> «shortName»<A> from«from.typeName»Function(final «from.typeName»Function<A> f) {
 					requireNonNull(f);
 					return value -> requireNonNull(f.apply(value));
 				}
 
-			«ELSEIF from == Type.BOOL && to == Type.OBJECT»
+			«ELSEIF from == Type.BOOLEAN && to == Type.OBJECT»
 				static <A> «shortName»<A> fromFunction(final Function<Boolean, A> f) {
 					requireNonNull(f);
 					return value -> requireNonNull(f.apply(value));
 				}
 
-			«ELSEIF from == Type.OBJECT && to != Type.BOOL»
-				static <A> «shortName»<A> fromTo«to.javaPrefix»Function(final To«to.javaPrefix»Function<A> f) {
+			«ELSEIF from == Type.OBJECT && to != Type.BOOLEAN»
+				static <A> «shortName»<A> fromTo«to.typeName»Function(final To«to.typeName»Function<A> f) {
 					requireNonNull(f);
 					return a -> f.applyAs«to.typeName»(requireNonNull(a));
 				}
 
-			«ELSEIF from == Type.OBJECT && to == Type.BOOL»
+			«ELSEIF from == Type.OBJECT && to == Type.BOOLEAN»
 				static <A> «shortName»<A> fromPredicate(final Predicate<A> p) {
 					requireNonNull(p);
 					return a -> p.test(requireNonNull(a));
 				}
 
-			«ELSEIF from == to && to != Type.BOOL»
-				static «shortName» from«from.javaPrefix»UnaryOperator(final «from.javaPrefix»UnaryOperator op) {
+			«ELSEIF from == to && to != Type.BOOLEAN»
+				static «shortName» from«from.typeName»UnaryOperator(final «from.typeName»UnaryOperator op) {
 					requireNonNull(op);
 					return op::applyAs«from.typeName»;
 				}
-			«ELSEIF from == Type.BOOL && to == Type.BOOL»
+			«ELSEIF from == Type.BOOLEAN && to == Type.BOOLEAN»
 				static «shortName» fromUnaryOperator(final UnaryOperator<Boolean> op) {
 					requireNonNull(op);
 					return op::apply;
@@ -498,18 +498,18 @@ final class FGenerator implements InterfaceGenerator {
 					requireNonNull(p);
 					return p::test;
 				}
-			«ELSEIF to == Type.BOOL»
-				static «shortName» from«from.javaPrefix»Predicate(final «from.javaPrefix»Predicate p) {
+			«ELSEIF to == Type.BOOLEAN»
+				static «shortName» from«from.typeName»Predicate(final «from.typeName»Predicate p) {
 					requireNonNull(p);
 					return p::test;
 				}
-			«ELSEIF from != Type.BOOL && to != Type.BOOL»
-				static «shortName» from«from.javaPrefix»To«to.javaPrefix»Function(final «from.javaPrefix»To«to.javaPrefix»Function f) {
+			«ELSEIF from != Type.BOOLEAN && to != Type.BOOLEAN»
+				static «shortName» from«from.typeName»To«to.typeName»Function(final «from.typeName»To«to.typeName»Function f) {
 					requireNonNull(f);
 					return f::applyAs«to.typeName»;
 				}
-			«ELSEIF from == Type.BOOL»
-				static «shortName» fromTo«to.javaPrefix»Function(final To«to.javaPrefix»Function<Boolean> f) {
+			«ELSEIF from == Type.BOOLEAN»
+				static «shortName» fromTo«to.typeName»Function(final To«to.typeName»Function<Boolean> f) {
 					requireNonNull(f);
 					return f::applyAs«to.typeName»;
 				}

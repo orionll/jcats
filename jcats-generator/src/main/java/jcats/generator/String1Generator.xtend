@@ -153,7 +153,7 @@ final class String1Generator implements ClassGenerator {
 			}
 
 			«FOR type : Type.primitives»
-				public static String1 from«type.javaPrefix»(final «type.javaName» value) {
+				public static String1 from«type.typeName»(final «type.javaName» value) {
 					return new String1(«type.boxedName».toString(value));
 				}
 

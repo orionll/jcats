@@ -249,7 +249,7 @@ final class CommonGenerator implements ClassGenerator {
 		}
 	
 		«FOR type : Type.javaUnboxedTypes»
-			final class Table«type.typeName»Iterator implements PrimitiveIterator.Of«type.javaPrefix» {
+			final class Table«type.typeName»Iterator implements PrimitiveIterator.Of«type.typeName» {
 				private final int size;
 				private final Int«type.typeName»F f;
 				private int i;
@@ -265,7 +265,7 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 				@Override
-				public «type.javaName» next«type.javaPrefix»() {
+				public «type.javaName» next«type.typeName»() {
 					if (i >= size) {
 						throw new NoSuchElementException();
 					} else {
@@ -276,10 +276,10 @@ final class CommonGenerator implements ClassGenerator {
 
 		«ENDFOR»
 		«FOR type : Type.javaUnboxedTypes»
-			final class «type.typeName»Iterator implements PrimitiveIterator.Of«type.javaPrefix» {
+			final class «type.typeName»Iterator implements PrimitiveIterator.Of«type.typeName» {
 				final Iterator<«type.boxedName»> iterator;
 
-				private «type.javaPrefix»Iterator(final Iterator<«type.boxedName»> iterator) {
+				private «type.typeName»Iterator(final Iterator<«type.boxedName»> iterator) {
 					this.iterator = iterator;
 				}
 
@@ -289,15 +289,15 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 				@Override
-				public «type.javaName» next«type.javaPrefix»() {
+				public «type.javaName» next«type.typeName»() {
 					return iterator.next();
 				}
 
-				static PrimitiveIterator.Of«type.javaPrefix» getIterator(final Iterator<«type.boxedName»> iterator) {
-					if (iterator instanceof PrimitiveIterator.Of«type.javaPrefix») {
-						return (PrimitiveIterator.Of«type.javaPrefix») iterator;
+				static PrimitiveIterator.Of«type.typeName» getIterator(final Iterator<«type.boxedName»> iterator) {
+					if (iterator instanceof PrimitiveIterator.Of«type.typeName») {
+						return (PrimitiveIterator.Of«type.typeName») iterator;
 					} else {
-						return new «type.javaPrefix»Iterator(iterator);
+						return new «type.typeName»Iterator(iterator);
 					}
 				}
 			}

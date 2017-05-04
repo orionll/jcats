@@ -12,10 +12,10 @@ final class CommonGenerator implements ClassGenerator {
 
 
 		«FOR type : Type.javaUnboxedTypes»
-			final class Empty«type.typeName»Iterator implements PrimitiveIterator.Of«type.javaPrefix» {
+			final class Empty«type.typeName»Iterator implements PrimitiveIterator.Of«type.typeName» {
 				private static final Empty«type.typeName»Iterator INSTANCE = new Empty«type.typeName»Iterator();
 
-				private Empty«type.javaPrefix»Iterator() {
+				private Empty«type.typeName»Iterator() {
 				}
 
 				@Override
@@ -24,7 +24,7 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 				@Override
-				public «type.javaName» next«type.javaPrefix»() {
+				public «type.javaName» next«type.typeName»() {
 					throw new NoSuchElementException();
 				}
 

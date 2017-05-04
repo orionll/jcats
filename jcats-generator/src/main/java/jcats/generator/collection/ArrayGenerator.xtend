@@ -175,7 +175,7 @@ final class ArrayGenerator implements ClassGenerator {
 				«IF Type.javaUnboxedTypes.contains(type)»
 					final «type.iteratorGenericName» iterator = «type.getIterator("iterable.iterator()")»;
 					while (iterator.hasNext()) {
-						array[i++] = iterator.next«type.javaPrefix»();
+						array[i++] = iterator.next«type.typeName»();
 					}
 				«ELSE»
 					for (final «type.genericName» value : iterable) {
@@ -352,7 +352,7 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			public «genericName» filter(final «IF type != Type.OBJECT»«type.typeName»«ENDIF»BoolF«IF type == Type.OBJECT»<A>«ENDIF» predicate) {
+			public «genericName» filter(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
 				if (isEmpty()) {
 					return empty«shortName»();
@@ -629,15 +629,15 @@ final class ArrayGenerator implements ClassGenerator {
 			@Override
 			«IF type == Type.OBJECT»
 				public Spliterator<A> spliterator() {
-			«ELSEIF type == Type.BOOL»
+			«ELSEIF type == Type.BOOLEAN»
 				public Spliterator<Boolean> spliterator() {
 			«ELSE»
-				public Spliterator.Of«type.javaPrefix» spliterator() {
+				public Spliterator.Of«type.typeName» spliterator() {
 			«ENDIF»
 				if (isEmpty()) {
 					return Spliterators.«type.emptySpliteratorName»();
 				} else {
-					return Spliterators.spliterator(«IF type == Type.BOOL»new BoolArrayIterator(array), size()«ELSE»array«ENDIF», Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
+					return Spliterators.spliterator(«IF type == Type.BOOLEAN»new BooleanArrayIterator(array), size()«ELSE»array«ENDIF», Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 				}
 			}
 
