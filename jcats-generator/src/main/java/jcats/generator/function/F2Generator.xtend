@@ -147,6 +147,70 @@ class F2Generator implements InterfaceGenerator {
 
 			«IF returnType == Type.OBJECT»
 				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+					default F<A1, F<A2, B>> curry() {
+						return (final A1 value1) -> {
+							requireNonNull(value1);
+							return (final A2 value2) -> {
+								requireNonNull(value2);
+								return requireNonNull(apply(value1, value2));
+							};
+						};
+					}
+				«ELSEIF type1 == Type.OBJECT»
+					default F<A, «type2.typeName»ObjectF<B>> curry() {
+						return (final A value1) -> {
+							requireNonNull(value1);
+							return (final «type2.javaName» value2) -> requireNonNull(apply(value1, value2));
+						};
+					}
+				«ELSEIF type2 == Type.OBJECT»
+					default «type1.typeName»ObjectF<F<A, B>> curry() {
+						return (final «type1.javaName» value1) -> (final A value2) -> {
+							requireNonNull(value2);
+							return requireNonNull(apply(value1, value2));
+						};
+					}
+				«ELSE»
+					default «type1.typeName»ObjectF<«type2.typeName»ObjectF<A>> curry() {
+						return (final «type1.javaName» value1) -> (final «type2.javaName» value2) ->
+							requireNonNull(apply(value1, value2));
+					}
+				«ENDIF»
+			«ELSE»
+				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+					default F<A1, «returnType.typeName»F<A2>> curry() {
+						return (final A1 value1) -> {
+							requireNonNull(value1);
+							return (final A2 value2) -> {
+								requireNonNull(value2);
+								return apply(value1, value2);
+							};
+						};
+					}
+				«ELSEIF type1 == Type.OBJECT»
+					default F<A, «type2.typeName»«returnType.typeName»F> curry() {
+						return (final A value1) -> {
+							requireNonNull(value1);
+							return (final «type2.javaName» value2) -> apply(value1, value2);
+						};
+					}
+				«ELSEIF type2 == Type.OBJECT»
+					default «type1.typeName»ObjectF<«returnType.typeName»F<A>> curry() {
+						return (final «type1.javaName» value1) -> (final A value2) -> {
+							requireNonNull(value2);
+							return apply(value1, value2);
+						};
+					}
+				«ELSE»
+					default «type1.typeName»ObjectF<«type2.typeName»«returnType.typeName»F> curry() {
+						return (final «type1.javaName» value1) -> (final «type2.javaName» value2) ->
+							apply(value1, value2);
+					}
+				«ENDIF»
+			«ENDIF»
+
+			«IF returnType == Type.OBJECT»
+				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 					default F2<A2, A1, B> reverse() {
 						return (final A2 value2, final A1 value1) -> {
 							requireNonNull(value1);
