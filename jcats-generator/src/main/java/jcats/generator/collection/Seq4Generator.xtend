@@ -1047,6 +1047,21 @@ final class Seq4Generator extends SeqGenerator {
 					}
 				}
 			}
+
+			@Override
+			public void foreachUntil(final «type.boolFName» eff) {
+				for (final «type.javaName»[][][] node3 : node4) {
+					for (final «type.javaName»[][] node2 : node3) {
+						for (final «type.javaName»[] node1 : node2) {
+							for (final «type.javaName» value : node1) {
+								if (!eff.apply(«type.genericCast»value)) {
+									return;
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		final class «iteratorName(4)» implements «type.iteratorGenericName» {

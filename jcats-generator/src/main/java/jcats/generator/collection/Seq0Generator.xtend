@@ -143,6 +143,11 @@ class Seq0Generator extends SeqGenerator {
 			public void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
 			}
+
+			@Override
+			public void foreachUntil(final «type.boolFName» eff) {
+				requireNonNull(eff);
+			}
 		}
 	''' }
 }

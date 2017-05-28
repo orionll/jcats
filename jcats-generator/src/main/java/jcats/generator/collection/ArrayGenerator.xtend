@@ -449,6 +449,16 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public void foreachUntil(final «type.boolFName» eff) {
+				requireNonNull(eff);
+				for (final «type.javaName» value : array) {
+					if (!eff.apply(«type.genericCast»value)) {
+						return;
+					}
+				}
+			}
+
+			@Override
 			@Deprecated
 			public «type.arrayGenericName» to«type.arrayShortName»() {
 				return this;

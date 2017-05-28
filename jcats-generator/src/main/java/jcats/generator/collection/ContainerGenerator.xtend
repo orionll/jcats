@@ -249,6 +249,24 @@ class ContainerGenerator implements InterfaceGenerator {
 				«ENDIF»
 			}
 
+			default void foreachUntil(final «type.boolFName» eff) {
+				requireNonNull(eff);
+				«IF Type.javaUnboxedTypes.contains(type)»
+					final «type.iteratorGenericName» iterator = iterator();
+					while (iterator.hasNext()) {
+						if (!eff.apply(iterator.«type.iteratorNext»())) {
+							return;
+						}
+					}
+				«ELSE»
+					for (final «type.genericName» value : this) {
+						if (!eff.apply(value)) {
+							return;
+						}
+					}
+				«ENDIF»
+			}
+
 			@Override
 			default void forEach(final Consumer<? super «type.genericBoxedName»> action) {
 				requireNonNull(action);

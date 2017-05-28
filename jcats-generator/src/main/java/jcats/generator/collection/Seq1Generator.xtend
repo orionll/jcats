@@ -339,6 +339,15 @@ final class Seq1Generator extends SeqGenerator {
 					eff.apply(«type.genericCast»value);
 				}
 			}
+
+			@Override
+			public void foreachUntil(final «type.boolFName» eff) {
+				for (final «type.javaName» value : node1) {
+					if (!eff.apply(«type.genericCast»value)) {
+						return;
+					}
+				}
+			}
 		}
 	''' }
 }

@@ -740,6 +740,17 @@ class Seq2Generator extends SeqGenerator {
 					}
 				}
 			}
+
+			@Override
+			public void foreachUntil(final «type.boolFName» eff) {
+				for (final «type.javaName»[] node1 : node2) {
+					for (final «type.javaName» value : node1) {
+						if (!eff.apply(«type.genericCast»value)) {
+							return;
+						}
+					}
+				}
+			}
 		}
 
 		final class «iteratorName(2)» implements «type.iteratorGenericName» {

@@ -225,6 +225,16 @@ final class VNGenerators {
 					}
 
 					@Override
+					public void foreachUntil(final «type.boolFName» eff) {
+						«FOR index : 1 .. arity-1»
+							if (!eff.apply(a«index»)) {
+								return;
+							}
+						«ENDFOR»
+						eff.apply(a«arity»);
+					}
+
+					@Override
 					public int hashCode() {
 						int result = 1;
 						«FOR index : 1 .. arity»
