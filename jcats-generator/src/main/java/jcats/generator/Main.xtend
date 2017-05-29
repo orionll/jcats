@@ -23,6 +23,7 @@ import jcats.generator.collection.SeqBuilderGenerator
 import jcats.generator.collection.SeqGenerator
 import jcats.generator.collection.StackBuilderGenerator
 import jcats.generator.collection.StackGenerator
+import jcats.generator.collection.UniqueContainerGenerator
 import jcats.generator.collection.VNGenerators
 import jcats.generator.function.Eff0Generator
 import jcats.generator.function.EffGenerator
@@ -99,6 +100,7 @@ class Main {
 			EffNGenerators.generators,
 			ContainerGenerator.generators,
 			IndexedContainerGenerator.generators,
+			UniqueContainerGenerator.generators,
 			ArrayGenerator.generators,
 			ArrayBuilderGenerator.generators,
 			SeqGenerator.generators,

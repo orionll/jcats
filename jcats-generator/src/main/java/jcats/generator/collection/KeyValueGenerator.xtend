@@ -2,6 +2,7 @@ package jcats.generator.collection
 
 import jcats.generator.InterfaceGenerator
 import jcats.generator.Constants
+import jcats.generator.Type
 
 class KeyValueGenerator implements InterfaceGenerator {
 
@@ -19,6 +20,7 @@ class KeyValueGenerator implements InterfaceGenerator {
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.COMMON».*;
 
 		public interface KeyValue<K, A> extends Iterable<P<K, A>>, Equatable<KeyValue<K, A>>, Sized {
 
@@ -59,7 +61,7 @@ class KeyValueGenerator implements InterfaceGenerator {
 				forEach(entry -> eff.apply(entry.get1(), entry.get2()));
 			}
 
-			default Container<K> keys() {
+			default UniqueContainer<K> keys() {
 				return new Keys<>(this);
 			}
 
@@ -91,6 +93,11 @@ class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public boolean contains(final A value) {
+				return keyValue.containsValue(value);
+			}
+
+			@Override
 			public void foreach(final Eff<A> eff) {
 				keyValue.forEach(p -> eff.apply(p.get2()));
 			}
@@ -104,9 +111,14 @@ class KeyValueGenerator implements InterfaceGenerator {
 			public Iterator<A> iterator() {
 				return new MappedIterator<>(keyValue.iterator(), P::get2);
 			}
+
+			@Override
+			public String toString() {
+				return iterableToString(this, "Values");
+			}
 		}
 
-		final class Keys<K> implements Container<K> {
+		final class Keys<K> implements UniqueContainer<K> {
 			private final KeyValue<K, ?> keyValue;
 
 			Keys(final KeyValue<K, ?> keyValue) {
@@ -116,6 +128,11 @@ class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public int size() {
 				return keyValue.size();
+			}
+
+			@Override
+			public boolean contains(final K key) {
+				return keyValue.containsKey(key);
 			}
 
 			@Override
@@ -131,6 +148,15 @@ class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public Iterator<K> iterator() {
 				return new MappedIterator<>(keyValue.iterator(), P::get1);
+			}
+
+			«uniqueHashCode»
+
+			«uniqueEquals(Type.OBJECT, "UniqueContainer")»
+
+			@Override
+			public String toString() {
+				return iterableToString(this, "Keys");
 			}
 		}
 	''' }

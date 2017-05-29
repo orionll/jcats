@@ -54,6 +54,13 @@ interface Generator {
 		}
 	'''}
 
+	def static uniqueHashCode() { '''
+		@Override
+		public int hashCode() {
+			return uniqueContainerHashCode(this);
+		}
+	'''}
+
 	def static keyValueHashCode() { '''
 		@Override
 		public int hashCode() {
@@ -68,6 +75,19 @@ interface Generator {
 				return true;
 			} else if (obj instanceof «wildcardName.replaceAll("<\\?>", "")») {
 				return «type.indexedContainerShortName.firstToLowerCase»sEqual(this, («wildcardName») obj);
+			} else {
+				return false;
+			}
+		}
+	'''}
+
+	def static uniqueEquals(Type type, String shortName) {'''
+		@Override
+		public boolean equals(final Object obj) {
+			if (obj == this) {
+				return true;
+			} else if (obj instanceof «shortName») {
+				return «type.uniqueContainerShortName.firstToLowerCase»sEqual(this, («shortName») obj);
 			} else {
 				return false;
 			}

@@ -77,6 +77,31 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
+			«FOR type : Type.values»
+				static boolean «type.uniqueContainerShortName.firstToLowerCase»sEqual(final «type.uniqueContainerShortName» c1, final «type.uniqueContainerShortName» c2) {
+					if (c1.size() == c2.size()) {
+						«IF type == Type.OBJECT»
+							for (final Object value : c1) {
+								if (!c2.contains(value)) {
+									return false;
+								}
+							}
+						«ELSE»
+							final «type.iteratorGenericName» iterator1 = c1.iterator();
+							while (iterator1.hasNext()) {
+								final «type.javaName» value = iterator1.«type.iteratorNext»();
+								if (!c2.contains(value)) {
+									return false;
+								}
+							}
+						«ENDIF»
+						return true;
+					} else {
+						return false;
+					}
+				}
+
+			«ENDFOR»
 			static boolean keyValuesEqual(final KeyValue<Object, ?> keyValue1, final KeyValue<Object, ?> keyValue2) {
 				if (keyValue1.size() == keyValue2.size()) {
 					for (final P<?, ?> entry : keyValue1) {
@@ -111,6 +136,14 @@ final class CommonGenerator implements ClassGenerator {
 					hashCode = 31 * hashCode + value.hashCode();
 				}
 				return hashCode;
+			}
+
+			static int uniqueContainerHashCode(final UniqueContainer<?> container) {
+				int result = 0;
+				for (final Object value : container) {
+					result += value.hashCode();
+				}
+				return result;
 			}
 
 			static int keyValueHashCode(final KeyValue<?, ?> keyValue) {

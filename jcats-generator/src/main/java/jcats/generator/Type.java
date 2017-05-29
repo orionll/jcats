@@ -159,6 +159,10 @@ public enum Type {
 		return genericName("Indexed");
 	}
 
+	public String uniqueContainerShortName() {
+		return shortName("UniqueContainer");
+	}
+
 	public String iteratorGenericName() {
 		switch (this) {
 			case OBJECT: return "Iterator<A>";

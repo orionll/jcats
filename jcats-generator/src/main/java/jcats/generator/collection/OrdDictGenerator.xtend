@@ -47,6 +47,7 @@ class OrdDictGenerator implements ClassGenerator {
 
 			@Override
 			public A getOrNull(final K key) {
+				requireNonNull(key);
 				if (entry == null) {
 					return null;
 				}
