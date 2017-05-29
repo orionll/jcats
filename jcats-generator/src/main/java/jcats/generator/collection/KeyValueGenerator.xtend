@@ -40,7 +40,9 @@ class KeyValueGenerator implements InterfaceGenerator {
 
 			A getOrNull(final K key);
 
-			boolean containsKey(final K key);
+			default boolean containsKey(final K key) {
+				return (getOrNull(key) != null);
+			}
 
 			default boolean containsValue(final A value) {
 				requireNonNull(value);

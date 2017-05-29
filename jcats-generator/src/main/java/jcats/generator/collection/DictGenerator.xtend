@@ -88,11 +88,6 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public boolean containsKey(final K key) {
-				return (getOrNull(key) != null);
-			}
-
-			@Override
 			public A getOrNull(final K key) {
 				return get(key, key.hashCode(), 0);
 			}

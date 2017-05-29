@@ -46,11 +46,6 @@ class OrdDictGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public boolean containsKey(final K key) {
-				return (getOrNull(key) != null);
-			}
-
-			@Override
 			public A getOrNull(final K key) {
 				if (entry == null) {
 					return null;
