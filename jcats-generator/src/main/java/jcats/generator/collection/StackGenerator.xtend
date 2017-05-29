@@ -2,6 +2,7 @@ package jcats.generator.collection
 
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
+import jcats.generator.Type
 
 final class StackGenerator implements ClassGenerator {
 	override className() { Constants.STACK }
@@ -25,8 +26,7 @@ final class StackGenerator implements ClassGenerator {
 		import static «Constants.OPTION».none;
 		import static «Constants.OPTION».some;
 		import static «Constants.P».p;
-		import static «Constants.COMMON».iterableToString;
-		import static «Constants.COMMON».iterableHashCode;
+		import static «Constants.COMMON».*;
 
 
 		public final class Stack<A> implements Container<A>, Equatable<Stack<A>>, Serializable {
@@ -265,7 +265,7 @@ final class StackGenerator implements ClassGenerator {
 				return isEmpty() ? emptySpliterator() : spliteratorUnknownSize(iterator(), Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 
-			«hashcode»
+			«hashcode(Type.OBJECT)»
 
 			@Override
 			public boolean equals(final Object obj) {

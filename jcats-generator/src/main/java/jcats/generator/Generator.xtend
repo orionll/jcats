@@ -45,12 +45,16 @@ interface Generator {
 		}
 	'''}
 
-	def static hashcode() { return hashcode("A", false) }
+	def static hashcode(Type type) { return hashcode(type, false) }
 
-	def static hashcode(String paramBoxedName, boolean isFinal) { '''
+	def static hashcode(Type type, boolean isFinal) { '''
 		@Override
 		public «IF isFinal»final «ENDIF»int hashCode() {
-			return iterableHashCode(this);
+			«IF Type.javaUnboxedTypes.contains(type)»
+				return «type.containerShortName.firstToLowerCase»HashCode(this);
+			«ELSE»
+				return iterableHashCode(this);
+			«ENDIF»
 		}
 	'''}
 

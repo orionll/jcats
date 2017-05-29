@@ -143,6 +143,10 @@ public enum Type {
 		return genericName("Container");
 	}
 
+	public String containerWildcardName() {
+		return wildcardName("Container");
+	}
+
 	public String indexedContainerGenericName() {
 		return genericName("IndexedContainer");
 	}

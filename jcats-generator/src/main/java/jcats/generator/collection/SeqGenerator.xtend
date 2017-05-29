@@ -229,11 +229,7 @@ class SeqGenerator implements ClassGenerator {
 			«ELSE»
 				public final <A> Seq<A> map(final «type.typeName»ObjectF<A> f) {
 					requireNonNull(f);
-					«IF type == Type.BOOLEAN»
-						return Seq.sizedToSeq(new MappedIterator<>(iterator(), f.toF()), size());
-					«ELSE»
-						return Seq.sizedToSeq(new Mapped«type.typeName»ObjectIterator<>(iterator(), f), size());
-					«ENDIF»
+					return Seq.sizedToSeq(new Mapped«type.typeName»ObjectIterator<>(iterator(), f), size());
 				}
 			«ENDIF»
 
@@ -1124,7 +1120,7 @@ class SeqGenerator implements ClassGenerator {
 				public abstract «type.iteratorGenericName» iterator();
 
 			«ENDIF»
-			«hashcode(type.genericBoxedName, true)»
+			«hashcode(type, true)»
 
 			«equals(type, type.indexedContainerWildcardName, true)»
 

@@ -80,8 +80,8 @@ final class CommonGenerator implements ClassGenerator {
 			«FOR type : Type.values»
 				static boolean «type.uniqueContainerShortName.firstToLowerCase»sEqual(final «type.uniqueContainerShortName» c1, final «type.uniqueContainerShortName» c2) {
 					if (c1.size() == c2.size()) {
-						«IF type == Type.OBJECT»
-							for (final Object value : c1) {
+						«IF type == Type.OBJECT || type == Type.BOOLEAN»
+							for (final «type.javaName» value : c1) {
 								if (!c2.contains(value)) {
 									return false;
 								}
@@ -138,14 +138,38 @@ final class CommonGenerator implements ClassGenerator {
 				return hashCode;
 			}
 
-			static int uniqueContainerHashCode(final UniqueContainer<?> container) {
-				int result = 0;
-				for (final Object value : container) {
-					result += value.hashCode();
+			«FOR type : Type.javaUnboxedTypes»
+				static int «type.containerShortName.firstToLowerCase»HashCode(final «type.containerWildcardName» container) {
+					int hashCode = 1;
+					final «type.iteratorGenericName» iterator = container.iterator();
+					while (iterator.hasNext()) {
+						final «type.javaName» value = iterator.«type.iteratorNext»();
+						hashCode = 31 * hashCode + «type.boxedName».hashCode(value);
+					}
+					return hashCode;
 				}
-				return result;
+
+			«ENDFOR»
+			static int uniqueContainerHashCode(final Iterable<?> uniqueContainer) {
+				int hashCode = 0;
+				for (final Object value : uniqueContainer) {
+					hashCode += value.hashCode();
+				}
+				return hashCode;
 			}
 
+			«FOR type : Type.javaUnboxedTypes»
+				static int «type.uniqueContainerShortName.firstToLowerCase»HashCode(final «type.containerWildcardName» container) {
+					int hashCode = 1;
+					final «type.iteratorGenericName» iterator = container.iterator();
+					while (iterator.hasNext()) {
+						final «type.javaName» value = iterator.«type.iteratorNext»();
+						hashCode += «type.boxedName».hashCode(value);
+					}
+					return hashCode;
+				}
+
+			«ENDFOR»
 			static int keyValueHashCode(final KeyValue<?, ?> keyValue) {
 				int result = 0;
 				for (final P<?, ?> entry : keyValue) {
