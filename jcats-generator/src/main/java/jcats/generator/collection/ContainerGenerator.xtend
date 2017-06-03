@@ -102,6 +102,25 @@ class ContainerGenerator implements InterfaceGenerator {
 				return intNone();
 			}
 
+			default IntOption lastIndexOf(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
+				int index = size() - 1;
+				final «type.iteratorGenericName» iterator = reverseIterator();
+				while (iterator.hasNext()) {
+					«IF Type.javaUnboxedTypes.contains(type)»
+						if (iterator.«type.iteratorNext»() == value) {
+					«ELSE»
+						if (iterator.«type.iteratorNext»().equals(value)) {
+					«ENDIF»
+						return intSome(index);
+					}
+					index--;
+				}
+				return intNone();
+			}
+
 			«IF Type.javaUnboxedTypes.contains(type)»
 				default <A> A foldLeft(final A start, final Object«type.typeName»ObjectF2<A, A> f2) {
 					requireNonNull(start);
@@ -313,7 +332,7 @@ class ContainerGenerator implements InterfaceGenerator {
 						final «type.iteratorGenericName» iterator = iterator();
 						while (iterator.hasNext()) {
 							array[i++] = iterator.«type.iteratorNext»();
-						} 
+						}
 					«ELSE»
 						for (final «type.javaName» value : this) {
 							array[i++] = value;

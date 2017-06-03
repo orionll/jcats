@@ -26,7 +26,7 @@ final class CastsGenerator implements ClassGenerator {
 			«cast("Comparator", "castComparator", #["A"], #["A"], #[])»
 
 			«cast("Optional", "castOptional", #["A"], #[], #["A"])»
-			
+
 			«cast("Stream", "castStream", #["A"], #[], #["A"])»
 
 			«cast("Callable", "castCallable", #["A"], #[], #["A"])»
