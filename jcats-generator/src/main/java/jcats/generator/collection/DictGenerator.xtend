@@ -83,11 +83,6 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public boolean isEmpty() {
-				return (this == EMPTY);
-			}
-
-			@Override
 			public A getOrNull(final K key) {
 				return get(key, key.hashCode(), 0);
 			}

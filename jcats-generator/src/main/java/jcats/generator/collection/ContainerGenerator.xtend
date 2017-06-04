@@ -78,22 +78,27 @@ class ContainerGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
+				«IF type == Type.OBJECT»
+					return indexWhere(value::equals);
+				«ELSE»
+					return indexWhere(a -> a == value);
+				«ENDIF»
+			}
+
+			default IntOption indexWhere(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
 				int index = 0;
 				«IF Type.javaUnboxedTypes.contains(type)»
 					final «type.iteratorGenericName» iterator = iterator();
 					while (iterator.hasNext()) {
-						if (iterator.«type.iteratorNext»() == value) {
+						if (predicate.apply(iterator.«type.iteratorNext»())) {
 							return intSome(index);
 						}
 						index++;
 					}
 				«ELSE»
-					for (final «type.genericName» a : this) {
-						«IF type == Type.OBJECT»
-							if (a.equals(value)) {
-						«ELSE»
-							if (a == value) {
-						«ENDIF»
+					for (final «type.genericName» value : this) {
+						if (predicate.apply(value)) {
 							return intSome(index);
 						}
 						index++;
@@ -106,14 +111,19 @@ class ContainerGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
+				«IF type == Type.OBJECT»
+					return lastIndexWhere(value::equals);
+				«ELSE»
+					return lastIndexWhere(a -> a == value);
+				«ENDIF»
+			}
+
+			default IntOption lastIndexWhere(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
 				int index = size() - 1;
 				final «type.iteratorGenericName» iterator = reverseIterator();
 				while (iterator.hasNext()) {
-					«IF Type.javaUnboxedTypes.contains(type)»
-						if (iterator.«type.iteratorNext»() == value) {
-					«ELSE»
-						if (iterator.«type.iteratorNext»().equals(value)) {
-					«ENDIF»
+					if (predicate.apply(iterator.«type.iteratorNext»())) {
 						return intSome(index);
 					}
 					index--;
