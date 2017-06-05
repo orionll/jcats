@@ -143,6 +143,42 @@ class SeqGenerator implements ClassGenerator {
 				}
 			}
 
+			public final «genericName» removeFirstWhere(final «type.boolFName» predicate) {
+				final IntOption index = indexWhere(predicate);
+				if (index.isEmpty()) {
+					return this;
+				} else {
+					final int i = index.get();
+					return take(i).concat(drop(i + 1));
+				}
+			}
+
+			public final «genericName» removeFirst(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					return removeFirstWhere(value::equals);
+				«ELSE»
+					return removeFirstWhere(a -> a == value);
+				«ENDIF»
+			}
+
+			public final «genericName» removeLastWhere(final «type.boolFName» predicate) {
+				final IntOption index = lastIndexWhere(predicate);
+				if (index.isEmpty()) {
+					return this;
+				} else {
+					final int i = index.get();
+					return take(i).concat(drop(i + 1));
+				}
+			}
+
+			public final «genericName» removeLast(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					return removeLastWhere(value::equals);
+				«ELSE»
+					return removeLastWhere(a -> a == value);
+				«ENDIF»
+			}
+
 			/**
 			 * O(min(this.size, suffix.size))
 			 */
