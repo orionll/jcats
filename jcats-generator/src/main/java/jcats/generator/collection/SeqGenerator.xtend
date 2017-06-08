@@ -137,9 +137,7 @@ class SeqGenerator implements ClassGenerator {
 				if (index < 0 || index >= size) {
 					throw new IndexOutOfBoundsException(Integer.toString(index));
 				} else {
-					final «genericName» prefix = take(index);
-					final «genericName» suffix = drop(index + 1);
-					return prefix.concat(suffix);
+					return remove(index);
 				}
 			}
 
@@ -148,8 +146,7 @@ class SeqGenerator implements ClassGenerator {
 				if (index.isEmpty()) {
 					return this;
 				} else {
-					final int i = index.get();
-					return take(i).concat(drop(i + 1));
+					return remove(index.get());
 				}
 			}
 
@@ -166,8 +163,7 @@ class SeqGenerator implements ClassGenerator {
 				if (index.isEmpty()) {
 					return this;
 				} else {
-					final int i = index.get();
-					return take(i).concat(drop(i + 1));
+					return remove(index.get());
 				}
 			}
 
@@ -177,6 +173,12 @@ class SeqGenerator implements ClassGenerator {
 				«ELSE»
 					return removeLastWhere(a -> a == value);
 				«ENDIF»
+			}
+
+			private «genericName» remove(final int index) {
+				final «genericName» prefix = take(index);
+				final «genericName» suffix = drop(index + 1);
+				return prefix.concat(suffix);
 			}
 
 			/**

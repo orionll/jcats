@@ -137,7 +137,47 @@ final class ArrayGenerator implements ClassGenerator {
 			public «genericName» removeAt(final int index) {
 				if (index < 0 || index >= array.length) {
 					throw new IndexOutOfBoundsException(Integer.toString(index));
-				} else if (array.length == 1) {
+				} else {
+					return remove(index);
+				}
+			}
+
+			public «genericName» removeFirstWhere(final «type.boolFName» predicate) {
+				final IntOption index = indexWhere(predicate);
+				if (index.isEmpty()) {
+					return this;
+				} else {
+					return remove(index.get());
+				}
+			}
+
+			public «genericName» removeFirst(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					return removeFirstWhere(value::equals);
+				«ELSE»
+					return removeFirstWhere(a -> a == value);
+				«ENDIF»
+			}
+
+			public «genericName» removeLastWhere(final «type.boolFName» predicate) {
+				final IntOption index = lastIndexWhere(predicate);
+				if (index.isEmpty()) {
+					return this;
+				} else {
+					return remove(index.get());
+				}
+			}
+
+			public «genericName» removeLast(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					return removeLastWhere(value::equals);
+				«ELSE»
+					return removeLastWhere(a -> a == value);
+				«ENDIF»
+			}
+
+			private «genericName» remove(final int index) {
+				if (array.length == 1) {
 					return empty«shortName»();
 				} else {
 					final «type.javaName»[] result = new «type.javaName»[array.length - 1];
