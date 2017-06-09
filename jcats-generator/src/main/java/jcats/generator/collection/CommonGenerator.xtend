@@ -130,6 +130,22 @@ final class CommonGenerator implements ClassGenerator {
 				return builder.toString();
 			}
 
+			«FOR type : Type.javaUnboxedTypes»
+				static String «type.containerShortName.firstToLowerCase»ToString(final «type.containerWildcardName» container, final String name) {
+					final «type.iteratorGenericName» iterator = container.iterator();
+					final StringBuilder builder = new StringBuilder(name);
+					builder.append("(");
+					while (iterator.hasNext()) {
+						builder.append(iterator.«type.iteratorNext»());
+						if (iterator.hasNext()) {
+							builder.append(", ");
+						}
+					}
+					builder.append(")");
+					return builder.toString();
+				}
+
+			«ENDFOR»
 			static int iterableHashCode(final Iterable<?> iterable) {
 				int hashCode = 1;
 				for (final Object value : iterable) {

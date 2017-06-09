@@ -41,7 +41,11 @@ interface Generator {
 	def toStr(Type type, boolean isFinal) { '''
 		@Override
 		public «IF isFinal»final «ENDIF»String toString() {
-			return iterableToString(this, "«name»");
+			«IF Type.javaUnboxedTypes.contains(type)»
+				return «type.containerShortName.firstToLowerCase»ToString(this, "«name»");
+			«ELSE»
+				return iterableToString(this, "«name»");
+			«ENDIF»
 		}
 	'''}
 
