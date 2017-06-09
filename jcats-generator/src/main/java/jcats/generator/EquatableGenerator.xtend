@@ -18,6 +18,20 @@ final class EquatableGenerator implements InterfaceGenerator {
 			default boolean isNotEqualTo(final A other) {
 				return !isEqualTo(other);
 			}
+
+			default boolean isEqualToAny(final A value, final A... values) {
+				requireNonNull(value);
+				if (equals(value)) {
+					return true;
+				}
+				for (final A val : values) {
+					requireNonNull(val);
+					if (equals(val)) {
+						return true;
+					}
+				}
+				return false;
+			}
 		}
 	''' }
 }
