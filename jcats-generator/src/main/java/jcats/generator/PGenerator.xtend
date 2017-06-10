@@ -78,10 +78,32 @@ class PGenerator implements ClassGenerator {
 		}
 	}
 
+	def type1BoxedName() {
+		if (type1 == Type.OBJECT && type2 == Type.OBJECT) {
+			"A1"
+		} else if (type1 == Type.OBJECT) {
+			"A"
+		} else {
+			type1.genericBoxedName
+		}
+	}
+
+	def type2BoxedName() {
+		if (type1 == Type.OBJECT && type2 == Type.OBJECT) {
+			"A2"
+		} else if (type2 == Type.OBJECT) {
+			"A"
+		} else {
+			type2.genericBoxedName
+		}
+	}
+
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
 		import java.io.Serializable;
+		import java.util.Map.Entry;
+		import java.util.AbstractMap.SimpleImmutableEntry;
 		import «Constants.F»;
 		«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 			import «Constants.F2»;
@@ -206,6 +228,10 @@ class PGenerator implements ClassGenerator {
 				public <B1, B2> P<B1, B2> biMap(final «type1.typeName»ObjectF<B1> f1, final «type2.typeName»ObjectF<B2> f2) {
 			«ENDIF»			
 				return p(f1.apply(a1), f2.apply(a2));
+			}
+
+			public Entry<«type1BoxedName», «type2BoxedName»> toEntry() {
+				return new SimpleImmutableEntry<>(a1, a2);
 			}
 
 			@Override

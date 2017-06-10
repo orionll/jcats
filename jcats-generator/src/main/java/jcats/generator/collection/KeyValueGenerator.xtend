@@ -11,8 +11,17 @@ class KeyValueGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
+		import java.util.AbstractMap;
+		import java.util.AbstractSet;
+		import java.util.Collection;
 		import java.util.Iterator;
+		import java.util.Map;
+		import java.util.Map.Entry;
+		import java.util.Set;
+		import java.util.function.BiConsumer;
+		import java.util.function.BiFunction;
 		import java.util.function.Consumer;
+		import java.util.function.Function;
 		import java.util.stream.Stream;
 		import java.util.stream.StreamSupport;
 
@@ -67,6 +76,10 @@ class KeyValueGenerator implements InterfaceGenerator {
 
 			default Container<A> values() {
 				return new Values<>(this);
+			}
+
+			default Map<K, A> asMap() {
+				return new KeyValueAsMap<>(this);
 			}
 
 			default Stream<P<K, A>> stream() {
@@ -157,6 +170,172 @@ class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public String toString() {
 				return iterableToString(this, "Keys");
+			}
+		}
+
+		final class KeyValueAsMap<K, A> extends AbstractMap<K, A> {
+			private final KeyValue<K, A> keyValue;
+
+			KeyValueAsMap(final KeyValue<K, A> keyValue) {
+				this.keyValue = keyValue;
+			}
+
+			@Override
+			public int size() {
+				return keyValue.size();
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return keyValue.isEmpty();
+			}
+
+			@Override
+			public boolean containsKey(final Object key) {
+				return (key != null) && keyValue.containsKey((K) key);
+			}
+
+			@Override
+			public boolean containsValue(final Object value) {
+				return (value != null) && keyValue.containsValue((A) value);
+			}
+
+			@Override
+			public A get(final Object key) {
+				if (key == null) {
+					return null;
+				} else {
+					return keyValue.getOrNull((K) key);
+				}
+			}
+
+			@Override
+			public A getOrDefault(final Object key, final A defaultValue) {
+				if (key == null) {
+					return null;
+				} else {
+					final A value = keyValue.getOrNull((K) key);
+					return (value == null) ? defaultValue : value;
+				}
+			}
+
+			@Override
+			public void putAll(final Map<? extends K, ? extends A> m) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public A putIfAbsent(final K key, final A value) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public A remove(final Object key) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public boolean remove(final Object key, final Object value) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public void clear() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public A compute(final K key, final BiFunction<? super K, ? super A, ? extends A> remappingFunction) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public A computeIfAbsent(final K key, final Function<? super K, ? extends A> mappingFunction) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public A computeIfPresent(final K key, final BiFunction<? super K, ? super A, ? extends A> remappingFunction) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public A replace(final K key, final A value) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public boolean replace(final K key, final A oldValue, final A newValue) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public void replaceAll(final BiFunction<? super K, ? super A, ? extends A> function) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public A merge(final K key, final A value, final BiFunction<? super A, ? super A, ? extends A> remappingFunction) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public Set<Entry<K, A>> entrySet() {
+				return new KeyValueEntrySet<>(keyValue);
+			}
+
+			@Override
+			public Set<K> keySet() {
+				return keyValue.keys().asSet();
+			}
+
+			@Override
+			public Collection<A> values() {
+				return keyValue.values().asCollection();
+			}
+
+			@Override
+			public void forEach(final BiConsumer<? super K, ? super A> action) {
+				keyValue.forEach((final P<K, A> entry) -> action.accept(entry.get1(), entry.get2()));
+			}
+		}
+
+		final class KeyValueEntrySet<K, A> extends AbstractSet<Entry<K, A>> {
+			private final KeyValue<K, A> keyValue;
+
+			KeyValueEntrySet(final KeyValue<K, A> keyValue) {
+				this.keyValue = keyValue;
+			}
+
+			@Override
+			public int size() {
+				return keyValue.size();
+			}
+
+			@Override
+			public boolean contains(final Object obj) {
+				if (obj instanceof Entry) {
+					final Entry<?, ?> entry = (Entry<?, ?>) obj;
+					final Object key = entry.getKey();
+					if (key == null) {
+						return false;
+					} else {
+						final Object value = entry.getValue();
+						return (value != null) && value.equals(keyValue.getOrNull((K) key));
+					}
+				} else {
+					return false;
+				}
+			}
+
+			@Override
+			public Iterator<Entry<K, A>> iterator() {
+				return new MappedIterator<>(keyValue.iterator(), P::toEntry);
+			}
+
+			@Override
+			public void forEach(final Consumer<? super Entry<K, A>> action) {
+				keyValue.forEach(p -> action.accept(p.toEntry()));
 			}
 		}
 	''' }
