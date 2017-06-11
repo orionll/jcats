@@ -11,17 +11,13 @@ class KeyValueGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		import java.util.AbstractMap;
-		import java.util.AbstractSet;
 		import java.util.Collection;
 		import java.util.Iterator;
 		import java.util.Map;
 		import java.util.Map.Entry;
 		import java.util.Set;
 		import java.util.function.BiConsumer;
-		import java.util.function.BiFunction;
 		import java.util.function.Consumer;
-		import java.util.function.Function;
 		import java.util.stream.Stream;
 		import java.util.stream.StreamSupport;
 
@@ -173,7 +169,7 @@ class KeyValueGenerator implements InterfaceGenerator {
 			}
 		}
 
-		final class KeyValueAsMap<K, A> extends AbstractMap<K, A> {
+		final class KeyValueAsMap<K, A> extends AbstractImmutableMap<K, A> {
 			private final KeyValue<K, A> keyValue;
 
 			KeyValueAsMap(final KeyValue<K, A> keyValue) {
@@ -220,66 +216,6 @@ class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public void putAll(final Map<? extends K, ? extends A> m) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public A putIfAbsent(final K key, final A value) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public A remove(final Object key) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean remove(final Object key, final Object value) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public void clear() {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public A compute(final K key, final BiFunction<? super K, ? super A, ? extends A> remappingFunction) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public A computeIfAbsent(final K key, final Function<? super K, ? extends A> mappingFunction) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public A computeIfPresent(final K key, final BiFunction<? super K, ? super A, ? extends A> remappingFunction) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public A replace(final K key, final A value) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean replace(final K key, final A oldValue, final A newValue) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public void replaceAll(final BiFunction<? super K, ? super A, ? extends A> function) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public A merge(final K key, final A value, final BiFunction<? super A, ? super A, ? extends A> remappingFunction) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
 			public Set<Entry<K, A>> entrySet() {
 				return new KeyValueEntrySet<>(keyValue);
 			}
@@ -300,7 +236,7 @@ class KeyValueGenerator implements InterfaceGenerator {
 			}
 		}
 
-		final class KeyValueEntrySet<K, A> extends AbstractSet<Entry<K, A>> {
+		final class KeyValueEntrySet<K, A> extends AbstractImmutableSet<Entry<K, A>> {
 			private final KeyValue<K, A> keyValue;
 
 			KeyValueEntrySet(final KeyValue<K, A> keyValue) {

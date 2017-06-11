@@ -23,7 +23,6 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 		
-		import java.util.AbstractList;
 		import java.util.Collection;
 		import java.util.Iterator;
 		import java.util.List;
@@ -50,7 +49,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			«ENDIF»
 		}
 
-		final class «type.genericName("IndexedContainerAsList")» extends AbstractList<«type.genericBoxedName»> implements RandomAccess {
+		final class «type.genericName("IndexedContainerAsList")» extends AbstractImmutableList<«type.genericBoxedName»> implements RandomAccess {
 			final «genericName» container;
 
 			«shortName»AsList(final «genericName» container) {

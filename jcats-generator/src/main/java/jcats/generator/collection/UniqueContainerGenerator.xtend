@@ -23,10 +23,8 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 		
-		import java.util.AbstractSet;
 		import java.util.Collection;
 		import java.util.Iterator;
-		import java.util.RandomAccess;
 		import java.util.Set;
 		import java.util.Spliterator;
 
@@ -50,7 +48,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			«ENDIF»
 		}
 
-		final class «type.genericName("UniqueContainerAsSet")» extends AbstractSet<«type.genericBoxedName»> {
+		final class «type.genericName("UniqueContainerAsSet")» extends AbstractImmutableSet<«type.genericBoxedName»> {
 			final «genericName» container;
 
 			«shortName»AsSet(final «genericName» container) {

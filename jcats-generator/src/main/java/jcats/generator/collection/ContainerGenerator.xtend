@@ -23,7 +23,6 @@ class ContainerGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		import java.util.AbstractCollection;
 		import java.util.ArrayList;
 		import java.util.Collection;
 		import java.util.HashSet;
@@ -389,7 +388,7 @@ class ContainerGenerator implements InterfaceGenerator {
 			«ENDIF»
 		}
 
-		class «type.genericName("ContainerAsCollection")» extends AbstractCollection<«type.genericBoxedName»> {
+		class «type.genericName("ContainerAsCollection")» extends AbstractImmutableCollection<«type.genericBoxedName»> {
 			final «genericName» container;
 
 			«shortName»AsCollection(final «genericName» container) {
