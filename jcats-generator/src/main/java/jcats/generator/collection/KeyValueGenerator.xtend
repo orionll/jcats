@@ -271,7 +271,7 @@ class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			public void forEach(final Consumer<? super Entry<K, A>> action) {
-				keyValue.forEach(p -> action.accept(p.toEntry()));
+				keyValue.forEach((final P<K, A> p) -> action.accept(p.toEntry()));
 			}
 		}
 	''' }

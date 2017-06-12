@@ -28,6 +28,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		import java.util.List;
 		import java.util.RandomAccess;
 		import java.util.Spliterator;
+		import java.util.function.Consumer;
 
 		import «Constants.JCATS».*;
 
@@ -81,6 +82,11 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			@Override
 			public Spliterator<«type.genericBoxedName»> spliterator() {
 				return container.spliterator();
+			}
+
+			@Override
+			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
+				container.forEach(action);
 			}
 		}
 	''' }

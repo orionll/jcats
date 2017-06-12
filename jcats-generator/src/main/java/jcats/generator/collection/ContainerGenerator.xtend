@@ -388,7 +388,7 @@ class ContainerGenerator implements InterfaceGenerator {
 			«ENDIF»
 		}
 
-		class «type.genericName("ContainerAsCollection")» extends AbstractImmutableCollection<«type.genericBoxedName»> {
+		final class «type.genericName("ContainerAsCollection")» extends AbstractImmutableCollection<«type.genericBoxedName»> {
 			final «genericName» container;
 
 			«shortName»AsCollection(final «genericName» container) {
@@ -415,6 +415,11 @@ class ContainerGenerator implements InterfaceGenerator {
 			@Override
 			public Spliterator<«type.genericBoxedName»> spliterator() {
 				return container.spliterator();
+			}
+
+			@Override
+			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
+				container.forEach(action);
 			}
 		}
 	''' }

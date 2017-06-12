@@ -27,6 +27,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 		import java.util.Iterator;
 		import java.util.Set;
 		import java.util.Spliterator;
+		import java.util.function.Consumer;
 
 		import «Constants.JCATS».*;
 
@@ -92,6 +93,11 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			@Override
 			public Spliterator<«type.genericBoxedName»> spliterator() {
 				return container.spliterator();
+			}
+
+			@Override
+			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
+				container.forEach(action);
 			}
 		}
 	''' }
