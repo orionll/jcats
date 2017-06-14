@@ -16,6 +16,8 @@ class KeyValueGenerator implements InterfaceGenerator {
 		import java.util.Map;
 		import java.util.Map.Entry;
 		import java.util.Set;
+		import java.util.Spliterator;
+		import java.util.Spliterators;
 		import java.util.function.BiConsumer;
 		import java.util.function.Consumer;
 		import java.util.stream.Stream;
@@ -78,6 +80,15 @@ class KeyValueGenerator implements InterfaceGenerator {
 				return new KeyValueAsMap<>(this);
 			}
 
+			@Override
+			default Spliterator<P<K, A>> spliterator() {
+				if (isEmpty()) {
+					return Spliterators.emptySpliterator();
+				} else {
+					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE);
+				}
+			}
+
 			default Stream<P<K, A>> stream() {
 				return StreamSupport.stream(spliterator(), false);
 			}
@@ -119,6 +130,15 @@ class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public Iterator<A> iterator() {
 				return new MappedIterator<>(keyValue.iterator(), P::get2);
+			}
+
+			@Override
+			public Spliterator<A> spliterator() {
+				if (isEmpty()) {
+					return Spliterators.emptySpliterator();
+				} else {
+					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.IMMUTABLE);
+				}
 			}
 
 			@Override
@@ -267,6 +287,15 @@ class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public Iterator<Entry<K, A>> iterator() {
 				return new MappedIterator<>(keyValue.iterator(), P::toEntry);
+			}
+
+			@Override
+			public Spliterator<Entry<K, A>> spliterator() {
+				if (isEmpty()) {
+					return Spliterators.emptySpliterator();
+				} else {
+					return Spliterators.spliterator(this, Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE);
+				}
 			}
 
 			@Override

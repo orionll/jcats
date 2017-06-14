@@ -16,8 +16,6 @@ class DictGenerator implements ClassGenerator {
 		import java.io.Serializable;
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
-		import java.util.Spliterator;
-		import java.util.Spliterators;
 		import java.util.function.Consumer;
 
 		import «Constants.JCATS».*;
@@ -346,15 +344,6 @@ class DictGenerator implements ClassGenerator {
 					}
 					treeMap >>>= 1;
 					leafMap >>>= 1;
-				}
-			}
-
-			@Override
-			public Spliterator<P<K, A>> spliterator() {
-				if (isEmpty()) {
-					return Spliterators.emptySpliterator();
-				} else {
-					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE);
 				}
 			}
 

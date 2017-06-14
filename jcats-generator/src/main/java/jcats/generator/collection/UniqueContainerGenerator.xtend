@@ -27,6 +27,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 		import java.util.Iterator;
 		import java.util.Set;
 		import java.util.Spliterator;
+		import java.util.Spliterators;
 		import java.util.function.Consumer;
 
 		import «Constants.JCATS».*;
@@ -43,6 +44,16 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			default Set<«type.genericBoxedName»> asSet() {
 				return new «type.diamondName("UniqueContainerAsSet")»(this);
 			}
+
+			@Override
+			default «type.spliteratorGenericName» spliterator() {
+				if (isEmpty()) {
+					return Spliterators.«type.emptySpliteratorName»();
+				} else {
+					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE);
+				}
+			}
+
 			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»
