@@ -44,7 +44,7 @@ class KeyValueGenerator implements InterfaceGenerator {
 			default A getOrElse(final K key, final F0<A> other) {
 				requireNonNull(other);
 				final A value = getOrNull(key);
-				return (value == null) ? other.apply() : value;
+				return (value == null) ? requireNonNull(other.apply()) : value;
 			}
 
 			A getOrNull(final K key);
