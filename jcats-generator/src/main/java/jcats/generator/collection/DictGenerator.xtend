@@ -109,7 +109,7 @@ class DictGenerator implements ClassGenerator {
 						}
 
 					case TREE: return getTree(branch).get(key, keyHash, shift + 5);
-					case COLLISION: return getCollision(branch).get(key);
+					case COLLISION: return getFromCollision(getCollision(branch), key);
 					default: throw new AssertionError();
 				}
 			}
@@ -156,16 +156,16 @@ class DictGenerator implements ClassGenerator {
 				return this;
 			}
 
-			private ListDict<K, A> collisionAt(final int index) {
-				return (ListDict<K, A>) slots[index];
+			private P[] collisionAt(final int index) {
+				return (P[]) slots[index];
 			}
 
-			private ListDict<K, A> getCollision(final int branch) {
+			private P[] getCollision(final int branch) {
 				return collisionAt(select(branch));
 			}
 
-			private Dict<K, A> setCollision(final int branch, final ListDict<K, A> dict) {
-				slots[select(branch)] = dict;
+			private Dict<K, A> setCollision(final int branch, final P[] collision) {
+				slots[select(branch)] = collision;
 				return this;
 			}
 
@@ -225,8 +225,8 @@ class DictGenerator implements ClassGenerator {
 									return remap(treeMap, leafMap, size).setEntry(branch, p(key, value));
 								}
 							} else {
-								final ListDict<K, A> listDict = new ListDict<>(p(key, value), new ListDict<>(leaf, null));
-								return remap(treeMap | branch, leafMap, size + 1).setCollision(branch, listDict);
+								final P[] collision = { p(key, value), leaf };
+								return remap(treeMap | branch, leafMap, size + 1).setCollision(branch, collision);
 							}
 						} else {
 							final P<K, A> entry = p(key, value);
@@ -244,14 +244,14 @@ class DictGenerator implements ClassGenerator {
 						}
 
 					case COLLISION:
-						final ListDict<K, A> oldDict = getCollision(branch);
-						final ListDict<K, A> newDict = oldDict.update(key, value);
-						if (newDict == oldDict) {
+						final P[] oldCollision = getCollision(branch);
+						final P[] newCollision = updateCollision(oldCollision, key, value);
+						if (newCollision == oldCollision) {
 							return this;
-						} else if (newDict.next == oldDict) {
-							return remap(treeMap, leafMap, size + 1).setCollision(branch, newDict);
+						} else if (newCollision.length > oldCollision.length) {
+							return remap(treeMap, leafMap, size + 1).setCollision(branch, newCollision);
 						} else {
-							return remap(treeMap, leafMap, size).setCollision(branch, newDict);
+							return remap(treeMap, leafMap, size).setCollision(branch, newCollision);
 						}
 
 					default:
@@ -288,14 +288,14 @@ class DictGenerator implements ClassGenerator {
 						}
 
 					case COLLISION:
-						final ListDict<K, A> oldDict = getCollision(branch);
-						final ListDict<K, A> newDict = oldDict.remove(key);
-						if (newDict == oldDict) {
+						final P[] oldCollision = getCollision(branch);
+						final P[] newCollision = removeFromCollision(oldCollision, key);
+						if (newCollision == oldCollision) {
 							return this;
-						} else if (newDict.next == null) {
-							return remap(treeMap ^ branch, leafMap | branch, size - 1).setEntry(branch, newDict.entry);
+						} else if (newCollision.length == 1) {
+							return remap(treeMap ^ branch, leafMap | branch, size - 1).setEntry(branch, newCollision[0]);
 						} else {
-							return remap(treeMap, leafMap, size - 1).setCollision(branch, newDict);
+							return remap(treeMap, leafMap, size - 1).setCollision(branch, newCollision);
 						}
 
 					default:
@@ -324,6 +324,49 @@ class DictGenerator implements ClassGenerator {
 				}
 			}
 
+			private A getFromCollision(final P[] collision, final K key) {
+				for (final P<K, A> entry : collision) {
+					if (entry.get1().equals(key)) {
+						return entry.get2();
+					}
+				}
+				return null;
+			}
+
+			private P[] updateCollision(final P[] collision, final K key, final A value) {
+				for (int i = 0; i < collision.length; i++) {
+					final P<K, A> entry = collision[i];
+					if (entry.get1().equals(key)) {
+						if (entry.get2() == value) {
+							return collision;
+						} else {
+							final P[] newCollision = new P[collision.length];
+							System.arraycopy(collision, 0, newCollision, 0, collision.length);
+							newCollision[i] = p(key, value);
+							return newCollision;
+						}
+					}
+				}
+
+				final P[] newCollision = new P[collision.length + 1];
+				System.arraycopy(collision, 0, newCollision, 1, collision.length);
+				newCollision[0] = p(key, value);
+				return newCollision;
+			}
+
+			private P[] removeFromCollision(final P[] collision, final K key) {
+				for (int i = 0; i < collision.length; i++) {
+					final P<K, A> entry = collision[i];
+					if (entry.get1().equals(key)) {
+						final P[] newCollision = new P[collision.length - 1];
+						System.arraycopy(collision, 0, newCollision, 0, i);
+						System.arraycopy(collision, i + 1, newCollision, i, newCollision.length - i);
+						return newCollision;
+					}
+				}
+				return collision;
+			}
+
 			@Override
 			public Iterator<P<K, A>> iterator() {
 				return new DictIterator<>(leafMap, treeMap, slots);
@@ -340,7 +383,11 @@ class DictGenerator implements ClassGenerator {
 						case VOID: break;
 						case LEAF: action.accept(entryAt(i++)); break;
 						case TREE: treeAt(i++).forEach(action); break;
-						case COLLISION: collisionAt(i++).forEach(action); break;
+						case COLLISION:
+							for (final P<K, A> entry : collisionAt(i++)) {
+								action.accept(entry);
+							}
+							break;
 					}
 					treeMap >>>= 1;
 					leafMap >>>= 1;
@@ -405,7 +452,7 @@ class DictGenerator implements ClassGenerator {
 							break;
 
 						case Dict.COLLISION:
-							childIterator = collisionAt(i++).iterator();
+							childIterator = new ArrayIterator<>(collisionAt(i++));
 							next = childIterator.next();
 							break;
 					}
@@ -427,102 +474,8 @@ class DictGenerator implements ClassGenerator {
 				return (Dict<K, A>) slots[index];
 			}
 
-			private ListDict<K, A> collisionAt(final int index) {
-				return (ListDict<K, A>) slots[index];
-			}
-		}
-
-		/**
-		 * Used when multiple keys have hash collisions.
-		 */
-		final class ListDict<K, A> implements Serializable {
-			final P<K, A> entry;
-			final ListDict<K, A> next;
-
-			ListDict(final P<K, A> entry, final ListDict<K, A> next) {
-				this.entry = entry;
-				this.next = next;
-			}
-
-			A get(final K key) {
-				for (ListDict<K, A> dict = this; dict != null; dict = dict.next) {
-					if (dict.entry.get1().equals(key)) {
-						return dict.entry.get2();
-					}
-				}
-				return null;
-			}
-
-			ListDict<K, A> update(final K key, final A value) {
-				ListDict<K, A> nodeToUpdate = this;
-				while (nodeToUpdate != null) {
-					if (nodeToUpdate.entry.get1().equals(key)) {
-						break;
-					}
-					nodeToUpdate = nodeToUpdate.next;
-				}
-
-				if (nodeToUpdate == null) {
-					return new ListDict<>(p(key, value), this);
-				} else if (nodeToUpdate.entry.get2() == value) {
-					return this;
-				} else {
-					ListDict<K, A> result = new ListDict<>(p(key, value), nodeToUpdate.next);
-					for (ListDict<K, A> dict = this; dict != nodeToUpdate; dict = dict.next) {
-						result = new ListDict<>(dict.entry, result);
-					}
-					return result;
-				}
-			}
-
-			ListDict<K, A> remove(final K key) {
-				ListDict<K, A> nodeToRemove = this;
-				while (nodeToRemove != null) {
-					if (nodeToRemove.entry.get1().equals(key)) {
-						break;
-					}
-					nodeToRemove = nodeToRemove.next;
-				}
-
-				if (nodeToRemove == null) {
-					return this;
-				} else {
-					ListDict<K, A> result = nodeToRemove.next;
-					for (ListDict<K, A> dict = this; dict != nodeToRemove; dict = dict.next) {
-						result = new ListDict<>(dict.entry, result);
-					}
-					return result;
-				}
-			}
-
-			Iterator<P<K, A>> iterator() {
-				return new ListDictIterator<>(this);
-			}
-
-			void forEach(final Consumer<? super P<K, A>> action) {
-				for (ListDict<K, A> dict = this; dict != null; dict = dict.next) {
-					action.accept(dict.entry);
-				}
-			}
-		}
-
-		final class ListDictIterator<K, A> implements Iterator<P<K, A>> {
-			private ListDict<K, A> current;
-
-			ListDictIterator(final ListDict<K, A> dict) {
-				current = dict;
-			}
-
-			@Override
-			public boolean hasNext() {
-				return (current != null);
-			}
-
-			@Override
-			public P<K, A> next() {
-				final P<K, A> result = current.entry;
-				current = current.next;
-				return result;
+			private P[] collisionAt(final int index) {
+				return (P[]) slots[index];
 			}
 		}
 	''' }

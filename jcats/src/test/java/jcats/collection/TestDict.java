@@ -39,10 +39,10 @@ public class TestDict {
 		assertEquals(none(), emptyDict().get("a"));
 	}
 
-	/*@Test
-	public void emptyKeySet() {
-		assertTrue(emptyDict().keySet().isEmpty());
-	}*/
+	@Test
+	public void emptyKeys() {
+		assertTrue(emptyDict().keys().isEmpty());
+	}
 
 	@Test
 	public void singleElementNotEmpty() {
@@ -80,10 +80,10 @@ public class TestDict {
 		assertEquals(1, dict("a", 1).remove("b").size());
 	}
 
-	/*@Test
-	public void singleElementKeySet() {
-		assertTrue(emptyDict().put("a", 1).keySet().contains("a"));
-	}*/
+	@Test
+	public void singleElementKeys() {
+		assertTrue(emptyDict().put("a", 1).keys().contains("a"));
+	}
 
 	@Test
 	public void hashCodeClashContains() {
@@ -112,6 +112,12 @@ public class TestDict {
 		assertEquals(some(3), dict3.get("Aa"));
 		assertEquals(some(2), dict3.get("BB"));
 		assertEquals(2, dict3.size());
+
+		final Dict<String, Integer> dict4 = dict4("AaAa", 1, "BBBB", 2, "AaBB", 3, "AaAa", 4);
+		assertEquals(some(4), dict4.get("AaAa"));
+		assertEquals(some(2), dict4.get("BBBB"));
+		assertEquals(some(3), dict4.get("AaBB"));
+		assertEquals(3, dict4.size());
 	}
 
 	@Test
@@ -122,10 +128,10 @@ public class TestDict {
 		assertEquals(1, dict.size());
 	}
 
-	/*@Test
+	@Test
 	public void hashCodeClashKeySet() {
-		assertEquals(2, emptyDict().put("Aa", 1).put("BB", 2).keySet().size());
-	}*/
+		assertEquals(2, emptyDict().put("Aa", 1).put("BB", 2).keys().size());
+	}
 
 	@Test
 	public void largeMapSize() {
@@ -134,17 +140,17 @@ public class TestDict {
 
 	@Test
 	public void largeMapContains() {
-		assertTrue(getLargeMap().containsKey(Character.toString((char) ('A' + LARGE_MAP_SIZE - 1))));
+		assertTrue(getLargeMap().containsKey(Character.toString((char) (('A' + LARGE_MAP_SIZE) - 1))));
 	}
 
 	@Test
 	public void largeMapGet() {
-		assertEquals(some(LARGE_MAP_SIZE - 1), getLargeMap().get(Character.toString((char) ('A' + LARGE_MAP_SIZE - 1))));
+		assertEquals(some(LARGE_MAP_SIZE - 1), getLargeMap().get(Character.toString((char) (('A' + LARGE_MAP_SIZE) - 1))));
 	}
 
 	@Test
 	public void largeMapRemove() {
-		assertEquals(LARGE_MAP_SIZE - 1, getLargeMap().remove(Character.toString((char) ('A' + LARGE_MAP_SIZE - 1))).size());
+		assertEquals(LARGE_MAP_SIZE - 1, getLargeMap().remove(Character.toString((char) (('A' + LARGE_MAP_SIZE) - 1))).size());
 	}
 
 	@Test
@@ -156,10 +162,10 @@ public class TestDict {
 		assertEquals(3, dict.size());
 	}
 
-	/*@Test
+	@Test
 	public void largeMapKeySet() {
-		assertEquals(LARGE_MAP_SIZE, getLargeMap().keySet().size());
-	}*/
+		assertEquals(LARGE_MAP_SIZE, getLargeMap().keys().size());
+	}
 
 	@Test
 	public void immutability() {
