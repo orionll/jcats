@@ -7,7 +7,7 @@ import jcats.generator.InterfaceGenerator
 
 final class EffNGenerators {
 	def static List<Generator> generators() {
-		(2 .. Constants.MAX_ARITY).map[generator(it)].toList
+		(3 .. Constants.MAX_ARITY).map[generator(it)].toList
 	}
 
 	private def static Generator generator(int arity) {
