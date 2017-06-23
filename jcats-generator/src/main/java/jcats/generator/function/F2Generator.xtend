@@ -496,6 +496,22 @@ class F2Generator implements InterfaceGenerator {
 					return op::applyAs«returnType.typeName»;
 				}
 			«ENDIF»
+			«IF returnType == Type.OBJECT»
+				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+					«cast(#["A1", "A2", "B"], #["A1", "A2"], #["B"])»
+				«ELSEIF type1 == Type.OBJECT || type2 == Type.OBJECT»
+					«cast(#["A", "B"], #["A"], #["B"])»
+				«ELSE»
+					«cast(#["A"], #[], #["A"])»
+				«ENDIF»
+			«ELSE»
+				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+
+					«cast(#["A1", "A2"], #["A1", "A2"], #[])»
+				«ELSEIF type1 == Type.OBJECT || type2 == Type.OBJECT»
+					«cast(#["A"], #["A"], #[])»
+				«ENDIF»
+			«ENDIF»
 		}
 	''' }
 }
