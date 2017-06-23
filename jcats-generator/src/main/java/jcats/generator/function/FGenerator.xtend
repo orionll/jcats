@@ -350,11 +350,11 @@ final class FGenerator implements InterfaceGenerator {
 					return this::apply;
 				}
 			«ELSEIF to == Type.BOOLEAN»
-				default «from.typeName»Predicate toPredicate() {
+				default «from.typeName»Predicate to«from.typeName»Predicate() {
 					return this::apply;
 				}
 			«ELSEIF from != Type.BOOLEAN && to != Type.BOOLEAN»
-				default «from.typeName»To«to.typeName»Function toFunction() {
+				default «from.typeName»To«to.typeName»Function to«from.typeName»To«to.typeName»Function() {
 					return this::apply;
 				}
 			«ELSEIF from == Type.BOOLEAN»
@@ -369,7 +369,7 @@ final class FGenerator implements InterfaceGenerator {
 				}
 
 			«ELSE»
-				default «from.typeName»Eff toEff() {
+				default «from.typeName»Eff to«from.typeName»Eff() {
 					return this::apply;
 				}
 
