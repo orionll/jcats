@@ -114,28 +114,28 @@ final class F0Generator implements InterfaceGenerator {
 			«ENDIF»
 			«IF type == Type.OBJECT»
 				default <B> F<B, A> toConstF() {
-					return b -> {
+					return (final B b) -> {
 						requireNonNull(b);
 						return requireNonNull(apply());
 					};
 				}
 			«ELSE»
 				default <A> «type.typeName»F<A> toConstF() {
-					return a -> {
+					return (final A a) -> {
 						requireNonNull(a);
 						return apply();
 					};
 				}
 			«ENDIF»
 
-			«FOR t : Type.values.filter[it != Type.OBJECT]»
+			«FOR t : Type.primitives»
 				«IF type == Type.OBJECT»
 					default «t.typeName»ObjectF<A> toConst«t.typeName»ObjectF() {
-						return __ -> requireNonNull(apply());
+						return (final «t.javaName» __) -> requireNonNull(apply());
 					}
 				«ELSE»
 					default «t.typeName»«type.typeName»F toConst«t.typeName»«type.typeName»F() {
-						return __ -> apply();
+						return (final «t.javaName» __) -> apply();
 					}
 				«ENDIF»
 

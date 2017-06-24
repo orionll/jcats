@@ -155,7 +155,7 @@ final class ArrayGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					return removeFirstWhere(value::equals);
 				«ELSE»
-					return removeFirstWhere(a -> a == value);
+					return removeFirstWhere((final «type.javaName» a) -> a == value);
 				«ENDIF»
 			}
 
@@ -172,7 +172,7 @@ final class ArrayGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					return removeLastWhere(value::equals);
 				«ELSE»
-					return removeLastWhere(a -> a == value);
+					return removeLastWhere((final «type.javaName» a) -> a == value);
 				«ENDIF»
 			}
 

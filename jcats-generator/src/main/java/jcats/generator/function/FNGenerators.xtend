@@ -31,7 +31,7 @@ final class FNGenerators {
 
 					default <C> F«arity»<«(1 .. arity).map["A" + it + ", "].join»C> map(final F<B, C> f) {
 						requireNonNull(f);
-						return («(1 .. arity).map["a" + it].join(", ")») -> {
+						return («(1 .. arity).map['''final A«it» a«it»'''].join(", ")») -> {
 							«FOR i : 1 .. arity»
 								requireNonNull(a«i»);
 							«ENDFOR»
@@ -43,7 +43,7 @@ final class FNGenerators {
 					«FOR i : 1 .. arity»
 						default <C> F«arity»<«(1 .. arity).map[(if (it == i) "C" else "A" + it) + ", "].join»B> contraMap«i»(final F<C, A«i»> f) {
 							requireNonNull(f);
-							return («(1 .. arity).map[if (it == i) "c" else "a" + it].join(", ")») -> {
+							return («(1 .. arity).map[if (it == i) "final C c" else '''final A«it» a«it»'''].join(", ")») -> {
 								«FOR j : 1 .. arity»
 									requireNonNull(«if (i == j) "c" else "a" + j»);
 								«ENDFOR»
@@ -55,13 +55,13 @@ final class FNGenerators {
 					«ENDFOR»
 					«FOR i : 1 ..< arity»
 						default «curryReturnType(i, arity)» curry«if (i == 1) "" else i»() {
-							return a1 -> {
+							return (final A1 a1) -> {
 							«FOR j : 1 ..< i»
 								«(1 .. j).map["\t"].join»requireNonNull(a«j»);
-								«(1 .. j).map["\t"].join»return a«j + 1» -> {
+								«(1 .. j).map["\t"].join»return (final A«j+1» a«j+1») -> {
 							«ENDFOR»
 							«(1 .. i).map["\t"].join»requireNonNull(a«i»);
-							«(1 .. i).map["\t"].join»return («(i + 1 .. arity).map['''a«it»'''].join(", ")») -> {
+							«(1 .. i).map["\t"].join»return («(i + 1 .. arity).map['''final A«it» a«it»'''].join(", ")») -> {
 								«FOR j : i + 1 .. arity»
 									«(1 .. i).map["\t"].join»requireNonNull(a«j»);
 								«ENDFOR»
@@ -75,7 +75,7 @@ final class FNGenerators {
 					«ENDFOR»
 					default <C> F«arity»<«(1 .. arity).map["A" + it + ", "].join»C> flatMap(final F<B, F«arity»<«(1 .. arity).map["A" + it + ", "].join»C>> f) {
 						requireNonNull(f);
-						return («(1 .. arity).map["a" + it].join(", ")») -> {
+						return («(1 .. arity).map['''final A«it» a«it»'''].join(", ")») -> {
 							«FOR i : 1 .. arity»
 								requireNonNull(a«i»);
 							«ENDFOR»
@@ -85,7 +85,7 @@ final class FNGenerators {
 					}
 
 					default Eff«arity»<«(1 .. arity).map["A" + it].join(", ")»> toEff() {
-						return («(1 .. arity).map["a" + it].join(", ")») -> {
+						return («(1 .. arity).map['''final A«it» a«it»'''].join(", ")») -> {
 							«FOR i : 1 .. arity»
 								requireNonNull(a«i»);
 							«ENDFOR»

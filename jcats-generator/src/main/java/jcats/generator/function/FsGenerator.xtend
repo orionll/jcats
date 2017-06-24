@@ -14,8 +14,8 @@ final class FsGenerator implements ClassGenerator {
 
 		final class Fs {
 			static final F ID = Objects::requireNonNull;
-			«FOR type : Type.values.filter[t | t != Type.OBJECT]»
-				static final «type.typeName»«type.typeName»F «type.typeName.toUpperCase»_ID = value -> value;
+			«FOR type : Type.primitives»
+				static final «type.typeName»«type.typeName»F «type.typeName.toUpperCase»_ID = (final «type.javaName» value) -> value;
 			«ENDFOR»
 		}
 	''' }

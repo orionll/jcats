@@ -65,7 +65,7 @@ class KeyValueGenerator implements InterfaceGenerator {
 
 			default void foreach(final Eff2<K, A> eff) {
 				requireNonNull(eff);
-				forEach(entry -> eff.apply(entry.get1(), entry.get2()));
+				forEach((final P<K, A> entry) -> eff.apply(entry.get1(), entry.get2()));
 			}
 
 			default UniqueContainer<K> keys() {
@@ -119,12 +119,12 @@ class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			public void foreach(final Eff<A> eff) {
-				keyValue.forEach(p -> eff.apply(p.get2()));
+				keyValue.forEach((final P<?, A> p) -> eff.apply(p.get2()));
 			}
 
 			@Override
 			public void forEach(final Consumer<? super A> consumer) {
-				keyValue.forEach(p -> consumer.accept(p.get2()));
+				keyValue.forEach((final P<?, A> p) -> consumer.accept(p.get2()));
 			}
 
 			@Override
@@ -166,12 +166,12 @@ class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			public void foreach(final Eff<K> eff) {
-				keyValue.forEach(p -> eff.apply(p.get1()));
+				keyValue.forEach((final P<K, ?> p) -> eff.apply(p.get1()));
 			}
 
 			@Override
 			public void forEach(final Consumer<? super K> consumer) {
-				keyValue.forEach(p -> consumer.accept(p.get1()));
+				keyValue.forEach((final P<K, ?> p) -> consumer.accept(p.get1()));
 			}
 
 			@Override

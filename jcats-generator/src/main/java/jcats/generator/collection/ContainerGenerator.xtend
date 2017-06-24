@@ -80,7 +80,7 @@ class ContainerGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT»
 					return indexWhere(value::equals);
 				«ELSE»
-					return indexWhere(a -> a == value);
+					return indexWhere((final «type.javaName» a) -> a == value);
 				«ENDIF»
 			}
 
@@ -113,7 +113,7 @@ class ContainerGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT»
 					return lastIndexWhere(value::equals);
 				«ELSE»
-					return lastIndexWhere(a -> a == value);
+					return lastIndexWhere((final «type.javaName» a) -> a == value);
 				«ENDIF»
 			}
 

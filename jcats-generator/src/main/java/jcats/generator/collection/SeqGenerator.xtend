@@ -105,7 +105,7 @@ class SeqGenerator implements ClassGenerator {
 			 */
 			public final «genericName» set(final int index, final «type.genericName» value) {
 				«IF type == Type.OBJECT»
-					return update(index, __ -> value);
+					return update(index, (final «type.genericName» __) -> value);
 				«ELSE»
 					return update(index, «type.typeName»«type.typeName»F.constant(value));
 				«ENDIF»
@@ -154,7 +154,7 @@ class SeqGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					return removeFirstWhere(value::equals);
 				«ELSE»
-					return removeFirstWhere(a -> a == value);
+					return removeFirstWhere((final «type.javaName» a) -> a == value);
 				«ENDIF»
 			}
 
@@ -171,7 +171,7 @@ class SeqGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					return removeLastWhere(value::equals);
 				«ELSE»
-					return removeLastWhere(a -> a == value);
+					return removeLastWhere((final «type.javaName» a) -> a == value);
 				«ENDIF»
 			}
 
@@ -1185,7 +1185,7 @@ class SeqGenerator implements ClassGenerator {
 						return emptySeq();
 					} else {
 						final Iterator<A> iterator = iterator();
-						return tabulate(size(), i -> p(iterator.next(), i));
+						return tabulate(size(), (final int i) -> p(iterator.next(), i));
 					}
 				}
 
