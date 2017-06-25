@@ -47,6 +47,16 @@ class KeyValueGenerator implements InterfaceGenerator {
 				return (value == null) ? requireNonNull(other.apply()) : value;
 			}
 
+			default <X extends Throwable> A getOrThrow(final K key, final F0<X> f) throws X {
+				requireNonNull(f);
+				final A value = getOrNull(key);
+				if (value == null) {
+					throw f.apply();
+				} else {
+					return value;
+				}
+			}
+
 			A getOrNull(final K key);
 
 			default boolean containsKey(final K key) {
