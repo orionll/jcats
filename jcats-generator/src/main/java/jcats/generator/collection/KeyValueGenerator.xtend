@@ -238,7 +238,7 @@ class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public A getOrDefault(final Object key, final A defaultValue) {
 				if (key == null) {
-					return null;
+					return defaultValue;
 				} else {
 					final A value = keyValue.getOrNull((K) key);
 					return (value == null) ? defaultValue : value;
