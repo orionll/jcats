@@ -60,7 +60,7 @@ final class OptionGenerator implements ClassGenerator {
 			import static java.util.Collections.emptyIterator;
 		«ENDIF»
 
-		public final class «genericName» implements Equatable<«genericName»>, Iterable<«type.genericBoxedName»>, Sized, Serializable {
+		public final class «genericName» implements «type.maybeGenericName», Equatable<«genericName»>, Serializable {
 			«IF type == Type.OBJECT»
 				private static final Option NONE = new Option(null);
 			«ELSE»
@@ -77,23 +77,22 @@ final class OptionGenerator implements ClassGenerator {
 				this.value = value;
 			}
 
-			@Override
-			public int size() {
-				«IF type == Type.OBJECT»
-					return (value == null) ? 0 : 1;
-				«ELSE»
-					return (this == NONE) ? 0 : 1;
-				«ENDIF»
-			}
-
-			public «type.genericName» get() {
-				if (isEmpty()) {
-					throw new NoSuchElementException();
-				} else {
-					return value;
+			«IF type != Type.OBJECT»
+				@Override
+				public boolean isEmpty() {
+					return (this == NONE);
 				}
-			}
 
+				@Override
+				public «type.genericName» get() {
+					if (isEmpty()) {
+						throw new NoSuchElementException();
+					} else {
+						return value;
+					}
+				}
+
+			«ENDIF»
 			public «genericName» set(final «type.genericName» value) {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
@@ -114,19 +113,12 @@ final class OptionGenerator implements ClassGenerator {
 			}
 
 			«IF type == Type.OBJECT»
+				@Override
 				public «type.genericName» getOrNull() {
-					return isEmpty() ? null : value;
+					return value;
 				}
 
 			«ENDIF»
-			public <X extends Throwable> «type.genericName» getOrThrow(final F0<X> f) throws X {
-				requireNonNull(f);
-				if (isEmpty()) {
-					throw f.apply();
-				} else {
-					return value;
-				}
-			}
 
 			public «genericName» or(final «genericName» other) {
 				requireNonNull(other);
@@ -225,20 +217,6 @@ final class OptionGenerator implements ClassGenerator {
 				}
 			}
 
-			«IF type == Type.OBJECT»
-				public Optional<A> toOptional() {
-					return Optional.ofNullable(value);
-				}
-			«ELSEIF type == Type.BOOLEAN»
-				public Optional<Boolean> toOptional() {
-					return isEmpty() ? Optional.empty() : Optional.of(value);
-				}
-			«ELSE»
-				public Optional«type.typeName» toOptional«type.typeName»() {
-					return isEmpty() ? Optional«type.typeName».empty() : Optional«type.typeName».of(value);
-				}
-			«ENDIF»
-
 			@Override
 			public int hashCode() {
 				«IF type == Type.OBJECT»
@@ -262,28 +240,6 @@ final class OptionGenerator implements ClassGenerator {
 				} else {
 					return false;
 				}
-			}
-
-			@Override
-			public «type.iteratorGenericName» iterator() {
-				«IF Type.javaUnboxedTypes.contains(type)»
-					return isEmpty() ? empty«type.typeName»Iterator() : new «type.typeName»SingletonIterator(value);
-				«ELSE»
-					return isEmpty() ? emptyIterator() : new SingletonIterator<>(value);
-				«ENDIF»
-			}
-
-			@Override
-			public «type.spliteratorGenericName» spliterator() {
-				if (isEmpty()) {
-					return Spliterators.«type.emptySpliteratorName»();
-				} else {
-					return Spliterators.spliterator(new «type.javaUnboxedName»[] { value }, Spliterator.NONNULL | Spliterator.IMMUTABLE);
-				}
-			}
-
-			public «type.streamGenericName» stream() {
-				return isEmpty() ? «type.streamName».empty() : «type.streamName».of(value);
 			}
 
 			@Override

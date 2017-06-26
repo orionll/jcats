@@ -87,6 +87,14 @@ public enum Type {
 		return genericName("F0");
 	}
 
+	public String maybeShortName() {
+		return shortName("Maybe");
+	}
+
+	public String maybeGenericName() {
+		return genericName("Maybe");
+	}
+
 	public String optionShortName() {
 		return shortName("Option");
 	}

@@ -92,6 +92,7 @@ class Main {
 			new String1Generator,
 			new jcats.generator.collection.CommonGenerator
 		],
+			MaybeGenerator.generators,
 			OptionGenerator.generators,
 			FGenerator.generators,
 			F0Generator.generators,

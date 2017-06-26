@@ -15,7 +15,7 @@ final class EitherGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.F».id;
 
-		public final class Either<X, A> implements Equatable<Either<X, A>>, Serializable {
+		public final class Either<X, A> implements Maybe<A>, Equatable<Either<X, A>>, Serializable {
 			private final X left;
 			private final A right;
 
@@ -32,19 +32,28 @@ final class EitherGenerator implements ClassGenerator {
 				return (right != null);
 			}
 
-			public A get() {
-				if (isRight()) {
-					return right;
-				} else {
-					throw new NoSuchElementException();
-				}
-			}
-
 			public X getLeft() {
 				if (isLeft()) {
 					return left;
 				} else {
 					throw new NoSuchElementException();
+				}
+			}
+
+			@Override
+			public A getOrNull() {
+				if (isRight()) {
+					return right;
+				} else {
+					return null;
+				}
+			}
+
+			public X getLeftOrNull() {
+				if (isLeft()) {
+					return left;
+				} else {
+					return null;
 				}
 			}
 
