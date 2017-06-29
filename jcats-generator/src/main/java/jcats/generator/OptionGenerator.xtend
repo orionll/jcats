@@ -22,21 +22,16 @@ final class OptionGenerator implements ClassGenerator {
 		package «Constants.JCATS»;
 
 		import java.io.Serializable;
-		«IF Type.javaUnboxedTypes.contains(type)»
-			import java.util.PrimitiveIterator;
+		«IF type == Type.OBJECT»
+			import java.util.Objects;
 		«ELSE»
-			import java.util.Iterator;
+			import java.util.NoSuchElementException;
 		«ENDIF»
-		import java.util.NoSuchElementException;
-		import java.util.Objects;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.Optional«type.typeName»;
 		«ELSE»
 			import java.util.Optional;
 		«ENDIF»
-		import java.util.Spliterator;
-		import java.util.Spliterators;
-		import java.util.stream.«type.streamName»;
 
 		import «Constants.FUNCTION».*;
 
@@ -54,11 +49,6 @@ final class OptionGenerator implements ClassGenerator {
 				import static «Constants.JCATS».«returnType.optionShortName».*;
 			«ENDIF»
 		«ENDFOR»
-		«IF Type.javaUnboxedTypes.contains(type)»
-			import static «Constants.JCATS».Empty«type.typeName»Iterator.empty«type.typeName»Iterator;
-		«ELSE»
-			import static java.util.Collections.emptyIterator;
-		«ENDIF»
 
 		public final class «genericName» implements «type.maybeGenericName», Equatable<«genericName»>, Serializable {
 			«IF type == Type.OBJECT»
