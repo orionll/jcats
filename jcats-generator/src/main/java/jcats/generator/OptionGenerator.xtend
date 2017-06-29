@@ -165,6 +165,23 @@ final class OptionGenerator implements ClassGenerator {
 				}
 			}
 
+			«IF type == Type.OBJECT»
+				public <B> Option<B> mapToNullable(final F<A, B> f) {
+			«ELSE»
+				public <A> Option<A> mapToNullable(final «type.typeName»ObjectF<A> f) {
+			«ENDIF»
+				requireNonNull(f);
+				if (isEmpty()) {
+					return none();
+				«IF type == Type.OBJECT»
+					} else if (f == id()) {
+						return (Option) this;
+				«ENDIF»
+				} else {
+					return fromNullable(f.apply(value));
+				}
+			}
+
 			«FOR returnType : Type.primitives»
 				«IF type == Type.OBJECT»
 					public «returnType.typeName»Option mapTo«returnType.typeName»(final «returnType.typeName»F<A> f) {
