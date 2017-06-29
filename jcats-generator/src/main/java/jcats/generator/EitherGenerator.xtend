@@ -32,7 +32,7 @@ final class EitherGenerator implements ClassGenerator {
 				return (right != null);
 			}
 
-			public X getLeft() {
+			public X getLeft() throws NoSuchElementException {
 				if (isLeft()) {
 					return left;
 				} else {
@@ -115,7 +115,7 @@ final class EitherGenerator implements ClassGenerator {
 				}
 			}
 
-			public Either<A, X> flip() {
+			public Either<A, X> reverse() {
 				return new Either<>(right, left);
 			}
 
@@ -129,7 +129,7 @@ final class EitherGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public boolean equals(Object obj) {
+			public boolean equals(final Object obj) {
 				if (obj == this) {
 					return true;
 				} else if (obj instanceof Either<?, ?>) {
