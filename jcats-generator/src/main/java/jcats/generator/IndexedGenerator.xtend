@@ -19,7 +19,7 @@ final class IndexedGenerator implements InterfaceGenerator {
 		package «Constants.JCATS»;
 
 		public interface «type.indexedGenericName» {
-			«type.genericName» get(final int index);
+			«type.genericName» get(final int index) throws IndexOutOfBoundsException;
 		}
 	''' }
 }
