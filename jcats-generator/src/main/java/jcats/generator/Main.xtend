@@ -75,7 +75,6 @@ class Main {
 
 	private def static List<Generator> allGenerators() {
 		#[#[
-			new EitherGenerator,
 			new FsGenerator,
 			new Eff0Generator,
 			new EquatableGenerator,
@@ -94,6 +93,7 @@ class Main {
 		],
 			MaybeGenerator.generators,
 			OptionGenerator.generators,
+			EitherGenerator.generators,
 			FGenerator.generators,
 			F0Generator.generators,
 			EffGenerator.generators,
