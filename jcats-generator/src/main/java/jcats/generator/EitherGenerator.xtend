@@ -180,6 +180,24 @@ final class EitherGenerator implements ClassGenerator {
 			}
 
 			«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
+				public <B> B match(final F<X, B> ifLeft, final F<A, B> ifRight) {
+			«ELSEIF leftType != Type.OBJECT && rightType == Type.OBJECT»
+				public <B> B match(final «leftType.typeName»ObjectF<B> ifLeft, final F<A, B> ifRight) {
+			«ELSEIF leftType == Type.OBJECT && rightType != Type.OBJECT»
+				public <A> A match(final F<X, A> ifLeft, final «rightType.typeName»ObjectF<A> ifRight) {
+			«ELSE»
+				public <A> A match(final «leftType.typeName»ObjectF<A> ifLeft, final «rightType.typeName»ObjectF<A> ifRight) {
+			«ENDIF»
+				requireNonNull(ifLeft);
+				requireNonNull(ifRight);
+				if (isLeft()) {
+					return ifLeft.apply(left);
+				} else {
+					return ifRight.apply(right);
+				}
+			}
+
+			«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
 				public <B> Either<X, B> map(final F<A, B> f) {
 					requireNonNull(f);
 					if (isRight()) {
@@ -403,6 +421,16 @@ final class EitherGenerator implements ClassGenerator {
 				return isRight() ? «rightType.someName»(right) : «rightType.noneName»();
 			}
 
+			«IF leftType != Type.OBJECT || rightType != Type.OBJECT»
+				public Either<«leftTypeGenericBoxedName», «rightType.genericBoxedName»> toEither() {
+					if (isLeft()) {
+						return Either.left(left);
+					} else {
+						return Either.right(right);
+					}
+				}
+
+			«ENDIF»
 			@Override
 			public int hashCode() {
 				return isRight() ? «IF rightType == Type.OBJECT»right.hashCode()«ELSE»«rightType.boxedName».hashCode(right)«ENDIF» : ~«IF leftType == Type.OBJECT»left.hashCode()«ELSE»«leftType.boxedName».hashCode(left)«ENDIF»;
@@ -453,6 +481,11 @@ final class EitherGenerator implements ClassGenerator {
 				«ELSE»
 					return new «diamondName»(«leftType.defaultValue», right, false);
 				«ENDIF»
+			}
+
+			«javadocSynonym("right")»
+			public static «paramGenericName» of(final «rightType.genericName» right) {
+				return right(right);
 			}
 			«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
 
