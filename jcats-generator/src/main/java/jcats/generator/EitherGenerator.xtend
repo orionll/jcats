@@ -70,18 +70,33 @@ final class EitherGenerator implements ClassGenerator {
 		if (leftType == Type.OBJECT) "X" else leftType.genericBoxedName	
 	}
 
+	def leftName() {
+		if (leftType == Type.OBJECT && rightType == Type.OBJECT) "left" else leftType.typeName.firstToLowerCase + rightType.typeName + "Left";
+	}
+
+	def rightName() {
+		if (leftType == Type.OBJECT && rightType == Type.OBJECT) "right" else leftType.typeName.firstToLowerCase + rightType.typeName + "Right";
+	}
+
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
 		import java.io.Serializable;
 		import java.util.NoSuchElementException;
-		import java.util.Objects;
+		«IF leftType == Type.OBJECT || rightType == Type.OBJECT»
+			import java.util.Objects;
+		«ENDIF»
 
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
-		import static «Constants.F».id;
+		«IF rightType == Type.OBJECT»
+			import static «Constants.F».id;
+		«ENDIF»
 		import static «Constants.JCATS».«rightType.optionShortName».*;
+		«IF leftType != Type.OBJECT || rightType != Type.OBJECT»
+			import static «Constants.EITHER».*;
+		«ENDIF»
 
 		public final class «genericName» implements «rightType.maybeGenericName», Equatable<«genericName»>, Serializable {
 			private final «leftTypeGenericName» left;
@@ -424,9 +439,9 @@ final class EitherGenerator implements ClassGenerator {
 			«IF leftType != Type.OBJECT || rightType != Type.OBJECT»
 				public Either<«leftTypeGenericBoxedName», «rightType.genericBoxedName»> toEither() {
 					if (isLeft()) {
-						return Either.left(left);
+						return left(left);
 					} else {
-						return Either.right(right);
+						return right(right);
 					}
 				}
 
@@ -461,7 +476,7 @@ final class EitherGenerator implements ClassGenerator {
 				return isLeft() ? "«shortName.replace("Either", "")»Left(" + left + ")" : "«shortName.replace("Either", "")»Right(" + right + ")";
 			}
 
-			public static «paramGenericName» left(final «leftTypeGenericName» left) {
+			public static «paramGenericName» «leftName»(final «leftTypeGenericName» left) {
 				«IF leftType == Type.OBJECT»
 					requireNonNull(left);
 				«ENDIF»
@@ -472,7 +487,7 @@ final class EitherGenerator implements ClassGenerator {
 				«ENDIF»
 			}
 
-			public static «paramGenericName» right(final «rightType.genericName» right) {
+			public static «paramGenericName» «rightName»(final «rightType.genericName» right) {
 				«IF rightType == Type.OBJECT»
 					requireNonNull(right);
 				«ENDIF»
@@ -483,9 +498,9 @@ final class EitherGenerator implements ClassGenerator {
 				«ENDIF»
 			}
 
-			«javadocSynonym("right")»
+			«javadocSynonym("«rightName»")»
 			public static «paramGenericName» of(final «rightType.genericName» right) {
-				return right(right);
+				return «rightName»(right);
 			}
 			«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
 
