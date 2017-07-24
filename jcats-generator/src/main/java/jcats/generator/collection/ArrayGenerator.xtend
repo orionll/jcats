@@ -489,6 +489,18 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			@Override
+			«IF type == Type.OBJECT»
+				public void foreachWithIndex(final ObjectIntEff2<A> eff) {
+			«ELSE»
+				public void foreachWithIndex(final «type.typeName»IntEff2 eff) {
+			«ENDIF»
+				requireNonNull(eff);
+				for (int i = 0; i < array.length; i++) {
+					eff.apply(«type.genericCast»array[i], i);
+				}
+			}
+
+			@Override
 			public void foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
 				for (final «type.javaName» value : array) {

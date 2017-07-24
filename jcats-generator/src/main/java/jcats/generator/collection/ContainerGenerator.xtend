@@ -277,6 +277,30 @@ class ContainerGenerator implements InterfaceGenerator {
 				«ENDIF»
 			}
 
+			«IF type == Type.OBJECT»
+				default void foreachWithIndex(final ObjectIntEff2<A> eff) {
+			«ELSE»
+				default void foreachWithIndex(final «type.typeName»IntEff2 eff) {
+			«ENDIF»
+				requireNonNull(eff);
+				int i = 0;
+				«IF Type.javaUnboxedTypes.contains(type)»
+					final «type.iteratorGenericName» iterator = iterator();
+					while (iterator.hasNext()) {
+						if (i < 0) {
+							throw new IndexOutOfBoundsException("Integer overflow");
+						}
+						eff.apply(iterator.«type.iteratorNext»(), i++);
+				«ELSE»
+					for (final «type.genericName» value : this) {
+						if (i < 0) {
+							throw new IndexOutOfBoundsException("Integer overflow");
+						}
+						eff.apply(value, i++);
+				«ENDIF»
+				}
+			}
+
 			default void foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
 				«IF Type.javaUnboxedTypes.contains(type)»

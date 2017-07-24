@@ -225,6 +225,17 @@ final class VNGenerators {
 					}
 
 					@Override
+					«IF type == Type.OBJECT»
+						public void foreachWithIndex(final ObjectIntEff2<A> eff) {
+					«ELSE»
+						public void foreachWithIndex(final «type.typeName»IntEff2 eff) {
+					«ENDIF»
+						«FOR index : 1 .. arity»
+							eff.apply(a«index», «index-1»);
+						«ENDFOR»
+					}
+
+					@Override
 					public void foreachUntil(final «type.boolFName» eff) {
 						«FOR index : 1 .. arity-1»
 							if (!eff.apply(a«index»)) {
