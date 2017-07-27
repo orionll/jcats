@@ -48,6 +48,20 @@ class ContainerGenerator implements InterfaceGenerator {
 
 		public interface «genericName» extends Iterable<«type.genericBoxedName»>, Sized {
 
+			@Override
+			default int size() {
+				final «type.iteratorGenericName» iterator = iterator();
+				int size = 0;
+				while (iterator.hasNext()) {
+					iterator.«type.iteratorNext»();
+					size++;
+					if (size < 0) {
+						throw new IndexOutOfBoundsException("Integer overflow");
+					}
+				}
+				return size;
+			}
+
 			default boolean contains(final «type.genericName» value) {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
