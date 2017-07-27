@@ -278,9 +278,9 @@ class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			«IF type == Type.OBJECT»
-				default void foreachWithIndex(final ObjectIntEff2<A> eff) {
+				default void foreachWithIndex(final IntObjectEff2<A> eff) {
 			«ELSE»
-				default void foreachWithIndex(final «type.typeName»IntEff2 eff) {
+				default void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
 			«ENDIF»
 				requireNonNull(eff);
 				int i = 0;
@@ -290,13 +290,13 @@ class ContainerGenerator implements InterfaceGenerator {
 						if (i < 0) {
 							throw new IndexOutOfBoundsException("Integer overflow");
 						}
-						eff.apply(iterator.«type.iteratorNext»(), i++);
+						eff.apply(i++, iterator.«type.iteratorNext»());
 				«ELSE»
 					for (final «type.genericName» value : this) {
 						if (i < 0) {
 							throw new IndexOutOfBoundsException("Integer overflow");
 						}
-						eff.apply(value, i++);
+						eff.apply(i++, value);
 				«ENDIF»
 				}
 			}
