@@ -37,25 +37,26 @@ class SeqGenerator implements ClassGenerator {
 
 		import java.io.Serializable;
 		import java.util.Collection;
+		import java.util.Iterator;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.PrimitiveIterator;
-		«ELSE»
-			import java.util.Iterator;
+
 		«ENDIF»
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
 
-		«IF type == Type.OBJECT»
-			import static java.lang.Math.min;
-		«ENDIF»
+		import static java.lang.Math.min;
 		import static java.util.Objects.requireNonNull;
 		«IF type != Type.OBJECT»
 			import static jcats.collection.Seq.*;
 		«ENDIF»
 		«IF type == Type.OBJECT»
-			import static «Constants.F».id;
-			import static «Constants.P».p;
+			import static «Constants.F».*;
+			import static «Constants.P».*;
+			import static «Constants.JCATS».IntObjectP.*;
+		«ELSE»
+			import static «Constants.JCATS».Int«type.typeName»P.*;
 		«ENDIF»
 		import static «Constants.COMMON».*;
 
@@ -1173,51 +1174,58 @@ class SeqGenerator implements ClassGenerator {
 			«toStr(type, true)»
 
 			«IF type == Type.OBJECT»
-				«zip(true, true)»
+				public <B> Seq<P<A, B>> zip(final Container<B> that) {
+					return zipWith(that, P::p);
+				}
 
-				«zipWith(true, true)»
+				public <B, C> Seq<C> zipWith(final Container<B> that, final F2<A, B, C> f) {
+					requireNonNull(f);
+					if (isEmpty() || that.isEmpty()) {
+						return emptySeq();
+					} else {
+						final int size = min(size(), that.size());
+						final Iterator<A> iterator1 = iterator();
+						final Iterator<B> iterator2 = that.iterator();
+						return fill(size, () -> f.apply(iterator1.next(), iterator2.next()));
+					}
+				}
 
-				/**
-				 * O(size)
-				 */
-				public final Seq<P<A, Integer>> zipWithIndex() {
+				public final Seq<IntObjectP<A>> zipWithIndex() {
 					if (isEmpty()) {
 						return emptySeq();
 					} else {
 						final Iterator<A> iterator = iterator();
-						return tabulate(size(), (final int i) -> p(iterator.next(), i));
+						return tabulate(size(), (final int i) -> intObjectP(i, iterator.next()));
+					}
+				}
+			«ELSE»
+				public <A> Seq<«type.typeName»ObjectP<A>> zip(final Container<A> that) {
+					return zipWith(that, «type.typeName»ObjectP::«type.typeName.firstToLowerCase»ObjectP);
+				}
+
+				public <A, B> Seq<B> zipWith(final Container<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
+					requireNonNull(f);
+					if (isEmpty() || that.isEmpty()) {
+						return emptySeq();
+					} else {
+						final int size = min(size(), that.size());
+						final «type.iteratorGenericName» iterator1 = iterator();
+						final Iterator<A> iterator2 = that.iterator();
+						return Seq.fill(size, () -> f.apply(iterator1.next(), iterator2.next()));
 					}
 				}
 
-				«zipN»
-				«zipWithN[arity | '''
-					requireNonNull(f);
-					if («(1 .. arity).map["seq" + it + ".isEmpty()"].join(" || ")») {
+				public final Seq<Int«type.typeName»P> zipWithIndex() {
+					if (isEmpty()) {
 						return emptySeq();
 					} else {
-						final int size = «(1 ..< arity).map['''min(seq«it».size()'''].join(", ")», seq«arity».size()«(1 ..< arity).map[")"].join»;
-						«FOR i : 1 .. arity»
-							final Iterator<A«i»> iterator«i» = seq«i».iterator();
-						«ENDFOR»
-						return fill(size, () -> requireNonNull(f.apply(«(1 .. arity).map['''iterator«it».next()'''].join(", ")»)));
+						final «type.iteratorGenericName» iterator = iterator();
+						return Seq.tabulate(size(), (final int i) -> int«type.typeName»P(i, iterator.next()));
 					}
-				''']»
-				«productN»
-				«productWithN[arity | '''
-					requireNonNull(f);
-					if («(1 .. arity).map["seq" + it + ".isEmpty()"].join(" || ")») {
-						return emptySeq();
-					} else {
-						final long size1 = seq1.size();
-						«FOR i : 2 .. arity»
-							final long size«i» = size«i-1» * seq«i».size();
-							if (size«i» != (int) size«i») {
-								throw new IndexOutOfBoundsException("Size overflow");
-							}
-						«ENDFOR»
-						return sizedToSeq(new Product«arity»Iterator<>(«(1 .. arity).map['''seq«it»'''].join(", ")», f), (int) size«arity»);
-					}
-				''']»
+				}
+			«ENDIF»
+
+			«IF type == Type.OBJECT»
 				static int index1(final int index) {
 					return (index & 0x1F);
 				}

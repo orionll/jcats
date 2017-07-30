@@ -35,10 +35,8 @@ final class F0Generator implements InterfaceGenerator {
 		«ELSE»
 			import java.util.function.«type.typeName»Supplier;
 		«ENDIF»
-		import «Constants.P»;
-		«FOR arity : 3 .. Constants.MAX_ARITY»
-			import «Constants.P»«arity»;
-		«ENDFOR»
+
+		import «Constants.JCATS».*;
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.F».id;
@@ -189,24 +187,42 @@ final class F0Generator implements InterfaceGenerator {
 					requireNonNull(s);
 					return () -> requireNonNull(s.get());
 				}
-
 			«ELSE»
 				static «shortName» from«type.typeName»Supplier(final «type.typeName»Supplier s) {
 					requireNonNull(s);
 					return s::getAs«type.typeName»;
 				}
 			«ENDIF»
+
 			«IF type == Type.OBJECT»
-				«productN»
-				«productWithN[arity | '''
+				default <B> F0<P<A, B>> zip(final F0<B> that) {
+					return zipWith(that, P::p);
+				}
+
+				default <B, C> F0<C> zipWith(final F0<B> that, final F2<A, B, C> f) {
 					requireNonNull(f);
 					return () -> {
-						«FOR i : 1 .. arity»
-							final A«i» a«i» = requireNonNull(f«i».apply());
-						«ENDFOR»
-						return requireNonNull(f.apply(«(1 .. arity).map["a" + it].join(", ")»));
+						final A a = requireNonNull(apply());
+						final B b = requireNonNull(that.apply());
+						return requireNonNull(f.apply(a, b));
 					};
-				''']»
+				}
+			«ELSE»
+				default <A> F0<«type.typeName»ObjectP<A>> zip(final F0<A> that) {
+					return zipWith(that, «type.typeName»ObjectP::«type.typeName.firstToLowerCase»ObjectP);
+				}
+
+				default <A, B> F0<B> zipWith(final F0<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
+					requireNonNull(f);
+					return () -> {
+						final «type.javaName» value = apply();
+						final A a = requireNonNull(that.apply());
+						return requireNonNull(f.apply(value, a));
+					};
+				}
+			«ENDIF»
+			«IF type == Type.OBJECT»
+
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
 		}

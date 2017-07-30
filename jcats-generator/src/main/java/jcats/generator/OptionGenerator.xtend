@@ -61,7 +61,7 @@ final class OptionGenerator implements ClassGenerator {
 				private static final «shortName» TRUE = new «shortName»(true);
 			«ENDIF»
 
-			private final «type.genericName» value;
+			final «type.genericName» value;
 
 			private «shortName»(final «type.genericName» value) {
 				this.value = value;
@@ -293,17 +293,36 @@ final class OptionGenerator implements ClassGenerator {
 					return optional.isPresent() ? «type.someName»(optional.getAs«type.typeName»()) : «type.noneName»();
 				}
 			«ENDIF»
-			«IF type == Type.OBJECT»
 
-				«productN»
-				«productWithN[arity | '''
+			«IF type == Type.OBJECT»
+				public <B> Option<P<A, B>> zip(final Option<B> that) {
+					return zipWith(that, P::p);
+				}
+
+				public <B, C> Option<C> zipWith(final Option<B> that, final F2<A, B, C> f) {
 					requireNonNull(f);
-					if («(1 .. arity).map["option" + it + ".isEmpty()"].join(" || ")») {
+					if (isEmpty() || that.isEmpty()) {
 						return none();
 					} else {
-						return some(f.apply(«(1 .. arity).map['''option«it».value'''].join(", ")»));
+						return some(requireNonNull(f.apply(value, that.value)));
 					}
-				''']»
+				}
+			«ELSE»
+				public <A> Option<«type.typeName»ObjectP<A>> zip(final Option<A> that) {
+					return zipWith(that, «type.typeName»ObjectP::«type.typeName.firstToLowerCase»ObjectP);
+				}
+
+				public <A, B> Option<B> zipWith(final Option<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
+					requireNonNull(f);
+					if (isEmpty() || that.isEmpty()) {
+						return none();
+					} else {
+						return some(requireNonNull(f.apply(value, that.value)));
+					}
+				}
+			«ENDIF»
+			«IF type == Type.OBJECT»
+
 				«join»
 
 				«cast(#["A"], #[], #["A"])»

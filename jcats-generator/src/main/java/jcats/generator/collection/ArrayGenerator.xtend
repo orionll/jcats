@@ -29,11 +29,10 @@ final class ArrayGenerator implements ClassGenerator {
 
 		import java.io.Serializable;
 		import java.util.Arrays;
+		import java.util.Iterator;
 		import java.util.Collection;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.PrimitiveIterator;
-		«ELSE»
-			import java.util.Iterator;
 		«ENDIF»
 		import java.util.Spliterator;
 		import java.util.Spliterators;
@@ -49,7 +48,7 @@ final class ArrayGenerator implements ClassGenerator {
 			import static «Constants.COLLECTION».«toType.typeName»Array.empty«toType.typeName»Array;
 		«ENDFOR»
 		import static «Constants.F».id;
-		import static «Constants.P».p;
+		import static «Constants.JCATS».Int«type.typeName»P.*;
 		import static «Constants.COMMON».*;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import static «Constants.JCATS».«type.typeName»Option.*;
@@ -490,13 +489,13 @@ final class ArrayGenerator implements ClassGenerator {
 
 			@Override
 			«IF type == Type.OBJECT»
-				public void foreachWithIndex(final ObjectIntEff2<A> eff) {
+				public void foreachWithIndex(final IntObjectEff2<A> eff) {
 			«ELSE»
-				public void foreachWithIndex(final «type.typeName»IntEff2 eff) {
+				public void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
 			«ENDIF»
 				requireNonNull(eff);
 				for (int i = 0; i < array.length; i++) {
-					eff.apply(«type.genericCast»array[i], i);
+					eff.apply(i, «type.genericCast»array[i]);
 				}
 			}
 
@@ -721,69 +720,69 @@ final class ArrayGenerator implements ClassGenerator {
 			«toStr(type, false)»
 
 			«IF type == Type.OBJECT»
-			«zip»
-
-			«zipWith»
-
-			/**
-			 * O(size)
-			 */
-			public Array<P<A, Integer>> zipWithIndex() {
-				if (isEmpty()) {
-					return emptyArray();
-				} else {
-					final Object[] result = new Object[array.length];
-					for (int i = 0; i < array.length; i++) {
-						result[i] = p(array[i], i);
-					}
-					return new Array<>(result);
+				public <B> Array<P<A, B>> zip(final Container<B> that) {
+					return zipWith(that, P::p);
 				}
-			}
 
-			«zipN»
-			«zipWithN[arity | '''
-				requireNonNull(f);
-				if («(1 .. arity).map["array" + it + ".isEmpty()"].join(" || ")») {
-					return emptyArray();
-				} else {
-					final int length = «(1 ..< arity).map['''min(array«it».array.length'''].join(", ")», array«arity».array.length«(1 ..< arity).map[")"].join»;
-					final Object[] array = new Object[length];
-					for (int i = 0; i < length; i++) {
-						array[i] = requireNonNull(f.apply(«(1 .. arity).map['''array«it».get(i)'''].join(", ")»));
-					}
-					return new Array<>(array);
-				}
-			''']»
-			«productN»
-			«productWithN[arity | '''
-				requireNonNull(f);
-				if («(1 .. arity).map["array" + it + ".isEmpty()"].join(" || ")») {
-					return emptyArray();
-				} else {
-					«FOR i : 1 .. arity»
-						final Object[] arr«i» = array«i».array;
-					«ENDFOR»
-					final long size1 = arr1.length;
-					«FOR i : 2 .. arity»
-						final long size«i» = size«i-1» * arr«i».length;
-						if (size«i» != (int) size«i») {
-							throw new IndexOutOfBoundsException("Size overflow");
+				public <B, C> Array<C> zipWith(final Container<B> that, final F2<A, B, C> f) {
+					requireNonNull(f);
+					if (isEmpty() || that.isEmpty()) {
+						return emptyArray();
+					} else {
+						final Object[] result = new Object[min(array.length, that.size())];
+						final Iterator<B> iterator = that.iterator();
+						for (int i = 0; i < result.length; i++) {
+							result[i] = requireNonNull(f.apply((A) array[i], iterator.next()));
 						}
-					«ENDFOR»
-					final Object[] array = new Object[(int) size«arity»];
-					int i = 0;
-					«FOR i : 1 .. arity»
-						«(1 ..< i).map["\t"].join»for (final Object a«i» : arr«i») {
-					«ENDFOR»
-						«(1 ..< arity).map["\t"].join»array[i++] = requireNonNull(f.apply(«(1 .. arity).map['''(A«it») a«it»'''].join(", ")»));
-					«FOR i : 1 .. arity»
-						«(1 ..< arity - i + 1).map["\t"].join»}
-					«ENDFOR»
-					return new Array<>(array);
+						return new Array<>(result);
+					}
 				}
-			''']»
 
-			«cast(#["A"], #[], #["A"])»
+				public Array<IntObjectP<A>> zipWithIndex() {
+					if (isEmpty()) {
+						return emptyArray();
+					} else {
+						final Object[] result = new Object[array.length];
+						for (int i = 0; i < array.length; i++) {
+							result[i] = intObjectP(i, array[i]);
+						}
+						return new Array<>(result);
+					}
+				}
+			«ELSE»
+				public <A> Array<«type.typeName»ObjectP<A>> zip(final Container<A> that) {
+					return zipWith(that, «type.typeName»ObjectP::«type.typeName.firstToLowerCase»ObjectP);
+				}
+
+				public <A, B> Array<B> zipWith(final Container<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
+					requireNonNull(f);
+					if (isEmpty() || that.isEmpty()) {
+						return emptyArray();
+					} else {
+						final Object[] result = new Object[min(array.length, that.size())];
+						final Iterator<A> iterator = that.iterator();
+						for (int i = 0; i < result.length; i++) {
+							result[i] = requireNonNull(f.apply(array[i], iterator.next()));
+						}
+						return new Array<>(result);
+					}
+				}
+
+				public Array<Int«type.typeName»P> zipWithIndex() {
+					if (isEmpty()) {
+						return emptyArray();
+					} else {
+						final Object[] result = new Object[array.length];
+						for (int i = 0; i < array.length; i++) {
+							result[i] = int«type.typeName»P(i, array[i]);
+						}
+						return new Array<>(result);
+					}
+				}
+			«ENDIF»
+
+			«IF type == Type.OBJECT»
+				«cast(#["A"], #[], #["A"])»
 
 			«ENDIF»
 			public static «IF type == Type.OBJECT»<A> «ENDIF»«arrayBuilderName» builder() {

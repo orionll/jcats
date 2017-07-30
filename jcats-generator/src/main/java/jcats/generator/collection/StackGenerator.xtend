@@ -289,68 +289,6 @@ final class StackGenerator implements ClassGenerator {
 
 			«toStr»
 
-			«zip»
-
-			«zipWith»
-
-			/**
-			 * O(size)
-			 */
-			public Stack<P<A, Integer>> zipWithIndex() {
-				if (isEmpty()) {
-					return nil();
-				} else {
-					final StackBuilder<P<A, Integer>> builder = new StackBuilder<>();
-					Stack<A> stack = this;
-					int index = 0;
-					while (stack.isNotEmpty()) {
-						builder.append(p(stack.head(), index));
-						stack = stack.tail;
-						if (index == Integer.MAX_VALUE && !stack.isEmpty()) {
-							throw new IndexOutOfBoundsException("Index overflow");
-						}
-						index++;
-					}
-					return builder.build();
-				}
-			}
-
-			«zipN»
-			«zipWithN[arity | '''
-				requireNonNull(f);
-				if («(1 .. arity).map["stack" + it + ".isEmpty()"].join(" || ")») {
-					return nil();
-				} else {
-					«FOR i : 1 .. arity»
-						Stack<A«i»> i«i» = stack«i»;
-					«ENDFOR»
-					final StackBuilder<B> builder = new StackBuilder<>();
-					while («(1 .. arity).map["!i" + it + ".isEmpty()"].join(" && ")») {
-						builder.append(f.apply(«(1 .. arity).map["i" + it + ".head"].join(", ")»));
-						«FOR i : 1 .. arity»
-							i«i» = i«i».tail;
-						«ENDFOR»
-					}
-					return builder.build();
-				}
-			''']»
-			«productN»
-			«productWithN[arity | '''
-				requireNonNull(f);
-				if («(1 .. arity).map["stack" + it + ".isEmpty()"].join(" || ")») {
-					return nil();
-				} else {
-					final StackBuilder<B> builder = new StackBuilder<>();
-					«FOR i : 1 .. arity»
-						«(1 ..< i).map["\t"].join»for (final A«i» a«i» : stack«i») {
-					«ENDFOR»
-						«(1 ..< arity).map["\t"].join»builder.append(requireNonNull(f.apply(«(1 .. arity).map["a" + it].join(", ")»)));
-					«FOR i : 1 .. arity»
-						«(1 ..< arity - i + 1).map["\t"].join»}
-					«ENDFOR»
-					return builder.build();
-				}
-			''']»
 			«cast(#["A"], #[], #["A"])»
 
 			public static <A> StackBuilder<A> builder() {

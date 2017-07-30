@@ -43,8 +43,11 @@ final class VNGenerators {
 				«IF type == Type.OBJECT»
 					import static «Constants.P».p;
 				«ELSE»
-					import static «Constants.JCATS».«type.typeName»«type.typeName»P.«type.typeName.toLowerCase»«type.typeName»P;
 					import static «Constants.COLLECTION».V«arity».v«arity»;
+				«ENDIF»
+				import static «Constants.JCATS».Int«type.typeName»P.*;
+				«IF type != Type.OBJECT && type != Type.INT»
+					import static «Constants.JCATS».«type.typeName»«type.typeName»P.*;
 				«ENDIF»
 				«IF arity > 2»
 					import static «Constants.P»«arity».p«arity»;
@@ -52,9 +55,9 @@ final class VNGenerators {
 				import static «Constants.COMMON».*;
 
 				public final class «genericName» implements «type.indexedContainerGenericName», Serializable {
-					private final «type.genericName» «(1 .. arity).map["a" + it].join(", ")»;
+					final «type.genericName» «(1 .. arity).map["a" + it].join(", ")»;
 
-					private «shortName»(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {
+					«shortName»(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {
 						«FOR i : 1 .. arity»
 							this.a«i» = a«i»;
 						«ENDFOR»
@@ -226,12 +229,12 @@ final class VNGenerators {
 
 					@Override
 					«IF type == Type.OBJECT»
-						public void foreachWithIndex(final ObjectIntEff2<A> eff) {
+						public void foreachWithIndex(final IntObjectEff2<A> eff) {
 					«ELSE»
-						public void foreachWithIndex(final «type.typeName»IntEff2 eff) {
+						public void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
 					«ENDIF»
 						«FOR index : 1 .. arity»
-							eff.apply(a«index», «index-1»);
+							eff.apply(«index-1», a«index»);
 						«ENDFOR»
 					}
 
@@ -287,15 +290,33 @@ final class VNGenerators {
 					}
 
 					«IF type == Type.OBJECT»
-						«zip(false, false)»
-
-						«zipWith(false, false)»
-
-						public V«arity»<P<A, Integer>> zipWithIndex() {
-							return new V«arity»<>(«(1 .. arity).map["p(a" + it + ", " + (it-1) + ")"].join(", ")»);
+						public <B> V«arity»<P<A, B>> zip(final V«arity»<B> that) {
+							return zipWith(that, P::p);
 						}
 
+						public <B, C> V«arity»<C> zipWith(final V«arity»<B> that, final F2<A, B, C> f) {
+							requireNonNull(f);
+							return new V«arity»<>(«(1 .. arity).map['''f.apply(a«it», that.a«it»)'''].join(", ")»);
+						}
+
+						public V«arity»<IntObjectP<A>> zipWithIndex() {
+							return new V«arity»<>(«(1 .. arity).map['''intObjectP(«it-1», a«it»)'''].join(", ")»);
+						}
+					«ELSE»
+						public <A> V«arity»<«type.typeName»ObjectP<A>> zip(final V«arity»<A> that) {
+							return zipWith(that, «type.typeName»ObjectP::«type.typeName.firstToLowerCase»ObjectP);
+						}
+
+						public <A, B> V«arity»<B> zipWith(final V«arity»<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
+							requireNonNull(f);
+							return new V«arity»<>(«(1 .. arity).map['''f.apply(a«it», that.a«it»)'''].join(", ")»);
+						}
+
+						public final V«arity»<Int«type.typeName»P> zipWithIndex() {
+							return new V«arity»<>(«(1 .. arity).map['''int«type.typeName»P(«it-1», a«it»)'''].join(", ")»);
+						}
 					«ENDIF»
+
 					@Override
 					public String toString() {
 						return "«shortName»(" + «(1 .. arity).map["a" + it].join(''' + ", " + ''')» + ")";
@@ -330,13 +351,6 @@ final class VNGenerators {
 					«ENDIF»
 					«IF type == Type.OBJECT»
 
-						«zipN(false)»
-						«zipWithN(false)[i | '''
-							«FOR j : 1 .. arity»
-								final B b«j» = requireNonNull(f.apply(«(1 .. i).map['''v«it».a«j»'''].join(", ")»));
-							«ENDFOR»
-							return new V«arity»<>(«(1 .. arity).map["b" + it].join(", ")»);
-						''']»
 						«cast(#["A"], #[], #["A"])»
 					«ENDIF»
 				}
