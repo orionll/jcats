@@ -99,7 +99,15 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				size += values.length;
 				return this;
 			}
+			«IF type == Type.OBJECT»
+				ArrayBuilder<A> appendArrayBuilder(final ArrayBuilder<A> builder) {
+					ensureCapacityInternal(size + builder.size);
+					System.arraycopy(builder.array, 0, array, size, builder.size);
+					size += builder.size;
+					return this;
+				}
 
+			«ENDIF»
 			private «genericName» appendSized(final Iterable<«type.genericBoxedName»> iterable, final int iterableLength) {
 				if (iterableLength == 0) {
 					return this;

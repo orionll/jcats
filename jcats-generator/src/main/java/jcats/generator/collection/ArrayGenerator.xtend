@@ -36,6 +36,7 @@ final class ArrayGenerator implements ClassGenerator {
 		«ENDIF»
 		import java.util.Spliterator;
 		import java.util.Spliterators;
+		import java.util.stream.Collector;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -796,6 +797,12 @@ final class ArrayGenerator implements ClassGenerator {
 					return new «arrayBuilderDiamondName»(new «type.javaName»[initialCapacity], 0);
 				}
 			}
+			«IF type == Type.OBJECT»
+
+				public static <A> Collector<A, ArrayBuilder<A>, Array<A>> collector() {
+					return Collector.of(Array::builder, ArrayBuilder::append, ArrayBuilder::appendArrayBuilder, ArrayBuilder::build);
+				}
+			«ENDIF»
 		}
 	''' }
 }
