@@ -123,6 +123,19 @@ final class FGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
+			«IF to == Type.BOOLEAN»
+				default «shortName»«typeParams» negate() {
+					«IF from == Type.OBJECT»
+						return (final «from.genericName» value) -> {
+							requireNonNull(value);
+							return !apply(value);
+						};
+					«ELSE»
+						return (final «from.javaName» value) -> !apply(value); 
+					«ENDIF»
+				}
+
+			«ENDIF»
 			«FOR primitive : Type.values.filter[it != Type.OBJECT]»
 				«IF from == Type.OBJECT && to == Type.OBJECT»
 					default «primitive.typeName»F<A> mapTo«primitive.typeName»(final «primitive.typeName»F<B> f) {
