@@ -40,8 +40,8 @@ class SeqGenerator implements ClassGenerator {
 		import java.util.Iterator;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.PrimitiveIterator;
-
 		«ENDIF»
+		import java.util.stream.Collector;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -1262,6 +1262,12 @@ class SeqGenerator implements ClassGenerator {
 			«ENDIF»
 				return new «seqBuilderDiamondName»();
 			}
+			«IF type == Type.OBJECT»
+
+				public static <A> Collector<A, SeqBuilder<A>, Seq<A>> collector() {
+					return Collector.of(Seq::builder, SeqBuilder::append, SeqBuilder::appendSeqBuilder, SeqBuilder::build);
+				}
+			«ENDIF»
 		}
 	''' }
 }
