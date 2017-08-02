@@ -1,11 +1,11 @@
 package jcats.generator.collection
 
+import java.util.List
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
+import jcats.generator.Generator
 import jcats.generator.Type
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
-import java.util.List
-import jcats.generator.Generator
 
 @FinalFieldsConstructor
 final class ArrayBuilderGenerator implements ClassGenerator {
@@ -27,6 +27,9 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 		import java.util.Collection;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.PrimitiveIterator;
+			import java.util.function.«type.typeName»Consumer;
+		«ELSE»
+			import java.util.Iterator;
 		«ENDIF»
 
 		import «Constants.SIZED»;
@@ -176,6 +179,15 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 					iterable.forEach(this::append);
 					return this;
 				}
+			}
+
+			public «genericName» appendIterator(final «type.iteratorGenericName» iterator) {
+				«IF Type.javaUnboxedTypes.contains(type)»
+					iterator.forEachRemaining((«type.typeName»Consumer) this::append);
+				«ELSE»
+					iterator.forEachRemaining(this::append);
+				«ENDIF»
+				return this;
 			}
 
 			public boolean isEmpty() {
