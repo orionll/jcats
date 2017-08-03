@@ -34,6 +34,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 		«ENDIF»
 
 		import static «Constants.COLLECTION».«shortSeqName».empty«shortSeqName»;
+		import static «Constants.COMMON».*;
 
 		«IF type == Type.OBJECT»
 			import static java.util.Objects.requireNonNull;
@@ -160,6 +161,16 @@ final class SeqBuilderGenerator implements ClassGenerator {
 				return this;
 			}
 
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			public final «genericName» appendValues(final «type.genericName»... values) {
+				for (final «type.genericName» value : values) {
+					append(value);
+				}
+				return this;
+			}
+
 			public «genericName» appendAll(final Iterable<«type.genericBoxedName»> iterable) {
 				«IF Type.javaUnboxedTypes.contains(type)»
 					final PrimitiveIterator.Of«type.typeName» iterator = «type.typeName»Iterator.getIterator(iterable.iterator());
@@ -246,7 +257,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 			}
 			«IF type == Type.OBJECT»
 
-				public «genericName» appendSeqBuilder(final «genericName» builder) {
+				«genericName» appendSeqBuilder(final «genericName» builder) {
 					builder.appendTo(this);
 					return this;
 				}
@@ -353,6 +364,15 @@ final class SeqBuilderGenerator implements ClassGenerator {
 					}
 				}
 			«ENDIF»
+
+			@Override
+			public String toString() {
+				«IF Type.javaUnboxedTypes.contains(type)»
+					return «type.containerShortName.firstToLowerCase»ToString(build(), "«shortName»");
+				«ELSE»
+					return iterableToString(build(), "«shortName»");
+				«ENDIF»
+			}
 		}
 	''' }
 }
