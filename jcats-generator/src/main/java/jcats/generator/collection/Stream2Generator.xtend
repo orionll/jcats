@@ -239,11 +239,15 @@ final class Stream2Generator implements ClassGenerator {
 			}
 
 			public Seq<A> toSeq() {
-				return Seq.<A> builder().appendIterator(stream.iterator()).build();
+				final SeqBuilder<A> builder = Seq.builder();
+				stream.forEach(builder::append);
+				return builder.build();
 			}
 
 			public Array<A> toArr() {
-				return Array.<A> builder().appendIterator(stream.iterator()).build();
+				final ArrayBuilder<A> builder = Array.builder();
+				stream.forEach(builder::append);
+				return builder.build();
 			}
 
 			public static <A> Stream2<A> stream2(final Stream<A> stream) {
