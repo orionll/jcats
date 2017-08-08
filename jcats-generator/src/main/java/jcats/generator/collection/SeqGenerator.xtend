@@ -41,6 +41,9 @@ class SeqGenerator implements ClassGenerator {
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
+		«IF Type.javaUnboxedTypes.contains(type)»
+			import java.util.function.«type.typeName»Consumer;
+		«ENDIF»
 		import java.util.stream.Collector;
 
 		import «Constants.JCATS».*;
@@ -733,6 +736,15 @@ class SeqGenerator implements ClassGenerator {
 					builder.appendAll(iterable);
 					return builder.build();
 				}
+			}
+
+			public static «paramGenericName» fromIterator(final Iterator<«type.genericBoxedName»> iterator) {
+				«IF Type.javaUnboxedTypes.contains(type)»
+					requireNonNull(iterator);
+				«ENDIF»
+				final «seqBuilderName» builder = builder();
+				builder.appendIterator(iterator);
+				return builder.build();
 			}
 
 			static «paramGenericName» sizedToSeq(final «type.iteratorGenericName» iterator, final int size) {

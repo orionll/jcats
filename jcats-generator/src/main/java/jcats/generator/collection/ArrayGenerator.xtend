@@ -37,6 +37,9 @@ final class ArrayGenerator implements ClassGenerator {
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.stream.Collector;
+		«IF Type.javaUnboxedTypes.contains(type)»
+			import java.util.function.«type.typeName»Consumer;
+		«ENDIF»
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -664,6 +667,19 @@ final class ArrayGenerator implements ClassGenerator {
 					iterable.forEach(builder::append);
 					return builder.build();
 				}
+			}
+
+			public static «paramGenericName» fromIterator(final Iterator<«type.genericBoxedName»> iterator) {
+				«IF Type.javaUnboxedTypes.contains(type)»
+					requireNonNull(iterator);
+				«ENDIF»
+				final «arrayBuilderName» builder = builder();
+				«IF Type.javaUnboxedTypes.contains(type)»
+					«type.typeName»Iterator.getIterator(iterator).forEachRemaining((«type.typeName»Consumer) builder::append);
+				«ELSE»
+					iterator.forEachRemaining(builder::append);
+				«ENDIF»
+				return builder.build();
 			}
 
 			«IF type == Type.OBJECT»
