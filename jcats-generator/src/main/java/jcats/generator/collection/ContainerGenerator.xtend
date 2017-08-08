@@ -1,14 +1,14 @@
 package jcats.generator.collection
 
-import jcats.generator.Generator
 import java.util.List
-import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
-import jcats.generator.Type
 import jcats.generator.Constants
+import jcats.generator.Generator
 import jcats.generator.InterfaceGenerator
+import jcats.generator.Type
+import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 
 @FinalFieldsConstructor
-class ContainerGenerator implements InterfaceGenerator {
+final class ContainerGenerator implements InterfaceGenerator {
 	val Type type
 
 	def static List<Generator> generators() {
@@ -413,12 +413,12 @@ class ContainerGenerator implements InterfaceGenerator {
 				return new HashSet<>(asCollection());
 			}
 
-			default «type.streamGenericName» stream() {
-				return StreamSupport.«type.streamFunction»(spliterator(), false);
+			default «type.stream2GenericName» stream() {
+				return new «type.stream2DiamondName»(StreamSupport.«type.streamFunction»(spliterator(), false));
 			}
 
-			default «type.streamGenericName» parallelStream() {
-				return StreamSupport.«type.streamFunction»(spliterator(), true);
+			default «type.stream2GenericName» parallelStream() {
+				return new «type.stream2DiamondName»(StreamSupport.«type.streamFunction»(spliterator(), true));
 			}
 			«IF type == Type.OBJECT»
 

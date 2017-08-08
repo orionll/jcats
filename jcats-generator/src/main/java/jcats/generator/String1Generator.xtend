@@ -8,7 +8,9 @@ final class String1Generator implements ClassGenerator {
 
 		import java.io.Serializable;
 		import java.util.Locale;
-		import java.util.stream.IntStream;
+		import «Constants.COLLECTION».IntStream2;
+
+		import static «Constants.COLLECTION».IntStream2.*;
 
 		/**
 		 * Nonempty string
@@ -38,13 +40,13 @@ final class String1Generator implements ClassGenerator {
 			}
 
 			@Override
-			public IntStream chars() {
-				return str.chars();
+			public IntStream2 chars() {
+				return intStream2(str.chars());
 			}
 
 			@Override
-			public IntStream codePoints() {
-				return str.codePoints();
+			public IntStream2 codePoints() {
+				return intStream2(str.codePoints());
 			}
 
 			public boolean startsWith(final String1 prefix) {

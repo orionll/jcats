@@ -34,6 +34,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 		import java.util.Spliterators;
 		import java.util.stream.«type.streamName»;
 
+		import «Constants.COLLECTION».*;
 		import «Constants.FUNCTION».*;
 
 		«IF Type.javaUnboxedTypes.contains(type)»
@@ -42,6 +43,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 			import static java.util.Collections.emptyIterator;
 		«ENDIF»
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.COLLECTION».«type.stream2Name».*;
 
 		public interface «genericName» extends Iterable<«type.genericBoxedName»>, Sized {
 			«IF type == Type.OBJECT»
@@ -123,12 +125,12 @@ final class MaybeGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
-			default «type.streamGenericName» stream() {
+			default «type.stream2GenericName» stream() {
 				«IF type == Type.OBJECT»
 					final A value = getOrNull();
-					return (value == null) ? «type.streamName».empty() : «type.streamName».of(value);
+					return stream2((value == null) ? «type.streamName».empty() : «type.streamName».of(value));
 				«ELSE»
-					return isEmpty() ? «type.streamName».empty() : «type.streamName».of(get());
+					return «type.stream2Name.firstToLowerCase»(isEmpty() ? «type.streamName».empty() : «type.streamName».of(get()));
 				«ENDIF»
 			}
 

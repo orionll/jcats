@@ -231,6 +231,30 @@ public enum Type {
 		}
 	}
 
+	public String stream2GenericName() {
+		switch (this) {
+			case OBJECT: return "Stream2<A>";
+			case BOOLEAN: return "Stream2<Boolean>";
+			default: return typeName() + "Stream2";
+		}
+	}
+
+	public String stream2DiamondName() {
+		if (Type.javaUnboxedTypes().contains(this)) {
+			return typeName() + "Stream2";
+		} else {
+			return "Stream2<>";
+		}
+	}
+
+	public String stream2Name() {
+		if (Type.javaUnboxedTypes().contains(this)) {
+			return typeName() + "Stream2";
+		} else {
+			return "Stream2";
+		}
+	}
+
 	public String iteratorWildcardName() {
 		switch (this) {
 			case OBJECT: return "Iterator<?>";

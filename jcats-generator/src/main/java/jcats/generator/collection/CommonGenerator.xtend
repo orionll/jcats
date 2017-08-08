@@ -663,5 +663,28 @@ final class CommonGenerator implements ClassGenerator {
 				throw new UnsupportedOperationException();
 			}
 		}
+
+		final class ArrayCollection<A> extends AbstractCollection<A> {
+			private final Object[] arr;
+
+			ArrayCollection(final Object[] arr) {
+				this.arr = arr;
+			}
+
+			@Override
+			public Iterator<A> iterator() {
+				return new ArrayIterator<>(arr);
+			}
+
+			@Override
+			public int size() {
+				return arr.length;
+			}
+
+			@Override
+			public Object[] toArray() {
+				return arr;
+			}
+		}
 	''' }
 }

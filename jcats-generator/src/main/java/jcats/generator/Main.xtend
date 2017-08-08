@@ -12,6 +12,7 @@ import jcats.generator.collection.DictGenerator
 import jcats.generator.collection.IndexedContainerGenerator
 import jcats.generator.collection.KeyValueGenerator
 import jcats.generator.collection.OrdDictGenerator
+import jcats.generator.collection.PrimitiveStream2Generator
 import jcats.generator.collection.Seq0Generator
 import jcats.generator.collection.Seq1Generator
 import jcats.generator.collection.Seq2Generator
@@ -23,6 +24,7 @@ import jcats.generator.collection.SeqBuilderGenerator
 import jcats.generator.collection.SeqGenerator
 import jcats.generator.collection.StackBuilderGenerator
 import jcats.generator.collection.StackGenerator
+import jcats.generator.collection.Stream2Generator
 import jcats.generator.collection.UniqueContainerGenerator
 import jcats.generator.collection.VNGenerators
 import jcats.generator.function.Eff0Generator
@@ -37,7 +39,7 @@ import jcats.generator.function.FsGenerator
 
 import static extension java.nio.file.Files.*
 
-class Main {
+final class Main {
 	def static void main(String[] args) {
 		if (args.length == 0) {
 			println("Error: specify jcats folder path")
@@ -89,6 +91,7 @@ class Main {
 			new CommonGenerator,
 			new CastsGenerator,
 			new String1Generator,
+			new Stream2Generator,
 			new jcats.generator.collection.CommonGenerator
 		],
 			MaybeGenerator.generators,
@@ -118,6 +121,7 @@ class Main {
 			PNGenerators.generators,
 			PGenerator.generators,
 			IndexedGenerator.generators,
+			PrimitiveStream2Generator.generators,
 			VNGenerators.generators
 		].flatten.toList
 	}

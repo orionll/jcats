@@ -1,10 +1,10 @@
 package jcats.generator.collection
 
-import jcats.generator.InterfaceGenerator
 import jcats.generator.Constants
+import jcats.generator.InterfaceGenerator
 import jcats.generator.Type
 
-class KeyValueGenerator implements InterfaceGenerator {
+final class KeyValueGenerator implements InterfaceGenerator {
 
 	override className() { Constants.COLLECTION + ".KeyValue" }
 
@@ -99,12 +99,12 @@ class KeyValueGenerator implements InterfaceGenerator {
 				}
 			}
 
-			default Stream<P<K, A>> stream() {
-				return StreamSupport.stream(spliterator(), false);
+			default Stream2<P<K, A>> stream() {
+				return new Stream2<>(StreamSupport.stream(spliterator(), false));
 			}
 
-			default Stream<P<K, A>> parallelStream() {
-				return StreamSupport.stream(spliterator(), true);
+			default Stream2<P<K, A>> parallelStream() {
+				return new Stream2<>(StreamSupport.stream(spliterator(), true));
 			}
 
 			«cast(#["K", "A"], #[], #["A"])»
