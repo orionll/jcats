@@ -25,11 +25,10 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.util.Collection;
+		import java.util.Iterator;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.PrimitiveIterator;
 			import java.util.function.«type.typeName»Consumer;
-		«ELSE»
-			import java.util.Iterator;
 		«ENDIF»
 
 		import «Constants.SIZED»;
@@ -181,9 +180,9 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				}
 			}
 
-			public «genericName» appendIterator(final «type.iteratorGenericName» iterator) {
+			public «genericName» appendIterator(final Iterator<«type.genericBoxedName»> iterator) {
 				«IF Type.javaUnboxedTypes.contains(type)»
-					iterator.forEachRemaining((«type.typeName»Consumer) this::append);
+					«type.typeName»Iterator.getIterator(iterator).forEachRemaining((«type.typeName»Consumer) this::append);
 				«ELSE»
 					iterator.forEachRemaining(this::append);
 				«ENDIF»

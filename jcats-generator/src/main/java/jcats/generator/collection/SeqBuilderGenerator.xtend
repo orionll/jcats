@@ -26,11 +26,10 @@ final class SeqBuilderGenerator implements ClassGenerator {
 
 		import java.util.Arrays;
 		import java.util.Collection;
+		import java.util.Iterator;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.PrimitiveIterator;
 			import java.util.function.«type.typeName»Consumer;
-		«ELSE»
-			import java.util.Iterator;
 		«ENDIF»
 
 		import static «Constants.COLLECTION».«shortSeqName».empty«shortSeqName»;
@@ -173,17 +172,16 @@ final class SeqBuilderGenerator implements ClassGenerator {
 
 			public «genericName» appendAll(final Iterable<«type.genericBoxedName»> iterable) {
 				«IF Type.javaUnboxedTypes.contains(type)»
-					final PrimitiveIterator.Of«type.typeName» iterator = «type.typeName»Iterator.getIterator(iterable.iterator());
-					appendIterator(iterator);
+					appendIterator(iterable.iterator());
 				«ELSE»
 					iterable.forEach(this::append);
 				«ENDIF»
 				return this;
 			}
 
-			public «genericName» appendIterator(final «type.iteratorGenericName» iterator) {
+			public «genericName» appendIterator(final Iterator<«type.genericBoxedName»> iterator) {
 				«IF Type.javaUnboxedTypes.contains(type)»
-					iterator.forEachRemaining((«type.typeName»Consumer) this::append);
+					«type.typeName»Iterator.getIterator(iterator).forEachRemaining((«type.typeName»Consumer) this::append);
 				«ELSE»
 					iterator.forEachRemaining(this::append);
 				«ENDIF»
