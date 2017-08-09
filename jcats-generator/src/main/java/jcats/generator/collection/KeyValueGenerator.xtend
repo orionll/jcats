@@ -11,8 +11,10 @@ final class KeyValueGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
+		import java.util.ArrayList;
 		import java.util.Collection;
 		import java.util.Iterator;
+		import java.util.HashSet;
 		import java.util.Map;
 		import java.util.Map.Entry;
 		import java.util.Set;
@@ -105,6 +107,26 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			default Stream2<P<K, A>> parallelStream() {
 				return new Stream2<>(StreamSupport.stream(spliterator(), true));
+			}
+
+			default ArrayList<P<K, A>> toArrayList() {
+				final ArrayList<P<K, A>> list = new ArrayList<>(size());
+				forEach(list::add);
+				return list;
+			}
+
+			default HashSet<P<K, A>> toHashSet() {
+				final HashSet<P<K, A>> list = new HashSet<>(Math.max((int) (size() / 0.75f) + 1, 16));
+				forEach(list::add);
+				return list;
+			}
+
+			default Array<P<K, A>> toArray() {
+				return Array.sizedToArray(this, size());
+			}
+
+			default Seq<P<K, A>> toSeq() {
+				return Seq.sizedToSeq(iterator(), size());
 			}
 
 			«cast(#["K", "A"], #[], #["A"])»

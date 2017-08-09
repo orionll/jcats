@@ -635,7 +635,7 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 
 			«ENDIF»
-			private static «paramGenericName» sizedToArray(final Iterable<«type.genericBoxedName»> iterable, final int size) {
+			static «paramGenericName» sizedToArray(final Iterable<«type.genericBoxedName»> iterable, final int size) {
 				if (size == 0) {
 					return empty«shortName»();
 				} else {
