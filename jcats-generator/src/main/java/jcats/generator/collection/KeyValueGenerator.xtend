@@ -22,7 +22,6 @@ final class KeyValueGenerator implements InterfaceGenerator {
 		import java.util.Spliterators;
 		import java.util.function.BiConsumer;
 		import java.util.function.Consumer;
-		import java.util.stream.Stream;
 		import java.util.stream.StreamSupport;
 
 		import «Constants.JCATS».*;
@@ -30,6 +29,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.COMMON».*;
+		import static «Constants.EITHER».*;
 
 		public interface KeyValue<K, A> extends Iterable<P<K, A>>, Equatable<KeyValue<K, A>>, Sized {
 
@@ -47,6 +47,12 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				requireNonNull(other);
 				final A value = getOrNull(key);
 				return (value == null) ? requireNonNull(other.apply()) : value;
+			}
+
+			default <X> Either<X, A> getOrError(final K key, final F0<X> error) {
+				requireNonNull(error);
+				final A value = getOrNull(key);
+				return (value == null) ? left(requireNonNull(error.apply())) : right(value);
 			}
 
 			default <X extends Throwable> A getOrThrow(final K key, final F0<X> f) throws X {
