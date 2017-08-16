@@ -94,6 +94,10 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				return new Values<>(this);
 			}
 
+			default UniqueContainer<P<K, A>> asUniqueContainer() {
+				return new KeyValueAsUniqueContainer<>(this);
+			}
+
 			default Map<K, A> asMap() {
 				return new KeyValueAsMap<>(this);
 			}
@@ -113,26 +117,6 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			default Stream2<P<K, A>> parallelStream() {
 				return new Stream2<>(StreamSupport.stream(spliterator(), true));
-			}
-
-			default ArrayList<P<K, A>> toArrayList() {
-				final ArrayList<P<K, A>> list = new ArrayList<>(size());
-				forEach(list::add);
-				return list;
-			}
-
-			default HashSet<P<K, A>> toHashSet() {
-				final HashSet<P<K, A>> list = new HashSet<>(Math.max((int) (size() / 0.75f) + 1, 16));
-				forEach(list::add);
-				return list;
-			}
-
-			default Array<P<K, A>> toArray() {
-				return Array.sizedToArray(this, size());
-			}
-
-			default Seq<P<K, A>> toSeq() {
-				return Seq.sizedToSeq(iterator(), size());
 			}
 
 			«cast(#["K", "A"], #[], #["A"])»
@@ -224,6 +208,54 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public String toString() {
 				return iterableToString(this, "Keys");
+			}
+		}
+
+		final class KeyValueAsUniqueContainer<K, A> implements UniqueContainer<P<K, A>> {
+			private final KeyValue<K, A> keyValue;
+		
+			KeyValueAsUniqueContainer(final KeyValue<K, A> keyValue) {
+				this.keyValue = keyValue;
+			}
+		
+			@Override
+			public int size() {
+				return keyValue.size();
+			}
+		
+			@Override
+			public boolean contains(final P<K, A> p) {
+				requireNonNull(p);
+				return p.get2().equals(keyValue.getOrNull(p.get1()));
+			}
+		
+			@Override
+			public void forEach(final Consumer<? super P<K, A>> action) {
+				keyValue.forEach(action);
+			}
+		
+			@Override
+			public void foreach(final Eff<P<K, A>> eff) {
+				keyValue.forEach(eff.toConsumer());
+			}
+		
+			@Override
+			public Iterator<P<K, A>> iterator() {
+				return keyValue.iterator();
+			}
+		
+			@Override
+			public Spliterator<P<K, A>> spliterator() {
+				return keyValue.spliterator();
+			}
+		
+			«uniqueHashCode»
+
+			«uniqueEquals(Type.OBJECT, "UniqueContainer")»
+		
+			@Override
+			public String toString() {
+				return keyValue.toString();
 			}
 		}
 
