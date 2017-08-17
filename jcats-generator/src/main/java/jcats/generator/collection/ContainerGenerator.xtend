@@ -30,6 +30,9 @@ final class ContainerGenerator implements InterfaceGenerator {
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
+		«IF type == Type.OBJECT»
+			import java.util.NavigableSet;
+		«ENDIF»
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.function.Consumer;
@@ -422,6 +425,11 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 			«IF type == Type.OBJECT»
 
+				static <A> Container<A> asContainer(final Collection<A> collection) {
+					requireNonNull(collection);
+					return new CollectionAsContainer<>(collection);
+				}
+
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
 		}
@@ -460,5 +468,95 @@ final class ContainerGenerator implements InterfaceGenerator {
 				container.forEach(action);
 			}
 		}
+		«IF type == Type.OBJECT»
+
+			final class CollectionAsContainer<A> implements Container<A> {
+				private final Collection<A> collection;
+
+				CollectionAsContainer(final Collection<A> collection) {
+					this.collection = collection;
+				}
+
+				@Override
+				public boolean isEmpty() {
+					return collection.isEmpty();
+				}
+
+				@Override
+				public boolean isNotEmpty() {
+					return !collection.isEmpty();
+				}
+
+				@Override
+				public int size() {
+					return collection.size();
+				}
+
+				@Override
+				public boolean hasFixedSize() {
+					return false;
+				}
+
+				@Override
+				public boolean contains(final A value) {
+					requireNonNull(value);
+					return collection.contains(value);
+				}
+
+				@Override
+				public void forEach(final Consumer<? super A> action) {
+					collection.forEach(action);
+				}
+
+				@Override
+				public void foreach(final Eff<A> eff) {
+					collection.forEach(eff.toConsumer());
+				}
+
+				@Override
+				public Iterator<A> iterator() {
+					return collection.iterator();
+				}
+
+				@Override
+				public Spliterator<A> spliterator() {
+					return collection.spliterator();
+				}
+
+				@Override
+				public Iterator<A> reverseIterator() {
+					if (collection instanceof NavigableSet) {
+						return ((NavigableSet<A>) collection).descendingIterator();
+					} else {
+						return Container.super.reverseIterator();
+					}
+				}
+
+				@Override
+				public Stream2<A> stream() {
+					return new Stream2<>(collection.stream());
+				}
+
+				@Override
+				public Stream2<A> parallelStream() {
+					return new Stream2<>(collection.parallelStream());
+				}
+
+				@Override
+				public Object[] toObjectArray() {
+					return collection.toArray();
+				}
+
+				@Override
+				public Collection<A> asCollection() {
+					return collection;
+				}
+
+				@Override
+				public String toString() {
+					return collection.toString();
+				}
+			}
+		«ENDIF»
 	''' }
 }
