@@ -215,7 +215,7 @@ class SeqGenerator implements ClassGenerator {
 					return ofAll(suffix);
 				} else if (suffix instanceof «shortName») {
 					return concat((«genericName») suffix);
-				} else if (suffix instanceof Sized) {
+				} else if (suffix instanceof Sized && ((Sized) suffix).hasFixedSize()) {
 					final int suffixSize = ((Sized) suffix).size();
 					if (suffixSize == 0) {
 						return this;
@@ -236,7 +236,7 @@ class SeqGenerator implements ClassGenerator {
 					return ofAll(prefix);
 				} else if (prefix instanceof «shortName») {
 					return ((«genericName») prefix).concat(this);
-				} else if (prefix instanceof Sized) {
+				} else if (prefix instanceof Sized && ((Sized) prefix).hasFixedSize()) {
 					final int prefixSize = ((Sized) prefix).size();
 					if (prefixSize == 0) {
 						return this;
@@ -729,7 +729,7 @@ class SeqGenerator implements ClassGenerator {
 				requireNonNull(iterable);
 				if (iterable instanceof «wildcardName») {
 					return («genericName») iterable;
-				} else if (iterable instanceof Sized) {
+				} else if (iterable instanceof Sized && ((Sized) iterable).hasFixedSize()) {
 					return sizedToSeq(«type.getIterator("iterable.iterator()")», ((Sized) iterable).size());
 				} else {
 					final «seqBuilderName» builder = new «seqBuilderDiamondName»();

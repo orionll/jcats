@@ -9,6 +9,10 @@ final class SizedGenerator implements InterfaceGenerator {
 		public interface Sized {
 			int size();
 
+			default boolean hasFixedSize() {
+				return true;
+			}
+
 			default boolean isEmpty() {
 				return size() == 0;
 			}

@@ -164,7 +164,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				requireNonNull(iterable);
 				if (iterable instanceof «type.arrayShortName») {
 					return appendArray(((«arrayGenericName») iterable).array);
-				} else if (iterable instanceof Sized) {
+				} else if (iterable instanceof Sized && ((Sized) iterable).hasFixedSize()) {
 					return appendSized(iterable, ((Sized) iterable).size());
 				} else {
 					if (iterable instanceof Collection) {

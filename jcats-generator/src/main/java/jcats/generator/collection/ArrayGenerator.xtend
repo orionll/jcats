@@ -261,7 +261,7 @@ final class ArrayGenerator implements ClassGenerator {
 					return ofAll(suffix);
 				} else if (suffix instanceof «shortName») {
 					return concat((«genericName») suffix);
-				} else if (suffix instanceof Sized) {
+				} else if (suffix instanceof Sized && ((Sized) suffix).hasFixedSize()) {
 					return appendSized(suffix, ((Sized) suffix).size());
 				} else {
 					final «arrayBuilderName» builder;
@@ -290,7 +290,7 @@ final class ArrayGenerator implements ClassGenerator {
 					return ofAll(prefix);
 				} else if (prefix instanceof «shortName») {
 					return ((«genericName») prefix).concat(this);
-				} else if (prefix instanceof Sized) {
+				} else if (prefix instanceof Sized && ((Sized) prefix).hasFixedSize()) {
 					return prependSized(prefix, ((Sized) prefix).size());
 				} else {
 					final «arrayBuilderName» builder;
@@ -648,7 +648,7 @@ final class ArrayGenerator implements ClassGenerator {
 			public static «paramGenericName» ofAll(final Iterable<«type.genericBoxedName»> iterable) {
 				if (iterable instanceof «type.containerShortName») {
 					return ((«type.containerGenericName») iterable).to«type.arrayShortName»();
-				} else if (iterable instanceof Sized) {
+				} else if (iterable instanceof Sized && ((Sized) iterable).hasFixedSize()) {
 					return sizedToArray(iterable, ((Sized) iterable).size());
 				«IF type == Type.OBJECT»
 					} else if (iterable instanceof Collection) {
