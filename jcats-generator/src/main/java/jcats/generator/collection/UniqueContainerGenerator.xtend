@@ -37,11 +37,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 		public interface «genericName» extends «type.containerGenericName», Equatable<«genericName»> {
 
 			@Override
-			default Collection<«type.genericBoxedName»> asCollection() {
-				return asSet();
-			}
-
-			default Set<«type.genericBoxedName»> asSet() {
+			default Set<«type.genericBoxedName»> asCollection() {
 				return new «type.diamondName("UniqueContainerAsSet")»(this);
 			}
 

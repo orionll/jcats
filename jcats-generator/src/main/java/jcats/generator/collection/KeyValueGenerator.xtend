@@ -312,7 +312,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			public Set<K> keySet() {
-				return keyValue.keys().asSet();
+				return keyValue.keys().asCollection();
 			}
 
 			@Override

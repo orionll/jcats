@@ -37,11 +37,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		public interface «genericName» extends «type.containerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
 
 			@Override
-			default Collection<«type.genericBoxedName»> asCollection() {
-				return asList();
-			}
-
-			default List<«type.genericBoxedName»> asList() {
+			default List<«type.genericBoxedName»> asCollection() {
 				return new «shortName»AsList«IF type == Type.OBJECT»<>«ENDIF»(this);
 			}
 			«IF type == Type.OBJECT»
