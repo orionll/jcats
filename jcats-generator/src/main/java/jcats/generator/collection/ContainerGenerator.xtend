@@ -470,8 +470,8 @@ final class ContainerGenerator implements InterfaceGenerator {
 		}
 		«IF type == Type.OBJECT»
 
-			final class CollectionAsContainer<A> implements Container<A> {
-				private final Collection<A> collection;
+			class CollectionAsContainer<A> implements Container<A> {
+				final Collection<A> collection;
 
 				CollectionAsContainer(final Collection<A> collection) {
 					this.collection = collection;

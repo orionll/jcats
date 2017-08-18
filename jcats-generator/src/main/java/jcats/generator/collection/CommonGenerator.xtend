@@ -17,6 +17,8 @@ final class CommonGenerator implements ClassGenerator {
 		import java.util.Collection;
 		import java.util.Comparator;
 		import java.util.Iterator;
+		import java.util.List;
+		import java.util.ListIterator;
 		import java.util.Map;
 		import java.util.NoSuchElementException;
 		import java.util.PrimitiveIterator;
@@ -260,6 +262,24 @@ final class CommonGenerator implements ClassGenerator {
 			}
 
 		«ENDFOR»
+		final class ListReverseIterator<A> implements Iterator<A> {
+			private final ListIterator<A> iterator;
+
+			ListReverseIterator(final List<A> list, final int index) {
+				this.iterator = list.listIterator(index);
+			}
+
+			@Override
+			public boolean hasNext() {
+				return iterator.hasPrevious();
+			}
+
+			@Override
+			public A next() {
+				return iterator.previous();
+			}
+		}
+
 		final class MappedIterator<A, B> implements Iterator<B> {
 			private final Iterator<A> iterator;
 			private final F<A, B> f;

@@ -22,7 +22,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
-		
+
 		import java.util.Collection;
 		import java.util.Iterator;
 		import java.util.List;
@@ -33,6 +33,8 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		import «Constants.JCATS».*;
 
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.JCATS».IntOption.*;
+		import static «Constants.COMMON».*;
 
 		public interface «genericName» extends «type.containerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
 
@@ -41,6 +43,11 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				return new «shortName»AsList«IF type == Type.OBJECT»<>«ENDIF»(this);
 			}
 			«IF type == Type.OBJECT»
+
+				static <A> IndexedContainer<A> asIndexedContainer(final List<A> list) {
+					requireNonNull(list);
+					return new ListAsIndexedContainer<>(list);
+				}
 
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
@@ -85,5 +92,67 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				container.forEach(action);
 			}
 		}
+		«IF type == Type.OBJECT»
+
+			final class ListAsIndexedContainer<A> extends CollectionAsContainer<A> implements IndexedContainer<A> {
+
+				ListAsIndexedContainer(final List<A> collection) {
+					super(collection);
+				}
+
+				@Override
+				public A get(final int index) {
+					return ((List<A>) collection).get(index);
+				}
+
+				@Override
+				public IntOption indexOf(final A value) {
+					final int index = ((List<A>) collection).indexOf(value);
+					return (index >= 0) ? intSome(index) : intNone();
+				}
+
+				@Override
+				public IntOption lastIndexOf(final A value) {
+					final int index = ((List<A>) collection).lastIndexOf(value);
+					return (index >= 0) ? intSome(index) : intNone();
+				}
+
+				@Override
+				public Iterator<A> reverseIterator() {
+					if (collection instanceof RandomAccess) {
+						final List<A> list = (List<A>) collection;
+						final int size = list.size();
+						if (size == 0) {
+							return Collections.emptyIterator();
+						} else {
+							return new ListReverseIterator<>(list, size);
+						}
+					} else {
+						return toArray().reverseIterator();
+					}
+				}
+
+				@Override
+				public List<A> asCollection() {
+					return (List<A>) collection;
+				}
+
+				@Override
+				public int hashCode() {
+					return iterableHashCode(this);
+				}
+
+				@Override
+				public boolean equals(final Object obj) {
+					if (obj == this) {
+						return true;
+					} else if (obj instanceof IndexedContainer) {
+						return indexedContainersEqual(this, (IndexedContainer<?>) obj);
+					} else {
+						return false;
+					}
+				}
+			}
+		«ENDIF»
 	''' }
 }
