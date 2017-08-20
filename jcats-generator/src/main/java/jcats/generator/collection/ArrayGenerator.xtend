@@ -37,6 +37,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.stream.Collector;
+		import java.util.stream.«type.streamName»;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.function.«type.typeName»Consumer;
 		«ENDIF»
@@ -674,11 +675,13 @@ final class ArrayGenerator implements ClassGenerator {
 					requireNonNull(iterator);
 				«ENDIF»
 				final «arrayBuilderName» builder = builder();
-				«IF Type.javaUnboxedTypes.contains(type)»
-					«type.typeName»Iterator.getIterator(iterator).forEachRemaining((«type.typeName»Consumer) builder::append);
-				«ELSE»
-					iterator.forEachRemaining(builder::append);
-				«ENDIF»
+				builder.appendIterator(iterator);
+				return builder.build();
+			}
+
+			public static «paramGenericName» from«type.streamName»(final «type.streamGenericName» stream) {
+				final «arrayBuilderName» builder = builder();
+				builder.append«type.streamName»(stream);
 				return builder.build();
 			}
 

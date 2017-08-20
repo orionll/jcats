@@ -24,6 +24,9 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.util.Collection;
+		«IF type == Type.OBJECT»
+			import java.util.Collections;
+		«ENDIF»
 		import java.util.Iterator;
 		import java.util.List;
 		import java.util.RandomAccess;

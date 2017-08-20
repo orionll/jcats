@@ -30,6 +30,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			import java.util.PrimitiveIterator;
 			import java.util.function.«type.typeName»Consumer;
 		«ENDIF»
+		import java.util.stream.«type.streamName»;
 
 		import «Constants.SIZED»;
 
@@ -186,6 +187,11 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				«ELSE»
 					iterator.forEachRemaining(this::append);
 				«ENDIF»
+				return this;
+			}
+
+			public «genericName» append«type.streamName»(final «type.streamGenericName» stream) {
+				stream.forEach(this::append);
 				return this;
 			}
 

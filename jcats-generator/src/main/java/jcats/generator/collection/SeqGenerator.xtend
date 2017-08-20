@@ -45,6 +45,7 @@ class SeqGenerator implements ClassGenerator {
 			import java.util.function.«type.typeName»Consumer;
 		«ENDIF»
 		import java.util.stream.Collector;
+		import java.util.stream.«type.streamName»;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -744,6 +745,12 @@ class SeqGenerator implements ClassGenerator {
 				«ENDIF»
 				final «seqBuilderName» builder = builder();
 				builder.appendIterator(iterator);
+				return builder.build();
+			}
+
+			public static «paramGenericName» from«type.streamName»(final «type.streamGenericName» stream) {
+				final «seqBuilderName» builder = builder();
+				builder.append«type.streamName»(stream);
 				return builder.build();
 			}
 
