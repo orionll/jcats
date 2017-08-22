@@ -64,13 +64,36 @@ final class CommonGenerator implements ClassGenerator {
 			«ENDFOR»
 			«FOR type : Type.values»
 				static boolean «type.indexedContainerShortName.firstToLowerCase»sEqual(final «type.indexedContainerWildcardName» c1, final «type.indexedContainerWildcardName» c2) {
-					if (c1.size() == c2.size()) {
+					if (c1.hasFixedSize() && c2.hasFixedSize()) {
+						if (c1.size() == c2.size()) {
+							final «type.iteratorWildcardName» iterator1 = c1.iterator();
+							final «type.iteratorWildcardName» iterator2 = c2.iterator();
+							while (iterator1.hasNext()) {
+								«IF type == Type.OBJECT»
+									final Object o1 = iterator1.next();
+									final Object o2 = requireNonNull(iterator2.next());
+									if (!o1.equals(o2)) {
+										return false;
+									}
+								«ELSE»
+									final «type.javaName» o1 = iterator1.«type.iteratorNext»();
+									final «type.javaName» o2 = iterator2.«type.iteratorNext»();
+									if (o1 != o2) {
+										return false;
+									}
+								«ENDIF»
+							}
+							return true;
+						} else {
+							return false;
+						}
+					} else {
 						final «type.iteratorWildcardName» iterator1 = c1.iterator();
 						final «type.iteratorWildcardName» iterator2 = c2.iterator();
-						while (iterator1.hasNext()) {
+						while (iterator1.hasNext() && iterator2.hasNext()) {
 							«IF type == Type.OBJECT»
 								final Object o1 = iterator1.next();
-								final Object o2 = iterator2.next();
+								final Object o2 = requireNonNull(iterator2.next());
 								if (!o1.equals(o2)) {
 									return false;
 								}
@@ -82,9 +105,7 @@ final class CommonGenerator implements ClassGenerator {
 								}
 							«ENDIF»
 						}
-						return true;
-					} else {
-						return false;
+						return !(iterator1.hasNext() || iterator2.hasNext());
 					}
 				}
 
