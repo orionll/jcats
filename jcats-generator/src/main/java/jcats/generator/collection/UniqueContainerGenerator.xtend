@@ -33,6 +33,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 		import «Constants.JCATS».*;
 
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.COMMON».*;
 
 		public interface «genericName» extends «type.containerGenericName», Equatable<«genericName»> {
 
@@ -49,8 +50,12 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE);
 				}
 			}
-
 			«IF type == Type.OBJECT»
+
+				static <A> UniqueContainer<A> asUniqueContainer(final Set<A> set) {
+					requireNonNull(set);
+					return new SetAsUniqueContainer<>(set);
+				}
 
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
@@ -107,5 +112,35 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 				container.forEach(action);
 			}
 		}
+		«IF type == Type.OBJECT»
+
+			final class SetAsUniqueContainer<A> extends CollectionAsContainer<A> implements UniqueContainer<A> {
+
+				SetAsUniqueContainer(final Set<A> collection) {
+					super(collection);
+				}
+
+				@Override
+				public Set<A> asCollection() {
+					return (Set<A>) collection;
+				}
+
+				@Override
+				public int hashCode() {
+					return uniqueContainerHashCode(this);
+				}
+
+				@Override
+				public boolean equals(final Object obj) {
+					if (obj == this) {
+						return true;
+					} else if (obj instanceof UniqueContainer) {
+						return uniqueContainersEqual(this, (UniqueContainer<?>) obj);
+					} else {
+						return false;
+					}
+				}
+			}
+		«ENDIF»
 	''' }
 }
