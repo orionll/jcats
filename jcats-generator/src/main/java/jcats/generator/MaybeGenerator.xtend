@@ -32,6 +32,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 		«ENDIF»
 		import java.util.Spliterator;
 		import java.util.Spliterators;
+		import java.util.function.Consumer;
 		import java.util.stream.«type.streamName»;
 
 		import «Constants.COLLECTION».*;
@@ -72,6 +73,21 @@ final class MaybeGenerator implements InterfaceGenerator {
 				default int size() {
 					return (getOrNull() == null) ? 0 : 1;
 				}
+
+				@Override
+				default void forEach(final Consumer<? super A> action) {
+					final A value = getOrNull();
+					if (value != null) {
+						action.accept(value);
+					}
+				}
+
+				default void foreach(final Eff<A> eff) {
+					final A value = getOrNull();
+					if (value != null) {
+						eff.apply(value);
+					}
+				}
 			«ELSE»
 				«type.genericName» get() throws NoSuchElementException;
 
@@ -90,6 +106,19 @@ final class MaybeGenerator implements InterfaceGenerator {
 				@Override
 				default int size() {
 					return isEmpty() ? 0 : 1;
+				}
+
+				@Override
+				default void forEach(final Consumer<? super «type.boxedName»> action) {
+					if (isNotEmpty()) {
+						action.accept(get());
+					}
+				}
+
+				default void foreach(final «type.effShortName» eff) {
+					if (isNotEmpty()) {
+						eff.apply(get());
+					}
 				}
 			«ENDIF»
 
@@ -124,6 +153,10 @@ final class MaybeGenerator implements InterfaceGenerator {
 					return isEmpty() ? Optional.empty() : Optional.of(get());
 				}
 			«ENDIF»
+
+			default «type.containerGenericName» as«type.containerShortName»() {
+				return new «type.diamondName("MaybeAsContainer")»(this);
+			}
 
 			default «type.stream2GenericName» stream() {
 				«IF type == Type.OBJECT»
@@ -168,6 +201,44 @@ final class MaybeGenerator implements InterfaceGenerator {
 						return Spliterators.spliterator(new «type.boxedName»[] { get() }, Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 					}
 				«ENDIF»
+			}
+		}
+
+		final class «type.genericName("MaybeAsContainer")» implements «type.containerGenericName» {
+			private final «genericName» maybe;
+
+			«shortName»AsContainer(final «genericName» maybe) {
+				this.maybe = maybe;
+			}
+
+			@Override
+			public int size() {
+				return maybe.size();
+			}
+
+			@Override
+			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
+				maybe.forEach(action);
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				maybe.foreach(eff);
+			}
+
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				return maybe.iterator();
+			}
+
+			@Override
+			public «type.spliteratorGenericName» spliterator() {
+				return maybe.spliterator();
+			}
+
+			@Override
+			public String toString() {
+				return maybe.toString();
 			}
 		}
 	''' }
