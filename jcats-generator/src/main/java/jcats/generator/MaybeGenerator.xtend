@@ -202,6 +202,10 @@ final class MaybeGenerator implements InterfaceGenerator {
 					}
 				«ENDIF»
 			}
+			«IF type == Type.OBJECT»
+
+				«cast(#["A"], #[], #["A"])»
+			«ENDIF»
 		}
 
 		final class «type.genericName("MaybeAsContainer")» implements «type.containerGenericName» {
