@@ -31,6 +31,7 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 		import java.util.Spliterator;
 		import java.util.function.*;
 		import java.util.stream.«type.streamName»;
+		import java.util.stream.Collectors;
 
 		import static java.util.Objects.requireNonNull;
 
@@ -243,6 +244,14 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 			@Override
 			public void close() {
 				stream.close();
+			}
+
+			public String joinToString() {
+				return mapToObj(«type.boxedName»::toString).collect(Collectors.joining());
+			}
+
+			public String joinToStringWithSeparator(final String separator) {
+				return mapToObj(«type.boxedName»::toString).collect(Collectors.joining(separator));
 			}
 
 			@Override

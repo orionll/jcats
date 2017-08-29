@@ -19,6 +19,7 @@ final class Stream2Generator implements ClassGenerator {
 		import java.util.Spliterator;
 		import java.util.function.*;
 		import java.util.stream.Collector;
+		import java.util.stream.Collectors;
 		import java.util.stream.DoubleStream;
 		import java.util.stream.IntStream;
 		import java.util.stream.LongStream;
@@ -228,6 +229,14 @@ final class Stream2Generator implements ClassGenerator {
 			@Override
 			public void close() {
 				stream.close();
+			}
+
+			public String joinToString() {
+				return map(Object::toString).collect(Collectors.joining());
+			}
+
+			public String joinToStringWithSeparator(final String separator) {
+				return map(Object::toString).collect(Collectors.joining(separator));
 			}
 
 			public ArrayList<A> toArrayList() {

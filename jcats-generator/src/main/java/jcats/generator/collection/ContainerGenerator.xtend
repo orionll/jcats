@@ -351,6 +351,32 @@ final class ContainerGenerator implements InterfaceGenerator {
 				return to«type.arrayShortName»().reverseIterator();
 			}
 
+			default String joinToString() {
+				if (isEmpty()) {
+					return "";
+				} else {
+					final StringBuilder builder = new StringBuilder();
+					foreach(builder::append);
+					return builder.toString();
+				}
+			}
+
+			default String joinToStringWithSeparator(final String separator) {
+				if (isEmpty()) {
+					return "";
+				} else {
+					final StringBuilder builder = new StringBuilder();
+					final «type.iteratorGenericName» iterator = iterator();
+					while (iterator.hasNext()) {
+						builder.append(iterator.«type.iteratorNext»());
+						if (iterator.hasNext()) {
+							builder.append(separator);
+						}
+					}
+					return builder.toString();
+				}
+			}
+
 			@Override
 			default «type.spliteratorGenericName» spliterator() {
 				if (isEmpty()) {
