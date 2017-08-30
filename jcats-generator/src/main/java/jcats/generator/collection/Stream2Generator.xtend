@@ -12,6 +12,7 @@ final class Stream2Generator implements ClassGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.util.ArrayList;
+		import java.util.Collection;
 		import java.util.Comparator;
 		import java.util.HashSet;
 		import java.util.Iterator;
@@ -24,6 +25,7 @@ final class Stream2Generator implements ClassGenerator {
 		import java.util.stream.IntStream;
 		import java.util.stream.LongStream;
 		import java.util.stream.Stream;
+		import java.util.stream.StreamSupport;
 
 		import static java.util.Objects.requireNonNull;
 
@@ -259,9 +261,33 @@ final class Stream2Generator implements ClassGenerator {
 				return builder.build();
 			}
 
-			public static <A> Stream2<A> stream2(final Stream<A> stream) {
+			public static <A> Stream2<A> from(final Stream<A> stream) {
 				requireNonNull(stream);
 				return new Stream2<>(stream);
+			}
+
+			@SafeVarargs
+			public static <A> Stream2<A> stream2(final A... values) {
+				for (final A value : values) {
+					requireNonNull(value);
+				}
+				return new Stream2<>(Stream.of(values));
+			}
+
+			«javadocSynonym("stream2")»
+			@SafeVarargs
+			public static <A> Stream2<A> of(final A... values) {
+				return stream2(values);
+			}
+
+			public static <A> Stream2<A> ofAll(final Iterable<A> iterable) {
+				if (iterable instanceof Collection) {
+					return new Stream2<>(((Collection<A>) iterable).stream());
+				} else if (iterable instanceof Stream) {
+					return (iterable instanceof Stream2) ? (Stream2<A>) iterable : new Stream2<>((Stream<A>) iterable);
+				} else {
+					return new Stream2<>(StreamSupport.stream(iterable.spliterator(), false));
+				}
 			}
 		}
 	''' }

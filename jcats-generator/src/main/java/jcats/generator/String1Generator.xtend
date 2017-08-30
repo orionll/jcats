@@ -10,8 +10,6 @@ final class String1Generator implements ClassGenerator {
 		import java.util.Locale;
 		import «Constants.COLLECTION».IntStream2;
 
-		import static «Constants.COLLECTION».IntStream2.*;
-
 		/**
 		 * Nonempty string
 		 */
@@ -41,12 +39,12 @@ final class String1Generator implements ClassGenerator {
 
 			@Override
 			public IntStream2 chars() {
-				return intStream2(str.chars());
+				return IntStream2.from(str.chars());
 			}
 
 			@Override
 			public IntStream2 codePoints() {
-				return intStream2(str.codePoints());
+				return IntStream2.from(str.codePoints());
 			}
 
 			public boolean startsWith(final String1 prefix) {

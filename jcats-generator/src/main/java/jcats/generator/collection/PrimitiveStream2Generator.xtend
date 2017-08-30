@@ -32,6 +32,7 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 		import java.util.function.*;
 		import java.util.stream.«type.streamName»;
 		import java.util.stream.Collectors;
+		import java.util.stream.StreamSupport;
 
 		import static java.util.Objects.requireNonNull;
 
@@ -281,9 +282,27 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 				return builder.build();
 			}
 
-			public static «shortName» «shortName.firstToLowerCase»(final «type.streamName» stream) {
+			public static «shortName» from(final «type.streamName» stream) {
 				requireNonNull(stream);
 				return new «shortName»(stream);
+			}
+
+			public static «shortName» «shortName.firstToLowerCase»(final «type.javaName»... values) {
+				return new «shortName»(«type.streamName».of(values));
+			}
+
+			«javadocSynonym('''«shortName.firstToLowerCase»''')»
+			public static «shortName» of(final «type.javaName»... values) {
+				return «shortName.firstToLowerCase»(values);
+			}
+
+			public static IntStream2 ofAll(final Iterable<Integer> iterable) {
+				final Spliterator<Integer> spliterator = iterable.spliterator();
+				if (spliterator instanceof Spliterator.OfInt) {
+					return new IntStream2(StreamSupport.intStream((Spliterator.OfInt) spliterator, false));
+				} else {
+					return new IntStream2(StreamSupport.stream(spliterator, false).mapToInt(Integer::intValue));
+				}
 			}
 		}
 	''' }
