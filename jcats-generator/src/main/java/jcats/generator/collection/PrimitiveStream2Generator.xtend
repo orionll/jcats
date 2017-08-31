@@ -27,8 +27,10 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 		«IF type != Type.DOUBLE»
 			import java.util.Optional«type.typeName»;
 		«ENDIF»
+		import java.util.Iterator;
 		import java.util.PrimitiveIterator;
 		import java.util.Spliterator;
+		import java.util.Spliterators;
 		import java.util.function.*;
 		import java.util.stream.«type.streamName»;
 		import java.util.stream.Collectors;
@@ -296,12 +298,25 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 				return «shortName.firstToLowerCase»(values);
 			}
 
-			public static IntStream2 ofAll(final Iterable<Integer> iterable) {
-				final Spliterator<Integer> spliterator = iterable.spliterator();
-				if (spliterator instanceof Spliterator.OfInt) {
-					return new IntStream2(StreamSupport.intStream((Spliterator.OfInt) spliterator, false));
+			public static «shortName» ofAll(final Iterable<«type.boxedName»> iterable) {
+				return fromSpliterator(iterable.spliterator());
+			}
+
+			public static «shortName» fromIterator(final Iterator<«type.boxedName»> iterator) {
+				if (iterator instanceof «type.iteratorGenericName») {
+					final «type.spliteratorGenericName» spliterator = Spliterators.spliteratorUnknownSize((«type.iteratorGenericName») iterator, Spliterator.ORDERED);
+					return new «shortName»(StreamSupport.«type.streamName.firstToLowerCase»(spliterator, false));
 				} else {
-					return new IntStream2(StreamSupport.stream(spliterator, false).mapToInt(Integer::intValue));
+					final Spliterator<«type.boxedName»> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
+					return new «shortName»(StreamSupport.stream(spliterator, false).mapTo«type.typeName»(«type.boxedName»::«type.javaName»Value));
+				}
+			}
+
+			public static «shortName» fromSpliterator(final Spliterator<«type.boxedName»> spliterator) {
+				if (spliterator instanceof «type.spliteratorGenericName») {
+					return new «shortName»(StreamSupport.«type.streamName.firstToLowerCase»((«type.spliteratorGenericName») spliterator, false));
+				} else {
+					return new «shortName»(StreamSupport.stream(spliterator, false).mapTo«type.typeName»(«type.boxedName»::«type.javaName»Value));
 				}
 			}
 		}

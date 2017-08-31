@@ -18,6 +18,7 @@ final class Stream2Generator implements ClassGenerator {
 		import java.util.Iterator;
 		import java.util.Optional;
 		import java.util.Spliterator;
+		import java.util.Spliterators;
 		import java.util.function.*;
 		import java.util.stream.Collector;
 		import java.util.stream.Collectors;
@@ -286,8 +287,16 @@ final class Stream2Generator implements ClassGenerator {
 				} else if (iterable instanceof Stream) {
 					return (iterable instanceof Stream2) ? (Stream2<A>) iterable : new Stream2<>((Stream<A>) iterable);
 				} else {
-					return new Stream2<>(StreamSupport.stream(iterable.spliterator(), false));
+					return fromSpliterator(iterable.spliterator());
 				}
+			}
+
+			public static <A> Stream2<A> fromIterator(final Iterator<A> iterator) {
+				return fromSpliterator(Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED));
+			}
+
+			public static <A> Stream2<A> fromSpliterator(final Spliterator<A> spliterator) {
+				return new Stream2<>(StreamSupport.stream(spliterator, false));
 			}
 		}
 	''' }
