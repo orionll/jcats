@@ -46,7 +46,7 @@ final class OrdGenerator implements ClassGenerator {
 			}
 
 			default Ord<A> reverse() {
-				return (x, y) -> {
+				return (final A x, final A y) -> {
 					requireNonNull(x);
 					requireNonNull(y);
 					return compare(x, y).reverse();
@@ -55,21 +55,21 @@ final class OrdGenerator implements ClassGenerator {
 
 			default <B> Ord<B> contraMap(final F<B, A> f) {
 				requireNonNull(f);
-				return (b1, b2) -> {
+				return (final B b1, final B b2) -> {
 					requireNonNull(b1);
 					requireNonNull(b2);
-					final A a1 = f.apply(b1);
-					final A a2 = f.apply(b2);
+					final A a1 = requireNonNull(f.apply(b1));
+					final A a2 = requireNonNull(f.apply(b2));
 					return requireNonNull(compare(a1, a2));
 				};
 			}
 
 			default Ord<A> then(final Ord<A> ord) {
 				requireNonNull(ord);
-				return (x, y) -> {
+				return (final A x, final A y) -> {
 					requireNonNull(x);
 					requireNonNull(y);
-					final Order order = compare(x, y);
+					final Order order = requireNonNull(compare(x, y));
 					return (order == Order.EQ) ? ord.compare(x, y) : order;
 				};
 			}
@@ -78,12 +78,16 @@ final class OrdGenerator implements ClassGenerator {
 				return then(Ord.<B>ord().contraMap(f));
 			}
 
+			default <B extends Comparable<B>> Ord<A> thenByReverse(final F<A, B> f) {
+				return then(Ord.<B>reverseOrd().contraMap(f));
+			}
+
 			default <B> Ord<A> thenByOrd(final F<A, B> f, final Ord<B> ord) {
 				return then(ord.contraMap(f));
 			}
 
 			default F2<A, A, Order> toF() {
-				return (x, y) -> {
+				return (final A x, final A y) -> {
 					requireNonNull(x);
 					requireNonNull(y);
 					return requireNonNull(compare(x, y));
@@ -91,7 +95,7 @@ final class OrdGenerator implements ClassGenerator {
 			}
 
 			default Comparator<A> toComparator() {
-				return (x, y) -> {
+				return (final A x, final A y) -> {
 					requireNonNull(x);
 					requireNonNull(y);
 					return compare(x, y).toInt();
@@ -100,7 +104,7 @@ final class OrdGenerator implements ClassGenerator {
 
 			static <A> Ord<A> fromF(final F2<A, A, Order> f2) {
 				requireNonNull(f2);
-				return (x, y) -> {
+				return (final A x, final A y) -> {
 					requireNonNull(x);
 					requireNonNull(y);
 					return requireNonNull(f2.apply(x, y));
@@ -109,7 +113,7 @@ final class OrdGenerator implements ClassGenerator {
 
 			static <A> Ord<A> fromComparator(final Comparator<A> comparator) {
 				requireNonNull(comparator);
-				return (x, y) -> {
+				return (final A x, final A y) -> {
 					requireNonNull(x);
 					requireNonNull(y);
 					return Order.fromInt(comparator.compare(x, y));
@@ -126,6 +130,10 @@ final class OrdGenerator implements ClassGenerator {
 
 			static <A, B extends Comparable<B>> Ord<A> by(final F<A, B> f) {
 				return Ord.<B>ord().contraMap(f);
+			}
+
+			static <A, B extends Comparable<B>> Ord<A> byReverse(final F<A, B> f) {
+				return Ord.<B>reverseOrd().contraMap(f);
 			}
 
 			static <A, B> Ord<A> byOrd(final F<A, B> f, final Ord<B> ord) {
