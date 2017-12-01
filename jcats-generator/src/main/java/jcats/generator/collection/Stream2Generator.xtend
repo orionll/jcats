@@ -16,6 +16,7 @@ final class Stream2Generator implements ClassGenerator {
 		import java.util.Comparator;
 		import java.util.HashSet;
 		import java.util.Iterator;
+		import java.util.LinkedHashSet;
 		import java.util.Optional;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
@@ -247,7 +248,11 @@ final class Stream2Generator implements ClassGenerator {
 			}
 
 			public HashSet<A> toHashSet() {
-				return new HashSet<>(new ArrayCollection<>(stream.toArray()));
+				return stream.collect(Collectors.toCollection(HashSet::new));
+			}
+
+			public LinkedHashSet<A> toLinkedHashSet() {
+				return stream.collect(Collectors.toCollection(LinkedHashSet::new));
 			}
 
 			public Seq<A> toSeq() {

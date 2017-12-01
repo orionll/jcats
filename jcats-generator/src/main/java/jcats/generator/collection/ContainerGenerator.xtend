@@ -27,6 +27,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 		import java.util.Collection;
 		import java.util.HashSet;
 		import java.util.Iterator;
+		import java.util.LinkedHashSet;
 		«IF Type.javaUnboxedTypes.contains(type)»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
@@ -467,6 +468,10 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			default HashSet<«type.genericBoxedName»> toHashSet() {
 				return new HashSet<>(asCollection());
+			}
+
+			default LinkedHashSet<«type.genericBoxedName»> toLinkedHashSet() {
+				return new LinkedHashSet<>(asCollection());
 			}
 
 			default «type.stream2GenericName» stream() {
