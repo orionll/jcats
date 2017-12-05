@@ -195,6 +195,10 @@ final class Stream2Generator implements ClassGenerator {
 				return stream.findAny();
 			}
 
+			public boolean contains(final A value) {
+				return anyMatch(value::equals);
+			}
+
 			@Override
 			public Iterator<A> iterator() {
 				return stream.iterator();

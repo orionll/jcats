@@ -205,6 +205,10 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 				return stream.findAny();
 			}
 
+			public boolean contains(final «type.javaName» value) {
+				return anyMatch(i -> i == value);
+			}
+
 			«IF type == Type.INT»
 				@Override
 				public LongStream2 asLongStream() {
