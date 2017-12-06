@@ -10,6 +10,7 @@ final class CommonGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
+		import java.io.Serializable;
 		import java.util.AbstractCollection;
 		import java.util.AbstractList;
 		import java.util.AbstractMap;
@@ -22,7 +23,11 @@ final class CommonGenerator implements ClassGenerator {
 		import java.util.Map;
 		import java.util.NoSuchElementException;
 		import java.util.PrimitiveIterator;
+		import java.util.RandomAccess;
+		import java.util.Spliterator;
+		import java.util.Spliterators;
 		import java.util.function.BiFunction;
+		import java.util.function.Consumer;
 		import java.util.function.Function;
 		import java.util.function.Predicate;
 		import java.util.function.UnaryOperator;
@@ -725,6 +730,42 @@ final class CommonGenerator implements ClassGenerator {
 			@Override
 			public Object[] toArray() {
 				return arr;
+			}
+		}
+
+		final class ImmutableArrayList<A> extends AbstractImmutableList<A> implements RandomAccess, Serializable {
+			private final Object[] arr;
+
+			// Assume arr.length > 0
+			ImmutableArrayList(final Object[] arr) {
+				this.arr = arr;
+			}
+
+			@Override
+			public A get(final int index) {
+				return (A) arr[index];
+			}
+
+			@Override
+			public int size() {
+				return arr.length;
+			}
+
+			@Override
+			public void forEach(final Consumer<? super A> action) {
+				for (final Object value : arr) {
+					action.accept((A) value);
+				}
+			}
+
+			@Override
+			public Iterator<A> iterator() {
+				return new ArrayIterator<>(arr);
+			}
+
+			@Override
+			public Spliterator<A> spliterator() {
+				return Spliterators.spliterator(arr, Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 		}
 	''' }

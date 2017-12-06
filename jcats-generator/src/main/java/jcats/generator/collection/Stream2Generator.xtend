@@ -13,10 +13,12 @@ final class Stream2Generator implements ClassGenerator {
 
 		import java.util.ArrayList;
 		import java.util.Collection;
+		import java.util.Collections;
 		import java.util.Comparator;
 		import java.util.HashSet;
 		import java.util.Iterator;
 		import java.util.LinkedHashSet;
+		import java.util.List;
 		import java.util.Optional;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
@@ -245,6 +247,15 @@ final class Stream2Generator implements ClassGenerator {
 
 			public String joinToStringWithSeparator(final String separator) {
 				return map(Object::toString).collect(Collectors.joining(separator));
+			}
+
+			public List<A> toUnmodifiableList() {
+				final Object[] array = stream.toArray();
+				if (array.length == 0) {
+					return Collections.emptyList();
+				} else {
+					return new ImmutableArrayList<>(array);
+				}
 			}
 
 			public ArrayList<A> toArrayList() {
