@@ -277,15 +277,11 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 			}
 
 			public «type.seqShortName» to«type.seqShortName»() {
-				final «type.seqShortName»Builder builder = «type.seqShortName».builder();
-				stream.forEach(builder::append);
-				return builder.build();
+				return stream.collect(«type.seqShortName»::builder, «type.seqShortName»Builder::append, «type.seqShortName»Builder::appendSeqBuilder).build();
 			}
 
 			public «type.arrayShortName» to«type.arrayShortName»() {
-				final «type.arrayShortName»Builder builder = «type.arrayShortName».builder();
-				stream.forEach(builder::append);
-				return builder.build();
+				return stream.collect(«type.arrayShortName»::builder, «type.arrayShortName»Builder::append, «type.arrayShortName»Builder::appendArrayBuilder).build();
 			}
 
 			public static «shortName» from(final «type.streamName» stream) {

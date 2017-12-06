@@ -259,76 +259,88 @@ final class SeqBuilderGenerator implements ClassGenerator {
 				trimmedNode6[index6 - 1] = trimmedNode5();
 				return trimmedNode6;
 			}
-			«IF type == Type.OBJECT»
 
-				«genericName» appendSeqBuilder(final «genericName» builder) {
-					builder.appendTo(this);
-					return this;
-				}
+			«genericName» appendSeqBuilder(final «genericName» builder) {
+				builder.appendTo(this);
+				return this;
+			}
 
-				private void appendTo(final «genericName» builder) {
-					if (node1 != null) {
-						if (node2 != null) {
-							appendInitTo(builder);
-							if (node3 == null) {
-								appendNode2To(builder);
-							} else if (node4 == null) {
-								appendNode3To(builder);
-								appendNode2To(builder);
-							} else if (node5 == null) {
-								appendNode4To(builder);
-								appendNode3To(builder);
-								appendNode2To(builder);
-							} else if (node6 == null) {
-								appendNode5To(builder);
-								appendNode4To(builder);
-								appendNode3To(builder);
-								appendNode2To(builder);
-							} else {
-								appendNode6To(builder);
-								appendNode5To(builder);
-								appendNode4To(builder);
-								appendNode3To(builder);
-								appendNode2To(builder);
-							}
+			private void appendTo(final «genericName» builder) {
+				if (node1 != null) {
+					if (node2 != null) {
+						appendInitTo(builder);
+						if (node3 == null) {
+							appendNode2To(builder);
+						} else if (node4 == null) {
+							appendNode3To(builder);
+							appendNode2To(builder);
+						} else if (node5 == null) {
+							appendNode4To(builder);
+							appendNode3To(builder);
+							appendNode2To(builder);
+						} else if (node6 == null) {
+							appendNode5To(builder);
+							appendNode4To(builder);
+							appendNode3To(builder);
+							appendNode2To(builder);
+						} else {
+							appendNode6To(builder);
+							appendNode5To(builder);
+							appendNode4To(builder);
+							appendNode3To(builder);
+							appendNode2To(builder);
 						}
-						appendNode1To(builder);
 					}
+					appendNode1To(builder);
 				}
+			}
 
-				private void appendInitTo(final «genericName» builder) {
-					for (final «type.javaName» value : init) {
+			private void appendInitTo(final «genericName» builder) {
+				for (final «type.javaName» value : init) {
+					builder.append(value);
+				}
+			}
+
+			private void appendNode1To(final «genericName» builder) {
+				for (int i = 0; i < index1; i++) {
+					builder.append(node1[i]);
+				}
+			}
+
+			private void appendNode2To(final «genericName» builder) {
+				for (int i = 0; i < index2 - 1; i++) {
+					for (final «type.javaName» value : node2[i]) {
 						builder.append(value);
 					}
 				}
+			}
 
-				private void appendNode1To(final «genericName» builder) {
-					for (int i = 0; i < index1; i++) {
-						builder.append(node1[i]);
-					}
-				}
-
-				private void appendNode2To(final «genericName» builder) {
-					for (int i = 0; i < index2 - 1; i++) {
-						for (final «type.javaName» value : node2[i]) {
+			private void appendNode3To(final «genericName» builder) {
+				for (int i = 0; i < index3 - 1; i++) {
+					for (final «type.javaName»[] n1 : node3[i]) {
+						for (final «type.javaName» value : n1) {
 							builder.append(value);
 						}
 					}
 				}
+			}
 
-				private void appendNode3To(final «genericName» builder) {
-					for (int i = 0; i < index3 - 1; i++) {
-						for (final «type.javaName»[] n1 : node3[i]) {
+			private void appendNode4To(final «genericName» builder) {
+				for (int i = 0; i < index4 - 1; i++) {
+					for (final «type.javaName»[][] n2 : node4[i]) {
+						for (final «type.javaName»[] n1 : n2) {
 							for (final «type.javaName» value : n1) {
 								builder.append(value);
 							}
 						}
 					}
 				}
+			}
 
-				private void appendNode4To(final «genericName» builder) {
-					for (int i = 0; i < index4 - 1; i++) {
-						for (final «type.javaName»[][] n2 : node4[i]) {
+			private void appendNode5To(final «genericName» builder) {
+				for (int i = 0; i < index5 - 1; i++) {
+					for (final «type.javaName»[][][] n3 : node5[i]) {
+						for (final «type.javaName»[][] n2 : n3) {
 							for (final «type.javaName»[] n1 : n2) {
 								for (final «type.javaName» value : n1) {
 									builder.append(value);
@@ -337,10 +349,12 @@ final class SeqBuilderGenerator implements ClassGenerator {
 						}
 					}
 				}
+			}
 
-				private void appendNode5To(final «genericName» builder) {
-					for (int i = 0; i < index5 - 1; i++) {
-						for (final «type.javaName»[][][] n3 : node5[i]) {
+			private void appendNode6To(final «genericName» builder) {
+				for (int i = 0; i < index6 - 1; i++) {
+					for (final «type.javaName»[][][][] n4 : node6[i]) {
+						for (final «type.javaName»[][][] n3 : n4) {
 							for (final «type.javaName»[][] n2 : n3) {
 								for (final «type.javaName»[] n1 : n2) {
 									for (final «type.javaName» value : n1) {
@@ -351,23 +365,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 						}
 					}
 				}
-
-				private void appendNode6To(final «genericName» builder) {
-					for (int i = 0; i < index6 - 1; i++) {
-						for (final «type.javaName»[][][][] n4 : node6[i]) {
-							for (final «type.javaName»[][][] n3 : n4) {
-								for (final «type.javaName»[][] n2 : n3) {
-									for (final «type.javaName»[] n1 : n2) {
-										for (final «type.javaName» value : n1) {
-											builder.append(value);
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			«ENDIF»
+			}
 
 			@Override
 			public String toString() {
