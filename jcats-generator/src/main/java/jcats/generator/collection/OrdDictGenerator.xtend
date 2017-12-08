@@ -41,7 +41,7 @@ class OrdDictGenerator implements ClassGenerator {
 				this.color = color;
 			}
 
-			public static <K, A> OrdDict<K, A> emptyDict(final Ord<K> ord) {
+			public static <K, A> OrdDict<K, A> emptyOrdDict(final Ord<K> ord) {
 				return new OrdDict<>(null, null, null, ord, BLACK);
 			}
 
