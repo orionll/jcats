@@ -46,7 +46,7 @@ public class TestOrdDict {
 
 	@Test
 	public void testPutRandom() {
-		OrdDict<Character, Integer> dict = OrdDict.emptyDict(Ord.<Character>ord());
+		OrdDict<Character, Integer> dict = OrdDict.emptyOrdDict(Ord.<Character>ord());
 		final Map<Character, Integer> map = new HashMap<>();
 
 		for (int i = 0; i < 100; i++) {
@@ -61,7 +61,7 @@ public class TestOrdDict {
 
 	@Test
 	public void testEmptyIterator() {
-		final OrdDict<Character, Object> dict = OrdDict.emptyDict(Ord.<Character>ord());
+		final OrdDict<Character, Object> dict = OrdDict.emptyOrdDict(Ord.<Character>ord());
 		assertEquals(0, Iterators.size(dict.iterator()));
 	}
 
@@ -76,7 +76,7 @@ public class TestOrdDict {
 	}
 
 	private static OrdDict<Character, String> createTestDict() {
-		OrdDict<Character, String> dict = OrdDict.emptyDict(Ord.<Character>ord());
+		OrdDict<Character, String> dict = OrdDict.emptyOrdDict(Ord.<Character>ord());
 		dict = dict.put('E', "e");
 		dict = dict.put('A', "a");
 		dict = dict.put('R', "r");
