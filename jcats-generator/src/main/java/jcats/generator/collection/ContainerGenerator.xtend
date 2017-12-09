@@ -148,6 +148,38 @@ final class ContainerGenerator implements InterfaceGenerator {
 				return intNone();
 			}
 
+			default «type.optionGenericName» firstMatch(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				«IF Type.javaUnboxedTypes.contains(type)»
+					final «type.iteratorGenericName» iterator = iterator();
+					while (iterator.hasNext()) {
+						final «type.genericName» value = iterator.«type.iteratorNext»();
+						if (predicate.apply(value)) {
+							return «type.someName»(value);
+						}
+					}
+				«ELSE»
+					for (final «type.genericName» value : this) {
+						if (predicate.apply(value)) {
+							return «type.someName»(value);
+						}
+					}
+				«ENDIF»
+				return «type.noneName»();
+			}
+
+			default «type.optionGenericName» lastMatch(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				final «type.iteratorGenericName» iterator = reverseIterator();
+				while (iterator.hasNext()) {
+					final «type.genericName» value = iterator.«type.iteratorNext»();
+					if (predicate.apply(value)) {
+						return «type.someName»(value);
+					}
+				}
+				return «type.noneName»();
+			}
+
 			default boolean anyMatch(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
 				«IF Type.javaUnboxedTypes.contains(type)»
