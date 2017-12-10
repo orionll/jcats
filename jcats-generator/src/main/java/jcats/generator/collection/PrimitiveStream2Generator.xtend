@@ -254,11 +254,11 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 			}
 
 			public String joinToString() {
-				return mapToObj(«type.boxedName»::toString).collect(Collectors.joining());
+				return stream.mapToObj(«type.boxedName»::toString).collect(Collectors.joining());
 			}
 
 			public String joinToStringWithSeparator(final String separator) {
-				return mapToObj(«type.boxedName»::toString).collect(Collectors.joining(separator));
+				return stream.mapToObj(«type.boxedName»::toString).collect(Collectors.joining(separator));
 			}
 
 			@Override

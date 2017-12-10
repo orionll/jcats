@@ -242,11 +242,11 @@ final class Stream2Generator implements ClassGenerator {
 			}
 
 			public String joinToString() {
-				return map(Object::toString).collect(Collectors.joining());
+				return stream.map(Object::toString).collect(Collectors.joining());
 			}
 
 			public String joinToStringWithSeparator(final String separator) {
-				return map(Object::toString).collect(Collectors.joining(separator));
+				return stream.map(Object::toString).collect(Collectors.joining(separator));
 			}
 
 			public List<A> toUnmodifiableList() {
