@@ -134,13 +134,23 @@ final class OptionGenerator implements ClassGenerator {
 				}
 			}
 
-			«IF type == Type.OBJECT»
-				public <B> B match(final F0<B> ifEmpty, final F<A, B> ifNotEmpty) {
-			«ELSE»
-				public <A> A match(final F0<A> ifEmpty, final «type.typeName»ObjectF<A> ifNotEmpty) {
-			«ENDIF»
-				requireNonNull(ifEmpty);
+			public void ifNotEmptyOrElse(final «type.effGenericName» ifNotEmpty, final Eff0 ifEmpty) {
 				requireNonNull(ifNotEmpty);
+				requireNonNull(ifEmpty);
+				if (isEmpty()) {
+					ifEmpty.apply();
+				} else {
+					ifNotEmpty.apply(value);
+				}
+			}
+
+			«IF type == Type.OBJECT»
+				public <B> B match(final F<A, B> ifNotEmpty, final F0<B> ifEmpty) {
+			«ELSE»
+				public <A> A match(final «type.typeName»ObjectF<A> ifNotEmpty, final F0<A> ifEmpty) {
+			«ENDIF»
+				requireNonNull(ifNotEmpty);
+				requireNonNull(ifEmpty);
 				if (isEmpty()) {
 					return ifEmpty.apply();
 				} else {
