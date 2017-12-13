@@ -82,7 +82,6 @@ final class Main {
 			new EquatableGenerator,
 			new SizedGenerator,
 			new OrderGenerator,
-			new OrdGenerator,
 			new StackGenerator,
 			new StackBuilderGenerator,
 			new KeyValueGenerator,
@@ -94,6 +93,7 @@ final class Main {
 			new Stream2Generator,
 			new jcats.generator.collection.CommonGenerator
 		],
+			OrdGenerator.generators,
 			MaybeGenerator.generators,
 			OptionGenerator.generators,
 			EitherGenerator.generators,

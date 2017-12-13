@@ -111,6 +111,14 @@ public enum Type {
 		return Generator.firstToLowerCase(shortName("None"));
 	}
 
+	public String ordShortName() {
+		return shortName("Ord");
+	}
+
+	public String ordGenericName() {
+		return genericName("Ord");
+	}
+
 	public String arrayShortName() {
 		return shortName("Array");
 	}
