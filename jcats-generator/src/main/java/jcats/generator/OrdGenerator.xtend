@@ -139,27 +139,51 @@ final class OrdGenerator implements ClassGenerator {
 			}
 
 			«IF type == Type.OBJECT»
-				default <B extends Comparable<B>> Ord<A> thenBy(final F<A, B> f) {
-					return then(Ord.<B>ord().contraMap(f));
+				default <B extends Comparable<B>> «genericName» thenBy(final F<A, B> f) {
+					return then(by(f));
 				}
 			«ELSE»
 				default <A extends Comparable<A>> «genericName» thenBy(final «type.typeName»ObjectF<A> f) {
-					return then(Ord.<A>ord().contraMapFrom«type.typeName»(f));
+					return then(by(f));
 				}
 			«ENDIF»
 
+			«FOR t : Type.primitives»
+				«IF type == Type.OBJECT»
+					default «genericName» thenBy«t.typeName»(final «t.typeName»F<A> f) {
+						return then(by«t.typeName»(f));
+					}
+				«ELSE»
+					default «genericName» thenBy«t.typeName»(final «type.typeName»«t.typeName»F f) {
+						return then(by«t.typeName»(f));
+					}
+				«ENDIF»
+
+			«ENDFOR»
 			«IF type == Type.OBJECT»
 				default <B extends Comparable<B>> Ord<A> thenByReverse(final F<A, B> f) {
-					return then(Ord.<B>reverseOrd().contraMap(f));
+					return then(byReverse(f));
 				}
 			«ELSE»
 				default <A extends Comparable<A>> «genericName» thenByReverse(final «type.typeName»ObjectF<A> f) {
-					return then(Ord.<A>reverseOrd().contraMapFrom«type.typeName»(f));
+					return then(byReverse(f));
 				}
 			«ENDIF»
 
+			«FOR t : Type.primitives»
+				«IF type == Type.OBJECT»
+					default «genericName» thenBy«t.typeName»Reverse(final «t.typeName»F<A> f) {
+						return then(by«t.typeName»Reverse(f));
+					}
+				«ELSE»
+					default «genericName» thenBy«t.typeName»Reverse(final «type.typeName»«t.typeName»F f) {
+						return then(by«t.typeName»Reverse(f));
+					}
+				«ENDIF»
+
+			«ENDFOR»
 			«IF type == Type.OBJECT»
-				default <B> Ord<A> thenByOrd(final F<A, B> f, final Ord<B> ord) {
+				default <B> «genericName» thenByOrd(final F<A, B> f, final Ord<B> ord) {
 					return then(ord.contraMap(f));
 				}
 			«ELSE»
@@ -168,6 +192,18 @@ final class OrdGenerator implements ClassGenerator {
 				}
 			«ENDIF»
 
+			«FOR t : Type.primitives»
+				«IF type == Type.OBJECT»
+					default «genericName» thenBy«t.typeName»Ord(final «t.typeName»F<A> f, final «t.ordGenericName» ord) {
+						return then(ord.contraMap(f));
+					}
+				«ELSE»
+					default «genericName» thenBy«t.typeName»Ord(final «type.typeName»«t.typeName»F f, final «t.ordGenericName» ord) {
+						return then(ord.contraMapFrom«type.typeName»(f));
+					}
+				«ENDIF»
+
+			«ENDFOR»
 			«IF type == Type.OBJECT»
 				default F2<A, A, Order> toF() {
 					return (final «type.genericName» x, final «type.genericName» y) -> {
@@ -231,7 +267,7 @@ final class OrdGenerator implements ClassGenerator {
 			«ENDIF»
 
 			«IF type == Type.OBJECT»
-				static <A extends Comparable<A>> Ord<A> ord() {
+				static <A extends Comparable<A>> «genericName» ord() {
 					return (Ord) NaturalOrd.INSTANCE;
 				}
 			«ELSE»
@@ -241,7 +277,7 @@ final class OrdGenerator implements ClassGenerator {
 			«ENDIF»
 
 			«IF type == Type.OBJECT»
-				static <A extends Comparable<A>> Ord<A> reverseOrd() {
+				static <A extends Comparable<A>> «genericName» reverseOrd() {
 					return (Ord) ReverseOrd.INSTANCE;
 				}
 			«ELSE»
@@ -251,7 +287,7 @@ final class OrdGenerator implements ClassGenerator {
 			«ENDIF»
 
 			«IF type == Type.OBJECT»
-				static <A, B extends Comparable<B>> Ord<A> by(final F<A, B> f) {
+				static <A, B extends Comparable<B>> «genericName» by(final F<A, B> f) {
 					return Ord.<B>ord().contraMap(f);
 				}
 			«ELSE»
@@ -259,7 +295,19 @@ final class OrdGenerator implements ClassGenerator {
 					return Ord.<A>ord().contraMapFrom«type.typeName»(f);
 				}
 			«ENDIF»
+			
+			«FOR t : Type.primitives»
+				«IF type == Type.OBJECT»
+					static <A> «genericName» by«t.typeName»(final «t.typeName»F<A> f) {
+						return «t.ordShortName».«t.ordShortName.firstToLowerCase»().contraMap(f);
+					}
+				«ELSE»
+					static «genericName» by«t.typeName»(final «type.typeName»«t.typeName»F f) {
+						return «t.ordShortName».«t.ordShortName.firstToLowerCase»().contraMapFrom«type.typeName»(f);
+					}
+				«ENDIF»
 
+			«ENDFOR»
 			«IF type == Type.OBJECT»
 				static <A, B extends Comparable<B>> Ord<A> byReverse(final F<A, B> f) {
 					return Ord.<B>reverseOrd().contraMap(f);
@@ -270,8 +318,20 @@ final class OrdGenerator implements ClassGenerator {
 				}
 			«ENDIF»
 
+			«FOR t : Type.primitives»
+				«IF type == Type.OBJECT»
+					static <A> «genericName» by«t.typeName»Reverse(final «t.typeName»F<A> f) {
+						return «t.ordShortName».«t.typeName.firstToLowerCase»ReverseOrd().contraMap(f);
+					}
+				«ELSE»
+					static «genericName» by«t.typeName»Reverse(final «type.typeName»«t.typeName»F f) {
+						return «t.ordShortName».«t.typeName.firstToLowerCase»ReverseOrd().contraMapFrom«type.typeName»(f);
+					}
+				«ENDIF»
+
+			«ENDFOR»
 			«IF type == Type.OBJECT»
-				static <A, B> Ord<A> byOrd(final F<A, B> f, final Ord<B> ord) {
+				static <A, B> «genericName» byOrd(final F<A, B> f, final Ord<B> ord) {
 					return ord.contraMap(f);
 				}
 			«ELSE»
@@ -279,6 +339,19 @@ final class OrdGenerator implements ClassGenerator {
 					return ord.contraMapFrom«type.typeName»(f);
 				}
 			«ENDIF»
+
+			«FOR t : Type.primitives»
+				«IF type == Type.OBJECT»
+					static <A> Ord<A> by«t.ordShortName»(final «t.typeName»F<A> f, final «t.ordGenericName» ord) {
+						return ord.contraMap(f);
+					}
+				«ELSE»
+					static «genericName» by«t.ordShortName»(final «type.typeName»«t.typeName»F f, final «t.ordGenericName» ord) {
+						return ord.contraMapFrom«type.typeName»(f);
+					}
+				«ENDIF»
+
+			«ENDFOR»
 			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #["A"], #[])»
