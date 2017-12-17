@@ -66,7 +66,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 			/**
 			 * O(1)
 			 */
-			public «genericName» append(final «type.javaName» value) {
+			public «genericName» append(final «type.genericName» value) {
 				«IF (type == Type.OBJECT)»
 					requireNonNull(value);
 				«ENDIF»
@@ -297,20 +297,20 @@ final class SeqBuilderGenerator implements ClassGenerator {
 
 			private void appendInitTo(final «genericName» builder) {
 				for (final «type.javaName» value : init) {
-					builder.append(value);
+					builder.append(«type.genericCast»value);
 				}
 			}
 
 			private void appendNode1To(final «genericName» builder) {
 				for (int i = 0; i < index1; i++) {
-					builder.append(node1[i]);
+					builder.append(«type.genericCast»node1[i]);
 				}
 			}
 
 			private void appendNode2To(final «genericName» builder) {
 				for (int i = 0; i < index2 - 1; i++) {
 					for (final «type.javaName» value : node2[i]) {
-						builder.append(value);
+						builder.append(«type.genericCast»value);
 					}
 				}
 			}
@@ -319,7 +319,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 				for (int i = 0; i < index3 - 1; i++) {
 					for (final «type.javaName»[] n1 : node3[i]) {
 						for (final «type.javaName» value : n1) {
-							builder.append(value);
+							builder.append(«type.genericCast»value);
 						}
 					}
 				}
@@ -330,7 +330,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 					for (final «type.javaName»[][] n2 : node4[i]) {
 						for (final «type.javaName»[] n1 : n2) {
 							for (final «type.javaName» value : n1) {
-								builder.append(value);
+								builder.append(«type.genericCast»value);
 							}
 						}
 					}
@@ -343,7 +343,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 						for (final «type.javaName»[][] n2 : n3) {
 							for (final «type.javaName»[] n1 : n2) {
 								for (final «type.javaName» value : n1) {
-									builder.append(value);
+									builder.append(«type.genericCast»value);
 								}
 							}
 						}
@@ -358,7 +358,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 							for (final «type.javaName»[][] n2 : n3) {
 								for (final «type.javaName»[] n1 : n2) {
 									for (final «type.javaName» value : n1) {
-										builder.append(value);
+										builder.append(«type.genericCast»value);
 									}
 								}
 							}
