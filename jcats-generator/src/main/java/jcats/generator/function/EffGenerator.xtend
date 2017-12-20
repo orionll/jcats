@@ -49,7 +49,7 @@ final class EffGenerator implements InterfaceGenerator {
 			«IF type == Type.OBJECT»
 				default <B> Eff<B> contraMap(final F<B, A> f) {
 					requireNonNull(f);
-					return (B b) -> {
+					return (final B b) -> {
 						requireNonNull(b);
 						final A a = requireNonNull(f.apply(b));
 						apply(a);
@@ -58,7 +58,7 @@ final class EffGenerator implements InterfaceGenerator {
 			«ELSE»
 				default <A> Eff<A> contraMap(final «type.typeName»F<A> f) {
 					requireNonNull(f);
-					return (A a) -> apply(f.apply(requireNonNull(a)));
+					return (final A a) -> apply(f.apply(requireNonNull(a)));
 				}
 			«ENDIF»
 
@@ -70,7 +70,7 @@ final class EffGenerator implements InterfaceGenerator {
 			«ENDIF»
 			«IF type == Type.OBJECT»
 				default Consumer<A> toConsumer() {
-					return (A a) -> apply(requireNonNull(a));
+					return (final A a) -> apply(requireNonNull(a));
 				}
 			«ELSEIF type != Type.BOOLEAN»
 				default «type.typeName»Consumer to«type.typeName»Consumer() {
@@ -85,7 +85,7 @@ final class EffGenerator implements InterfaceGenerator {
 			«IF type == Type.OBJECT»
 				static <A> Eff<A> fromConsumer(final Consumer<A> c) {
 					requireNonNull(c);
-					return (A a) -> c.accept(requireNonNull(a));
+					return (final A a) -> c.accept(requireNonNull(a));
 				}
 
 			«ELSEIF type != Type.BOOLEAN»
