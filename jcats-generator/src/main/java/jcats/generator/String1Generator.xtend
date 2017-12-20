@@ -116,6 +116,10 @@ final class String1Generator implements ClassGenerator {
 				}
 			}
 
+			public boolean isEqualToString(final String other) {
+				return str.equals(other);
+			}
+
 			public boolean equalsIgnoreCase(final String1 other) {
 				return str.equalsIgnoreCase(other.str);
 			}
@@ -140,11 +144,11 @@ final class String1Generator implements ClassGenerator {
 			}
 
 			«javadocSynonym("string1")»
-			public static String1 of(final String str) {
+			public static String1 of(final String str) throws IllegalArgumentException {
 				return string1(str);
 			}
 
-			public static String1 string1(final String str) {
+			public static String1 string1(final String str) throws IllegalArgumentException {
 				if (str.isEmpty()) {
 					throw new IllegalArgumentException("Empty string");
 				} else {
