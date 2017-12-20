@@ -402,6 +402,10 @@ final class ContainerGenerator implements InterfaceGenerator {
 				foreach(action::accept);
 			}
 
+			default void printAll() {
+				foreach(System.out::println);
+			}
+
 			«IF Type.javaUnboxedTypes.contains(type)»
 				@Override
 				«type.iteratorGenericName» iterator();
