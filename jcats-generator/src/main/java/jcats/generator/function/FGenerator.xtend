@@ -401,7 +401,37 @@ final class FGenerator implements InterfaceGenerator {
 				«ENDIF»
 			«ENDIF»
 			«IF from == Type.OBJECT && to == Type.OBJECT»
-				static <A, B> F<A, B> constant(final B b) {
+				static <A, B, C> F<A, C> andThen(final «shortName»«typeParams» f, final F<B, C> g) {
+			«ELSEIF to == Type.OBJECT»
+				static <A, B> «shortName»<B> andThen(final «shortName»«typeParams» f, final F<A, B> g) {
+			«ELSEIF from == Type.OBJECT»
+				static <A, B> F<A, B> andThen(final «shortName»«typeParams» f, final «to.typeName»ObjectF<B> g) {
+			«ELSE»
+				static <A> «from.typeName»ObjectF<A> andThen(final «shortName»«typeParams» f, final «to.typeName»ObjectF<A> g) {
+			«ENDIF»
+				return f.map(g);
+			}
+
+			«IF from == Type.OBJECT && to == Type.OBJECT»
+				static <A, B, C> F<A, C> compose(final F<B, C> f, final «shortName»«typeParams» g) {
+					return g.map(f);
+				}
+			«ELSEIF to == Type.OBJECT»
+				static <A, B> F<A, B> compose(final «shortName»<B> f, final «from.typeName»F<A> g) {
+					return g.map(f);
+				}
+			«ELSEIF from == Type.OBJECT»
+				static <A, B> «to.typeName»F<A> compose(final «to.typeName»F<B> f, final F<A, B> g) {
+					return g.mapTo«to.typeName»(f);
+				}
+			«ELSE»
+				static <A> «to.typeName»F<A> compose(final «shortName» f, final «from.typeName»F<A> g) {
+					return g.mapTo«to.typeName»(f);
+				}
+			«ENDIF»
+
+			«IF from == Type.OBJECT && to == Type.OBJECT»
+				static <A, B> F<A, B> always(final B b) {
 					requireNonNull(b);
 					return (final A a) -> {
 						requireNonNull(a);
@@ -409,19 +439,19 @@ final class FGenerator implements InterfaceGenerator {
 					};
 				}
 			«ELSEIF to == Type.OBJECT»
-				static <A> «shortName»<A> constant(final A a) {
+				static <A> «shortName»<A> always(final A a) {
 					requireNonNull(a);
 					return (final «from.javaName» __) -> a;
 				}
 			«ELSEIF from == Type.OBJECT»
-				static <A> «shortName»<A> constant(final «toName» value) {
+				static <A> «shortName»<A> always(final «toName» value) {
 					return (final A a) -> {
 						requireNonNull(a);
 						return value;
 					};
 				}
 			«ELSE»
-				static «shortName» constant(final «toName» value) {
+				static «shortName» always(final «toName» value) {
 					return (final «from.javaName» __) -> value;
 				}
 			«ENDIF»

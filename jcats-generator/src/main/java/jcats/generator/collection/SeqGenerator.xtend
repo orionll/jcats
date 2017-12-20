@@ -112,7 +112,7 @@ class SeqGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					return update(index, (final «type.genericName» __) -> value);
 				«ELSE»
-					return update(index, «type.typeName»«type.typeName»F.constant(value));
+					return update(index, «type.typeName»«type.typeName»F.always(value));
 				«ENDIF»
 			}
 
