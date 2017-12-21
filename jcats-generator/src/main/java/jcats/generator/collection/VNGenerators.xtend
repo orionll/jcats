@@ -141,6 +141,18 @@ final class VNGenerators {
 							return v«arity»(«(1 .. arity).map["f.apply(a" + it + ")"].join(", ")»);
 						}
 					«ELSE»
+						«IF arity == 2»
+							public <A> A match (final «type.typeName»«type.typeName»ObjectF2<A> f) {
+								final A a = f.apply(a1, a2);
+								return requireNonNull(a);
+							}
+						«ELSE»
+							public <A> A match(final F«arity»<«(1 .. arity).map[type.boxedName + ", "].join»A> f) {
+								final A a = f.apply(«(1 .. arity).map["a" + it].join(", ")»);
+								return requireNonNull(a);
+							}
+						«ENDIF»
+
 						public <A> V«arity»<A> map(final «type.typeName»ObjectF<A> f) {
 							return v«arity»(«(1 .. arity).map["f.apply(a" + it + ")"].join(", ")»);
 						}

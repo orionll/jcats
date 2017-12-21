@@ -104,16 +104,9 @@ class PGenerator implements ClassGenerator {
 		import java.io.Serializable;
 		import java.util.Map.Entry;
 		import java.util.AbstractMap.SimpleImmutableEntry;
-		import «Constants.F»;
-		«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
-			import «Constants.F2»;
-		«ENDIF»
-		«IF type1 != Type.OBJECT»
-			import «Constants.FUNCTION».«type1.typeName»ObjectF;
-		«ENDIF»
-		«IF type2 != Type.OBJECT»
-			import «Constants.FUNCTION».«type2.typeName»ObjectF;
-		«ENDIF»
+
+		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
 		«IF type1 != Type.OBJECT || type2 != Type.OBJECT»
@@ -170,8 +163,23 @@ class PGenerator implements ClassGenerator {
 					final B b = f.apply(a1, a2);
 					return requireNonNull(b);
 				}
-
+			«ELSEIF type1 == Type.OBJECT && type2 != Type.OBJECT»
+				public <B> B match(final Object«type2.typeName»ObjectF2<A, B>  f) {
+					final B b = f.apply(a1, a2);
+					return requireNonNull(b);
+				}
+			«ELSEIF type1 != Type.OBJECT && type2 == Type.OBJECT»
+				public <B> B match(final «type1.typeName»ObjectObjectF2<A, B>  f) {
+					final B b = f.apply(a1, a2);
+					return requireNonNull(b);
+				}
+			«ELSE»
+				public <A> A match(final «type1.typeName»«type2.typeName»ObjectF2<A>  f) {
+					final A a = f.apply(a1, a2);
+					return requireNonNull(a);
+				}
 			«ENDIF»
+
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 				public <B> P<B, A2> map1(final F<A1, B> f) {
 			«ELSEIF type2 == Type.OBJECT»
