@@ -52,9 +52,11 @@ class SeqGenerator implements ClassGenerator {
 
 		import static java.lang.Math.min;
 		import static java.util.Objects.requireNonNull;
-		«IF type != Type.OBJECT»
-			import static jcats.collection.Seq.*;
-		«ENDIF»
+		«FOR t : Type.values»
+			«IF t != type»
+				import static «Constants.COLLECTION».«t.seqShortName».*;
+			«ENDIF»
+		«ENDFOR»
 		«IF type == Type.OBJECT»
 			import static «Constants.F».*;
 			import static «Constants.P».*;
@@ -299,22 +301,37 @@ class SeqGenerator implements ClassGenerator {
 
 			«ENDFOR»
 			«IF type == Type.OBJECT»
-				public final <B> Seq<B> flatMap(final F<A, Seq<B>> f) {
+				public final <B> Seq<B> flatMap(final F<A, Iterable<B>> f) {
 			«ELSE»
-				public final <A> Seq<A> flatMap(final «type.typeName»ObjectF<Seq<A>> f) {
+				public final <A> Seq<A> flatMap(final «type.typeName»ObjectF<Iterable<A>> f) {
 			«ENDIF»
 				requireNonNull(f);
 				if (isEmpty()) {
 					return emptySeq();
 				} else {
 					final SeqBuilder<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> builder = new SeqBuilder<>();
-					for (final «type.genericName» value : this) {
-						builder.appendAll(f.apply(value));
-					}
+					foreach((final «type.genericName» value) -> builder.appendAll(f.apply(value)));
 					return builder.build();
 				}
 			}
 
+			«FOR toType : Type.primitives»
+				«IF type == Type.OBJECT»
+					public final «toType.seqGenericName» flatMapTo«toType.typeName»(final F<A, Iterable<«toType.genericBoxedName»>> f) {
+				«ELSE»
+					public final «toType.seqGenericName» flatMapTo«toType.typeName»(final «type.typeName»ObjectF<Iterable<«toType.genericBoxedName»>> f) {
+				«ENDIF»
+					requireNonNull(f);
+					if (isEmpty()) {
+						return empty«toType.seqShortName»();
+					} else {
+						final «toType.seqBuilderGenericName» builder = new «toType.seqBuilderDiamondName»();
+						foreach((final «type.genericName» value) -> builder.appendAll(f.apply(value)));
+						return builder.build();
+					}
+				}
+
+			«ENDFOR»
 			public final «genericName» filter(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
 				if (isEmpty()) {
@@ -1169,9 +1186,17 @@ class SeqGenerator implements ClassGenerator {
 
 			abstract void initSeqBuilder(final «seqBuilderName» builder);
 
-			«IF type == Type.OBJECT /* TODO */»
-				«join»
+			«IF type == Type.OBJECT»
+				public static <A> Seq<A> join(final Seq<Iterable<A>> seq) {
+					return seq.flatMap(id());
+				}
 
+				«FOR toType : Type.primitives»
+					public static «toType.seqGenericName» joinTo«toType.typeName»(final Seq<Iterable<«toType.genericBoxedName»>> seq) {
+						return seq.flatMapTo«toType.typeName»(id());
+					}
+
+				«ENDFOR»
 			«ENDIF»
 			«IF Type.javaUnboxedTypes.contains(type)»
 				@Override

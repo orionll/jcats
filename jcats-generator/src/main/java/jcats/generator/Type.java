@@ -143,6 +143,10 @@ public enum Type {
 		return genericName("SeqBuilder");
 	}
 
+	public String seqBuilderDiamondName() {
+		return diamondName("SeqBuilder");
+	}
+
 	public String effShortName() {
 		return shortName("Eff");
 	}
