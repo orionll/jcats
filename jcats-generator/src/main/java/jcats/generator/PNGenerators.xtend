@@ -14,6 +14,7 @@ final class PNGenerators {
 	def static fullName(int arity) { Constants.P + arity }
 	def static shortName(int arity) { if (arity == 2) "P" else "P" + arity }
 	def static parameters(int arity) { '''<«(1 .. arity).map["A" + it].join(", ")»>''' }
+	def static covariantParameters(int arity) { '''<«(1 .. arity).map["@Covariant A" + it].join(", ")»>''' }
 
 	private def static Generator generator(int arity) {
 		new ClassGenerator {
@@ -30,7 +31,7 @@ final class PNGenerators {
 
 				import static java.util.Objects.requireNonNull;
 
-				public final class «shortName»«parameters(arity)» implements Equatable<«shortName»«parameters(arity)»>, Serializable {
+				public final class «shortName»«covariantParameters(arity)» implements Equatable<«shortName»«parameters(arity)»>, Serializable {
 					«FOR i : 1 .. arity»
 						private final A«i» a«i»;
 					«ENDFOR»

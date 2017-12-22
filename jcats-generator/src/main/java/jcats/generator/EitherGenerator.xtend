@@ -32,6 +32,18 @@ final class EitherGenerator implements ClassGenerator {
 		}
 	}
 
+	def covariantName() {
+		if (leftType == Type.OBJECT && rightType == Type.OBJECT) {
+			"Either<@Covariant X, @Covariant A>"
+		} else if (leftType == Type.OBJECT) {
+			shortName + "<@Covariant X>"
+		} else if (rightType == Type.OBJECT) {
+			shortName + "<@Covariant A>"
+		} else {
+			shortName
+		}
+	}
+
 	def paramGenericName() {
 		if (leftType == Type.OBJECT && rightType == Type.OBJECT) {
 			"<X, A> Either<X, A>"
@@ -98,7 +110,7 @@ final class EitherGenerator implements ClassGenerator {
 			import static «Constants.EITHER».*;
 		«ENDIF»
 
-		public final class «genericName» implements «rightType.maybeGenericName», Equatable<«genericName»>, Serializable {
+		public final class «covariantName» implements «rightType.maybeGenericName», Equatable<«genericName»>, Serializable {
 			private final «leftTypeGenericName» left;
 			private final «rightType.genericName» right;
 			«IF leftType == Type.OBJECT || rightType == Type.OBJECT»

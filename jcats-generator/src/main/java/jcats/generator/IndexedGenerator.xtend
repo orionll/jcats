@@ -18,7 +18,7 @@ final class IndexedGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
-		public interface «type.indexedGenericName» {
+		public interface «type.covariantName("Indexed")» {
 			«type.genericName» get(final int index) throws IndexOutOfBoundsException;
 		}
 	''' }

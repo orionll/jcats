@@ -42,6 +42,17 @@ class Eff2Generator implements InterfaceGenerator {
 		}
 	}
 
+	def String variantName() {
+		shortName +
+		if (type1 == Type.OBJECT && type2 == Type.OBJECT) {
+			"<@Contravariant A1, @Contravariant A2>"
+		} else if (type1 == Type.OBJECT || type2 == Type.OBJECT) {
+			"<@Contravariant A>"
+		} else {
+			""
+		}
+	}
+
 	def type1GenericName() {
 		if (type1 == Type.OBJECT && type2 == Type.OBJECT) "A1"
 		else if (type1 == Type.OBJECT) "A"
@@ -62,10 +73,12 @@ class Eff2Generator implements InterfaceGenerator {
 			import java.util.function.Obj«type2.typeName»Consumer;
 		«ENDIF»
 
+		import «Constants.JCATS».*;
+
 		import static java.util.Objects.requireNonNull;
 
 		@FunctionalInterface
-		public interface «genericName» {
+		public interface «variantName» {
 			void apply(final «type1GenericName» value1, final «type2GenericName» value2);
 
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»

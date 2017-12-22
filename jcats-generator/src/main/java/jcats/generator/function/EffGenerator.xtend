@@ -40,10 +40,12 @@ final class EffGenerator implements InterfaceGenerator {
 			import java.util.function.«type.typeName»Consumer;
 		«ENDIF»
 
+		import «Constants.JCATS».*;
+
 		import static java.util.Objects.requireNonNull;
 
 		@FunctionalInterface
-		public interface «shortName»«if (type == Type.OBJECT) "<A>" else ""» {
+		public interface «shortName»«if (type == Type.OBJECT) "<@Contravariant A>" else ""» {
 			void apply(final «typeName» value);
 
 			«IF type == Type.OBJECT»

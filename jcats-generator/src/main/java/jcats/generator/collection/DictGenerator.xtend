@@ -26,7 +26,7 @@ class DictGenerator implements ClassGenerator {
 		import static jcats.collection.Common.*;
 
 
-		public final class Dict<K, A> implements KeyValue<K, A>, Serializable {
+		public final class Dict<K, @Covariant A> implements KeyValue<K, A>, Serializable {
 
 			private static final Dict EMPTY = new Dict(0, 0, Common.«Type.OBJECT.emptyArrayName», 0);
 

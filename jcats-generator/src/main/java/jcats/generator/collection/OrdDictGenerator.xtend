@@ -23,7 +23,7 @@ class OrdDictGenerator implements ClassGenerator {
 		import static jcats.P.p;
 		import static jcats.collection.Common.*;
 
-		public final class OrdDict<K, A> implements KeyValue<K, A> {
+		public final class OrdDict<K, @Covariant A> implements KeyValue<K, A> {
 			static final boolean RED = false;
 			static final boolean BLACK = true;
 

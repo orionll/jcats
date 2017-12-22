@@ -50,7 +50,7 @@ final class OptionGenerator implements ClassGenerator {
 			«ENDIF»
 		«ENDFOR»
 
-		public final class «genericName» implements «type.maybeGenericName», Equatable<«genericName»>, Serializable {
+		public final class «type.covariantName("Option")» implements «type.maybeGenericName», Equatable<«genericName»>, Serializable {
 			«IF type == Type.OBJECT»
 				private static final Option NONE = new Option(null);
 			«ELSE»

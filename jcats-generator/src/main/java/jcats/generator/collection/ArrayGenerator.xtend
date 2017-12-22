@@ -61,7 +61,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import static «Constants.JCATS».IntOption.*;
 
 
-		public final class «genericName» implements «type.indexedContainerGenericName», Serializable {
+		public final class «type.covariantName("Array")» implements «type.indexedContainerGenericName», Serializable {
 			static final «shortName» EMPTY = new «shortName»(«type.emptyArrayName»);
 
 			final «type.javaName»[] array;

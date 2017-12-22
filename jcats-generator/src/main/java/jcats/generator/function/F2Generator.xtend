@@ -33,21 +33,21 @@ class F2Generator implements InterfaceGenerator {
 		}
 	}
 
-	def genericName() {
+	def variantName() {
 		shortName +
 		if (returnType == Type.OBJECT) {
 			if (type1 == Type.OBJECT && type2 == Type.OBJECT) {
-				"<A1, A2, B>"
+				"<@Contravariant A1, @Contravariant A2, @Covariant B>"
 			} else if (type1 == Type.OBJECT || type2 == Type.OBJECT) {
-				"<A, B>"
+				"<@Contravariant A, @Covariant B>"
 			} else {
-				"<A>"
+				"<@Covariant A>"
 			}
 		} else {
 			if (type1 == Type.OBJECT && type2 == Type.OBJECT) {
-				"<A1, A2>"
+				"<@Contravariant A1, @Contravariant A2>"
 			} else if (type1 == Type.OBJECT || type2 == Type.OBJECT) {
-				"<A>"
+				"<@Contravariant A>"
 			} else {
 				""
 			}
@@ -120,10 +120,12 @@ class F2Generator implements InterfaceGenerator {
 			import java.util.function.«returnType.typeName»BinaryOperator;
 		«ENDIF»
 
+		import «Constants.JCATS».*;
+
 		import static java.util.Objects.requireNonNull;
 
 		@FunctionalInterface
-		public interface «genericName» {
+		public interface «variantName» {
 
 			«returnTypeGenericName» apply(final «type1GenericName» value1, final «type2GenericName» value2);
 

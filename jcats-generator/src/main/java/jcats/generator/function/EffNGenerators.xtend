@@ -17,10 +17,12 @@ final class EffNGenerators {
 			override sourceCode() { '''
 				package «Constants.FUNCTION»;
 
+				import «Constants.JCATS».*;
+
 				import static java.util.Objects.requireNonNull;
 
 				@FunctionalInterface
-				public interface Eff«arity»<«(1 .. arity).map["A" + it].join(", ")»> {
+				public interface Eff«arity»<«(1 .. arity).map["@Contravariant A" + it].join(", ")»> {
 					void apply(«(1 .. arity).map["final A" + it + " a" + it].join(", ")»);
 
 					«FOR i : 1 .. arity»

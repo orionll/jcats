@@ -50,7 +50,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 		«ENDIF»
 		import static «Constants.COLLECTION».Common.*;
 
-		public interface «genericName» extends Iterable<«type.genericBoxedName»>, Sized {
+		public interface «type.covariantName("Container")» extends Iterable<«type.genericBoxedName»>, Sized {
 
 			@Override
 			default int size() {

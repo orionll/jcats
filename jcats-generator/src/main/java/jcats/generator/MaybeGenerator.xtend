@@ -45,7 +45,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 		«ENDIF»
 		import static java.util.Objects.requireNonNull;
 
-		public interface «genericName» extends Iterable<«type.genericBoxedName»>, Sized {
+		public interface «type.covariantName("Maybe")» extends Iterable<«type.genericBoxedName»>, Sized {
 			«IF type == Type.OBJECT»
 				A getOrNull();
 

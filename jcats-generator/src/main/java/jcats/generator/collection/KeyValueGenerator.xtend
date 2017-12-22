@@ -31,7 +31,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 		import static «Constants.COMMON».*;
 		import static «Constants.EITHER».*;
 
-		public interface KeyValue<K, A> extends Iterable<P<K, A>>, Equatable<KeyValue<K, A>>, Sized {
+		public interface KeyValue<K, @Covariant A> extends Iterable<P<K, A>>, Equatable<KeyValue<K, A>>, Sized {
 
 			default Option<A> get(final K key) {
 				return Option.fromNullable(getOrNull(key));

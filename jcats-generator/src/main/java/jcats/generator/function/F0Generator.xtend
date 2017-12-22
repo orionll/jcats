@@ -42,7 +42,7 @@ final class F0Generator implements InterfaceGenerator {
 		import static «Constants.F».id;
 
 		@FunctionalInterface
-		public interface «shortName»«if (type == Type.OBJECT) "<A>" else ""» {
+		public interface «type.covariantName("F0")» {
 			«type.genericName» apply();
 
 			«IF type == Type.OBJECT»

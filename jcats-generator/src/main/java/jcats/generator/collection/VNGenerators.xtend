@@ -54,7 +54,7 @@ final class VNGenerators {
 				«ENDIF»
 				import static «Constants.COMMON».*;
 
-				public final class «genericName» implements «type.indexedContainerGenericName», Serializable {
+				public final class «type.covariantName(baseName)» implements «type.indexedContainerGenericName», Serializable {
 					final «type.genericName» «(1 .. arity).map["a" + it].join(", ")»;
 
 					«shortName»(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {

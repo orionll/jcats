@@ -35,7 +35,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.COMMON».*;
 
-		public interface «genericName» extends «type.containerGenericName», Equatable<«genericName»> {
+		public interface «type.covariantName("UniqueContainer")» extends «type.containerGenericName», Equatable<«genericName»> {
 
 			@Override
 			default Set<«type.genericBoxedName»> asCollection() {

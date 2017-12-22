@@ -67,7 +67,7 @@ class SeqGenerator implements ClassGenerator {
 		import static «Constants.COMMON».*;
 
 
-		public abstract class «genericName» implements «type.indexedContainerGenericName», Serializable {
+		public abstract class «type.covariantName("Seq")» implements «type.indexedContainerGenericName», Serializable {
 			private static final «shortName» EMPTY = new «shortName»0();
 
 			static final «type.javaName»[][] EMPTY_NODE2 = new «type.javaName»[0][];

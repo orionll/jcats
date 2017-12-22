@@ -51,6 +51,14 @@ public enum Type {
 		return (this == OBJECT) ? clazz + "<A>" : typeName() + clazz;
 	}
 
+	public String covariantName(final String clazz) {
+		return (this == OBJECT) ? clazz + "<@Covariant A>" : typeName() + clazz;
+	}
+
+	public String contravariantName(final String clazz) {
+		return (this == OBJECT) ? clazz + "<@Contravariant A>" : typeName() + clazz;
+	}
+
 	public String paramGenericName(final String clazz) {
 		return (this == OBJECT) ? "<A> " + clazz + "<A>" : typeName() + clazz;
 	}

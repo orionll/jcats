@@ -39,7 +39,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		import static «Constants.JCATS».IntOption.*;
 		import static «Constants.COMMON».*;
 
-		public interface «genericName» extends «type.containerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
+		public interface «type.covariantName("IndexedContainer")» extends «type.containerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
 
 			@Override
 			default List<«type.genericBoxedName»> asCollection() {

@@ -40,6 +40,18 @@ final class FGenerator implements InterfaceGenerator {
 		}
 	}
 
+	def variantTypeParams() {
+		if (from == Type.OBJECT && to == Type.OBJECT) {
+			"<@Contravariant A, @Covariant B>"
+		} else if (from == Type.OBJECT) {
+			"<@Contravariant A>"
+		} else if (to == Type.OBJECT) {
+			"<@Covariant A>"
+		} else {
+			""
+		}
+	}
+
 	def fromName() {
 		if (from == Type.OBJECT) "A" else from.javaName
 	}
@@ -80,11 +92,13 @@ final class FGenerator implements InterfaceGenerator {
 			import java.util.function.To«to.typeName»Function;
 		«ENDIF»
 
+		import «Constants.JCATS».*;
+
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.F».id;
 
 		@FunctionalInterface
-		public interface «shortName»«typeParams» {
+		public interface «shortName»«variantTypeParams» {
 			«toName» apply(final «fromName» value);
 
 			«IF from == Type.OBJECT && to == Type.OBJECT»

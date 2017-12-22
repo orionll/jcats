@@ -91,6 +91,8 @@ final class Main {
 			new CastsGenerator,
 			new String1Generator,
 			new Stream2Generator,
+			varianceAnnotationGenerator(true),
+			varianceAnnotationGenerator(false),
 			new jcats.generator.collection.CommonGenerator
 		],
 			OrdGenerator.generators,
@@ -124,6 +126,35 @@ final class Main {
 			PrimitiveStream2Generator.generators,
 			VNGenerators.generators
 		].flatten.toList
+	}
+
+	private def static Generator varianceAnnotationGenerator(boolean covariant) {
+		new Generator() {
+			def shortName() {
+				if (covariant) "Covariant" else "Contravariant"
+			}
+
+			override className() {
+				Constants.JCATS + "." + shortName
+			}
+
+			override sourceCode() { '''
+				package «Constants.JCATS»;
+
+				import java.lang.annotation.Documented;
+				import java.lang.annotation.Retention;
+				import java.lang.annotation.Target;
+
+				import static java.lang.annotation.ElementType.TYPE_PARAMETER;
+				import static java.lang.annotation.RetentionPolicy.SOURCE;
+
+				@Documented
+				@Retention(SOURCE)
+				@Target(TYPE_PARAMETER)
+				public @interface «shortName» {
+				}
+			''' }
+		}
 	}
 
 	private def static validate(String sourceCode, Path path) {

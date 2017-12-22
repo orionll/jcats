@@ -27,7 +27,7 @@ final class OrdGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 
 		@FunctionalInterface
-		public interface «genericName» {
+		public interface «type.contravariantName("Ord")» {
 
 			Order compare(final «type.genericName» x, final «type.genericName» y);
 

@@ -30,6 +30,16 @@ class PGenerator implements ClassGenerator {
 		}
 	}
 
+	def covariantName() {
+		if (type1 == Type.OBJECT && type2 == Type.OBJECT) {
+			"P<@Covariant A1, @Covariant A2>"
+		} else if (type1 == Type.OBJECT || type2 == Type.OBJECT) {
+			shortName + "<@Covariant A>"
+		} else {
+			shortName
+		}
+	}
+
 	def paramGenericName() {
 		if (type1 == Type.OBJECT && type2 == Type.OBJECT) {
 			'''<A1, A2> «genericName»'''
@@ -113,7 +123,7 @@ class PGenerator implements ClassGenerator {
 			import static «Constants.P».p;
 		«ENDIF»
 
-		public final class «genericName» implements Equatable<«genericName»>, Serializable {
+		public final class «covariantName» implements Equatable<«genericName»>, Serializable {
 			private final «type1Name» a1;
 			private final «type2Name» a2;
 
