@@ -52,7 +52,7 @@ final class OptionGenerator implements ClassGenerator {
 
 		public final class «type.covariantName("Option")» implements «type.maybeGenericName», Equatable<«genericName»>, Serializable {
 			«IF type == Type.OBJECT»
-				private static final Option NONE = new Option(null);
+				private static final Option<?> NONE = new Option<>(null);
 			«ELSE»
 				private static final «shortName» NONE = new «shortName»(«type.defaultValue»);
 			«ENDIF»
@@ -67,10 +67,25 @@ final class OptionGenerator implements ClassGenerator {
 				this.value = value;
 			}
 
-			«IF type != Type.OBJECT»
+			«IF type == Type.OBJECT»
+				@Override
+				public boolean isEmpty() {
+					return (this.value == null);
+				}
+
+				@Override
+				public boolean isNotEmpty() {
+					return (this.value != null);
+				}
+			«ELSE»
 				@Override
 				public boolean isEmpty() {
 					return (this == NONE);
+				}
+
+				@Override
+				public boolean isNotEmpty() {
+					return (this != NONE);
 				}
 
 				@Override
@@ -78,38 +93,37 @@ final class OptionGenerator implements ClassGenerator {
 					if (isEmpty()) {
 						throw new NoSuchElementException();
 					} else {
-						return value;
+						return this.value;
 					}
 				}
-
 			«ENDIF»
-			public «genericName» set(final «type.genericName» value) {
+
+			public «genericName» set(final «type.genericName» newValue) {
 				«IF type == Type.OBJECT»
-					requireNonNull(value);
+					requireNonNull(newValue);
 				«ENDIF»
-				return isEmpty() ? «type.noneName»() : «type.someName»(value);
+				return isEmpty() ? «type.noneName»() : «type.someName»(newValue);
 			}
 
 			public «type.genericName» getOr(final «type.genericName» other) {
 				«IF type == Type.OBJECT»
 					requireNonNull(other);
 				«ENDIF»
-				return isEmpty() ? other : value;
+				return isEmpty() ? other : this.value;
 			}
 
 			public «type.genericName» getOrElse(final «type.f0GenericName» other) {
 				requireNonNull(other);
-				return isEmpty() ? other.apply() : value;
+				return isEmpty() ? other.apply() : this.value;
 			}
 
 			«IF type == Type.OBJECT»
 				@Override
 				public «type.genericName» getOrNull() {
-					return value;
+					return this.value;
 				}
 
 			«ENDIF»
-
 			public «genericName» or(final «genericName» other) {
 				requireNonNull(other);
 				return isEmpty() ? other : this;
@@ -130,7 +144,7 @@ final class OptionGenerator implements ClassGenerator {
 			public void ifNotEmpty(final «type.effGenericName» eff) {
 				requireNonNull(eff);
 				if (isNotEmpty()) {
-					eff.apply(value);
+					eff.apply(this.value);
 				}
 			}
 
@@ -140,7 +154,7 @@ final class OptionGenerator implements ClassGenerator {
 				if (isEmpty()) {
 					ifEmpty.apply();
 				} else {
-					ifNotEmpty.apply(value);
+					ifNotEmpty.apply(this.value);
 				}
 			}
 
@@ -154,7 +168,7 @@ final class OptionGenerator implements ClassGenerator {
 				if (isEmpty()) {
 					return ifEmpty.apply();
 				} else {
-					return ifNotEmpty.apply(value);
+					return ifNotEmpty.apply(this.value);
 				}
 			}
 
@@ -168,10 +182,10 @@ final class OptionGenerator implements ClassGenerator {
 					return none();
 				«IF type == Type.OBJECT»
 					} else if (f == id()) {
-						return (Option) this;
+						return (Option<B>) this;
 				«ENDIF»
 				} else {
-					return some(f.apply(value));
+					return some(f.apply(this.value));
 				}
 			}
 
@@ -185,10 +199,10 @@ final class OptionGenerator implements ClassGenerator {
 					return none();
 				«IF type == Type.OBJECT»
 					} else if (f == id()) {
-						return (Option) this;
+						return (Option<B>) this;
 				«ENDIF»
 				} else {
-					return fromNullable(f.apply(value));
+					return fromNullable(f.apply(this.value));
 				}
 			}
 
@@ -196,7 +210,7 @@ final class OptionGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					public «returnType.typeName»Option mapTo«returnType.typeName»(final «returnType.typeName»F<A> f) {
 						requireNonNull(f);
-						return isEmpty() ? «returnType.noneName»() : «returnType.someName»(f.apply(value));
+						return isEmpty() ? «returnType.noneName»() : «returnType.someName»(f.apply(this.value));
 					}
 				«ELSE»
 					public «returnType.typeName»Option mapTo«returnType.typeName»(final «type.typeName»«returnType.typeName»F f) {
@@ -208,7 +222,7 @@ final class OptionGenerator implements ClassGenerator {
 								return this;
 						«ENDIF»
 						} else {
-							return «returnType.someName»(f.apply(value));
+							return «returnType.someName»(f.apply(this.value));
 						}
 					}
 				«ENDIF»
@@ -220,26 +234,40 @@ final class OptionGenerator implements ClassGenerator {
 				public <A> Option<A> flatMap(final «type.typeName»ObjectF<Option<A>> f) {
 			«ENDIF»
 				requireNonNull(f);
-				return isEmpty() ? none() : f.apply(value);
+				return isEmpty() ? none() : f.apply(this.value);
 			}
 
 			public «genericName» filter(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
 				if (isEmpty()) {
 					return «type.noneName»();
-				} else if (predicate.apply(value)) {
+				} else if (predicate.apply(this.value)) {
 					return this;
 				} else {
 					return «type.noneName»();
 				}
 			}
 
+			public boolean contains(final «type.genericName» val) {
+				«IF type == Type.OBJECT»
+					requireNonNull(val);
+					return isNotEmpty() && this.value.equals(val);
+				«ELSE»
+					return isNotEmpty() && (this.value == val);
+				«ENDIF»
+			}
+
+			public boolean exists(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				return isNotEmpty() && predicate.apply(this.value);
+			}
+
 			@Override
 			public int hashCode() {
 				«IF type == Type.OBJECT»
-					return Objects.hashCode(value);
+					return Objects.hashCode(this.value);
 				«ELSE»
-					return «type.boxedName».hashCode(value);
+					return «type.boxedName».hashCode(this.value);
 				«ENDIF»
 			}
 
@@ -249,10 +277,10 @@ final class OptionGenerator implements ClassGenerator {
 					return true;
 				} else if (obj instanceof «shortName») {
 					«IF type == Type.OBJECT»
-						return Objects.equals(value, ((Option<?>) obj).value);
+						return Objects.equals(this.value, ((Option<?>) obj).value);
 					«ELSE»
 						final «shortName» other = («shortName») obj;
-						return isEmpty() == other.isEmpty() && value == other.value;
+						return isEmpty() == other.isEmpty() && this.value == other.value;
 					«ENDIF»
 				} else {
 					return false;
@@ -261,11 +289,15 @@ final class OptionGenerator implements ClassGenerator {
 
 			@Override
 			public String toString() {
-				return isEmpty() ? "«type.shortName("None")»" : "«type.shortName("Some")»(" + value + ")";
+				return isEmpty() ? "«type.shortName("None")»" : "«type.shortName("Some")»(" + this.value + ")";
 			}
 
 			public static «paramGenericName» «type.noneName»() {
-				return NONE;
+				«IF type == Type.OBJECT»
+					return (Option<A>) NONE;
+				«ELSE»
+					return NONE;
+				«ENDIF»
 			}
 
 			public static «paramGenericName» «type.someName»(final «type.genericName» value) {
@@ -314,7 +346,7 @@ final class OptionGenerator implements ClassGenerator {
 					if (isEmpty() || that.isEmpty()) {
 						return none();
 					} else {
-						return some(requireNonNull(f.apply(value, that.value)));
+						return some(requireNonNull(f.apply(this.value, that.value)));
 					}
 				}
 			«ELSE»
@@ -327,7 +359,7 @@ final class OptionGenerator implements ClassGenerator {
 					if (isEmpty() || that.isEmpty()) {
 						return none();
 					} else {
-						return some(requireNonNull(f.apply(value, that.value)));
+						return some(requireNonNull(f.apply(this.value, that.value)));
 					}
 				}
 			«ENDIF»
