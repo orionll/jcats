@@ -139,6 +139,24 @@ final class MaybeGenerator implements InterfaceGenerator {
 				«ENDIF»
 			}
 
+			default boolean contains(final «type.genericName» val) {
+				«IF type == Type.OBJECT»
+					requireNonNull(val);
+					return isNotEmpty() && getOrNull().equals(val);
+				«ELSE»
+					return isNotEmpty() && (get() == val);
+				«ENDIF»
+			}
+
+			default boolean exists(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				«IF type == Type.OBJECT»
+					return isNotEmpty() && predicate.apply(getOrNull());
+				«ELSE»
+					return isNotEmpty() && predicate.apply(get());
+				«ENDIF»
+			}
+
 			«IF Type.javaUnboxedTypes.contains(type)»
 				default Optional«type.typeName» toOptional«type.typeName»() {
 					return isEmpty() ? Optional«type.typeName».empty() : Optional«type.typeName».of(get());
@@ -216,32 +234,32 @@ final class MaybeGenerator implements InterfaceGenerator {
 
 			@Override
 			public int size() {
-				return maybe.size();
+				return this.maybe.size();
 			}
 
 			@Override
 			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
-				maybe.forEach(action);
+				this.maybe.forEach(action);
 			}
 
 			@Override
 			public void foreach(final «type.effGenericName» eff) {
-				maybe.foreach(eff);
+				this.maybe.foreach(eff);
 			}
 
 			@Override
 			public «type.iteratorGenericName» iterator() {
-				return maybe.iterator();
+				return this.maybe.iterator();
 			}
 
 			@Override
 			public «type.spliteratorGenericName» spliterator() {
-				return maybe.spliterator();
+				return this.maybe.spliterator();
 			}
 
 			@Override
 			public String toString() {
-				return maybe.toString();
+				return this.maybe.toString();
 			}
 		}
 	''' }

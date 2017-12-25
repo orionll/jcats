@@ -248,20 +248,6 @@ final class OptionGenerator implements ClassGenerator {
 				}
 			}
 
-			public boolean contains(final «type.genericName» val) {
-				«IF type == Type.OBJECT»
-					requireNonNull(val);
-					return isNotEmpty() && this.value.equals(val);
-				«ELSE»
-					return isNotEmpty() && (this.value == val);
-				«ENDIF»
-			}
-
-			public boolean exists(final «type.boolFName» predicate) {
-				requireNonNull(predicate);
-				return isNotEmpty() && predicate.apply(this.value);
-			}
-
 			@Override
 			public int hashCode() {
 				«IF type == Type.OBJECT»
