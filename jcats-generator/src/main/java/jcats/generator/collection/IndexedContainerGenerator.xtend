@@ -137,7 +137,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 				@Override
 				public List<A> asCollection() {
-					return (List<A>) collection;
+					return Collections.unmodifiableList((List<A>) collection);
 				}
 
 				@Override

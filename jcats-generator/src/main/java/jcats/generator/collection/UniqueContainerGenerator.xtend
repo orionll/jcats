@@ -22,8 +22,11 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
-		
+
 		import java.util.Collection;
+		«IF type == Type.OBJECT»
+			import java.util.Collections;
+		«ENDIF»
 		import java.util.Iterator;
 		import java.util.Set;
 		import java.util.Spliterator;
@@ -122,7 +125,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 
 				@Override
 				public Set<A> asCollection() {
-					return (Set<A>) collection;
+					return Collections.unmodifiableSet((Set<A>) collection);
 				}
 
 				@Override

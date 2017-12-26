@@ -33,6 +33,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 		«ENDIF»
 		«IF type == Type.OBJECT»
 			import java.util.NavigableSet;
+			import java.util.Collections;
 		«ENDIF»
 		import java.util.Spliterator;
 		import java.util.Spliterators;
@@ -643,7 +644,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 				@Override
 				public Collection<A> asCollection() {
-					return collection;
+					return Collections.unmodifiableCollection(collection);
 				}
 
 				@Override
