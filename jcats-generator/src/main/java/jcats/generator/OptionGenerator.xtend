@@ -323,29 +323,30 @@ final class OptionGenerator implements ClassGenerator {
 			«ENDIF»
 
 			«IF type == Type.OBJECT»
-				public <B> Option<P<A, B>> zip(final Option<B> that) {
-					return zipWith(that, P::p);
-				}
-
-				public <B, C> Option<C> zipWith(final Option<B> that, final F2<A, B, C> f) {
-					requireNonNull(f);
-					if (isEmpty() || that.isEmpty()) {
-						return none();
-					} else {
-						return some(requireNonNull(f.apply(this.value, that.value)));
+				«FOR i : 2 .. Constants.MAX_ARITY»
+					public static <«(1..i).map['''A«it», '''].join»B> Option<B> map«i»(«(1..i).map['''final Option<A«it»> option«it», '''].join»final F«i»<«(1..i).map['''A«it», '''].join»B> f) {
+						«FOR j : 1 .. i»
+							requireNonNull(option«j»);
+						«ENDFOR»
+						requireNonNull(f);
+						«FOR j : 1 .. i»
+							if (option«j».isEmpty()) {
+								return none();
+							}
+						«ENDFOR»
+						return some(f.apply(«(1..i).map['''option«it».value'''].join(", ")»));
 					}
-				}
-			«ELSE»
-				public <A> Option<«type.typeName»ObjectP<A>> zip(final Option<A> that) {
-					return zipWith(that, «type.typeName»ObjectP::«type.typeName.firstToLowerCase»ObjectP);
-				}
 
-				public <A, B> Option<B> zipWith(final Option<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
+				«ENDFOR»
+			«ELSE»
+				public static <A, B> Option<B> map2(final «shortName» option1, final Option<A> option2, final «type.typeName»ObjectObjectF2<A, B> f) {
+					requireNonNull(option1);
+					requireNonNull(option2);
 					requireNonNull(f);
-					if (isEmpty() || that.isEmpty()) {
+					if (option1.isEmpty() || option2.isEmpty()) {
 						return none();
 					} else {
-						return some(requireNonNull(f.apply(this.value, that.value)));
+						return some(f.apply(option1.value, option2.value));
 					}
 				}
 			«ENDIF»

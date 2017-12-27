@@ -201,28 +201,29 @@ final class F0Generator implements InterfaceGenerator {
 			«ENDIF»
 
 			«IF type == Type.OBJECT»
-				default <B> F0<P<A, B>> zip(final F0<B> that) {
-					return zipWith(that, P::p);
-				}
+				«FOR i : 2 .. Constants.MAX_ARITY»
+					static <«(1..i).map['''A«it», '''].join»B> F0<B> map«i»(«(1..i).map['''final F0<A«it»> f«it», '''].join»final F«i»<«(1..i).map['''A«it», '''].join»B> f) {
+						«FOR j : 1 .. i»
+							requireNonNull(f«j»);
+						«ENDFOR»
+						requireNonNull(f);
+						return () -> {
+							«FOR j : 1 .. i»
+								final A«j» a«j» = requireNonNull(f«j».apply());
+							«ENDFOR»
+							return requireNonNull(f.apply(«(1..i).map['''a«it»'''].join(", ")»));
+						};
+					}
 
-				default <B, C> F0<C> zipWith(final F0<B> that, final F2<A, B, C> f) {
-					requireNonNull(f);
-					return () -> {
-						final A a = requireNonNull(apply());
-						final B b = requireNonNull(that.apply());
-						return requireNonNull(f.apply(a, b));
-					};
-				}
+				«ENDFOR»
 			«ELSE»
-				default <A> F0<«type.typeName»ObjectP<A>> zip(final F0<A> that) {
-					return zipWith(that, «type.typeName»ObjectP::«type.typeName.firstToLowerCase»ObjectP);
-				}
-
-				default <A, B> F0<B> zipWith(final F0<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
+				static <A, B> F0<B> map2(final «shortName» f1, final F0<A> f2, final «type.typeName»ObjectObjectF2<A, B> f) {
+					requireNonNull(f1);
+					requireNonNull(f2);
 					requireNonNull(f);
 					return () -> {
-						final «type.javaName» value = apply();
-						final A a = requireNonNull(that.apply());
+						final «type.javaName» value = f1.apply();
+						final A a = requireNonNull(f2.apply());
 						return requireNonNull(f.apply(value, a));
 					};
 				}
