@@ -27,6 +27,10 @@ final class F0Generator implements InterfaceGenerator {
 		}
 	}
 
+	def genericName() {
+		type.genericName("F0")
+	}
+
 	override sourceCode() { '''
 		package «Constants.FUNCTION»;
 
@@ -155,7 +159,7 @@ final class F0Generator implements InterfaceGenerator {
 				}
 
 				/**
-				 * Synonym for {@link #value}
+				 * Alias for {@link #value}
 				 */
 				static <A> F0<A> of(final A a) {
 					return value(a);
@@ -173,6 +177,10 @@ final class F0Generator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
+			static «type.paramGenericName("F0")» lazy(final «genericName» f) {
+				return new Lazy«type.diamondName("F0")»(f);
+			}
+
 			«IF type == Type.OBJECT»
 				«join»
 			«ELSE»
@@ -184,12 +192,10 @@ final class F0Generator implements InterfaceGenerator {
 
 			«IF type == Type.OBJECT»
 				static <A> F0<A> fromSupplier(final Supplier<A> s) {
-					requireNonNull(s);
 					return () -> requireNonNull(s.get());
 				}
 			«ELSE»
 				static «shortName» from«type.typeName»Supplier(final «type.typeName»Supplier s) {
-					requireNonNull(s);
 					return s::getAs«type.typeName»;
 				}
 			«ENDIF»
@@ -225,6 +231,48 @@ final class F0Generator implements InterfaceGenerator {
 
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
+		}
+
+		final class Lazy«genericName» implements «genericName» {
+			private final «genericName» f;
+			«IF type == Type.OBJECT»
+				private volatile «type.genericName» value;
+			«ELSE»
+				private volatile boolean initialized;
+				private «type.genericName» value;
+			«ENDIF»
+
+			Lazy«shortName»(final «genericName» f) {
+				this.f = requireNonNull(f);
+			}
+
+			@Override
+			public «type.genericName» apply() {
+				«IF type == Type.OBJECT»
+					if (this.value == null) {
+						synchronized (this) {
+							if (this.value == null) {
+								final A a = requireNonNull(this.f.apply());
+								this.value = a;
+								return a;
+							}
+						}
+					}
+					return this.value;
+				«ELSE»
+					if (!this.initialized) {
+						synchronized (this) {
+							if (!this.initialized) {
+								final «type.genericName» a = «type.requireNonNull("this.f.apply()")»;
+								this.value = a;
+								this.initialized = true;
+								return a;
+							}
+						}
+					}
+					return this.value;
+				«ENDIF»
+			}
 		}
 	''' }
 }
