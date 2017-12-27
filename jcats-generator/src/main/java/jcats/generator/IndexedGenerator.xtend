@@ -18,8 +18,14 @@ final class IndexedGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
+		import static java.util.Objects.requireNonNull;
+
 		public interface «type.covariantName("Indexed")» {
 			«type.genericName» get(final int index) throws IndexOutOfBoundsException;
+			«IF type == Type.OBJECT»
+
+				«cast(#["A"], #[], #["A"])»
+			«ENDIF»
 		}
 	''' }
 }
