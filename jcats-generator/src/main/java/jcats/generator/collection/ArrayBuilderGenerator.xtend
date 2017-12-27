@@ -189,7 +189,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			}
 
 			public «genericName» append«type.streamName»(final «type.streamGenericName» stream) {
-				stream.forEach(this::append);
+				stream.forEachOrdered(this::append);
 				return this;
 			}
 
