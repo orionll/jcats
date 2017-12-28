@@ -426,6 +426,20 @@ final class FGenerator implements InterfaceGenerator {
 				return f.map(g);
 			}
 
+			«FOR type : Type.primitives»
+				«IF from == Type.OBJECT && to == Type.OBJECT»
+					static <A, B> «type.typeName»F<A> andThenTo«type.typeName»(final «shortName»«typeParams» f, final «type.typeName»F<B> g) {
+				«ELSEIF to == Type.OBJECT»
+					static <A> «from.typeName»«type.typeName»F andThenTo«type.typeName»(final «shortName»«typeParams» f, final «type.typeName»F<A> g) {
+				«ELSEIF from == Type.OBJECT»
+					static <A> «type.typeName»F<A> andThenTo«type.typeName»(final «shortName»«typeParams» f, final «to.typeName»«type.typeName»F g) {
+				«ELSE»
+					static «from.typeName»«type.typeName»F andThenTo«type.typeName»(final «shortName»«typeParams» f, final «to.typeName»«type.typeName»F g) {
+				«ENDIF»
+					return f.mapTo«type.typeName»(g);
+				}
+
+			«ENDFOR»
 			«IF from == Type.OBJECT && to == Type.OBJECT»
 				static <A, B, C> F<A, C> compose(final F<B, C> f, final «shortName»«typeParams» g) {
 					return g.map(f);
@@ -435,7 +449,7 @@ final class FGenerator implements InterfaceGenerator {
 					return g.map(f);
 				}
 			«ELSEIF from == Type.OBJECT»
-				static <A, B> «to.typeName»F<A> compose(final «to.typeName»F<B> f, final F<A, B> g) {
+				static <A, B> «to.typeName»F<A> compose(final «shortName»<B> f, final F<A, B> g) {
 					return g.mapTo«to.typeName»(f);
 				}
 			«ELSE»
@@ -444,6 +458,26 @@ final class FGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
+			«FOR type : Type.primitives»
+				«IF from == Type.OBJECT && to == Type.OBJECT»
+					static <A, B> «type.typeName»ObjectF<B> composeFrom«type.typeName»(final F<A, B> f, final «type.typeName»ObjectF<A> g) {
+						return g.map(f);
+					}
+				«ELSEIF to == Type.OBJECT»
+					static <A> «type.typeName»ObjectF<A> composeFrom«type.typeName»(final «shortName»<A> f, final «type.typeName»«from.typeName»F g) {
+						return g.map(f);
+					}
+				«ELSEIF from == Type.OBJECT»
+					static <A> «type.typeName»«to.typeName»F composeFrom«type.typeName»(final «shortName»<A> f, final «type.typeName»ObjectF<A> g) {
+						return g.mapTo«to.typeName»(f);
+					}
+				«ELSE»
+					static «type.typeName»«to.typeName»F composeFrom«type.typeName»(final «shortName» f, final «type.typeName»«from.typeName»F g) {
+						return g.mapTo«to.typeName»(f);
+					}
+				«ENDIF»
+
+			«ENDFOR»
 			«IF from == Type.OBJECT && to == Type.OBJECT»
 				static <A, B> F<A, B> always(final B b) {
 					requireNonNull(b);
