@@ -19,17 +19,10 @@ final class EffGenerator implements InterfaceGenerator {
 		Constants.FUNCTION + "." + shortName
 	}
 
-	def shortName() {
-		if (type == Type.OBJECT) {
-			"Eff"
-		} else {
-			type.typeName + "Eff"
-		}
-	}
-
-	def typeName() {
-		if (type == Type.OBJECT) "A" else type.javaName
-	}
+	def shortName() { type.shortName("Eff") }
+	def genericName() { type.genericName("Eff") }
+	def paramGenericName() { type.paramGenericName("Eff") }
+	def contravariantName() { type.contravariantName("Eff") }
 
 	override sourceCode() { '''
 		package «Constants.FUNCTION»;
@@ -45,8 +38,8 @@ final class EffGenerator implements InterfaceGenerator {
 		import static java.util.Objects.requireNonNull;
 
 		@FunctionalInterface
-		public interface «shortName»«if (type == Type.OBJECT) "<@Contravariant A>" else ""» {
-			void apply(final «typeName» value);
+		public interface «contravariantName» {
+			void apply(final «type.genericName» value);
 
 			«IF type == Type.OBJECT»
 				default <B> Eff<B> contraMap(final F<B, A> f) {
@@ -83,6 +76,10 @@ final class EffGenerator implements InterfaceGenerator {
 					return this::apply;
 				}
 			«ENDIF»
+
+			static «paramGenericName» $(final «genericName» eff) {
+				return requireNonNull(eff);
+			}
 
 			«IF type == Type.OBJECT»
 				static <A> Eff<A> fromConsumer(final Consumer<A> c) {

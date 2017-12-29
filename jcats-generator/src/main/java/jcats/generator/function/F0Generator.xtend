@@ -19,17 +19,10 @@ final class F0Generator implements InterfaceGenerator {
 		Constants.FUNCTION + "." + shortName
 	}
 
-	def shortName() {
-		if (type == Type.OBJECT) {
-			"F0"
-		} else {
-			type.typeName + "F0"
-		}
-	}
-
-	def genericName() {
-		type.genericName("F0")
-	}
+	def shortName() { type.shortName("F0") }
+	def lowerCaseName() { shortName.firstToLowerCase }
+	def genericName() { type.genericName("F0") }
+	def paramGenericName() { type.paramGenericName("F0") }
 
 	override sourceCode() { '''
 		package «Constants.FUNCTION»;
@@ -115,14 +108,14 @@ final class F0Generator implements InterfaceGenerator {
 
 			«ENDIF»
 			«IF type == Type.OBJECT»
-				default <B> F<B, A> toConstF() {
+				default <B> F<B, A> toF() {
 					return (final B b) -> {
 						requireNonNull(b);
 						return requireNonNull(apply());
 					};
 				}
 			«ELSE»
-				default <A> «type.typeName»F<A> toConstF() {
+				default <A> «type.typeName»F<A> toF() {
 					return (final A a) -> {
 						requireNonNull(a);
 						return apply();
@@ -132,11 +125,11 @@ final class F0Generator implements InterfaceGenerator {
 
 			«FOR t : Type.primitives»
 				«IF type == Type.OBJECT»
-					default «t.typeName»ObjectF<A> toConst«t.typeName»ObjectF() {
+					default «t.typeName»ObjectF<A> to«t.typeName»ObjectF() {
 						return (final «t.javaName» __) -> requireNonNull(apply());
 					}
 				«ELSE»
-					default «t.typeName»«type.typeName»F toConst«t.typeName»«type.typeName»F() {
+					default «t.typeName»«type.typeName»F to«t.typeName»«type.typeName»F() {
 						return (final «t.javaName» __) -> apply();
 					}
 				«ENDIF»
@@ -152,30 +145,21 @@ final class F0Generator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
-			«IF type == Type.OBJECT»
-				static <A> F0<A> value(final A a) {
-					requireNonNull(a);
-					return () -> a;
-				}
+			static «paramGenericName» «lowerCaseName»(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
+				return () -> value;
+			}
 
-				/**
-				 * Alias for {@link #value}
-				 */
-				static <A> F0<A> of(final A a) {
-					return value(a);
-				}
-			«ELSE»
-				static «shortName» «type.typeName.firstToLowerCase»Value(final «type.genericName» value) {
-					return () -> value;
-				}
+			«javadocSynonym(lowerCaseName)»
+			static «paramGenericName» of(final «type.genericName» value) {
+				return «lowerCaseName»(value);
+			}
 
-				/**
-				 * Synonym for {@link #«type.typeName.firstToLowerCase»Value}
-				 */
-				static «shortName» of(final «type.genericName» value) {
-					return «type.typeName.firstToLowerCase»Value(value);
-				}
-			«ENDIF»
+			static «paramGenericName» $(final «genericName» f) {
+				return requireNonNull(f);
+			}
 
 			static «type.paramGenericName("F0")» lazy(final «genericName» f) {
 				return new Lazy«type.diamondName("F0")»(f);

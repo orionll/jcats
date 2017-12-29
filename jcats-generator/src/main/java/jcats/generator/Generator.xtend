@@ -123,7 +123,7 @@ interface Generator {
 
 	def static fill(Type type, String paramGenericName) { '''
 		public static «paramGenericName» fill(final int size, final «IF type == Type.OBJECT»F0<A>«ELSE»«type.typeName»F0«ENDIF» f) {
-			return tabulate(size, f.toConstInt«type.typeName»F());
+			return tabulate(size, f.toInt«type.typeName»F());
 		}
 	'''}
 
@@ -168,9 +168,6 @@ interface Generator {
 	def static firstToLowerCase(String str) {
 		if (str.empty) {
 			str
-		} else if (str.matches("[A-Z]\\d")) {
-			// Avoid names like v42, f05, ...
-			str.toCharArray.head.toLowerCase.toString
 		} else {
 			str.toCharArray.head.toLowerCase + str.toCharArray.tail.join
 		}

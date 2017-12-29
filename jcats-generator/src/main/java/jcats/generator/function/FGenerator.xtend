@@ -505,24 +505,6 @@ final class FGenerator implements InterfaceGenerator {
 			«ENDIF»
 
 			«IF from == Type.OBJECT && to == Type.OBJECT»
-				static <A, B> F<A, B> fromF0(final F0<B> b) {
-					return b.toConstF();
-				}
-			«ELSEIF from == Type.OBJECT»
-				static <A> «shortName»<A> from«to.typeName»F0(final «to.typeName»F0 f) {
-					return f.toConstF();
-				}
-			«ELSEIF to == Type.OBJECT»
-				static <A> «shortName»<A> fromF0(final F0<A> a) {
-					return a.toConst«shortName»();
-				}
-			«ELSE»
-				static «shortName» from«to.typeName»F0(final «to.typeName»F0 f) {
-					return f.toConst«shortName»();
-				}
-			«ENDIF»
-
-			«IF from == Type.OBJECT && to == Type.OBJECT»
 				«joinMultiple(#["A"], "B")»
 			«ELSEIF to == Type.OBJECT»
 				«join»
