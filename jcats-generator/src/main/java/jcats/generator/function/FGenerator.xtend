@@ -40,6 +40,18 @@ final class FGenerator implements InterfaceGenerator {
 		}
 	}
 
+	def genericName() {
+		shortName + typeParams
+	}
+
+	def paramGenericName() {
+		if (typeParams.isEmpty) {
+			genericName
+		} else {
+			typeParams + " " + genericName
+		}
+	}
+
 	def variantTypeParams() {
 		if (from == Type.OBJECT && to == Type.OBJECT) {
 			"<@Contravariant A, @Covariant B>"
@@ -150,7 +162,7 @@ final class FGenerator implements InterfaceGenerator {
 				}
 
 			«ENDIF»
-			«FOR primitive : Type.values.filter[it != Type.OBJECT]»
+			«FOR primitive : Type.primitives»
 				«IF from == Type.OBJECT && to == Type.OBJECT»
 					default «primitive.typeName»F<A> mapTo«primitive.typeName»(final «primitive.typeName»F<B> f) {
 						requireNonNull(f);
@@ -226,6 +238,42 @@ final class FGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
+			«FOR primitive : Type.primitives»
+				«IF from == Type.OBJECT && to == Type.OBJECT»
+					default «primitive.typeName»ObjectF<B> contraMapFrom«primitive.typeName»(final «primitive.typeName»ObjectF<A> f) {
+						requireNonNull(f);
+						return (final «primitive.genericName» value) -> {
+							final A a = requireNonNull(f.apply(value));
+							return requireNonNull(apply(a));
+						};
+					}
+				«ELSEIF to == Type.OBJECT»
+					default «primitive.typeName»ObjectF<A> contraMapFrom«primitive.typeName»(final «primitive.typeName»«from.typeName»F f) {
+						requireNonNull(f);
+						return (final «primitive.genericName» value) -> {
+							final «from.genericName» result = f.apply(value);
+							return requireNonNull(apply(result));
+						};
+					}
+				«ELSEIF from == Type.OBJECT»
+					default «primitive.typeName»«to.typeName»F contraMapFrom«primitive.typeName»(final «primitive.typeName»ObjectF<A> f) {
+						requireNonNull(f);
+						return (final «primitive.genericName» value) -> {
+							final A a = requireNonNull(f.apply(value));
+							return apply(a);
+						};
+					}
+				«ELSE»
+					default «primitive.typeName»«to.typeName»F contraMapFrom«primitive.typeName»(final «primitive.typeName»«from.typeName»F f) {
+						requireNonNull(f);
+						return (final «primitive.genericName» value) -> {
+							final «from.genericName» result = f.apply(value);
+							return apply(result);
+						};
+					}
+				«ENDIF»
+
+			«ENDFOR»
 			«IF from == Type.OBJECT && to == Type.OBJECT»
 				default <C, D> F<C, D> diMap(final F<C, A> f, final F<B, D> g) {
 					requireNonNull(f);
@@ -442,67 +490,58 @@ final class FGenerator implements InterfaceGenerator {
 			«ENDFOR»
 			«IF from == Type.OBJECT && to == Type.OBJECT»
 				static <A, B, C> F<A, C> compose(final F<B, C> f, final «shortName»«typeParams» g) {
-					return g.map(f);
-				}
 			«ELSEIF to == Type.OBJECT»
 				static <A, B> F<A, B> compose(final «shortName»<B> f, final «from.typeName»F<A> g) {
-					return g.map(f);
-				}
 			«ELSEIF from == Type.OBJECT»
 				static <A, B> «to.typeName»F<A> compose(final «shortName»<B> f, final F<A, B> g) {
-					return g.mapTo«to.typeName»(f);
-				}
 			«ELSE»
 				static <A> «to.typeName»F<A> compose(final «shortName» f, final «from.typeName»F<A> g) {
-					return g.mapTo«to.typeName»(f);
-				}
 			«ENDIF»
+				return f.contraMap(g);
+			}
 
 			«FOR type : Type.primitives»
 				«IF from == Type.OBJECT && to == Type.OBJECT»
 					static <A, B> «type.typeName»ObjectF<B> composeFrom«type.typeName»(final F<A, B> f, final «type.typeName»ObjectF<A> g) {
-						return g.map(f);
-					}
 				«ELSEIF to == Type.OBJECT»
 					static <A> «type.typeName»ObjectF<A> composeFrom«type.typeName»(final «shortName»<A> f, final «type.typeName»«from.typeName»F g) {
-						return g.map(f);
-					}
 				«ELSEIF from == Type.OBJECT»
 					static <A> «type.typeName»«to.typeName»F composeFrom«type.typeName»(final «shortName»<A> f, final «type.typeName»ObjectF<A> g) {
-						return g.mapTo«to.typeName»(f);
-					}
 				«ELSE»
 					static «type.typeName»«to.typeName»F composeFrom«type.typeName»(final «shortName» f, final «type.typeName»«from.typeName»F g) {
-						return g.mapTo«to.typeName»(f);
-					}
 				«ENDIF»
+					return f.contraMapFrom«type.typeName»(g);
+				}
 
 			«ENDFOR»
-			«IF from == Type.OBJECT && to == Type.OBJECT»
-				static <A, B> F<A, B> always(final B b) {
-					requireNonNull(b);
-					return (final A a) -> {
-						requireNonNull(a);
-						return b;
-					};
-				}
-			«ELSEIF to == Type.OBJECT»
-				static <A> «shortName»<A> always(final A a) {
-					requireNonNull(a);
-					return (final «from.javaName» __) -> a;
-				}
-			«ELSEIF from == Type.OBJECT»
-				static <A> «shortName»<A> always(final «toName» value) {
+			static «paramGenericName» always(final «toName» value) {
+				«IF from == Type.OBJECT && to == Type.OBJECT»
+					requireNonNull(value);
 					return (final A a) -> {
 						requireNonNull(a);
 						return value;
 					};
-				}
-			«ELSE»
-				static «shortName» always(final «toName» value) {
+				«ELSEIF to == Type.OBJECT»
+					requireNonNull(value);
 					return (final «from.javaName» __) -> value;
-				}
-			«ENDIF»
+				«ELSEIF from == Type.OBJECT»
+					return (final A a) -> {
+						requireNonNull(a);
+						return value;
+					};
+				«ELSE»
+					return (final «from.javaName» __) -> value;
+				«ENDIF»
+			}
+
+			«javadocSynonym("always")»
+			static «paramGenericName» of(final «toName» value) {
+				return always(value);
+			}
+
+			static «paramGenericName» $(final «genericName» f) {
+				return requireNonNull(f);
+			}
 
 			«IF from == Type.OBJECT && to == Type.OBJECT»
 				«joinMultiple(#["A"], "B")»
