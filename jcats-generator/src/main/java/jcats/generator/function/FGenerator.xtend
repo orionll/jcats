@@ -45,12 +45,22 @@ final class FGenerator implements InterfaceGenerator {
 	}
 
 	def paramGenericName() {
-		if (typeParams.isEmpty) {
+		if (typeParams.empty) {
 			genericName
 		} else {
 			typeParams + " " + genericName
 		}
 	}
+
+	def alwaysName() {
+		if (from == Type.OBJECT && to == Type.OBJECT) {
+			"always"
+		} else if (from == Type.OBJECT) {
+			to.typeName.firstToLowerCase + "Always"
+		} else {
+			from.typeName.firstToLowerCase + to.typeName + "Always"
+		}
+	} 
 
 	def variantTypeParams() {
 		if (from == Type.OBJECT && to == Type.OBJECT) {
@@ -514,7 +524,7 @@ final class FGenerator implements InterfaceGenerator {
 				}
 
 			«ENDFOR»
-			static «paramGenericName» always(final «toName» value) {
+			static «paramGenericName» «alwaysName»(final «toName» value) {
 				«IF from == Type.OBJECT && to == Type.OBJECT»
 					requireNonNull(value);
 					return (final A a) -> {
@@ -534,12 +544,12 @@ final class FGenerator implements InterfaceGenerator {
 				«ENDIF»
 			}
 
-			«javadocSynonym("always")»
+			«javadocSynonym(alwaysName)»
 			static «paramGenericName» of(final «toName» value) {
-				return always(value);
+				return «alwaysName»(value);
 			}
 
-			static «paramGenericName» $(final «genericName» f) {
+			static «paramGenericName» «shortName.firstToLowerCase»(final «genericName» f) {
 				return requireNonNull(f);
 			}
 

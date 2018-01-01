@@ -29,7 +29,7 @@ final class Eff0Generator implements InterfaceGenerator {
 				}
 
 			«ENDFOR»
-			static Eff0 $(final Eff0 eff) {
+			static Eff0 eff0(final Eff0 eff) {
 				return requireNonNull(eff);
 			}
 		}

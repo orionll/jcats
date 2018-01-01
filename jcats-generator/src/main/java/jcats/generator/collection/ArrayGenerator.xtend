@@ -53,6 +53,7 @@ final class ArrayGenerator implements ClassGenerator {
 			import static «Constants.COLLECTION».«toType.typeName»Array.empty«toType.typeName»Array;
 		«ENDFOR»
 		import static «Constants.F».id;
+		import static «Constants.FUNCTION».Int«type.typeName»F.*;
 		import static «Constants.JCATS».Int«type.typeName»P.*;
 		import static «Constants.COMMON».*;
 		«IF Type.javaUnboxedTypes.contains(type)»

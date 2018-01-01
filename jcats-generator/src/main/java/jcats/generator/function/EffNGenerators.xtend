@@ -14,6 +14,8 @@ final class EffNGenerators {
 		new InterfaceGenerator {
 			override className() { Constants.EFF + arity }
 
+			def params() { '''<«(1 .. arity).map["A" + it].join(", ")»>''' }
+
 			override sourceCode() { '''
 				package «Constants.FUNCTION»;
 
@@ -38,16 +40,19 @@ final class EffNGenerators {
 						}
 
 					«ENDFOR»
-					«IF arity == 2»
-						default Eff2<A2, A1> flip() {
-							return (a2, a1) -> {
-								requireNonNull(a1);
-								requireNonNull(a2);
-								apply(a1, a2);
-							};
-						}
+					default Eff«arity»<«(arity .. 1).map["A" + it].join(", ")»> reverse() {
+						return («(arity .. 1).map["a" + it].join(", ")») -> {
+							«FOR i : arity .. 1»
+								requireNonNull(a«i»);
+							«ENDFOR»
+							apply(«(1 .. arity).map["a" + it].join(", ")»);
+						};
+					}
 
-					«ENDIF»
+					static «params» Eff«arity»«params» eff«arity»(final Eff«arity»«params» eff) {
+						return requireNonNull(eff);
+					}
+
 					«cast((1 .. arity).map["A" + it], (1 .. arity).map["A" + it], #[])»
 				}
 

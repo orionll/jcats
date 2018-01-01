@@ -32,9 +32,9 @@ class F2Generator implements InterfaceGenerator {
 			'''«type1.typeName»«type2.typeName»«returnType.typeName»F2'''
 		}
 	}
-
-	def variantName() {
-		shortName +
+	
+	def typeParams(boolean annotations) {
+		val params =
 		if (returnType == Type.OBJECT) {
 			if (type1 == Type.OBJECT && type2 == Type.OBJECT) {
 				"<@Contravariant A1, @Contravariant A2, @Covariant B>"
@@ -52,6 +52,24 @@ class F2Generator implements InterfaceGenerator {
 				""
 			}
 		}
+		if (annotations) {
+			params
+		} else {
+			params.replaceAll("@Contravariant ", "").replaceAll("@Covariant ", "")
+		}
+	}
+
+	def variantName() {
+		shortName + typeParams(true)
+	}
+
+	def genericName() {
+		shortName + typeParams(false)
+	}
+
+	def paramGenericName() {
+		val params = typeParams(false)
+		if (params.empty) genericName else params + " " + genericName
 	}
 
 	def returnTypeGenericName() {
@@ -104,6 +122,10 @@ class F2Generator implements InterfaceGenerator {
 				'''«returnType.typeName»ObjectF<A>'''
 			}
 		}
+	}
+
+	def alwaysName() {
+		shortName.replaceAll("F2", "Always").firstToLowerCase
 	}
 
 	override sourceCode() { '''
@@ -471,6 +493,7 @@ class F2Generator implements InterfaceGenerator {
 						return f.applyAs«returnType.typeName»(value1, value2);
 					};
 				}
+
 			«ELSEIF type1 == Type.OBJECT && type2 == Type.OBJECT && returnType == Type.BOOLEAN»
 				default BiPredicate<A1, A2> toBiPredicate() {
 					return (final A1 value1, final A2 value2) -> {
@@ -497,8 +520,37 @@ class F2Generator implements InterfaceGenerator {
 				static «type1.typeName»«type1.typeName»«type1.typeName»F2 from«returnType.typeName»BinaryOperator(final «returnType.typeName»BinaryOperator op) {
 					return op::applyAs«returnType.typeName»;
 				}
+
 			«ENDIF»
+			static «paramGenericName» «alwaysName»(final «returnTypeGenericName» value) {
+				«IF returnType != Type.OBJECT && type1 != Type.OBJECT && type2 != Type.OBJECT»
+					return (final «type1GenericName» value1, final «type2GenericName» value2) -> value;
+				«ELSE»
+					«IF returnType == Type.OBJECT»
+						requireNonNull(value);
+					«ENDIF»
+					return (final «type1GenericName» value1, final «type2GenericName» value2) -> {
+						«IF type1 == Type.OBJECT»
+							requireNonNull(value1);
+						«ENDIF»
+						«IF type2 == Type.OBJECT»
+							requireNonNull(value2);
+						«ENDIF»
+						return value;
+					};
+				«ENDIF»
+			}
+
+			«javadocSynonym(alwaysName)»
+			static «paramGenericName» of(final «returnTypeGenericName» value) {
+				return «alwaysName»(value);
+			}
+
+			static «paramGenericName» «shortName.firstToLowerCase»(final «genericName» f) {
+				return requireNonNull(f);
+			}
 			«IF returnType == Type.OBJECT»
+
 				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 					«cast(#["A1", "A2", "B"], #["A1", "A2"], #["B"])»
 				«ELSEIF type1 == Type.OBJECT || type2 == Type.OBJECT»
@@ -511,6 +563,7 @@ class F2Generator implements InterfaceGenerator {
 
 					«cast(#["A1", "A2"], #["A1", "A2"], #[])»
 				«ELSEIF type1 == Type.OBJECT || type2 == Type.OBJECT»
+
 					«cast(#["A"], #["A"], #[])»
 				«ENDIF»
 			«ENDIF»

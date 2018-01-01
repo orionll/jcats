@@ -15,6 +15,9 @@ final class FNGenerators {
 		new InterfaceGenerator {
 			override className() { Constants.F + arity }
 
+			def typeParams() { '''<«(1 .. arity).map['''A«it», '''].join»B>''' }
+			def genericName() { "F" + arity + typeParams }
+
 			override sourceCode() { '''
 				package «Constants.FUNCTION»;
 
@@ -93,6 +96,25 @@ final class FNGenerators {
 							«ENDFOR»
 							apply(«(1 .. arity).map["a" + it].join(", ")»);
 						};
+					}
+
+					static «typeParams» «genericName» always(final B value) {
+						requireNonNull(value);
+						return («(1 .. arity).map['''final A«it» a«it»'''].join(", ")») -> {
+							«FOR i : 1 .. arity»
+								requireNonNull(a«i»);
+							«ENDFOR»
+							return value;
+						};
+					}
+
+					«javadocSynonym("always")»
+					static «typeParams» «genericName» of(final B value) {
+						return always(value);
+					}
+
+					static «typeParams» «genericName» f«arity»(final «genericName» f) {
+						return requireNonNull(f);
 					}
 
 					«joinMultiple((1 .. arity).map["A" + it], "B")»

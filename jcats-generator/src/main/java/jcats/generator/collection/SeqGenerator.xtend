@@ -58,11 +58,17 @@ class SeqGenerator implements ClassGenerator {
 			«ENDIF»
 		«ENDFOR»
 		«IF type == Type.OBJECT»
-			import static «Constants.F».*;
 			import static «Constants.P».*;
 			import static «Constants.JCATS».IntObjectP.*;
+			import static «Constants.F».*;
+			import static «Constants.FUNCTION».IntObjectF.*;
+		«ELSEIF type == Type.INT»
+			import static «Constants.JCATS».Int«type.typeName»P.*;
+			import static «Constants.FUNCTION».IntIntF.*;
 		«ELSE»
 			import static «Constants.JCATS».Int«type.typeName»P.*;
+			import static «Constants.FUNCTION».Int«type.typeName»F.*;
+			import static «Constants.FUNCTION».«type.typeName»«type.typeName»F.*;
 		«ENDIF»
 		import static «Constants.COMMON».*;
 
@@ -112,9 +118,9 @@ class SeqGenerator implements ClassGenerator {
 			 */
 			public final «genericName» set(final int index, final «type.genericName» value) {
 				«IF type == Type.OBJECT»
-					return update(index, (final «type.genericName» __) -> value);
+					return update(index, always(value));
 				«ELSE»
-					return update(index, «type.typeName»«type.typeName»F.always(value));
+					return update(index, «type.typeName.firstToLowerCase»«type.typeName»Always(value));
 				«ENDIF»
 			}
 

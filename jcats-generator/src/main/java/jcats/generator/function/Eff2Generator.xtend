@@ -42,6 +42,18 @@ class Eff2Generator implements InterfaceGenerator {
 		}
 	}
 
+	def String paramGenericName() {
+		val params = 
+		if (type1 == Type.OBJECT && type2 == Type.OBJECT) {
+			"<A1, A2>"
+		} else if (type1 == Type.OBJECT || type2 == Type.OBJECT) {
+			"<A>"
+		} else {
+			""
+		}
+		if (params.empty) shortName else params + " " + shortName + params 
+	}
+
 	def String variantName() {
 		shortName +
 		if (type1 == Type.OBJECT && type2 == Type.OBJECT) {
@@ -217,7 +229,7 @@ class Eff2Generator implements InterfaceGenerator {
 					};
 				}
 
-				static <A1, A2> «genericName» fromBiConsumer(final BiConsumer<A1, A2> consumer) {
+				static «paramGenericName» fromBiConsumer(final BiConsumer<A1, A2> consumer) {
 					return (final A1 value1, final A2 value2) -> {
 						requireNonNull(value1);
 						requireNonNull(value2);
@@ -233,13 +245,17 @@ class Eff2Generator implements InterfaceGenerator {
 					};
 				}
 
-				static <A> Object«type2.typeName»Eff2<A> fromObj«type2.typeName»Consumer(final Obj«type2.typeName»Consumer<A> consumer) {
+				static «paramGenericName» fromObj«type2.typeName»Consumer(final Obj«type2.typeName»Consumer<A> consumer) {
 					return (final A value1, final «type2.javaName» value2) -> {
 						requireNonNull(value1);
 						consumer.accept(value1, value2);
 					};
 				}
 			«ENDIF»
+
+			static «paramGenericName» «shortName.firstToLowerCase»(final «genericName» eff) {
+				return requireNonNull(eff);
+			}
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 
 				«cast(#["A1", "A2"], #["A1", "A2"], #[])»

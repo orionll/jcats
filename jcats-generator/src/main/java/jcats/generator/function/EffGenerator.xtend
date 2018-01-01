@@ -77,7 +77,7 @@ final class EffGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
-			static «paramGenericName» $(final «genericName» eff) {
+			static «paramGenericName» «shortName.firstToLowerCase»(final «genericName» eff) {
 				return requireNonNull(eff);
 			}
 

@@ -23,6 +23,7 @@ final class F0Generator implements InterfaceGenerator {
 	def lowerCaseName() { shortName.firstToLowerCase }
 	def genericName() { type.genericName("F0") }
 	def paramGenericName() { type.paramGenericName("F0") }
+	def valueName() { type.shortName("Value").firstToLowerCase }
 
 	override sourceCode() { '''
 		package «Constants.FUNCTION»;
@@ -145,19 +146,19 @@ final class F0Generator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
-			static «paramGenericName» «lowerCaseName»(final «type.genericName» value) {
+			static «paramGenericName» «valueName»(final «type.genericName» value) {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
 				return () -> value;
 			}
 
-			«javadocSynonym(lowerCaseName)»
+			«javadocSynonym(valueName)»
 			static «paramGenericName» of(final «type.genericName» value) {
-				return «lowerCaseName»(value);
+				return «valueName»(value);
 			}
 
-			static «paramGenericName» $(final «genericName» f) {
+			static «paramGenericName» «lowerCaseName»(final «genericName» f) {
 				return requireNonNull(f);
 			}
 

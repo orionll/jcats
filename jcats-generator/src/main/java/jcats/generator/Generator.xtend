@@ -117,7 +117,7 @@ interface Generator {
 
 	def static repeat(Type type, String paramGenericName) { '''
 		public static «paramGenericName» repeat(final int size, final «type.genericName» value) {
-			return tabulate(size, Int«type.typeName»F.always(value));
+			return tabulate(size, int«type.typeName»Always(value));
 		}
 	'''}
 
