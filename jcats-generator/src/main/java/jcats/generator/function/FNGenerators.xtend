@@ -89,7 +89,7 @@ final class FNGenerators {
 						};
 					}
 
-					default Eff«arity»<«(1 .. arity).map["A" + it].join(", ")»> toEff() {
+					default Eff«arity»<«(1 .. arity).map["A" + it].join(", ")»> toEff«arity»() {
 						return («(1 .. arity).map['''final A«it» a«it»'''].join(", ")») -> {
 							«FOR i : 1 .. arity»
 								requireNonNull(a«i»);
@@ -98,6 +98,20 @@ final class FNGenerators {
 						};
 					}
 
+					«FOR i : 1 .. arity»
+						default F«arity-1»<«(1 .. arity).filter[it != i].map['''A«it», '''].join»B> apply«i»(final A«i» value«i») {
+							requireNonNull(value«i»);
+							return («(1 .. arity).filter[it != i].map['''final A«it» value«it»'''].join(", ")») -> {
+								«FOR j : 1 .. arity»
+									«IF j != i»
+										requireNonNull(value«j»);
+									«ENDIF»
+								«ENDFOR»
+								return requireNonNull(apply(«(1 .. arity).map['''value«it»'''].join(", ")»));
+							};
+						}
+
+					«ENDFOR»
 					static «typeParams» «genericName» always(final B value) {
 						requireNonNull(value);
 						return («(1 .. arity).map['''final A«it» a«it»'''].join(", ")») -> {

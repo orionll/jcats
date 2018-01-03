@@ -219,6 +219,30 @@ class Eff2Generator implements InterfaceGenerator {
 						apply(value1, value2);
 				}
 			«ENDIF»
+
+			«IF type2 == Type.OBJECT»
+				default Eff<«type2GenericName»> apply1(final «type1GenericName» value1) {
+			«ELSE»
+				default «type2.typeName»Eff apply1(final «type1GenericName» value1) {
+			«ENDIF»
+				«IF type1 == Type.OBJECT»
+					requireNonNull(value1);
+				«ENDIF»
+				return (final «type2GenericName» value2) ->
+					apply(value1, «type2.requireNonNull("value2")»);
+			}
+
+			«IF type1 == Type.OBJECT»
+				default Eff<«type1GenericName»> apply2(final «type2GenericName» value2) {
+			«ELSE»
+				default «type1.typeName»Eff apply2(final «type2GenericName» value2) {
+			«ENDIF»
+				«IF type2 == Type.OBJECT»
+					requireNonNull(value2);
+				«ENDIF»
+				return (final «type1GenericName» value1) ->
+					apply(«type1.requireNonNull("value1")», value2);
+			}
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 
 				default BiConsumer<A1, A2> toBiConsumer() {

@@ -537,6 +537,116 @@ class F2Generator implements InterfaceGenerator {
 
 			«IF returnType == Type.OBJECT»
 				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+					default F<«type2GenericName», «returnTypeGenericName»> apply1(final «type1GenericName» value1) {
+						requireNonNull(value1);
+						return (final «type2GenericName» value2) -> {
+							requireNonNull(value2);
+							return requireNonNull(apply(value1, value2));
+						};
+					}
+
+					default F<«type1GenericName», «returnTypeGenericName»> apply2(final «type2GenericName» value2) {
+						requireNonNull(value2);
+						return (final «type1GenericName» value1) -> {
+							requireNonNull(value1);
+							return requireNonNull(apply(value1, value2));
+						};
+					}
+				«ELSEIF type1 == Type.OBJECT»
+					default «type2.typeName»ObjectF<«returnTypeGenericName»> apply1(final «type1GenericName» value1) {
+						requireNonNull(value1);
+						return (final «type2GenericName» value2) ->
+							requireNonNull(apply(value1, value2));
+					}
+
+					default F<«type1GenericName», «returnTypeGenericName»> apply2(final «type2GenericName» value2) {
+						return (final «type1GenericName» value1) -> {
+							requireNonNull(value1);
+							return requireNonNull(apply(value1, value2));
+						};
+					}
+				«ELSEIF type2 == Type.OBJECT»
+					default F<«type2GenericName», «returnTypeGenericName»> apply1(final «type1GenericName» value1) {
+						return (final «type2GenericName» value2) -> {
+							requireNonNull(value2);
+							return requireNonNull(apply(value1, value2));
+						};
+					}
+
+					default «type1.typeName»ObjectF<«returnTypeGenericName»> apply2(final «type2GenericName» value2) {
+						requireNonNull(value2);
+						return (final «type1GenericName» value1) ->
+							requireNonNull(apply(value1, value2));
+					}
+				«ELSE»
+					default «type2.typeName»ObjectF<«returnTypeGenericName»> apply1(final «type1GenericName» value1) {
+						return (final «type2GenericName» value2) ->
+							requireNonNull(apply(value1, value2));
+					}
+
+					default «type1.typeName»ObjectF<«returnTypeGenericName»> apply2(final «type2GenericName» value2) {
+						return (final «type1GenericName» value1) ->
+							requireNonNull(apply(value1, value2));
+					}
+				«ENDIF»
+			«ELSE»
+				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+					default «returnType.typeName»F<«type2GenericName»> apply1(final «type1GenericName» value1) {
+						requireNonNull(value1);
+						return (final «type2GenericName» value2) -> {
+							requireNonNull(value2);
+							return apply(value1, value2);
+						};
+					}
+
+					default «returnType.typeName»F<«type1GenericName»> apply2(final «type2GenericName» value2) {
+						requireNonNull(value2);
+						return (final «type1GenericName» value1) -> {
+							requireNonNull(value1);
+							return apply(value1, value2);
+						};
+					}
+				«ELSEIF type1 == Type.OBJECT»
+					default «type2.typeName»«returnType.typeName»F apply1(final «type1GenericName» value1) {
+						requireNonNull(value1);
+						return (final «type2GenericName» value2) ->
+							apply(value1, value2);
+					}
+
+					default «returnType.typeName»F<«type1GenericName»> apply2(final «type2GenericName» value2) {
+						return (final «type1GenericName» value1) -> {
+							requireNonNull(value1);
+							return apply(value1, value2);
+						};
+					}
+				«ELSEIF type2 == Type.OBJECT»
+					default «returnType.typeName»F<«type2GenericName»> apply1(final «type1GenericName» value1) {
+						return (final «type2GenericName» value2) -> {
+							requireNonNull(value2);
+							return apply(value1, value2);
+						};
+					}
+
+					default «type1.typeName»«returnType.typeName»F apply2(final «type2GenericName» value2) {
+						requireNonNull(value2);
+						return (final «type1GenericName» value1) ->
+							apply(value1, value2);
+					}
+				«ELSE»
+					default «type2.typeName»«returnType.typeName»F apply1(final «type1GenericName» value1) {
+						return (final «type2GenericName» value2) ->
+							apply(value1, value2);
+					}
+
+					default «type1.typeName»«returnType.typeName»F apply2(final «type2GenericName» value2) {
+						return (final «type1GenericName» value1) ->
+							apply(value1, value2);
+					}
+				«ENDIF»
+			«ENDIF»
+
+			«IF returnType == Type.OBJECT»
+				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 					default F2<A2, A1, B> reverse() {
 						return (final A2 value2, final A1 value1) -> {
 							requireNonNull(value1);

@@ -49,6 +49,20 @@ final class EffNGenerators {
 						};
 					}
 
+					«FOR i : 1 .. arity»
+						default Eff«arity-1»<«(1 .. arity).filter[it != i].map['''A«it»'''].join(", ")»> apply«i»(final A«i» value«i») {
+							requireNonNull(value«i»);
+							return («(1 .. arity).filter[it != i].map['''final A«it» value«it»'''].join(", ")») -> {
+								«FOR j : 1 .. arity»
+									«IF j != i»
+										requireNonNull(value«j»);
+									«ENDIF»
+								«ENDFOR»
+								apply(«(1 .. arity).map['''value«it»'''].join(", ")»);
+							};
+						}
+
+					«ENDFOR»
 					static «params» Eff«arity»«params» eff«arity»(final Eff«arity»«params» eff) {
 						return requireNonNull(eff);
 					}
