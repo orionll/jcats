@@ -57,6 +57,23 @@ final class EffGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
+			«FOR primitive : Type.primitives»
+				«IF type == Type.OBJECT»
+					default «primitive.typeName»Eff contraMapFrom«primitive.typeName»(final «primitive.typeName»ObjectF<A> f) {
+						requireNonNull(f);
+						return (final «primitive.genericName» value) -> {
+							final A result = requireNonNull(f.apply(value));
+							apply(result);
+						};
+					}
+				«ELSE»
+					default «primitive.typeName»Eff contraMapFrom«primitive.typeName»(final «primitive.typeName»«type.typeName»F f) {
+						requireNonNull(f);
+						return (final «primitive.genericName» value) -> apply(f.apply(value));
+					}
+				«ENDIF»
+
+			«ENDFOR»
 			default Eff0 toEff0(final «type.genericName» value) {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
@@ -88,6 +105,24 @@ final class EffGenerator implements InterfaceGenerator {
 				return requireNonNull(eff);
 			}
 
+			«IF type == Type.OBJECT»
+				static <A, B> Eff<A> compose(final Eff<B> eff, final F<A, B> f) {
+			«ELSE»
+				static <A> Eff<A> compose(final «shortName» eff, final «type.typeName»F<A> f) {
+			«ENDIF»
+				return eff.contraMap(f);
+			}
+
+			«FOR primitive : Type.primitives»
+				«IF type == Type.OBJECT»
+					static <A> «primitive.typeName»Eff composeFrom«primitive.typeName»(final Eff<A> eff, final «primitive.typeName»ObjectF<A> f) {
+				«ELSE»
+					static «primitive.typeName»Eff composeFrom«primitive.typeName»(final «shortName» eff, final «primitive.typeName»«type.typeName»F f) {
+				«ENDIF»
+					return eff.contraMapFrom«primitive.typeName»(f);
+				}
+
+			«ENDFOR» 
 			«IF type == Type.OBJECT»
 				static <A> Eff<A> fromConsumer(final Consumer<A> c) {
 					requireNonNull(c);
