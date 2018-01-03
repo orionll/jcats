@@ -136,6 +136,10 @@ final class F0Generator implements InterfaceGenerator {
 				«ENDIF»
 
 			«ENDFOR»
+			default Eff0 toEff0() {
+				return this::apply;
+			}
+
 			«IF type == Type.OBJECT»
 				default Supplier<A> toSupplier() {
 					return () -> requireNonNull(apply());

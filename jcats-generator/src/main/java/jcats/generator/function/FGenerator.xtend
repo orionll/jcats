@@ -366,6 +366,19 @@ final class FGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
+			«IF to == Type.OBJECT»
+				default F0<«toName»> toF0(final «fromName» value) {
+					«IF from == Type.OBJECT»
+						requireNonNull(value);
+					«ENDIF»
+					return () -> requireNonNull(apply(value));
+				}
+			«ELSE»
+				default «to.typeName»F0 to«to.typeName»F0(final «fromName» value) {
+					return () -> «to.requireNonNull("apply(value)")»;
+				}
+			«ENDIF»
+
 			«IF from != Type.OBJECT && to == Type.OBJECT»
 				default F<«from.boxedName», A> toF() {
 					return (final «from.boxedName» value) -> {
