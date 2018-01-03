@@ -32,6 +32,10 @@ final class Eff0Generator implements InterfaceGenerator {
 			static Eff0 eff0(final Eff0 eff) {
 				return requireNonNull(eff);
 			}
+
+			static Eff0 doNothing() {
+				return () -> {};
+			}
 		}
 	''' }
 }

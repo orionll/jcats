@@ -280,6 +280,17 @@ class Eff2Generator implements InterfaceGenerator {
 			static «paramGenericName» «shortName.firstToLowerCase»(final «genericName» eff) {
 				return requireNonNull(eff);
 			}
+
+			static «paramGenericName» doNothing() {
+				return (final «type1GenericName» value1, final «type2GenericName» value2) -> {
+					«IF type1 == Type.OBJECT»
+						requireNonNull(value1);
+					«ENDIF»
+					«IF type2 == Type.OBJECT»
+						requireNonNull(value2);
+					«ENDIF»
+				};
+			}
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 
 				«cast(#["A1", "A2"], #["A1", "A2"], #[])»

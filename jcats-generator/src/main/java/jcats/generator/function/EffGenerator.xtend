@@ -27,6 +27,7 @@ final class EffGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.FUNCTION»;
 
+		import java.util.Objects;
 		«IF type == Type.OBJECT || type == Type.BOOLEAN»
 			import java.util.function.Consumer;
 		«ELSE»
@@ -122,7 +123,11 @@ final class EffGenerator implements InterfaceGenerator {
 					return eff.contraMapFrom«primitive.typeName»(f);
 				}
 
-			«ENDFOR» 
+			«ENDFOR»
+			static «paramGenericName» doNothing() {
+				return Objects::requireNonNull;
+			}
+
 			«IF type == Type.OBJECT»
 				static <A> Eff<A> fromConsumer(final Consumer<A> c) {
 					requireNonNull(c);

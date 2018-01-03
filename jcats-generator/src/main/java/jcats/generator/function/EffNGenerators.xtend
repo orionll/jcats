@@ -30,7 +30,7 @@ final class EffNGenerators {
 					«FOR i : 1 .. arity»
 						default <B> Eff«arity»<«(1 .. arity).map[(if (it == i) "B" else "A" + it)].join(", ")»> contraMap«i»(final F<B, A«i»> f) {
 							requireNonNull(f);
-							return («(1 .. arity).map[if (it == i) "b" else "a" + it].join(", ")») -> {
+							return («(1 .. arity).map[if (it == i) "final B b" else '''final A«it» a«it»'''].join(", ")») -> {
 								«FOR j : 1 .. arity»
 									requireNonNull(«if (i == j) "b" else "a" + j»);
 								«ENDFOR»
@@ -41,11 +41,11 @@ final class EffNGenerators {
 
 					«ENDFOR»
 					default Eff«arity»<«(arity .. 1).map["A" + it].join(", ")»> reverse() {
-						return («(arity .. 1).map["a" + it].join(", ")») -> {
+						return («(arity .. 1).map['''final A«it» value«it»'''].join(", ")») -> {
 							«FOR i : arity .. 1»
-								requireNonNull(a«i»);
+								requireNonNull(value«i»);
 							«ENDFOR»
-							apply(«(1 .. arity).map["a" + it].join(", ")»);
+							apply(«(1 .. arity).map["value" + it].join(", ")»);
 						};
 					}
 
@@ -65,6 +65,14 @@ final class EffNGenerators {
 					«ENDFOR»
 					static «params» Eff«arity»«params» eff«arity»(final Eff«arity»«params» eff) {
 						return requireNonNull(eff);
+					}
+
+					static «params» Eff«arity»«params» doNothing() {
+						return («(1 .. arity).map['''final A«it» value«it»'''].join(", ")») -> {
+							«FOR i : 1 .. arity»
+								requireNonNull(value«i»);
+							«ENDFOR»
+						};
 					}
 
 					«cast((1 .. arity).map["A" + it], (1 .. arity).map["A" + it], #[])»
