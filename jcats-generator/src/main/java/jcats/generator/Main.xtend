@@ -11,7 +11,6 @@ import jcats.generator.collection.ContainerGenerator
 import jcats.generator.collection.DictGenerator
 import jcats.generator.collection.IndexedContainerGenerator
 import jcats.generator.collection.KeyValueGenerator
-import jcats.generator.collection.OrdDictGenerator
 import jcats.generator.collection.PrimitiveStream2Generator
 import jcats.generator.collection.Seq0Generator
 import jcats.generator.collection.Seq1Generator
@@ -22,6 +21,7 @@ import jcats.generator.collection.Seq5Generator
 import jcats.generator.collection.Seq6Generator
 import jcats.generator.collection.SeqBuilderGenerator
 import jcats.generator.collection.SeqGenerator
+import jcats.generator.collection.SortedDictGenerator
 import jcats.generator.collection.StackBuilderGenerator
 import jcats.generator.collection.StackGenerator
 import jcats.generator.collection.Stream2Generator
@@ -86,7 +86,7 @@ final class Main {
 			new StackBuilderGenerator,
 			new KeyValueGenerator,
 			new DictGenerator,
-			new OrdDictGenerator,
+			new SortedDictGenerator,
 			new CommonGenerator,
 			new CastsGenerator,
 			new String1Generator,

@@ -6,8 +6,6 @@ final class OrderGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
-		import static java.util.Objects.requireNonNull;
-
 		public enum Order implements Equatable<Order> {
 			/**
 			 * Less than
