@@ -31,6 +31,7 @@ final class SortedDictGenerator implements ClassGenerator {
 			final P<K, A> entry;
 			final SortedDict<K, A> left;
 			final SortedDict<K, A> right;
+			private final int size;
 			private final Ord<K> ord;
 			private final int balance;
 
@@ -38,6 +39,11 @@ final class SortedDictGenerator implements ClassGenerator {
 				this.entry = entry;
 				this.left = left;
 				this.right = right;
+				if (entry == null) {
+					this.size = 0;
+				} else {
+					this.size = ((left == null) ? 0 : left.size) + ((right == null) ? 0 : right.size) + 1;
+				}
 				this.ord = ord;
 				this.balance = balance;
 			}
@@ -364,7 +370,7 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			@Override
 			public int size() {
-				throw new UnsupportedOperationException();
+				return this.size;
 			}
 
 			public String print() {

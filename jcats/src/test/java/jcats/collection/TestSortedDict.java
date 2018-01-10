@@ -21,15 +21,16 @@ import static org.junit.Assert.*;
 public class TestSortedDict {
 
 	@Test
-	public void emptyContainsNothing() {
-		final SortedDict<Character, Integer> dict = SortedDict.emptySortedDict(Ord.<Character>ord());
-		assertFalse(dict.containsKey('A'));
+	public void empty() {
+		final SortedDict<Character, Object> dict = SortedDict.emptySortedDict(Ord.<Character>ord());
+		assertEquals(0, dict.size());
+		assertEquals(0, Iterators.size(dict.iterator()));
 	}
 
 	@Test
-	public void emptyIterator() {
-		final SortedDict<Character, Object> dict = SortedDict.emptySortedDict(Ord.<Character>ord());
-		assertEquals(0, Iterators.size(dict.iterator()));
+	public void emptyContainsNothing() {
+		final SortedDict<Character, Integer> dict = SortedDict.emptySortedDict(Ord.<Character>ord());
+		assertFalse(dict.containsKey('A'));
 	}
 
 	@Test
@@ -205,19 +206,9 @@ public class TestSortedDict {
 		return dict;
 	}
 
-	/*private static <K, A> void assertDict(final SortedDict<K, A> root, final SortedDict<K, A> dict, final K expectedKey, final A expectedValue,
-			final Boolean expectedColor) {
-		assertEquals(expectedKey, dict.entry.get1());
-		assertEquals(expectedValue, dict.entry.get2());
-		if (expectedColor != null) {
-			assertEquals(expectedColor, dict.color);
-		}
-		assertEquals(some(expectedValue), root.get(expectedKey));
-		assertEquals(Ord.ord(), dict.ord);
-	}*/
-
 	private static void assertDictEquals(final String message, final SortedMap<Integer, Integer> map, final SortedDict<Integer, Integer> dict) {
 		assertNotNull(message, dict);
+		assertEquals(message, map.size(), dict.size());
 		final List<Entry<Integer, Integer>> dictEntries = ImmutableList.copyOf(Iterators.transform(dict.iterator(), P::toEntry));
 		final List<Entry<Integer, Integer>> mapEntries = ImmutableList.copyOf(map.entrySet());
 		assertEquals(message, mapEntries, dictEntries);
