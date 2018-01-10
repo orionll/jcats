@@ -431,8 +431,15 @@ final class SortedDictGenerator implements ClassGenerator {
 				return this.size;
 			}
 
-			public String print() {
-				return printNode(this);
+			int checkHeight() {
+				final int leftHeight = (this.left == null) ? 0 : this.left.checkHeight();
+				final int rightHeight = (this.right == null) ? 0 : this.right.checkHeight();
+				if (Math.abs(rightHeight - leftHeight) <= 1) {
+					return 1 + Math.max(leftHeight, rightHeight);
+				} else {
+					throw new AssertionError(String.format("Wrong balance for node %s: left height = %d, right height = %d",
+							this.entry, leftHeight, rightHeight));
+				}
 			}
 
 			private static <K, A> String printNode(final SortedDict<K, A> root) {
@@ -531,7 +538,7 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			@Override
 			public String toString() {
-				return print();
+				return printNode(this);
 				// return iterableToString(this, "SortedDict");
 			}
 

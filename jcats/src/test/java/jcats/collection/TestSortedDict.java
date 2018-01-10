@@ -205,11 +205,15 @@ public class TestSortedDict {
 
 		dict = dict.put('A', "a");
 		dict = dict.put('X', "x");
+
+		dict.checkHeight();
+
 		return dict;
 	}
 
 	private static void assertDictEquals(final String message, final SortedMap<Integer, Integer> map, final SortedDict<Integer, Integer> dict) {
 		assertNotNull(message, dict);
+		dict.checkHeight();
 		assertEquals(message, map.size(), dict.size());
 		final List<Entry<Integer, Integer>> dictEntries = ImmutableList.copyOf(Iterators.transform(dict.iterator(), P::toEntry));
 		final List<Entry<Integer, Integer>> mapEntries = ImmutableList.copyOf(map.entrySet());
