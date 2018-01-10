@@ -13,10 +13,13 @@ final class SortedDictGenerator implements ClassGenerator {
 
 		import java.io.PrintWriter;
 		import java.io.StringWriter;
+		import java.io.Serializable;
 		import java.util.ArrayList;
 		import java.util.Collections;
 		import java.util.Iterator;
 		import java.util.List;
+		import java.util.Spliterator;
+		import java.util.Spliterators;
 		import java.util.function.Consumer;
 
 		import «Constants.JCATS».*;
@@ -27,7 +30,10 @@ final class SortedDictGenerator implements ClassGenerator {
 		import static «Constants.P».p;
 		import static «Constants.COMMON».*;
 
-		public final class SortedDict<K, @Covariant A> implements KeyValue<K, A> {
+		public final class SortedDict<K, @Covariant A> implements KeyValue<K, A>, Serializable {
+			private static final SortedDict<?, ?> EMPTY =
+					new SortedDict<>(null, null, null, Ord.<Integer>ord(), 0);
+
 			final P<K, A> entry;
 			final SortedDict<K, A> left;
 			final SortedDict<K, A> right;
@@ -48,8 +54,50 @@ final class SortedDictGenerator implements ClassGenerator {
 				this.balance = balance;
 			}
 
-			public static <K, A> SortedDict<K, A> emptySortedDict(final Ord<K> ord) {
-				return new SortedDict<>(null, null, null, ord, 0);
+			public static <K extends Comparable<K>, A> SortedDict<K, A> emptySortedDict() {
+				return (SortedDict<K, A>) EMPTY;
+			}
+
+			public static <K, A> SortedDict<K, A> emptySortedDictBy(final Ord<K> ord) {
+				requireNonNull(ord);
+				if (ord == Ord.ord()) {
+					return (SortedDict<K, A>) EMPTY;
+				} else {
+					return new SortedDict<>(null, null, null, ord, 0);
+				}
+			}
+
+			public static <K extends Comparable<K>, A> SortedDict<K, A> sortedDict(final K key, final A value) {
+				return SortedDict.<K, A> emptySortedDict().put(key, value);
+			}
+
+			«FOR i : 2 .. Constants.MAX_ARITY»
+				public static <K extends Comparable<K>, A> SortedDict<K, A> sortedDict«i»(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
+					return SortedDict.<K, A> emptySortedDict()
+						«FOR j : 1 .. i»
+							.put(key«j», value«j»)«IF j == i»;«ENDIF»
+						«ENDFOR»
+				}
+
+			«ENDFOR»
+			«javadocSynonym("emptySortedDict")»
+			public static <K extends Comparable<K>, A> SortedDict<K, A> of() {
+				return emptySortedDict();
+			}
+
+			«javadocSynonym("sortedDict")»
+			public static <K extends Comparable<K>, A> SortedDict<K, A> of(final K key, final A value) {
+				return sortedDict(key, value);
+			}
+
+			«FOR i : 2 .. Constants.MAX_ARITY»
+				public static <K extends Comparable<K>, A> SortedDict<K, A> of(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
+					return sortedDict«i»(«(1..i).map["key" + it + ", value" + it].join(", ")»);
+				}
+
+			«ENDFOR»
+			public Ord<K> ord() {
+				return this.ord;
 			}
 
 			@Override
@@ -202,7 +250,7 @@ final class SortedDictGenerator implements ClassGenerator {
 				} else {
 					final SortedDict<K, A> newDict = delete(key, new DeleteResult<>());
 					if (newDict == null) {
-						return emptySortedDict(this.ord);
+						return emptySortedDictBy(this.ord);
 					} else {
 						return newDict;
 					}
@@ -349,6 +397,16 @@ final class SortedDictGenerator implements ClassGenerator {
 			@Override
 			public Iterator<P<K, A>> iterator() {
 				return (this.entry == null) ? Collections.emptyIterator() : new SortedDictIterator<>(this);
+			}
+
+			@Override
+			public Spliterator<P<K, A>> spliterator() {
+				if (this.entry == null) {
+					return Spliterators.emptySpliterator();
+				} else {
+					return Spliterators.spliterator(iterator(), size(),
+						Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE);
+				}
 			}
 
 			@Override

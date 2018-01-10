@@ -54,7 +54,10 @@ class DictGenerator implements ClassGenerator {
 
 			«FOR i : 2 .. Constants.MAX_ARITY»
 				public static <K, A> Dict<K, A> dict«i»(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
-					return Dict.<K, A> emptyDict()«(1..i).map[".put(key" + it + ", value" + it + ")"].join»;
+					return Dict.<K, A> emptyDict()
+						«FOR j : 1 .. i»
+							.put(key«j», value«j»)«IF j == i»;«ENDIF»
+						«ENDFOR»
 				}
 
 			«ENDFOR»

@@ -16,20 +16,21 @@ import java.util.TreeMap;
 import static jcats.Option.some;
 import static jcats.P.p;
 import static jcats.collection.Array.array;
+import static jcats.collection.SortedDict.emptySortedDict;
 import static org.junit.Assert.*;
 
 public class TestSortedDict {
 
 	@Test
 	public void empty() {
-		final SortedDict<Character, Object> dict = SortedDict.emptySortedDict(Ord.<Character>ord());
+		final SortedDict<Character, Object> dict = emptySortedDict();
 		assertEquals(0, dict.size());
 		assertEquals(0, Iterators.size(dict.iterator()));
 	}
 
 	@Test
 	public void emptyContainsNothing() {
-		final SortedDict<Character, Integer> dict = SortedDict.emptySortedDict(Ord.<Character>ord());
+		final SortedDict<Character, Integer> dict = emptySortedDict();
 		assertFalse(dict.containsKey('A'));
 	}
 
@@ -41,11 +42,12 @@ public class TestSortedDict {
 				p('L', "l"), p('M', "mm"), p('P', "pp"), p('R', "r"), p('S', "s"), p('X', "x"));
 
 		assertTrue(Iterators.elementsEqual(list.iterator(), dict.iterator()));
+		assertEquals(list.size(), dict.size());
 	}
 
 	@Test
 	public void putRandom() {
-		SortedDict<Integer, Integer> dict = SortedDict.emptySortedDict(Ord.<Integer>ord());
+		SortedDict<Integer, Integer> dict = emptySortedDict();
 		final SortedMap<Integer, Integer> map = new TreeMap<>();
 
 		final long seed = System.currentTimeMillis();
@@ -72,13 +74,13 @@ public class TestSortedDict {
 
 	@Test
 	public void removeFromEmpty() {
-		final SortedDict<Character, Object> dict = SortedDict.emptySortedDict(Ord.<Character>ord());
+		final SortedDict<Character, Object> dict = emptySortedDict();
 		assertTrue(dict == dict.remove('A'));
 	}
 
 	@Test
 	public void remove() {
-		SortedDict<Integer, Integer> dict = SortedDict.emptySortedDict(Ord.<Integer>ord());
+		SortedDict<Integer, Integer> dict = emptySortedDict();
 		final SortedMap<Integer, Integer> map = new TreeMap<>();
 		final int size = 300;
 		for (int i = 0; i < size; i++) {
@@ -94,7 +96,7 @@ public class TestSortedDict {
 
 	@Test
 	public void removeReverse() {
-		SortedDict<Integer, Integer> dict = SortedDict.emptySortedDict(Ord.<Integer>ord());
+		SortedDict<Integer, Integer> dict = emptySortedDict();
 		final SortedMap<Integer, Integer> map = new TreeMap<>();
 		final int size = 300;
 		for (int i = 0; i < size; i++) {
@@ -118,7 +120,7 @@ public class TestSortedDict {
 
 	@Test
 	public void removeWithDoubleRightLeftRotation() {
-		SortedDict<Integer, Integer> dict = SortedDict.emptySortedDict(Ord.<Integer>ord());
+		SortedDict<Integer, Integer> dict = emptySortedDict();
 		final SortedMap<Integer, Integer> map = new TreeMap<>();
 		final Array<Integer> sequence = array(3, 2, 6, 1, 5, 7, 4);
 		for (final Integer i : sequence) {
@@ -132,7 +134,7 @@ public class TestSortedDict {
 
 	@Test
 	public void removeWithDoubleLeftRightRotation() {
-		SortedDict<Integer, Integer> dict = SortedDict.emptySortedDict(Ord.<Integer>ord());
+		SortedDict<Integer, Integer> dict = emptySortedDict();
 		final SortedMap<Integer, Integer> map = new TreeMap<>();
 		final Array<Integer> sequence = array(4, 7, 5, 1, 6, 2, 3);
 		for (final Integer i : sequence) {
@@ -146,7 +148,7 @@ public class TestSortedDict {
 
 	@Test
 	public void removeRandom() {
-		SortedDict<Integer, Integer> dict = SortedDict.emptySortedDict(Ord.<Integer>ord());
+		SortedDict<Integer, Integer> dict = emptySortedDict();
 		final SortedMap<Integer, Integer> map = new TreeMap<>();
 
 		final long seed = System.currentTimeMillis();
@@ -182,7 +184,7 @@ public class TestSortedDict {
 	}
 
 	private static SortedDict<Character, String> createTestDict() {
-		SortedDict<Character, String> dict = SortedDict.emptySortedDict(Ord.<Character>ord());
+		SortedDict<Character, String> dict = emptySortedDict();
 		dict = dict.put('E', "e");
 		dict = dict.put('A', "a");
 		dict = dict.put('R', "r");
