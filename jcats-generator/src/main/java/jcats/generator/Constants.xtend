@@ -12,6 +12,7 @@ final class Constants {
 	val public static SIZED = "jcats.Sized"
 	val public static STRING1 = "jcats.String1"
 	val public static MAX_ARITY = 5
+	val public static DICT_FACTORY_METHODS_COUNT = 11
 	val public static EFFECT = "jcats.function.Effect"
 	val public static F = "jcats.function.F"
 	val public static F0 = "jcats.function.F0"

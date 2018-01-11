@@ -54,48 +54,6 @@ final class SortedDictGenerator implements ClassGenerator {
 				this.balance = balance;
 			}
 
-			public static <K extends Comparable<K>, A> SortedDict<K, A> emptySortedDict() {
-				return (SortedDict<K, A>) EMPTY;
-			}
-
-			public static <K, A> SortedDict<K, A> emptySortedDictBy(final Ord<K> ord) {
-				requireNonNull(ord);
-				if (ord == Ord.ord()) {
-					return (SortedDict<K, A>) EMPTY;
-				} else {
-					return new SortedDict<>(null, null, null, ord, 0);
-				}
-			}
-
-			public static <K extends Comparable<K>, A> SortedDict<K, A> sortedDict(final K key, final A value) {
-				return SortedDict.<K, A> emptySortedDict().put(key, value);
-			}
-
-			«FOR i : 2 .. Constants.MAX_ARITY»
-				public static <K extends Comparable<K>, A> SortedDict<K, A> sortedDict«i»(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
-					return SortedDict.<K, A> emptySortedDict()
-						«FOR j : 1 .. i»
-							.put(key«j», value«j»)«IF j == i»;«ENDIF»
-						«ENDFOR»
-				}
-
-			«ENDFOR»
-			«javadocSynonym("emptySortedDict")»
-			public static <K extends Comparable<K>, A> SortedDict<K, A> of() {
-				return emptySortedDict();
-			}
-
-			«javadocSynonym("sortedDict")»
-			public static <K extends Comparable<K>, A> SortedDict<K, A> of(final K key, final A value) {
-				return sortedDict(key, value);
-			}
-
-			«FOR i : 2 .. Constants.MAX_ARITY»
-				public static <K extends Comparable<K>, A> SortedDict<K, A> of(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
-					return sortedDict«i»(«(1..i).map["key" + it + ", value" + it].join(", ")»);
-				}
-
-			«ENDFOR»
 			public Ord<K> ord() {
 				return this.ord;
 			}
@@ -538,8 +496,58 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			@Override
 			public String toString() {
-				return printNode(this);
-				// return iterableToString(this, "SortedDict");
+				return iterableToString(this, "SortedDict");
+			}
+
+			public static <K extends Comparable<K>, A> SortedDict<K, A> emptySortedDict() {
+				return (SortedDict<K, A>) EMPTY;
+			}
+
+			public static <K, A> SortedDict<K, A> emptySortedDictBy(final Ord<K> ord) {
+				requireNonNull(ord);
+				if (ord == Ord.ord()) {
+					return (SortedDict<K, A>) EMPTY;
+				} else {
+					return new SortedDict<>(null, null, null, ord, 0);
+				}
+			}
+
+			public static <K extends Comparable<K>, A> SortedDict<K, A> sortedDict(final K key, final A value) {
+				return SortedDict.<K, A> emptySortedDict().put(key, value);
+			}
+
+			«FOR i : 2 .. Constants.DICT_FACTORY_METHODS_COUNT»
+				public static <K extends Comparable<K>, A> SortedDict<K, A> sortedDict«i»(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
+					return SortedDict.<K, A> emptySortedDict()
+						«FOR j : 1 .. i»
+							.put(key«j», value«j»)«IF j == i»;«ENDIF»
+						«ENDFOR»
+				}
+
+			«ENDFOR»
+			«javadocSynonym("emptySortedDict")»
+			public static <K extends Comparable<K>, A> SortedDict<K, A> of() {
+				return emptySortedDict();
+			}
+
+			«javadocSynonym("sortedDict")»
+			public static <K extends Comparable<K>, A> SortedDict<K, A> of(final K key, final A value) {
+				return sortedDict(key, value);
+			}
+
+			«FOR i : 2 .. Constants.DICT_FACTORY_METHODS_COUNT»
+				public static <K extends Comparable<K>, A> SortedDict<K, A> of(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
+					return sortedDict«i»(«(1..i).map["key" + it + ", value" + it].join(", ")»);
+				}
+
+			«ENDFOR»
+			@SafeVarargs
+			public static <K extends Comparable<K>, A> SortedDict<K, A> ofEntries(final P<K, A>... entries) {
+				SortedDict<K, A> dict = emptySortedDict();
+				for (final P<K, A> entry : entries) {
+					dict = dict.put(entry.get1(), entry.get2());
+				}
+				return dict;
 			}
 
 			«cast(#["K", "A"], #[], #["A"])»

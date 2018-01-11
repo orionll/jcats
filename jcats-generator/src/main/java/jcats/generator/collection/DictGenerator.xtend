@@ -27,8 +27,7 @@ class DictGenerator implements ClassGenerator {
 
 
 		public final class Dict<K, @Covariant A> implements KeyValue<K, A>, Serializable {
-
-			private static final Dict EMPTY = new Dict(0, 0, Common.«Type.OBJECT.emptyArrayName», 0);
+			private static final Dict<?, ?> EMPTY = new Dict(0, 0, Common.«Type.OBJECT.emptyArrayName», 0);
 
 			static final int VOID = 0, LEAF = 1, TREE = 2, COLLISION = 3;
 
@@ -44,43 +43,9 @@ class DictGenerator implements ClassGenerator {
 				this.size = size;
 			}
 
-			public static <K, A> Dict<K, A> emptyDict() {
-				return EMPTY;
-			}
-
-			public static <K, A> Dict<K, A> dict(final K key, final A value) {
-				return Dict.<K, A> emptyDict().put(key, value);
-			}
-
-			«FOR i : 2 .. Constants.MAX_ARITY»
-				public static <K, A> Dict<K, A> dict«i»(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
-					return Dict.<K, A> emptyDict()
-						«FOR j : 1 .. i»
-							.put(key«j», value«j»)«IF j == i»;«ENDIF»
-						«ENDFOR»
-				}
-
-			«ENDFOR»
-			«javadocSynonym("emptyDict")»
-			public static <K, A> Dict<K, A> of() {
-				return emptyDict();
-			}
-
-			«javadocSynonym("dict")»
-			public static <K, A> Dict<K, A> of(final K key, final A value) {
-				return dict(key, value);
-			}
-
-			«FOR i : 2 .. Constants.MAX_ARITY»
-				«javadocSynonym("dict" + i)»
-				public static <K, A> Dict<K, A> of(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
-					return dict«i»(«(1..i).map["key" + it + ", value" + it].join(", ")»);
-				}
-
-			«ENDFOR»
 			@Override
 			public int size() {
-				return size;
+				return this.size;
 			}
 
 			@Override
@@ -118,7 +83,7 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			private int slotMap() {
-				return treeMap | leafMap;
+				return this.treeMap | this.leafMap;
 			}
 
 			private static int choose(final int hash, final int shift) {
@@ -130,11 +95,11 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			private int follow(final int branch) {
-				return (((leafMap & branch) != 0) ? 1 : 0) | (((treeMap & branch) != 0) ? 2 : 0);
+				return (((this.leafMap & branch) != 0) ? 1 : 0) | (((this.treeMap & branch) != 0) ? 2 : 0);
 			}
 
 			private P<K, A> entryAt(final int index) {
-				return (P<K, A>) slots[index];
+				return (P<K, A>) this.slots[index];
 			}
 
 			private P<K, A> getEntry(final int branch) {
@@ -142,12 +107,12 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			private Dict<K, A> setEntry(final int branch, final P<K, A> entry) {
-				slots[select(branch)] = entry;
+				this.slots[select(branch)] = entry;
 				return this;
 			}
 
 			private Dict<K, A> treeAt(final int index) {
-				return (Dict<K, A>) slots[index];
+				return (Dict<K, A>) this.slots[index];
 			}
 
 			private Dict<K, A> getTree(final int branch) {
@@ -155,12 +120,12 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			private Dict<K, A> setTree(final int branch, final Dict<K, A> tree) {
-				slots[select(branch)] = tree;
+				this.slots[select(branch)] = tree;
 				return this;
 			}
 
 			private P[] collisionAt(final int index) {
-				return (P[]) slots[index];
+				return (P[]) this.slots[index];
 			}
 
 			private P[] getCollision(final int branch) {
@@ -168,21 +133,21 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			private Dict<K, A> setCollision(final int branch, final P[] collision) {
-				slots[select(branch)] = collision;
+				this.slots[select(branch)] = collision;
 				return this;
 			}
 
 			private boolean isSingle() {
-				return treeMap == 0 && Integer.bitCount(leafMap) == 1;
+				return this.treeMap == 0 && Integer.bitCount(this.leafMap) == 1;
 			}
 
 			private P<K, A> singleEntry() {
-				return (P<K, A>) slots[0];
+				return (P<K, A>) this.slots[0];
 			}
 
 			private Dict<K, A> remap(final int treeMap, final int leafMap, final int size) {
 				if (this.leafMap == leafMap && this.treeMap == treeMap) {
-					return new Dict<>(treeMap, leafMap, slots.clone(), size);
+					return new Dict<>(treeMap, leafMap, this.slots.clone(), size);
 				} else if (size == 0) {
 					return emptyDict();
 				} else  {
@@ -214,7 +179,7 @@ class DictGenerator implements ClassGenerator {
 
 				switch (follow(branch)) {
 					case VOID:
-						return remap(treeMap, leafMap | branch, size + 1).setEntry(branch, p(key, value));
+						return remap(this.treeMap, this.leafMap | branch, this.size + 1).setEntry(branch, p(key, value));
 
 					case LEAF:
 						final P<K, A> leaf = getEntry(branch);
@@ -225,16 +190,16 @@ class DictGenerator implements ClassGenerator {
 								if (value == leaf.get2()) {
 									return this;
 								} else {
-									return remap(treeMap, leafMap, size).setEntry(branch, p(key, value));
+									return remap(this.treeMap, this.leafMap, this.size).setEntry(branch, p(key, value));
 								}
 							} else {
 								final P[] collision = { p(key, value), leaf };
-								return remap(treeMap | branch, leafMap, size + 1).setCollision(branch, collision);
+								return remap(this.treeMap | branch, this.leafMap, this.size + 1).setCollision(branch, collision);
 							}
 						} else {
 							final P<K, A> entry = p(key, value);
 							final Dict<K, A> tree = merge(leaf, leafKeyHash, entry, keyHash, shift + 5);
-							return remap(treeMap | branch, leafMap ^ branch, size + 1).setTree(branch, tree);
+							return remap(this.treeMap | branch, this.leafMap ^ branch, this.size + 1).setTree(branch, tree);
 						}
 
 					case TREE:
@@ -243,7 +208,7 @@ class DictGenerator implements ClassGenerator {
 						if (newTree == oldTree) {
 							return this;
 						} else {
-							return remap(treeMap, leafMap, size + newTree.size - oldTree.size).setTree(branch, newTree);
+							return remap(this.treeMap, this.leafMap, this.size + newTree.size - oldTree.size).setTree(branch, newTree);
 						}
 
 					case COLLISION:
@@ -252,9 +217,9 @@ class DictGenerator implements ClassGenerator {
 						if (newCollision == oldCollision) {
 							return this;
 						} else if (newCollision.length > oldCollision.length) {
-							return remap(treeMap, leafMap, size + 1).setCollision(branch, newCollision);
+							return remap(this.treeMap, this.leafMap, this.size + 1).setCollision(branch, newCollision);
 						} else {
-							return remap(treeMap, leafMap, size).setCollision(branch, newCollision);
+							return remap(this.treeMap, this.leafMap, this.size).setCollision(branch, newCollision);
 						}
 
 					default:
@@ -272,7 +237,7 @@ class DictGenerator implements ClassGenerator {
 					case LEAF:
 						final P<K, A> entry = getEntry(branch);
 						if (entry.get1().equals(key)) {
-							return remap(treeMap, leafMap ^ branch, size - 1);
+							return remap(this.treeMap, this.leafMap ^ branch, this.size - 1);
 						} else {
 							return this;
 						}
@@ -283,11 +248,11 @@ class DictGenerator implements ClassGenerator {
 						if (oldTree == newTree) {
 							return this;
 						} else if (newTree.isEmpty()) {
-							return remap(treeMap ^ branch, leafMap, size - 1);
+							return remap(this.treeMap ^ branch, this.leafMap, this.size - 1);
 						} else if (newTree.isSingle()) {
-							return remap(treeMap ^ branch, leafMap | branch, size + 1 - oldTree.size).setEntry(branch, newTree.singleEntry());
+							return remap(this.treeMap ^ branch, this.leafMap | branch, this.size + 1 - oldTree.size).setEntry(branch, newTree.singleEntry());
 						} else {
-							return remap(treeMap, leafMap, size + newTree.size - oldTree.size).setTree(branch, newTree);
+							return remap(this.treeMap, this.leafMap, this.size + newTree.size - oldTree.size).setTree(branch, newTree);
 						}
 
 					case COLLISION:
@@ -296,9 +261,9 @@ class DictGenerator implements ClassGenerator {
 						if (newCollision == oldCollision) {
 							return this;
 						} else if (newCollision.length == 1) {
-							return remap(treeMap ^ branch, leafMap | branch, size - 1).setEntry(branch, newCollision[0]);
+							return remap(this.treeMap ^ branch, this.leafMap | branch, this.size - 1).setEntry(branch, newCollision[0]);
 						} else {
-							return remap(treeMap, leafMap, size - 1).setCollision(branch, newCollision);
+							return remap(this.treeMap, this.leafMap, this.size - 1).setCollision(branch, newCollision);
 						}
 
 					default:
@@ -372,7 +337,7 @@ class DictGenerator implements ClassGenerator {
 
 			@Override
 			public Iterator<P<K, A>> iterator() {
-				return new DictIterator<>(leafMap, treeMap, slots);
+				return new DictIterator<>(this.leafMap, this.treeMap, this.slots);
 			}
 
 			@Override
@@ -406,6 +371,49 @@ class DictGenerator implements ClassGenerator {
 				return iterableToString(this, "Dict");
 			}
 
+			public static <K, A> Dict<K, A> emptyDict() {
+				return (Dict<K, A>) EMPTY;
+			}
+
+			public static <K, A> Dict<K, A> dict(final K key, final A value) {
+				return Dict.<K, A> emptyDict().put(key, value);
+			}
+
+			«FOR i : 2 .. Constants.DICT_FACTORY_METHODS_COUNT»
+				public static <K, A> Dict<K, A> dict«i»(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
+					return Dict.<K, A> emptyDict()
+						«FOR j : 1 .. i»
+							.put(key«j», value«j»)«IF j == i»;«ENDIF»
+						«ENDFOR»
+				}
+
+			«ENDFOR»
+			«javadocSynonym("emptyDict")»
+			public static <K, A> Dict<K, A> of() {
+				return emptyDict();
+			}
+
+			«javadocSynonym("dict")»
+			public static <K, A> Dict<K, A> of(final K key, final A value) {
+				return dict(key, value);
+			}
+
+			«FOR i : 2 .. Constants.DICT_FACTORY_METHODS_COUNT»
+				«javadocSynonym("dict" + i)»
+				public static <K, A> Dict<K, A> of(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
+					return dict«i»(«(1..i).map["key" + it + ", value" + it].join(", ")»);
+				}
+
+			«ENDFOR»
+			@SafeVarargs
+			public static <K, A> Dict<K, A> ofEntries(final P<K, A>... entries) {
+				Dict<K, A> dict = emptyDict();
+				for (final P<K, A> entry : entries) {
+					dict = dict.put(entry.get1(), entry.get2());
+				}
+				return dict;
+			}
+
 			«cast(#["K", "A"], #[], #["A"])»
 		}
 
@@ -424,61 +432,61 @@ class DictGenerator implements ClassGenerator {
 
 			@Override
 			public boolean hasNext() {
-				return ((treeMap | leafMap) != 0) || (childIterator != null && childIterator.hasNext());
+				return ((this.treeMap | this.leafMap) != 0) || (this.childIterator != null && this.childIterator.hasNext());
 			}
 
 			@Override
 			public P<K, A> next() {
-				if (childIterator == null || !childIterator.hasNext()) {
-					if (childIterator != null) {
-						childIterator = null;
+				if (this.childIterator == null || !this.childIterator.hasNext()) {
+					if (this.childIterator != null) {
+						this.childIterator = null;
 					}
-					if ((treeMap | leafMap) == 0) {
+					if ((this.treeMap | this.leafMap) == 0) {
 						throw new NoSuchElementException();
 					}
 
 					int slotType;
-					while ((slotType = (leafMap & 1) | (treeMap & 1) << 1) == Dict.VOID) {
-						treeMap >>>= 1;
-						leafMap >>>= 1;
+					while ((slotType = (this.leafMap & 1) | (this.treeMap & 1) << 1) == Dict.VOID) {
+						this.treeMap >>>= 1;
+						this.leafMap >>>= 1;
 					}
 
 					P<K, A> next = null;
 					switch (slotType) {
 						case Dict.LEAF:
-							next = entryAt(i++);
+							next = entryAt(this.i++);
 							break;
 
 						case Dict.TREE:
-							childIterator = treeAt(i++).iterator();
-							next = childIterator.next();
+							this.childIterator = treeAt(this.i++).iterator();
+							next = this.childIterator.next();
 							break;
 
 						case Dict.COLLISION:
-							childIterator = new ArrayIterator<>(collisionAt(i++));
-							next = childIterator.next();
+							this.childIterator = new ArrayIterator<>(collisionAt(this.i++));
+							next = this.childIterator.next();
 							break;
 					}
 
-					treeMap >>>= 1;
-					leafMap >>>= 1;
+					this.treeMap >>>= 1;
+					this.leafMap >>>= 1;
 
 					return next;
 				} else {
-					return childIterator.next();
+					return this.childIterator.next();
 				}
 			}
 
 			private P<K, A> entryAt(final int index) {
-				return (P<K, A>) slots[index];
+				return (P<K, A>) this.slots[index];
 			}
 
 			private Dict<K, A> treeAt(final int index) {
-				return (Dict<K, A>) slots[index];
+				return (Dict<K, A>) this.slots[index];
 			}
 
 			private P[] collisionAt(final int index) {
-				return (P[]) slots[index];
+				return (P[]) this.slots[index];
 			}
 		}
 	''' }
