@@ -7,6 +7,8 @@ final class SortedDictGenerator implements ClassGenerator {
 	override className() { Constants.COLLECTION + "." + shortName }
 
 	def shortName() { "SortedDict" }
+	def genericName() { "SortedDict<K, A>" }
+	def diamondName() { "SortedDict<>" }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -99,107 +101,14 @@ final class SortedDictGenerator implements ClassGenerator {
 				}
 			}
 
-			private SortedDict<K, A> update(final K key, final A value, final InsertResult result) {
-				final Order order = this.ord.compare(key, this.entry.get1());
-				if (order == EQ) {
-					result.heightIncreased = false;
-					if (key == this.entry.get1() && value == this.entry.get2()) {
-						return this;
-					} else {
-						return new SortedDict<>(p(key, value), this.left, this.right, this.ord, this.balance);
-					}
-				} else if (order == LT) {
-					final SortedDict<K, A> newLeft;
-					if (this.left == null) {
-						result.heightIncreased = true;
-						newLeft = new SortedDict<>(p(key, value), null, null, this.ord, 0);
-					} else {
-						newLeft = this.left.update(key, value, result);
-						if (newLeft == this.left) {
-							result.heightIncreased = false;
-							return this;
-						} else if (!result.heightIncreased) {
-							return new SortedDict<>(this.entry, newLeft, this.right, this.ord, this.balance);
-						}
-					}
-					if (this.balance == 1) {
-						result.heightIncreased = false;
-						return new SortedDict<>(this.entry, newLeft, this.right, this.ord, 0);
-					} else if (this.balance == 0) {
-						result.heightIncreased = true;
-						return new SortedDict<>(this.entry, newLeft, this.right, this.ord, -1);
-					} else {
-						return insertAndRotateRight(newLeft, result);
-					}
-				} else if (order == GT) {
-					final SortedDict<K, A> newRight;
-					if (this.right == null) {
-						result.heightIncreased = true;
-						newRight = new SortedDict<>(p(key, value), null, null, this.ord, 0);
-					} else {
-						newRight = this.right.update(key, value, result);
-						if (newRight == this.right) {
-							result.heightIncreased = false;
-							return this;
-						} else if (!result.heightIncreased) {
-							return new SortedDict<>(this.entry, this.left, newRight, this.ord, this.balance);
-						}
-					}
-					if (this.balance == -1) {
-						result.heightIncreased = false;
-						return new SortedDict<>(this.entry, this.left, newRight, this.ord, 0);
-					} else if (this.balance == 0) {
-						result.heightIncreased = true;
-						return new SortedDict<>(this.entry, this.left, newRight, this.ord, 1);
-					} else {
-						return insertAndRotateLeft(newRight, result);
-					}
-				} else {
-					throw nullOrder(order);
-				}
+			private «genericName» update(final K key, final A value, final InsertResult result) {
+				«AVLCommon.update(genericName, diamondName, "entry.get1()", "p(key, value)",
+					"key == this.entry.get1() && value == this.entry.get2()", "key, value")»
 			}
 
-			private SortedDict<K, A> insertAndRotateRight(final SortedDict<K, A> newLeft, final InsertResult result) {
-				if (newLeft.balance == -1) {
-					result.heightIncreased = false;
-					final SortedDict<K, A> newRight = new SortedDict<>(this.entry, newLeft.right, this.right, this.ord, 0);
-					return new SortedDict<>(newLeft.entry, newLeft.left, newRight, this.ord, 0);
-				} else if (newLeft.balance == 0) {
-					result.heightIncreased = true;
-					final SortedDict<K, A> newRight = new SortedDict<>(this.entry, newLeft.right, this.right, this.ord, -1);
-					return new SortedDict<>(newLeft.entry, newLeft.left, newRight, this.ord, 1);
-				} else {
-					result.heightIncreased = false;
-					final int balanceLeft = (newLeft.right.balance == 1) ? -1 : 0;
-					final int balanceRight = (newLeft.right.balance == -1) ? 1 : 0;
-					final SortedDict<K, A> newLeft2 = new SortedDict<>(
-							newLeft.entry, newLeft.left, newLeft.right.left, this.ord, balanceLeft);
-					final SortedDict<K, A> newRight = new SortedDict<>(
-							this.entry, newLeft.right.right, this.right, this.ord, balanceRight);
-					return new SortedDict<>(newLeft.right.entry, newLeft2, newRight, this.ord, 0);
-				}
-			}
+			«AVLCommon.insertAndRotateRight(genericName, diamondName)»
 
-			private SortedDict<K, A> insertAndRotateLeft(final SortedDict<K, A> newRight, final InsertResult result) {
-				if (newRight.balance == 1) {
-					result.heightIncreased = false;
-					final SortedDict<K, A> newLeft = new SortedDict<>(this.entry, this.left, newRight.left, this.ord, 0);
-					return new SortedDict<>(newRight.entry, newLeft, newRight.right, this.ord, 0);
-				} else if (newRight.balance == 0) {
-					result.heightIncreased = true;
-					final SortedDict<K, A> newLeft = new SortedDict<>(this.entry, this.left, newRight.left, this.ord, 1);
-					return new SortedDict<>(newRight.entry, newLeft, newRight.right, this.ord, -1);
-				} else {
-					result.heightIncreased = false;
-					final int balanceLeft = (newRight.left.balance == 1) ? -1 : 0;
-					final int balanceRight = (newRight.left.balance == -1) ? 1 : 0;
-					final SortedDict<K, A> newLeft = new SortedDict<>(
-							this.entry, this.left, newRight.left.left, this.ord, balanceLeft);
-					final SortedDict<K, A> newRight2 = new SortedDict<>(
-							newRight.entry, newRight.left.right, newRight.right, this.ord, balanceRight);
-					return new SortedDict<>(newRight.left.entry, newLeft, newRight2, this.ord, 0);
-				}
-			}
+			«AVLCommon.insertAndRotateLeft(genericName, diamondName)»
 
 			public SortedDict<K, A> remove(final K key) {
 				requireNonNull(key);
@@ -216,133 +125,14 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			private SortedDict<K, A> delete(final K key, final DeleteResult<K, A> result) {
-				final Order order = this.ord.compare(key, this.entry.get1());
-				if (order == EQ) {
-					if (this.left == null) {
-						result.heightDecreased = true;
-						return this.right;
-					} else if (this.right == null) {
-						result.heightDecreased = true;
-						return this.left;
-					}
-					final SortedDict<K, A> newLeft = this.left.deleteMaximum(result);
-					if (!result.heightDecreased) {
-						return new SortedDict<>(result.entry, newLeft, this.right, this.ord, this.balance);
-					} else if (this.balance == -1) {
-						// heightDecreased is already true
-						return new SortedDict<>(result.entry, newLeft, this.right, this.ord, 0);
-					} else if (this.balance == 0) {
-						result.heightDecreased = false;
-						return new SortedDict<>(result.entry, newLeft, this.right, this.ord, 1);
-					} else {
-						return deleteAndRotateLeft(newLeft, result.entry, result);
-					}
-				} else if (order == LT) {
-					if (this.left == null) {
-						result.heightDecreased = false;
-						return this;
-					}
-					final SortedDict<K, A> newLeft = this.left.delete(key, result);
-					if (newLeft == this.left) {
-						result.heightDecreased = false;
-						return this;
-					} else if (!result.heightDecreased) {
-						return new SortedDict<>(this.entry, newLeft, this.right, this.ord, this.balance);
-					} else if (this.balance == -1) {
-						// heightDecreased is already true
-						return new SortedDict<>(this.entry, newLeft, this.right, this.ord, 0);
-					} else if (this.balance == 0) {
-						result.heightDecreased = false;
-						return new SortedDict<>(this.entry, newLeft, this.right, this.ord, 1);
-					} else {
-						return deleteAndRotateLeft(newLeft, this.entry, result);
-					}
-				} else if (order == GT) {
-					if (this.right == null) {
-						result.heightDecreased = false;
-						return this;
-					}
-					final SortedDict<K, A> newRight = this.right.delete(key, result);
-					if (newRight == this.right) {
-						result.heightDecreased = false;
-						return this;
-					} else if (!result.heightDecreased) {
-						return new SortedDict<>(this.entry, this.left, newRight, this.ord, this.balance);
-					} else if (this.balance == 1) {
-						// heightDecreased is already true
-						return new SortedDict<>(this.entry, this.left, newRight, this.ord, 0);
-					} else if (this.balance == 0) {
-						result.heightDecreased = false;
-						return new SortedDict<>(this.entry, this.left, newRight, this.ord, -1);
-					} else {
-						return deleteAndRotateRight(newRight, result);
-					}
-				} else {
-					throw nullOrder(order);
-				}
+				«AVLCommon.delete(genericName, diamondName, "entry.get1()")»
 			}
 
-			private SortedDict<K, A> deleteMaximum(final DeleteResult<K, A> result) {
-				if (this.right == null) {
-					result.entry = this.entry;
-					result.heightDecreased = true;
-					return this.left;
-				}
-				final SortedDict<K, A> newRight = this.right.deleteMaximum(result);
-				if (!result.heightDecreased) {
-					return new SortedDict<>(this.entry, this.left, newRight, this.ord, this.balance);
-				} else if (this.balance == 1) {
-					// heightDecreased is already true
-					return new SortedDict<>(this.entry, this.left, newRight, this.ord, 0);
-				} else if (this.balance == 0) {
-					result.heightDecreased = false;
-					return new SortedDict<>(this.entry, this.left, newRight, this.ord, -1);
-				} else {
-					return deleteAndRotateRight(newRight, result);
-				}
-			}
+			«AVLCommon.deleteMaximum(genericName, diamondName, "DeleteResult<K, A>")»
 
-			private SortedDict<K, A> deleteAndRotateLeft(final SortedDict<K, A> newLeft, final P<K, A> newEntry, final DeleteResult<K, A> result) {
-				if (this.right.balance == 1) {
-					// heightDecreased is already true
-					final SortedDict<K, A> newLeft2 = new SortedDict<>(newEntry, newLeft, this.right.left, this.ord, 0);
-					return new SortedDict<>(this.right.entry, newLeft2, this.right.right, this.ord, 0);
-				} else if (this.right.balance == 0) {
-					result.heightDecreased = false;
-					final SortedDict<K, A> newLeft2 = new SortedDict<>(newEntry, newLeft, this.right.left, this.ord, 1);
-					return new SortedDict<>(this.right.entry, newLeft2, this.right.right, this.ord, -1);
-				} else {
-					// heightDecreased is already true
-					final int balanceLeft = (this.right.left.balance == 1) ? -1 : 0;
-					final int balanceRight = (this.right.left.balance == -1) ? 1 : 0;
-					final SortedDict<K, A> newLeft2 = new SortedDict<>(
-							newEntry, newLeft, this.right.left.left, this.ord, balanceLeft);
-					final SortedDict<K, A> newRight = new SortedDict<>(
-							this.right.entry, this.right.left.right, this.right.right, this.ord, balanceRight);
-					return new SortedDict<>(this.right.left.entry, newLeft2, newRight, this.ord, 0);
-				}
-			}
+			«AVLCommon.deleteAndRotateLeft(genericName, diamondName, "P<K, A>", "DeleteResult<K, A>")»
 
-			private SortedDict<K, A> deleteAndRotateRight(final SortedDict<K, A> newRight, final DeleteResult<K, A> result) {
-				if (this.left.balance == -1) {
-					// heightDecreased is already true
-					final SortedDict<K, A> newRight2 = new SortedDict<>(this.entry, this.left.right, newRight, this.ord, 0);
-					return new SortedDict<>(this.left.entry, this.left.left, newRight2, this.ord, 0);
-				} else if (this.left.balance == 0) {
-					result.heightDecreased = false;
-					final SortedDict<K, A> newRight2 = new SortedDict<>(this.entry, this.left.right, newRight, this.ord, -1);
-					return new SortedDict<>(this.left.entry, this.left.left, newRight2, this.ord, 1);
-				} else {
-					// heightDecreased is already true
-					final int balanceLeft = (this.left.right.balance == 1) ? -1 : 0;
-					final int balanceRight = (this.left.right.balance == -1) ? 1 : 0;
-					final SortedDict<K, A> newLeft = new SortedDict<>(
-							this.left.entry, this.left.left, this.left.right.left, this.ord, balanceLeft);
-					final SortedDict<K, A> newRight2 = new SortedDict<>(
-							this.entry, this.left.right.right, newRight, this.ord, balanceRight);
-					return new SortedDict<>(this.left.right.entry, newLeft, newRight2, this.ord, 0);
-				}
-			}
+			«AVLCommon.deleteAndRotateRight(genericName, diamondName, "DeleteResult<K, A>")»
 
 			private static NullPointerException nullOrder(final Order order) {
 				if (order == null) {

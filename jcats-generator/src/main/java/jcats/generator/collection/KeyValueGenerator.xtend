@@ -203,7 +203,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			«uniqueHashCode»
 
-			«uniqueEquals(Type.OBJECT, "UniqueContainer")»
+			«uniqueEquals(Type.OBJECT)»
 
 			@Override
 			public String toString() {
@@ -251,7 +251,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 		
 			«uniqueHashCode»
 
-			«uniqueEquals(Type.OBJECT, "UniqueContainer")»
+			«uniqueEquals(Type.OBJECT)»
 		
 			@Override
 			public String toString() {

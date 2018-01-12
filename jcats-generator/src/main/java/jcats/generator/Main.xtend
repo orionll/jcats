@@ -22,6 +22,7 @@ import jcats.generator.collection.Seq6Generator
 import jcats.generator.collection.SeqBuilderGenerator
 import jcats.generator.collection.SeqGenerator
 import jcats.generator.collection.SortedDictGenerator
+import jcats.generator.collection.SortedUniqueGenerator
 import jcats.generator.collection.StackBuilderGenerator
 import jcats.generator.collection.StackGenerator
 import jcats.generator.collection.Stream2Generator
@@ -87,6 +88,7 @@ final class Main {
 			new KeyValueGenerator,
 			new DictGenerator,
 			new SortedDictGenerator,
+			new SortedUniqueGenerator,
 			new CommonGenerator,
 			new CastsGenerator,
 			new String1Generator,
