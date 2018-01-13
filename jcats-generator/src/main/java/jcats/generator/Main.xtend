@@ -1,5 +1,6 @@
 package jcats.generator
 
+import com.google.common.base.Stopwatch
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
@@ -42,26 +43,31 @@ import static extension java.nio.file.Files.*
 
 final class Main {
 	def static void main(String[] args) {
-		if (args.length == 0) {
-			println("Error: specify jcats folder path")
-		} else if (args.length > 1) {
+		if (args.length > 1) {
 			println("Error: too many arguments")
-		} else {
-			val dir = new File(args.head)
-			if (dir.directory) {
-				val srcDir = new File(dir, "src/main/java")
-				if (dir.directory) {
-					generateSourceCode(srcDir)
-				} else {
-					println('''Error: «srcDir.absolutePath» must be an existing directory''')
-				}
-			} else {
-				println('''Error: «dir.absolutePath» must be an existing directory''')				
-			}
+			System.exit(1)
 		}
+
+		val stopwatch = Stopwatch.createStarted
+
+		val dir = new File(if (args.length > 0) args.head else "../jcats")
+		if (!dir.directory) {
+			println('''Error: «dir.canonicalPath» must be an existing directory''')
+			System.exit(1)
+		}
+
+		val srcDir = new File(dir, "src/main/java")
+		if (!srcDir.directory) {
+			srcDir.mkdir
+		}
+
+		generateSourceCode(srcDir)
+
+		println('''Execution time: «stopwatch.stop»''')
 	}
 
 	private def static generateSourceCode(File srcDir) {
+		println('''Generating source code to «srcDir.canonicalPath»''')
 		for (generator : allGenerators) {
 			val srcFile = generator.className.replace('.', '/') + ".java"
 			val srcFilePath = new File(srcDir, srcFile).toPath
