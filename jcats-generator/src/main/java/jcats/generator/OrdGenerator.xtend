@@ -261,7 +261,7 @@ final class OrdGenerator implements ClassGenerator {
 			«ELSE»
 				static «genericName» fromComparator(final Comparator<«type.genericBoxedName»> comparator) {
 					requireNonNull(comparator);
-					return (final «type.genericName» x, final «type.genericName» y) -> 
+					return (final «type.genericName» x, final «type.genericName» y) ->
 						Order.fromInt(comparator.compare(x, y));
 				}
 			«ENDIF»
@@ -295,7 +295,7 @@ final class OrdGenerator implements ClassGenerator {
 					return Ord.<A>ord().contraMapFrom«type.typeName»(f);
 				}
 			«ENDIF»
-			
+
 			«FOR t : Type.primitives»
 				«IF type == Type.OBJECT»
 					static <A> «genericName» by«t.typeName»(final «t.typeName»F<A> f) {

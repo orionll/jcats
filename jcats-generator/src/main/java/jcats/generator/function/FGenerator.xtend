@@ -167,7 +167,7 @@ final class FGenerator implements InterfaceGenerator {
 							return !apply(value);
 						};
 					«ELSE»
-						return (final «from.javaName» value) -> !apply(value); 
+						return (final «from.javaName» value) -> !apply(value);
 					«ENDIF»
 				}
 
