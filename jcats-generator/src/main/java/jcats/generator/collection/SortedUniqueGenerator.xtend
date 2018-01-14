@@ -62,15 +62,15 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public boolean contains(final A key) {
-				requireNonNull(key);
+			public boolean contains(final A value) {
+				requireNonNull(value);
 				if (this.entry == null) {
 					return false;
 				}
 
 				SortedUnique<A> unique = this;
 				while (true) {
-					final Order order = this.ord.compare(key, unique.entry);
+					final Order order = this.ord.compare(value, unique.entry);
 					if (order == EQ) {
 						return true;
 					} else if (order == LT) {
@@ -91,30 +91,30 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				}
 			}
 
-			public SortedUnique<A> put(final A key) {
-				requireNonNull(key);
+			public SortedUnique<A> put(final A value) {
+				requireNonNull(value);
 
 				if (this.entry == null) {
-					return new SortedUnique<>(key, null, null, this.ord, 0);
+					return new SortedUnique<>(value, null, null, this.ord, 0);
 				} else {
-					return update(key, new InsertResult());
+					return update(value, new InsertResult());
 				}
 			}
 
-			private «genericName» update(final A key, final InsertResult result) {
-				«AVLCommon.update(genericName, diamondName, "entry", "key", "key == this.entry", "key")»
+			private «genericName» update(final A value, final InsertResult result) {
+				«AVLCommon.update(genericName, diamondName, "value", "entry", "value", "value == this.entry", "value")»
 			}
 
 			«AVLCommon.insertAndRotateRight(genericName, diamondName)»
 
 			«AVLCommon.insertAndRotateLeft(genericName, diamondName)»
 
-			public SortedUnique<A> remove(final A key) {
-				requireNonNull(key);
+			public SortedUnique<A> remove(final A value) {
+				requireNonNull(value);
 				if (this.entry == null) {
 					return this;
 				} else {
-					final SortedUnique<A> newUnique = delete(key, new DeleteResult<>());
+					final SortedUnique<A> newUnique = delete(value, new DeleteResult<>());
 					if (newUnique == null) {
 						return emptySortedUniqueBy(this.ord);
 					} else {
@@ -123,8 +123,8 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				}
 			}
 
-			private SortedUnique<A> delete(final A key, final DeleteResult<A> result) {
-				«AVLCommon.delete(genericName, diamondName, "entry")»
+			private SortedUnique<A> delete(final A value, final DeleteResult<A> result) {
+				«AVLCommon.delete(genericName, diamondName, "value", "entry")»
 			}
 
 			«AVLCommon.deleteMaximum(genericName, diamondName, "DeleteResult<A>")»
@@ -211,23 +211,36 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				}
 			}
 
-			public static <A extends Comparable<A>> SortedUnique<A> single«shortName»(final A key) {
-				return SortedUnique.<A> emptySortedUnique().put(key);
+			public static <A extends Comparable<A>> SortedUnique<A> single«shortName»(final A value) {
+				return SortedUnique.<A> emptySortedUnique().put(value);
 			}
 
 			@SafeVarargs
-			public static <A extends Comparable<A>> SortedUnique<A> «shortName.firstToLowerCase»(final A... keys) {
+			public static <A extends Comparable<A>> SortedUnique<A> «shortName.firstToLowerCase»(final A... values) {
 				SortedUnique<A> unique = emptySortedUnique();
-				for (final A key : keys) {
-					unique = unique.put(key);
+				for (final A value : values) {
+					unique = unique.put(value);
 				}
 				return unique;
 			}
 
 			«javadocSynonym(shortName.firstToLowerCase)»
 			@SafeVarargs
-			public static <A extends Comparable<A>> SortedUnique<A> of(final A... keys) {
-				return «shortName.firstToLowerCase»(keys);
+			public static <A extends Comparable<A>> SortedUnique<A> of(final A... values) {
+				return «shortName.firstToLowerCase»(values);
+			}
+
+			public static <A extends Comparable<A>> SortedUnique<A> ofAll(final Iterable<A> iterable) {
+				requireNonNull(iterable);
+				if (iterable instanceof SortedUnique<?>) {
+					return (SortedUnique<A>) iterable;
+				} else {
+					SortedUnique<A> unique = emptySortedUnique();
+					for (final A value : iterable) {
+						unique = unique.put(value);
+					}
+					return unique;
+				}
 			}
 
 			«cast(#["A"], #[], #["A"])»

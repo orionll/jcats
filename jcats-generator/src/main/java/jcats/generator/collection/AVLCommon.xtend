@@ -2,8 +2,8 @@ package jcats.generator.collection
 
 final class AVLCommon {
 
-	def static update(String genericName, String diamondName, String getKey, String createEntry, String sameEntry, String updateArgs) '''
-		final Order order = this.ord.compare(key, this.«getKey»);
+	def static update(String genericName, String diamondName, String key, String getKey, String createEntry, String sameEntry, String updateArgs) '''
+		final Order order = this.ord.compare(«key», this.«getKey»);
 		if (order == EQ) {
 			result.heightIncreased = false;
 			if («sameEntry») {
@@ -108,8 +108,8 @@ final class AVLCommon {
 		}
 	'''
 
-	def static delete(String genericName, String diamondName, String getKey) '''
-		final Order order = this.ord.compare(key, this.«getKey»);
+	def static delete(String genericName, String diamondName, String key, String getKey) '''
+		final Order order = this.ord.compare(«key», this.«getKey»);
 		if (order == EQ) {
 			if (this.left == null) {
 				result.heightDecreased = true;
@@ -135,7 +135,7 @@ final class AVLCommon {
 				result.heightDecreased = false;
 				return this;
 			}
-			final «genericName» newLeft = this.left.delete(key, result);
+			final «genericName» newLeft = this.left.delete(«key», result);
 			if (newLeft == this.left) {
 				result.heightDecreased = false;
 				return this;
@@ -155,7 +155,7 @@ final class AVLCommon {
 				result.heightDecreased = false;
 				return this;
 			}
-			final «genericName» newRight = this.right.delete(key, result);
+			final «genericName» newRight = this.right.delete(«key», result);
 			if (newRight == this.right) {
 				result.heightDecreased = false;
 				return this;

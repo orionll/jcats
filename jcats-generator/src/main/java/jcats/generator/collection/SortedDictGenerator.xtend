@@ -102,7 +102,7 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			private «genericName» update(final K key, final A value, final InsertResult result) {
-				«AVLCommon.update(genericName, diamondName, "entry.get1()", "p(key, value)",
+				«AVLCommon.update(genericName, diamondName, "key", "entry.get1()", "p(key, value)",
 					"key == this.entry.get1() && value == this.entry.get2()", "key, value")»
 			}
 
@@ -125,7 +125,7 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			private SortedDict<K, A> delete(final K key, final DeleteResult<K, A> result) {
-				«AVLCommon.delete(genericName, diamondName, "entry.get1()")»
+				«AVLCommon.delete(genericName, diamondName, "key", "entry.get1()")»
 			}
 
 			«AVLCommon.deleteMaximum(genericName, diamondName, "DeleteResult<K, A>")»
