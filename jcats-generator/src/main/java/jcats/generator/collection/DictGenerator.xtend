@@ -15,6 +15,8 @@ class DictGenerator implements ClassGenerator {
 
 		import java.io.Serializable;
 		import java.util.Iterator;
+		import java.util.Map;
+		import java.util.Map.Entry;
 		import java.util.NoSuchElementException;
 		import java.util.function.Consumer;
 
@@ -410,6 +412,31 @@ class DictGenerator implements ClassGenerator {
 				Dict<K, A> dict = emptyDict();
 				for (final P<K, A> entry : entries) {
 					dict = dict.put(entry.get1(), entry.get2());
+				}
+				return dict;
+			}
+
+			public static <K, A> Dict<K, A> ofAll(final Iterable<P<K, A>> entries) {
+				Dict<K, A> dict = emptyDict();
+				for (final P<K, A> entry : entries) {
+					dict = dict.put(entry.get1(), entry.get2());
+				}
+				return dict;
+			}
+
+			public static <K, A> Dict<K, A> fromIterator(final Iterator<P<K, A>> entries) {
+				Dict<K, A> dict = emptyDict();
+				while (entries.hasNext()) {
+					final P<K, A> entry = entries.next();
+					dict = dict.put(entry.get1(), entry.get2());
+				}
+				return dict;
+			}
+
+			public static <K, A> Dict<K, A> fromMap(final Map<K, A> map) {
+				Dict<K, A> dict = emptyDict();
+				for (final Entry<K, A> entry : map.entrySet()) {
+					dict = dict.put(entry.getKey(), entry.getValue());
 				}
 				return dict;
 			}

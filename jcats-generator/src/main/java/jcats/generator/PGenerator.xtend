@@ -299,6 +299,10 @@ class PGenerator implements ClassGenerator {
 			public static «paramGenericName» of(final «type1Name» a1, final «type2Name» a2) {
 				return «shortName.firstToLowerCase»(a1, a2);
 			}
+
+			public static «paramGenericName» fromEntry(final Entry<«type1BoxedName», «type2BoxedName»> entry) {
+				return «shortName.firstToLowerCase»(entry.getKey(), entry.getValue());
+			}
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 
 				«cast(#["A1", "A2"], #[], #["A1", "A2"])»

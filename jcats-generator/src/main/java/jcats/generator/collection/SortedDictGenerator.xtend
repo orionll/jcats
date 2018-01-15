@@ -20,6 +20,9 @@ final class SortedDictGenerator implements ClassGenerator {
 		import java.util.Collections;
 		import java.util.Iterator;
 		import java.util.List;
+		import java.util.Map;
+		import java.util.Map.Entry;
+		import java.util.SortedMap;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.function.Consumer;
@@ -336,6 +339,45 @@ final class SortedDictGenerator implements ClassGenerator {
 				SortedDict<K, A> dict = emptySortedDict();
 				for (final P<K, A> entry : entries) {
 					dict = dict.put(entry.get1(), entry.get2());
+				}
+				return dict;
+			}
+
+			public static <K extends Comparable<K>, A> SortedDict<K, A> ofAll(final Iterable<P<K, A>> entries) {
+				SortedDict<K, A> dict = emptySortedDict();
+				for (final P<K, A> entry : entries) {
+					dict = dict.put(entry.get1(), entry.get2());
+				}
+				return dict;
+			}
+
+			public static <K extends Comparable<K>, A> SortedDict<K, A> fromIterator(final Iterator<P<K, A>> entries) {
+				SortedDict<K, A> dict = emptySortedDict();
+				while (entries.hasNext()) {
+					final P<K, A> entry = entries.next();
+					dict = dict.put(entry.get1(), entry.get2());
+				}
+				return dict;
+			}
+
+			public static <K extends Comparable<K>, A> SortedDict<K, A> fromMap(final Map<K, A> map) {
+				SortedDict<K, A> dict = emptySortedDict();
+				for (final Entry<K, A> entry : map.entrySet()) {
+					dict = dict.put(entry.getKey(), entry.getValue());
+				}
+				return dict;
+			}
+
+			public static <K, A> SortedDict<K, A> fromSortedMap(final SortedMap<K, A> map) {
+				final Comparator<? super K> comparator = map.comparator();
+				SortedDict<K, A> dict;
+				if (comparator == null) {
+					dict = (SortedDict<K, A>) emptySortedDict();
+				} else {
+					dict = emptySortedDictBy((Ord<K>) Ord.fromComparator(comparator));
+				}
+				for (final Entry<K, A> entry : map.entrySet()) {
+					dict = dict.put(entry.getKey(), entry.getValue());
 				}
 				return dict;
 			}
