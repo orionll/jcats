@@ -14,16 +14,12 @@ final class SortedUniqueGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		import java.io.PrintWriter;
-		import java.io.StringWriter;
 		import java.io.Serializable;
-		import java.util.ArrayList;
 		import java.util.Collections;
 		import java.util.Iterator;
-		import java.util.List;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
-		import java.util.function.Consumer;
+		import java.util.stream.Stream;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -141,6 +137,41 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				}
 			}
 
+			public SortedUnique<A> merge(final SortedUnique<A> other) {
+				requireNonNull(other);
+				if (isEmpty()) {
+					return other;
+				} else if (other.isEmpty()) {
+					return this;
+				} else {
+					SortedUnique<A> result;
+					final SortedUnique<A> from;
+					if (size() >= other.size()) {
+						result = this;
+						from = other;
+					} else {
+						result = other;
+						from = this;
+					}
+					for (final A value : from) {
+						result = result.put(value);
+					}
+					return result;
+				}
+			}
+
+			public SortedUnique<A> putAll(final Iterable<A> iterable) {
+				if (iterable instanceof SortedUnique<?>) {
+					return merge((SortedUnique<A>) iterable);
+				} else {
+					SortedUnique<A> result = this;
+					for (final A value : iterable) {
+						result = result.put(value);
+					}
+					return result;
+				}
+			}
+
 			@Override
 			public Iterator<A> iterator() {
 				return (this.entry == null) ? Collections.emptyIterator() : new SortedUniqueIterator<>(this);
@@ -202,7 +233,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				return (SortedUnique<A>) EMPTY;
 			}
 
-			public static <K, A> SortedUnique<A> emptySortedUniqueBy(final Ord<A> ord) {
+			public static <A> SortedUnique<A> emptySortedUniqueBy(final Ord<A> ord) {
 				requireNonNull(ord);
 				if (ord == Ord.ord()) {
 					return (SortedUnique<A>) EMPTY;
@@ -241,6 +272,18 @@ final class SortedUniqueGenerator implements ClassGenerator {
 					}
 					return unique;
 				}
+			}
+
+			public static <A extends Comparable<A>> SortedUnique<A> fromIterator(final Iterator<A> iterator) {
+				SortedUnique<A> unique = emptySortedUnique();
+				while (iterator.hasNext()) {
+					unique = unique.put(iterator.next());
+				}
+				return unique;
+			}
+
+			public static <A extends Comparable<A>> SortedUnique<A> fromStream(final Stream<A> stream) {
+				return stream.reduce(emptySortedUnique(), SortedUnique::put, SortedUnique::merge);
 			}
 
 			«cast(#["A"], #[], #["A"])»

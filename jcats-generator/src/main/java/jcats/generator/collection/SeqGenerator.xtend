@@ -198,6 +198,7 @@ class SeqGenerator implements ClassGenerator {
 			 * O(min(this.size, suffix.size))
 			 */
 			public final «genericName» concat(final «genericName» suffix) {
+				requireNonNull(suffix);
 				if (isEmpty()) {
 					return suffix;
 				} else if (suffix.isEmpty()) {

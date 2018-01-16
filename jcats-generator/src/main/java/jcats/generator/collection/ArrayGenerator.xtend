@@ -203,9 +203,7 @@ final class ArrayGenerator implements ClassGenerator {
 			 * O(this.size + suffix.size)
 			 */
 			public «genericName» concat(final «genericName» suffix) {
-				«IF type == Type.OBJECT»
-					requireNonNull(suffix);
-				«ENDIF»
+				requireNonNull(suffix);
 				if (isEmpty()) {
 					return suffix;
 				} else if (suffix.isEmpty()) {
