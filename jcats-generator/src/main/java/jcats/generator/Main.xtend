@@ -28,6 +28,7 @@ import jcats.generator.collection.StackBuilderGenerator
 import jcats.generator.collection.StackGenerator
 import jcats.generator.collection.Stream2Generator
 import jcats.generator.collection.UniqueContainerGenerator
+import jcats.generator.collection.UniqueGenerator
 import jcats.generator.collection.VNGenerators
 import jcats.generator.function.Eff0Generator
 import jcats.generator.function.Eff2Generator
@@ -93,6 +94,7 @@ final class Main {
 			new StackBuilderGenerator,
 			new KeyValueGenerator,
 			new DictGenerator,
+			new UniqueGenerator,
 			new SortedDictGenerator,
 			new SortedUniqueGenerator,
 			new CommonGenerator,
