@@ -10,6 +10,7 @@ import jcats.generator.collection.ArrayBuilderGenerator
 import jcats.generator.collection.ArrayGenerator
 import jcats.generator.collection.ContainerGenerator
 import jcats.generator.collection.DictGenerator
+import jcats.generator.collection.HashTableCommonGenerator
 import jcats.generator.collection.IndexedContainerGenerator
 import jcats.generator.collection.KeyValueGenerator
 import jcats.generator.collection.PrimitiveStream2Generator
@@ -97,6 +98,7 @@ final class Main {
 			new UniqueGenerator,
 			new SortedDictGenerator,
 			new SortedUniqueGenerator,
+			new HashTableCommonGenerator,
 			new CommonGenerator,
 			new CastsGenerator,
 			new String1Generator,

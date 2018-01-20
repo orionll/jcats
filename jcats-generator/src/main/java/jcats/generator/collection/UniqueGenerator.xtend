@@ -31,11 +31,10 @@ final class UniqueGenerator implements ClassGenerator {
 		import static «Constants.JCATS».Order.*;
 		import static «Constants.P».p;
 		import static «Constants.COMMON».*;
+		import static «Constants.COLLECTION».HashTableCommon.*;
 
 		public final class «shortName»<@Covariant A> implements UniqueContainer<A>, Serializable {
 			private static final «wildcardName» EMPTY = new «diamondName»(0, 0, Common.«Type.OBJECT.emptyArrayName», 0);
-
-			static final int VOID = 0, LEAF = 1, TREE = 2, COLLISION = 3;
 
 			private final int treeMap;
 			private final int leafMap;
@@ -69,9 +68,9 @@ final class UniqueGenerator implements ClassGenerator {
 			}
 
 			private boolean get(final A value, final int valueHash, final int shift) {
-				final int branch = choose(valueHash, shift);
+				final int branch = branch(valueHash, shift);
 
-				switch (follow(branch)) {
+				switch (slotType(branch, this.treeMap, this.leafMap)) {
 					case VOID: return false;
 					case LEAF: return getEntry(branch).equals(value);
 					case TREE: return getTree(branch).get(value, valueHash, shift + 5);
@@ -80,32 +79,16 @@ final class UniqueGenerator implements ClassGenerator {
 				}
 			}
 
-			private int slotMap() {
-				return this.treeMap | this.leafMap;
-			}
-
-			private static int choose(final int hash, final int shift) {
-				return 1 << ((hash >>> shift) & 0x1F);
-			}
-
-			private int select(final int branch) {
-				return Integer.bitCount((slotMap() & (branch - 1)));
-			}
-
-			private int follow(final int branch) {
-				return (((this.leafMap & branch) != 0) ? 1 : 0) | (((this.treeMap & branch) != 0) ? 2 : 0);
-			}
-
 			private A entryAt(final int index) {
 				return (A) this.slots[index];
 			}
 
 			private A getEntry(final int branch) {
-				return entryAt(select(branch));
+				return entryAt(arrayIndex(branch, this.treeMap, this.leafMap));
 			}
 
 			private «genericName» setEntry(final int branch, final A entry) {
-				this.slots[select(branch)] = entry;
+				this.slots[arrayIndex(branch, this.treeMap, this.leafMap)] = entry;
 				return this;
 			}
 
@@ -114,11 +97,11 @@ final class UniqueGenerator implements ClassGenerator {
 			}
 
 			private «genericName» getTree(final int branch) {
-				return treeAt(select(branch));
+				return treeAt(arrayIndex(branch, this.treeMap, this.leafMap));
 			}
 
 			private «genericName» setTree(final int branch, final «genericName» tree) {
-				this.slots[select(branch)] = tree;
+				this.slots[arrayIndex(branch, this.treeMap, this.leafMap)] = tree;
 				return this;
 			}
 
@@ -127,11 +110,11 @@ final class UniqueGenerator implements ClassGenerator {
 			}
 
 			private Object[] getCollision(final int branch) {
-				return collisionAt(select(branch));
+				return collisionAt(arrayIndex(branch, this.treeMap, this.leafMap));
 			}
 
 			private «genericName» setCollision(final int branch, final Object[] collision) {
-				this.slots[select(branch)] = collision;
+				this.slots[arrayIndex(branch, this.treeMap, this.leafMap)] = collision;
 				return this;
 			}
 
@@ -143,12 +126,12 @@ final class UniqueGenerator implements ClassGenerator {
 				return (A) this.slots[0];
 			}
 
-			«HashTableCommon.remap(shortName, genericName, diamondName)»
+			«HashTableCommonGenerator.remap(shortName, genericName, diamondName)»
 
 			private «genericName» update(final A value, final int valueHash, final int shift) {
-				final int branch = choose(valueHash, shift);
+				final int branch = branch(valueHash, shift);
 
-				switch (follow(branch)) {
+				switch (slotType(branch, this.treeMap, this.leafMap)) {
 					case VOID:
 						return remap(this.treeMap, this.leafMap | branch, this.size + 1).setEntry(branch, value);
 
@@ -192,9 +175,9 @@ final class UniqueGenerator implements ClassGenerator {
 				}
 			}
 
-			«HashTableCommon.remove(genericName, "A", "value", "A", "entry.equals(value)", "Object")»
+			«HashTableCommonGenerator.remove(genericName, "A", "value", "A", "entry.equals(value)", "Object")»
 
-			«HashTableCommon.merge(paramGenericName, "A", diamondName)»
+			«HashTableCommonGenerator.merge(paramGenericName, "A", diamondName)»
 
 			private boolean getFromCollision(final Object[] collision, final A value) {
 				for (final Object entry : collision) {
@@ -269,12 +252,12 @@ final class UniqueGenerator implements ClassGenerator {
 
 			@Override
 			public Iterator<A> iterator() {
-				return isEmpty() ? Collections.emptyIterator() : new «shortName»Iterator<>(this.leafMap, this.treeMap, this.slots);
+				return isEmpty() ? Collections.emptyIterator() : new HashTableIterator<>(this.leafMap, this.treeMap, this.slots);
 			}
 
 			@Override
 			public void foreach(final Eff<A> eff) {
-				«HashTableCommon.forEach("foreach", "eff", "apply", "Object", "A")»
+				«HashTableCommonGenerator.forEach("foreach", "eff", "apply", "Object", "A")»
 			}
 
 			«uniqueEquals(Type.OBJECT)»
@@ -335,39 +318,6 @@ final class UniqueGenerator implements ClassGenerator {
 			}
 
 			«cast(#["A"], #[], #["A"])»
-		}
-
-		final class «shortName»Iterator<A> implements Iterator<A> {
-			private int leafMap;
-			private int treeMap;
-			private final Object[] slots;
-			private int i;
-			private Iterator<A> childIterator;
-
-			«shortName»Iterator(final int leafMap, final int treeMap, final Object[] slots) {
-				this.leafMap = leafMap;
-				this.treeMap = treeMap;
-				this.slots = slots;
-			}
-
-			@Override
-			public boolean hasNext() {
-				return ((this.treeMap | this.leafMap) != 0) || (this.childIterator != null && this.childIterator.hasNext());
-			}
-
-			«HashTableCommon.iteratorNext("A")»
-
-			private A entryAt(final int index) {
-				return (A) this.slots[index];
-			}
-
-			private «genericName» treeAt(final int index) {
-				return («genericName») this.slots[index];
-			}
-
-			private Object[] collisionAt(final int index) {
-				return (Object[]) this.slots[index];
-			}
 		}
 	''' }
 }

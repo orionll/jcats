@@ -31,12 +31,10 @@ class DictGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.P».p;
 		import static jcats.collection.Common.*;
-
+		import static «Constants.COLLECTION».HashTableCommon.*;
 
 		public final class «shortName»<K, @Covariant A> implements KeyValue<K, A>, Serializable {
 			private static final «wildcardName» EMPTY = new «shortName»(0, 0, Common.«Type.OBJECT.emptyArrayName», 0);
-
-			static final int VOID = 0, LEAF = 1, TREE = 2, COLLISION = 3;
 
 			private final int treeMap;
 			private final int leafMap;
@@ -70,9 +68,9 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			private A get(final K key, final int keyHash, final int shift) {
-				final int branch = choose(keyHash, shift);
+				final int branch = branch(keyHash, shift);
 
-				switch (follow(branch)) {
+				switch (slotType(branch, this.treeMap, this.leafMap)) {
 					case VOID: return null;
 
 					case LEAF:
@@ -89,32 +87,16 @@ class DictGenerator implements ClassGenerator {
 				}
 			}
 
-			private int slotMap() {
-				return this.treeMap | this.leafMap;
-			}
-
-			private static int choose(final int hash, final int shift) {
-				return 1 << ((hash >>> shift) & 0x1F);
-			}
-
-			private int select(final int branch) {
-				return Integer.bitCount((slotMap() & (branch - 1)));
-			}
-
-			private int follow(final int branch) {
-				return (((this.leafMap & branch) != 0) ? 1 : 0) | (((this.treeMap & branch) != 0) ? 2 : 0);
-			}
-
 			private P<K, A> entryAt(final int index) {
 				return (P<K, A>) this.slots[index];
 			}
 
 			private P<K, A> getEntry(final int branch) {
-				return entryAt(select(branch));
+				return entryAt(arrayIndex(branch, this.treeMap, this.leafMap));
 			}
 
 			private «genericName» setEntry(final int branch, final P<K, A> entry) {
-				this.slots[select(branch)] = entry;
+				this.slots[arrayIndex(branch, this.treeMap, this.leafMap)] = entry;
 				return this;
 			}
 
@@ -123,11 +105,11 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			private «genericName» getTree(final int branch) {
-				return treeAt(select(branch));
+				return treeAt(arrayIndex(branch, this.treeMap, this.leafMap));
 			}
 
 			private «genericName» setTree(final int branch, final «genericName» tree) {
-				this.slots[select(branch)] = tree;
+				this.slots[arrayIndex(branch, this.treeMap, this.leafMap)] = tree;
 				return this;
 			}
 
@@ -136,11 +118,11 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			private P[] getCollision(final int branch) {
-				return collisionAt(select(branch));
+				return collisionAt(arrayIndex(branch, this.treeMap, this.leafMap));
 			}
 
 			private «genericName» setCollision(final int branch, final P[] collision) {
-				this.slots[select(branch)] = collision;
+				this.slots[arrayIndex(branch, this.treeMap, this.leafMap)] = collision;
 				return this;
 			}
 
@@ -152,12 +134,12 @@ class DictGenerator implements ClassGenerator {
 				return (P<K, A>) this.slots[0];
 			}
 
-			«HashTableCommon.remap(shortName, genericName, diamondName)»
+			«HashTableCommonGenerator.remap(shortName, genericName, diamondName)»
 
 			private «genericName» update(final K key, final int keyHash, final A value, final int shift) {
-				final int branch = choose(keyHash, shift);
+				final int branch = branch(keyHash, shift);
 
-				switch (follow(branch)) {
+				switch (slotType(branch, this.treeMap, this.leafMap)) {
 					case VOID:
 						return remap(this.treeMap, this.leafMap | branch, this.size + 1).setEntry(branch, p(key, value));
 
@@ -207,9 +189,9 @@ class DictGenerator implements ClassGenerator {
 				}
 			}
 
-			«HashTableCommon.remove(genericName, "K", "key", "P<K, A>", "entry.get1().equals(key)", "P")»
+			«HashTableCommonGenerator.remove(genericName, "K", "key", "P<K, A>", "entry.get1().equals(key)", "P")»
 
-			«HashTableCommon.merge(paramGenericName, "P<K, A>", diamondName)»
+			«HashTableCommonGenerator.merge(paramGenericName, "P<K, A>", diamondName)»
 
 			private A getFromCollision(final P[] collision, final K key) {
 				for (final P<K, A> entry : collision) {
@@ -256,12 +238,12 @@ class DictGenerator implements ClassGenerator {
 
 			@Override
 			public Iterator<P<K, A>> iterator() {
-				return isEmpty() ? Collections.emptyIterator() : new «shortName»Iterator<>(this.leafMap, this.treeMap, this.slots);
+				return isEmpty() ? Collections.emptyIterator() : new HashTableIterator<>(this.leafMap, this.treeMap, this.slots);
 			}
 
 			@Override
 			public void forEach(final Consumer<? super P<K, A>> action) {
-				«HashTableCommon.forEach("forEach", "action", "accept", "P", "P<K, A>")»
+				«HashTableCommonGenerator.forEach("forEach", "action", "accept", "P", "P<K, A>")»
 			}
 
 			«keyValueEquals»
@@ -290,7 +272,7 @@ class DictGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
-			«javadocSynonym("empty«shortName»")»
+			«javadocSynonym('''empty«shortName»''')»
 			public static «paramGenericName» of() {
 				return empty«shortName»();
 			}
@@ -342,39 +324,6 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			«cast(#["K", "A"], #[], #["A"])»
-		}
-
-		final class «shortName»Iterator<K, A> implements Iterator<P<K, A>> {
-			private int leafMap;
-			private int treeMap;
-			private final Object[] slots;
-			private int i;
-			private Iterator<P<K, A>> childIterator;
-
-			«shortName»Iterator(final int leafMap, final int treeMap, final Object[] slots) {
-				this.leafMap = leafMap;
-				this.treeMap = treeMap;
-				this.slots = slots;
-			}
-
-			@Override
-			public boolean hasNext() {
-				return ((this.treeMap | this.leafMap) != 0) || (this.childIterator != null && this.childIterator.hasNext());
-			}
-
-			«HashTableCommon.iteratorNext("P<K, A>")»
-
-			private P<K, A> entryAt(final int index) {
-				return (P<K, A>) this.slots[index];
-			}
-
-			private «genericName» treeAt(final int index) {
-				return («genericName») this.slots[index];
-			}
-
-			private P[] collisionAt(final int index) {
-				return (P[]) this.slots[index];
-			}
 		}
 	''' }
 }
