@@ -12,7 +12,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 	val Type type
 
 	def static List<Generator> generators() {
-		Type.values.toList.map[new UniqueContainerGenerator(it) as Generator]
+		Type.values.filter[it != Type.BOOLEAN].map[new UniqueContainerGenerator(it) as Generator].toList
 	}
 
 	override className() { Constants.COLLECTION + "." + shortName }

@@ -17,8 +17,9 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 	override className() { Constants.COLLECTION + "." + shortName }
 
-	def shortName() { if (type == Type.OBJECT) "IndexedContainer" else type.typeName + "IndexedContainer" }
-	def genericName() { if (type == Type.OBJECT) shortName + "<A>" else shortName }
+	def baseName() { "IndexedContainer" }
+	def shortName() { type.shortName(baseName) }
+	def genericName() { type.genericName(baseName) }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -74,7 +75,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			«ENDIF»
 		}
 		
-		final class «type.genericName("IndexedContainerIterator")» implements «type.iteratorGenericName» {
+		final class «type.iteratorGenericName(baseName)» implements «type.iteratorGenericName» {
 			private int i;
 			private final «genericName» container;
 			private final int size;

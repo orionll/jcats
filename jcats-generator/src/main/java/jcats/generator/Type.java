@@ -163,6 +163,14 @@ public enum Type {
 		return diamondName("SeqBuilder");
 	}
 
+	public String sortedUniqueShortName() {
+		return shortName("SortedUnique");
+	}
+
+	public String sortedUniqueGenericName() {
+		return genericName("SortedUnique");
+	}
+
 	public String effShortName() {
 		return shortName("Eff");
 	}
@@ -203,19 +211,39 @@ public enum Type {
 		return shortName("UniqueContainer");
 	}
 
+	public String uniqueContainerGenericName() {
+		return genericName("UniqueContainer");
+	}
+
+	public String uniqueContainerWildcardName() {
+		return wildcardName("UniqueContainer");
+	}
+
+	public String iteratorShortName(final String baseName) {
+		return shortName(baseName + "Iterator");
+	}
+
 	public String iteratorGenericName() {
-		switch (this) {
-			case OBJECT: return "Iterator<A>";
-			case BOOLEAN: return "Iterator<Boolean>";
-			default: return "PrimitiveIterator.Of" + typeName();
+		if (isJavaUnboxedType()) {
+			return "PrimitiveIterator.Of" + typeName();
+		} else {
+			return "Iterator<" + genericBoxedName() + ">";
 		}
 	}
 
+	public String iteratorGenericName(final String baseName) {
+		return genericName(baseName + "Iterator");
+	}
+
+	public String iteratorDiamondName(final String baseName) {
+		return diamondName(baseName + "Iterator");
+	}
+
 	public String iteratorReturnType() {
-		switch (this) {
-			case OBJECT: return "A";
-			case BOOLEAN: return "Boolean";
-			default: return javaName();
+		if (isJavaUnboxedType()) {
+			return javaName();
+		} else {
+			return genericBoxedName();
 		}
 	}
 

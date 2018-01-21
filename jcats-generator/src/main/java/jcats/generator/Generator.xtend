@@ -94,8 +94,8 @@ interface Generator {
 		public boolean equals(final Object obj) {
 			if (obj == this) {
 				return true;
-			} else if (obj instanceof UniqueContainer<?>) {
-				return «type.uniqueContainerShortName.firstToLowerCase»sEqual(this, (UniqueContainer<?>) obj);
+			} else if (obj instanceof «type.uniqueContainerWildcardName») {
+				return «type.uniqueContainerShortName.firstToLowerCase»sEqual(this, («type.uniqueContainerWildcardName») obj);
 			} else {
 				return false;
 			}

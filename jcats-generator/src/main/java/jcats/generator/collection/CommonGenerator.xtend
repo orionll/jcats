@@ -115,7 +115,7 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
-			«FOR type : Type.values»
+			«FOR type : Type.values.filter[it != Type.BOOLEAN]»
 				static boolean «type.uniqueContainerShortName.firstToLowerCase»sEqual(final «type.uniqueContainerShortName» c1, final «type.uniqueContainerShortName» c2) {
 					if (c1.size() == c2.size()) {
 						«IF type == Type.OBJECT || type == Type.BOOLEAN»
