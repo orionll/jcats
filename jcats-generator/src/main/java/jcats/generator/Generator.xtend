@@ -41,7 +41,7 @@ interface Generator {
 	def toStr(Type type, boolean isFinal) { '''
 		@Override
 		public «IF isFinal»final «ENDIF»String toString() {
-			«IF Type.javaUnboxedTypes.contains(type)»
+			«IF type.javaUnboxedType»
 				return «type.containerShortName.firstToLowerCase»ToString(this, "«name»");
 			«ELSE»
 				return iterableToString(this, "«name»");
@@ -54,7 +54,7 @@ interface Generator {
 	def static hashcode(Type type, boolean isFinal) { '''
 		@Override
 		public «IF isFinal»final «ENDIF»int hashCode() {
-			«IF Type.javaUnboxedTypes.contains(type)»
+			«IF type.javaUnboxedType»
 				return «type.containerShortName.firstToLowerCase»HashCode(this);
 			«ELSE»
 				return iterableHashCode(this);

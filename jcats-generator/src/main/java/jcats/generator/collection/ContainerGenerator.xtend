@@ -28,7 +28,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 		import java.util.HashSet;
 		import java.util.Iterator;
 		import java.util.LinkedHashSet;
-		«IF Type.javaUnboxedTypes.contains(type)»
+		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
 		«IF type == Type.OBJECT»
@@ -71,7 +71,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					final «type.iteratorGenericName» iterator = iterator();
 					while (iterator.hasNext()) {
 						if (iterator.«type.iteratorNext»() == value) {
@@ -106,7 +106,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			default IntOption indexWhere(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
 				int index = 0;
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					final «type.iteratorGenericName» iterator = iterator();
 					while (iterator.hasNext()) {
 						if (predicate.apply(iterator.«type.iteratorNext»())) {
@@ -151,7 +151,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			default «type.optionGenericName» firstMatch(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					final «type.iteratorGenericName» iterator = iterator();
 					while (iterator.hasNext()) {
 						final «type.genericName» value = iterator.«type.iteratorNext»();
@@ -183,7 +183,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			default boolean anyMatch(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					final «type.iteratorGenericName» iterator = iterator();
 					while (iterator.hasNext()) {
 						if (predicate.apply(iterator.«type.iteratorNext»())) {
@@ -208,7 +208,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 				return !anyMatch(predicate);
 			}
 
-			«IF Type.javaUnboxedTypes.contains(type)»
+			«IF type.javaUnboxedType»
 				default <A> A foldLeft(final A start, final Object«type.typeName»ObjectF2<A, A> f2) {
 					requireNonNull(start);
 					requireNonNull(f2);
@@ -242,7 +242,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
-			«IF Type.javaUnboxedTypes.contains(type)»
+			«IF type.javaUnboxedType»
 				«FOR returnType : Type.primitives»
 					default «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»«type.typeName»«returnType.typeName»F2 f2) {
 						requireNonNull(f2);
@@ -281,7 +281,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 				«ENDFOR»
 			«ENDIF»
-			«IF Type.javaUnboxedTypes.contains(type)»
+			«IF type.javaUnboxedType»
 				default <A> A foldRight(final A start, final «type.typeName»ObjectObjectF2<A, A> f2) {
 			«ELSEIF type == Type.BOOLEAN»
 				default <A> A foldRight(final A start, final «type.typeName»ObjectObjectF2<A, A> f2) {
@@ -335,7 +335,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
-			«IF Type.javaUnboxedTypes.contains(type)»
+			«IF type.javaUnboxedType»
 				default «type.javaName» sum() {
 					return foldLeftTo«type.typeName»(0, Common.SUM_«type.typeName.toUpperCase»);
 				}
@@ -343,7 +343,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			«ENDIF»
 			default void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					final «type.iteratorGenericName» iterator = iterator();
 					while (iterator.hasNext()) {
 						eff.apply(iterator.«type.iteratorNext»());
@@ -362,7 +362,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			«ENDIF»
 				requireNonNull(eff);
 				int i = 0;
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					final «type.iteratorGenericName» iterator = iterator();
 					while (iterator.hasNext()) {
 						if (i < 0) {
@@ -381,7 +381,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			default void foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					final «type.iteratorGenericName» iterator = iterator();
 					while (iterator.hasNext()) {
 						if (!eff.apply(iterator.«type.iteratorNext»())) {
@@ -407,7 +407,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 				foreach(System.out::println);
 			}
 
-			«IF Type.javaUnboxedTypes.contains(type)»
+			«IF type.javaUnboxedType»
 				@Override
 				«type.iteratorGenericName» iterator();
 
@@ -446,8 +446,10 @@ final class ContainerGenerator implements InterfaceGenerator {
 			default «type.spliteratorGenericName» spliterator() {
 				if (isEmpty()) {
 					return Spliterators.«type.emptySpliteratorName»();
-				} else {
+				} else if (hasFixedSize()) {
 					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
+				} else {
+					return Spliterators.spliteratorUnknownSize(iterator(), Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 				}
 			}
 
@@ -469,7 +471,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 				} else {
 					final «type.javaName»[] array = new «type.javaName»[size()];
 					int i = 0;
-					«IF Type.javaUnboxedTypes.contains(type)»
+					«IF type.javaUnboxedType»
 						final «type.iteratorGenericName» iterator = iterator();
 						while (iterator.hasNext()) {
 							array[i++] = iterator.«type.iteratorNext»();

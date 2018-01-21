@@ -32,6 +32,14 @@ public enum Type {
 		throw new IllegalStateException();
 	}
 
+	public boolean isPrimitive() {
+		return (this != OBJECT);
+	}
+
+	public boolean isJavaUnboxedType() {
+		return javaUnboxedTypes().contains(this);
+	}
+
 	public String defaultValue() {
 		switch (this) {
 			case OBJECT: return "null";
@@ -211,6 +219,14 @@ public enum Type {
 		}
 	}
 
+	public String emptyIterator() {
+		if (isJavaUnboxedType()) {
+			return noneName() + "().iterator()";
+		} else {
+			return "Collections.emptyIterator()";
+		}
+	}
+
 	public String spliteratorGenericName() {
 		switch (this) {
 			case OBJECT: return "Spliterator<A>";
@@ -236,7 +252,7 @@ public enum Type {
 	}
 
 	public String streamName() {
-		if (Type.javaUnboxedTypes().contains(this)) {
+		if (isJavaUnboxedType()) {
 			return typeName() + "Stream";
 		} else {
 			return "Stream";
@@ -244,7 +260,7 @@ public enum Type {
 	}
 
 	public String streamFunction() {
-		if (Type.javaUnboxedTypes().contains(this)) {
+		if (isJavaUnboxedType()) {
 			return javaName() + "Stream";
 		} else {
 			return "stream";
@@ -260,7 +276,7 @@ public enum Type {
 	}
 
 	public String stream2DiamondName() {
-		if (Type.javaUnboxedTypes().contains(this)) {
+		if (isJavaUnboxedType()) {
 			return typeName() + "Stream2";
 		} else {
 			return "Stream2<>";
@@ -268,7 +284,7 @@ public enum Type {
 	}
 
 	public String stream2Name() {
-		if (Type.javaUnboxedTypes().contains(this)) {
+		if (isJavaUnboxedType()) {
 			return typeName() + "Stream2";
 		} else {
 			return "Stream2";
@@ -284,7 +300,7 @@ public enum Type {
 	}
 
 	public String iteratorNext() {
-		return javaUnboxedTypes().contains(this) ? "next" + typeName() : "next";
+		return isJavaUnboxedType() ? "next" + typeName() : "next";
 	}
 
 	public String toArrayName() {
@@ -292,7 +308,7 @@ public enum Type {
 	}
 
 	public String getIterator(final String iterator) {
-		return javaUnboxedTypes().contains(this) ? typeName() + "Iterator.getIterator(" + iterator + ")" : iterator;
+		return isJavaUnboxedType() ? typeName() + "Iterator.getIterator(" + iterator + ")" : iterator;
 	}
 
 	public String emptyArrayName() {

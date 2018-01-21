@@ -31,14 +31,14 @@ final class ArrayGenerator implements ClassGenerator {
 		import java.util.Arrays;
 		import java.util.Iterator;
 		import java.util.Collection;
-		«IF Type.javaUnboxedTypes.contains(type)»
+		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.stream.Collector;
 		import java.util.stream.«type.streamName»;
-		«IF Type.javaUnboxedTypes.contains(type)»
+		«IF type.javaUnboxedType»
 			import java.util.function.«type.typeName»Consumer;
 		«ENDIF»
 
@@ -56,7 +56,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import static «Constants.FUNCTION».Int«type.typeName»F.*;
 		import static «Constants.JCATS».Int«type.typeName»P.*;
 		import static «Constants.COMMON».*;
-		«IF Type.javaUnboxedTypes.contains(type)»
+		«IF type.javaUnboxedType»
 			import static «Constants.JCATS».«type.typeName»Option.*;
 		«ENDIF»
 		import static «Constants.JCATS».IntOption.*;
@@ -215,7 +215,7 @@ final class ArrayGenerator implements ClassGenerator {
 
 			private static «IF type == Type.OBJECT»<A> «ENDIF»void fillArray(final «type.javaName»[] array, final int startIndex, final Iterable<«type.genericBoxedName»> iterable) {
 				int i = startIndex;
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					final «type.iteratorGenericName» iterator = «type.getIterator("iterable.iterator()")»;
 					while (iterator.hasNext()) {
 						array[i++] = iterator.next«type.typeName»();
@@ -670,7 +670,7 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			public static «paramGenericName» fromIterator(final Iterator<«type.genericBoxedName»> iterator) {
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					requireNonNull(iterator);
 				«ENDIF»
 				final «arrayBuilderName» builder = builder();
@@ -690,7 +690,7 @@ final class ArrayGenerator implements ClassGenerator {
 			«ENDIF»
 			@Override
 			public «type.iteratorGenericName» iterator() {
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					return isEmpty() ? «type.noneName»().iterator() : new «shortName»Iterator(array);
 				«ELSE»
 					return isEmpty() ? emptyIterator() : new «shortName»Iterator«IF type == Type.OBJECT»<>«ENDIF»(array);
@@ -699,7 +699,7 @@ final class ArrayGenerator implements ClassGenerator {
 
 			@Override
 			public «type.iteratorGenericName» reverseIterator() {
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					return isEmpty() ? «type.noneName»().iterator() : new «shortName»ReverseIterator(array);
 				«ELSE»
 					return isEmpty() ? emptyIterator() : new «shortName»ReverseIterator«IF type == Type.OBJECT»<>«ENDIF»(array);

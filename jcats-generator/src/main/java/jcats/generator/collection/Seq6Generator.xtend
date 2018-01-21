@@ -18,7 +18,7 @@ final class Seq6Generator extends SeqGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		«IF Type.javaUnboxedTypes.contains(type)»
+		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ELSE»
 			import java.util.Iterator;

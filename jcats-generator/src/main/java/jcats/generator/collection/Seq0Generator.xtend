@@ -18,7 +18,7 @@ class Seq0Generator extends SeqGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		«IF Type.javaUnboxedTypes.contains(type)»
+		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ELSE»
 			import java.util.Iterator;
@@ -28,7 +28,7 @@ class Seq0Generator extends SeqGenerator {
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
 
-		«IF Type.javaUnboxedTypes.contains(type)»
+		«IF type.javaUnboxedType»
 			import static «Constants.JCATS».«type.typeName»Option.«type.noneName»;
 		«ELSE»
 			import static java.util.Collections.emptyIterator;
@@ -123,7 +123,7 @@ class Seq0Generator extends SeqGenerator {
 
 			@Override
 			public «type.iteratorGenericName» iterator() {
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					return «type.noneName»().iterator();
 				«ELSE»
 					return emptyIterator();
@@ -132,7 +132,7 @@ class Seq0Generator extends SeqGenerator {
 
 			@Override
 			public «type.iteratorGenericName» reverseIterator() {
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					return «type.noneName»().iterator();
 				«ELSE»
 					return emptyIterator();

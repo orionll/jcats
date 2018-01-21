@@ -27,7 +27,7 @@ final class OptionGenerator implements ClassGenerator {
 		«ELSE»
 			import java.util.NoSuchElementException;
 		«ENDIF»
-		«IF Type.javaUnboxedTypes.contains(type)»
+		«IF type.javaUnboxedType»
 			import java.util.Optional«type.typeName»;
 		«ELSE»
 			import java.util.Optional;

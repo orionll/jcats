@@ -23,8 +23,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		import java.util.Collection;
-		«IF type == Type.OBJECT»
+		«IF !type.javaUnboxedType»
 			import java.util.Collections;
 		«ENDIF»
 		import java.util.Iterator;
@@ -32,14 +31,33 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		import java.util.RandomAccess;
 		import java.util.Spliterator;
 		import java.util.function.Consumer;
+		«IF type.javaUnboxedType»
+			import java.util.PrimitiveIterator;
+		«ENDIF»
 
 		import «Constants.JCATS».*;
 
 		import static java.util.Objects.requireNonNull;
-		import static «Constants.JCATS».IntOption.*;
-		import static «Constants.COMMON».*;
+		«IF type == Type.OBJECT»
+			import static «Constants.JCATS».IntOption.*;
+		«ENDIF»
+		«IF type.javaUnboxedType»
+			import static «Constants.JCATS».«type.optionShortName».*;
+		«ENDIF»
+		«IF type == Type.OBJECT»
+			import static «Constants.COMMON».*;
+		«ENDIF»
 
 		public interface «type.covariantName("IndexedContainer")» extends «type.containerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
+
+			@Override
+			default «type.iteratorGenericName» iterator() {
+				if (isEmpty()) {
+					return «type.emptyIterator»;
+				} else {
+					return new «type.diamondName("IndexedContainerIterator")»(this);
+				}
+			}
 
 			@Override
 			default List<«type.genericBoxedName»> asCollection() {
@@ -54,6 +72,27 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
+		}
+		
+		final class «type.genericName("IndexedContainerIterator")» implements «type.iteratorGenericName» {
+			private int i;
+			private final «genericName» container;
+			private final int size;
+		
+			«type.shortName("IndexedContainerIterator")»(final «genericName» container) {
+				this.container = container;
+				this.size = container.size();
+			}
+		
+			@Override
+			public boolean hasNext() {
+				return (this.i < this.size);
+			}
+		
+			@Override
+			public «type.iteratorReturnType» «type.iteratorNext»() {
+				return this.container.get(this.i++);
+			}
 		}
 
 		final class «type.genericName("IndexedContainerAsList")» extends AbstractImmutableList<«type.genericBoxedName»> implements RandomAccess {

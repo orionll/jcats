@@ -18,7 +18,7 @@ class Seq2Generator extends SeqGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		«IF Type.javaUnboxedTypes.contains(type)»
+		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ELSE»
 			import java.util.Iterator;

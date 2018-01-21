@@ -19,13 +19,13 @@ final class MaybeGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
-		«IF Type.javaUnboxedTypes.contains(type)»
+		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ELSE»
 			import java.util.Iterator;
 		«ENDIF»
 		import java.util.NoSuchElementException;
-		«IF Type.javaUnboxedTypes.contains(type)»
+		«IF type.javaUnboxedType»
 			import java.util.Optional«type.typeName»;
 		«ELSE»
 			import java.util.Optional;
@@ -38,7 +38,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 		import «Constants.COLLECTION».*;
 		import «Constants.FUNCTION».*;
 
-		«IF Type.javaUnboxedTypes.contains(type)»
+		«IF type.javaUnboxedType»
 			import static «Constants.JCATS».Empty«type.typeName»Iterator.empty«type.typeName»Iterator;
 		«ELSE»
 			import static java.util.Collections.emptyIterator;
@@ -157,7 +157,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 				«ENDIF»
 			}
 
-			«IF Type.javaUnboxedTypes.contains(type)»
+			«IF type.javaUnboxedType»
 				default Optional«type.typeName» toOptional«type.typeName»() {
 					return isEmpty() ? Optional«type.typeName».empty() : Optional«type.typeName».of(get());
 				}
@@ -186,7 +186,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 
 			@Override
 			default «type.iteratorGenericName» iterator() {
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					return isEmpty() ? empty«type.typeName»Iterator() : new «type.typeName»SingletonIterator(get());
 				«ELSEIF type == Type.OBJECT»
 					final A value = getOrNull();
@@ -198,7 +198,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 
 			@Override
 			default «type.spliteratorGenericName» spliterator() {
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					if (isEmpty()) {
 						return Spliterators.«type.emptySpliteratorName»();
 					} else {

@@ -81,7 +81,7 @@ class Eff2Generator implements InterfaceGenerator {
 		package «Constants.FUNCTION»;
 
 		import java.util.function.BiConsumer;
-		«IF type1 == Type.OBJECT && Type.javaUnboxedTypes.contains(type2)»
+		«IF type1 == Type.OBJECT && type2.javaUnboxedType»
 			import java.util.function.Obj«type2.typeName»Consumer;
 		«ENDIF»
 

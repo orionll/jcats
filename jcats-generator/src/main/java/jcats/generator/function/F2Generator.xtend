@@ -134,7 +134,7 @@ class F2Generator implements InterfaceGenerator {
 		«IF type1 == Type.OBJECT && type2 == Type.OBJECT && returnType == Type.OBJECT»
 			import java.util.function.BiFunction;
 			import java.util.function.BinaryOperator;
-		«ELSEIF type1 == Type.OBJECT && type2 == Type.OBJECT && Type.javaUnboxedTypes.contains(returnType)»
+		«ELSEIF type1 == Type.OBJECT && type2 == Type.OBJECT && returnType.javaUnboxedType»
 			import java.util.function.To«returnType.typeName»BiFunction;
 		«ELSEIF type1 == Type.OBJECT && type2 == Type.OBJECT && returnType == Type.BOOLEAN»
 			import java.util.function.BiPredicate;

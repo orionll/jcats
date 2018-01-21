@@ -26,7 +26,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 
 		import java.util.Collection;
 		import java.util.Iterator;
-		«IF Type.javaUnboxedTypes.contains(type)»
+		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 			import java.util.function.«type.typeName»Consumer;
 		«ENDIF»
@@ -115,7 +115,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 					return this;
 				} else {
 					ensureCapacityInternal(size + iterableLength);
-					«IF Type.javaUnboxedTypes.contains(type)»
+					«IF type.javaUnboxedType»
 						final PrimitiveIterator.Of«type.typeName» iterator = «type.typeName»Iterator.getIterator(iterable.iterator());
 						while (iterator.hasNext()) {
 							array[size++] = iterator.next«type.typeName»();
@@ -180,7 +180,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			}
 
 			public «genericName» appendIterator(final Iterator<«type.genericBoxedName»> iterator) {
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					«type.typeName»Iterator.getIterator(iterator).forEachRemaining((«type.typeName»Consumer) this::append);
 				«ELSE»
 					iterator.forEachRemaining(this::append);

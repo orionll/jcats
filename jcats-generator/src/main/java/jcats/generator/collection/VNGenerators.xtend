@@ -26,7 +26,7 @@ final class VNGenerators {
 
 				import java.io.Serializable;
 				import java.util.ArrayList;
-				«IF Type.javaUnboxedTypes.contains(type)»
+				«IF type.javaUnboxedType»
 					import java.util.PrimitiveIterator;
 				«ELSE»
 					import java.util.Iterator;
