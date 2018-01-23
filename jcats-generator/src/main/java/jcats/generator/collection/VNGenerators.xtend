@@ -83,7 +83,7 @@ final class VNGenerators {
 
 					«FOR i : 1 .. arity»
 						public «type.genericName» get«i»() {
-							return a«i»;
+							return this.a«i»;
 						}
 
 					«ENDFOR»
@@ -91,7 +91,7 @@ final class VNGenerators {
 					public «type.genericName» get(final int index) {
 						switch (index) {
 							«FOR i : 1 .. arity»
-								case «i-1»: return a«i»;
+								case «i-1»: return this.a«i»;
 							«ENDFOR»
 							default: throw new IndexOutOfBoundsException(Integer.toString(index));
 						}
@@ -99,14 +99,14 @@ final class VNGenerators {
 
 					«FOR i : 1 .. arity»
 						public «genericName» set«i»(final «type.genericName» a«i») {
-							return new «diamondName»(«(1 .. arity).map[if (type == Type.OBJECT && it == i) '''requireNonNull(a«i»)''' else "a" + it].join(", ")»);
+							return new «diamondName»(«(1 .. arity).map[if (type == Type.OBJECT && it == i) '''requireNonNull(a«i»)''' else "this.a" + it].join(", ")»);
 						}
 
 					«ENDFOR»
 					public «genericName» set(final int index, final «type.genericName» value) {
 						switch (index) {
 							«FOR i : 1 .. arity»
-								case «i-1»: return new «diamondName»(«(1 .. arity).map[if (it == i) '''«IF type == Type.OBJECT»requireNonNull(value)«ELSE»value«ENDIF»''' else "a" + it].join(", ")»);
+								case «i-1»: return new «diamondName»(«(1 .. arity).map[if (it == i) '''«IF type == Type.OBJECT»requireNonNull(value)«ELSE»value«ENDIF»''' else "this.a" + it].join(", ")»);
 							«ENDFOR»
 							default: throw new IndexOutOfBoundsException(Integer.toString(index));
 						}
@@ -114,8 +114,8 @@ final class VNGenerators {
 
 					«FOR i : 1 .. arity»
 						public «genericName» update«i»(final «type.updateFunction» f) {
-							final «type.genericName» a = f.apply(a«i»);
-							return new «diamondName»(«(1 .. arity).map[if (it == i) '''«IF type == Type.OBJECT»requireNonNull(a)«ELSE»a«ENDIF»''' else "a" + it].join(", ")»);
+							final «type.genericName» a = f.apply(this.a«i»);
+							return new «diamondName»(«(1 .. arity).map[if (it == i) '''«IF type == Type.OBJECT»requireNonNull(a)«ELSE»a«ENDIF»''' else "this.a" + it].join(", ")»);
 						}
 
 					«ENDFOR»
@@ -123,8 +123,8 @@ final class VNGenerators {
 						switch (index) {
 							«FOR i : 1 .. arity»
 								case «i-1»: {
-									final «type.genericName» a = f.apply(a«i»);
-									return new «diamondName»(«(1 .. arity).map[if (it == i) '''«IF type == Type.OBJECT»requireNonNull(a)«ELSE»a«ENDIF»''' else "a" + it].join(", ")»);
+									final «type.genericName» a = f.apply(this.a«i»);
+									return new «diamondName»(«(1 .. arity).map[if (it == i) '''«IF type == Type.OBJECT»requireNonNull(a)«ELSE»a«ENDIF»''' else "this.a" + it].join(", ")»);
 								}
 							«ENDFOR»
 							default: throw new IndexOutOfBoundsException(Integer.toString(index));
@@ -133,12 +133,12 @@ final class VNGenerators {
 
 					«IF type == Type.OBJECT»
 						public <B> B match(final F«arity»<«(1 .. arity).map["A, "].join»B> f) {
-							final B b = f.apply(«(1 .. arity).map["a" + it].join(", ")»);
+							final B b = f.apply(«(1 .. arity).map["this.a" + it].join(", ")»);
 							return requireNonNull(b);
 						}
 
 						public <B> V«arity»<B> map(final F<A, B> f) {
-							return v«arity»(«(1 .. arity).map["f.apply(a" + it + ")"].join(", ")»);
+							return v«arity»(«(1 .. arity).map["f.apply(this.a" + it + ")"].join(", ")»);
 						}
 					«ELSE»
 						«IF arity == 2»
@@ -148,7 +148,7 @@ final class VNGenerators {
 							}
 						«ELSE»
 							public <A> A match(final F«arity»<«(1 .. arity).map[type.boxedName + ", "].join»A> f) {
-								final A a = f.apply(«(1 .. arity).map["a" + it].join(", ")»);
+								final A a = f.apply(«(1 .. arity).map["this.a" + it].join(", ")»);
 								return requireNonNull(a);
 							}
 						«ENDIF»
@@ -159,16 +159,16 @@ final class VNGenerators {
 					«ENDIF»
 
 					public «genericName» reverse() {
-						return new «diamondName»(«(arity .. 1).map["a" + it].join(", ")»);
+						return new «diamondName»(«(arity .. 1).map["this.a" + it].join(", ")»);
 					}
 
 					@Override
 					public boolean contains(final «type.genericName» value) {
 						«FOR i : 1 .. arity»
 							«IF type == Type.OBJECT»
-								if (value.equals(a«i»)) {
+								if (value.equals(this.a«i»)) {
 							«ELSE»
-								if (value == a«i») {
+								if (value == this.a«i») {
 							«ENDIF»
 								return true;
 							}
@@ -179,16 +179,16 @@ final class VNGenerators {
 					«IF arity == 2»
 						«IF type == Type.OBJECT»
 							public P<A, A> toP() {
-								return p(a1, a2);
+								return p(this.a1, this.a2);
 							}
 						«ELSE»
 							public «type.typeName»«type.typeName»P to«type.typeName»«type.typeName»P() {
-								return «type.typeName.toLowerCase»«type.typeName»P(a1, a2);
+								return «type.typeName.toLowerCase»«type.typeName»P(this.a1, this.a2);
 							}
 						«ENDIF»
 					«ELSE»
 						public P«arity»<«(1 .. arity).map[type.genericBoxedName].join(", ")»> toP«arity»() {
-							return p«arity»(«(1 .. arity).map["a" + it].join(", ")»);
+							return p«arity»(«(1 .. arity).map["this.a" + it].join(", ")»);
 						}
 					«ENDIF»
 
@@ -196,7 +196,7 @@ final class VNGenerators {
 					public ArrayList<«type.genericBoxedName»> toArrayList() {
 						final ArrayList<«type.genericBoxedName»> result = new ArrayList<>(«arity»);
 						«FOR index : 1 .. arity»
-							result.add(a«index»);
+							result.add(this.a«index»);
 						«ENDFOR»
 						return result;
 					}
@@ -205,20 +205,20 @@ final class VNGenerators {
 					public HashSet<«type.genericBoxedName»> toHashSet() {
 						final HashSet<«type.genericBoxedName»> result = new HashSet<>(«Math.ceil(arity / 0.75) as int»);
 						«FOR index : 1 .. arity»
-							result.add(a«index»);
+							result.add(this.a«index»);
 						«ENDFOR»
 						return result;
 					}
 
 					@Override
 					public «type.seqGenericName» to«type.seqShortName»() {
-						final «type.javaName»[] node1 = { «(1 .. arity).map["a" + it].join(", ")» };
+						final «type.javaName»[] node1 = { «(1 .. arity).map["this.a" + it].join(", ")» };
 						return new «type.diamondName("Seq1")»(node1);
 					}
 
 					@Override
 					public «type.javaName»[] «type.toArrayName»() {
-						return new «type.javaName»[] { «(1 .. arity).map["a" + it].join(", ")» };
+						return new «type.javaName»[] { «(1 .. arity).map["this.a" + it].join(", ")» };
 					}
 
 					«IF type == Type.OBJECT»
@@ -226,7 +226,7 @@ final class VNGenerators {
 						public A[] toPreciseArray(final IntObjectF<A[]> supplier) {
 							final A[] array = supplier.apply(«arity»);
 							«FOR index : 1 .. arity»
-								array[«index - 1»] = a«index»;
+								array[«index - 1»] = this.a«index»;
 							«ENDFOR»
 							return array;
 						}
@@ -235,7 +235,7 @@ final class VNGenerators {
 					@Override
 					public void foreach(final «type.effGenericName» eff) {
 						«FOR index : 1 .. arity»
-							eff.apply(a«index»);
+							eff.apply(this.a«index»);
 						«ENDFOR»
 					}
 
@@ -246,18 +246,18 @@ final class VNGenerators {
 						public void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
 					«ENDIF»
 						«FOR index : 1 .. arity»
-							eff.apply(«index-1», a«index»);
+							eff.apply(«index-1», this.a«index»);
 						«ENDFOR»
 					}
 
 					@Override
 					public void foreachUntil(final «type.boolFName» eff) {
 						«FOR index : 1 .. arity-1»
-							if (!eff.apply(a«index»)) {
+							if (!eff.apply(this.a«index»)) {
 								return;
 							}
 						«ENDFOR»
-						eff.apply(a«arity»);
+						eff.apply(this.a«arity»);
 					}
 
 					@Override
@@ -265,9 +265,9 @@ final class VNGenerators {
 						int result = 1;
 						«FOR index : 1 .. arity»
 							«IF type == Type.OBJECT»
-								result = 31 * result + a«index».hashCode();
+								result = 31 * result + this.a«index».hashCode();
 							«ELSE»
-								result = 31 * result + «type.genericBoxedName».hashCode(a«index»);
+								result = 31 * result + «type.genericBoxedName».hashCode(this.a«index»);
 							«ENDIF»
 						«ENDFOR»
 						return result;
@@ -279,26 +279,27 @@ final class VNGenerators {
 						if (other == this) {
 							return true;
 						} else {
-							return «IF type == Type.OBJECT»a1.equals(other.a1)«ELSE»a1 == other.a1«ENDIF»
-								«FOR index : 2 .. arity»
-									&& «IF type == Type.OBJECT»a«index».equals(other.a«index»)«ELSE»a«index» == other.a«index»«ENDIF»«IF index == arity»;«ENDIF»
+							return «IF type == Type.OBJECT»this.a1.equals(other.a1)«ELSE»this.a1 == other.a1«ENDIF»
+								«FOR i : 2 .. arity»
+									&& «IF type == Type.OBJECT»this.a«i».equals(other.a«i»)«ELSE»this.a«i» == other.a«i»«ENDIF»«IF i == arity»;«ENDIF»
 								«ENDFOR»
 						}
 					}
 
 					@Override
 					public «type.iteratorGenericName» iterator() {
-						return new «type.diamondName("V" + arity + "Iterator")»(«(1 .. arity).map["a" + it].join(", ")»);
+						return new «type.diamondName("V" + arity + "Iterator")»(«(1 .. arity).map["this.a" + it].join(", ")»);
 					}
 
 					@Override
 					public «type.iteratorGenericName» reverseIterator() {
-						return new «type.diamondName("V" + arity + "ReverseIterator")»(«(1 .. arity).map["a" + it].join(", ")»);
+						return new «type.diamondName("V" + arity + "ReverseIterator")»(«(1 .. arity).map["this.a" + it].join(", ")»);
 					}
 
 					@Override
 					public «type.spliteratorGenericName» spliterator() {
-						return Spliterators.spliterator(iterator(), «arity», Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
+						return Spliterators.spliterator(new «type.javaUnboxedName»[] { «(1 .. arity).map["this.a" + it].join(", ")» },
+							Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 					}
 
 					«IF type == Type.OBJECT»
@@ -308,11 +309,11 @@ final class VNGenerators {
 
 						public <B, C> V«arity»<C> zipWith(final V«arity»<B> that, final F2<A, B, C> f) {
 							requireNonNull(f);
-							return new V«arity»<>(«(1 .. arity).map['''f.apply(a«it», that.a«it»)'''].join(", ")»);
+							return new V«arity»<>(«(1 .. arity).map['''f.apply(this.a«it», that.a«it»)'''].join(", ")»);
 						}
 
 						public V«arity»<IntObjectP<A>> zipWithIndex() {
-							return new V«arity»<>(«(1 .. arity).map['''intObjectP(«it-1», a«it»)'''].join(", ")»);
+							return new V«arity»<>(«(1 .. arity).map['''intObjectP(«it-1», this.a«it»)'''].join(", ")»);
 						}
 					«ELSE»
 						public <A> V«arity»<«type.typeName»ObjectP<A>> zip(final V«arity»<A> that) {
@@ -321,17 +322,17 @@ final class VNGenerators {
 
 						public <A, B> V«arity»<B> zipWith(final V«arity»<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
 							requireNonNull(f);
-							return new V«arity»<>(«(1 .. arity).map['''f.apply(a«it», that.a«it»)'''].join(", ")»);
+							return new V«arity»<>(«(1 .. arity).map['''f.apply(this.a«it», that.a«it»)'''].join(", ")»);
 						}
 
 						public final V«arity»<Int«type.typeName»P> zipWithIndex() {
-							return new V«arity»<>(«(1 .. arity).map['''int«type.typeName»P(«it-1», a«it»)'''].join(", ")»);
+							return new V«arity»<>(«(1 .. arity).map['''int«type.typeName»P(«it-1», this.a«it»)'''].join(", ")»);
 						}
 					«ENDIF»
 
 					@Override
 					public String toString() {
-						return "«shortName»(" + «(1 .. arity).map["a" + it].join(''' + ", " + ''')» + ")";
+						return "«shortName»(" + «(1 .. arity).map["this.a" + it].join(''' + ", " + ''')» + ")";
 					}
 
 					public static «type.paramGenericName(baseName)» «factoryMethodName»(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {
@@ -379,14 +380,14 @@ final class VNGenerators {
 
 					@Override
 					public boolean hasNext() {
-						return (i < «arity»);
+						return (this.i < «arity»);
 					}
 
 					@Override
 					public «type.iteratorReturnType» «type.iteratorNext»() {
-						switch (i) {
+						switch (this.i) {
 							«FOR i : 1 .. arity»
-								case «i-1»: i++; return a«i»;
+								case «i-1»: this.i++; return this.a«i»;
 							«ENDFOR»
 							default: throw new NoSuchElementException();
 						}
@@ -401,19 +402,19 @@ final class VNGenerators {
 						«FOR i : 1 .. arity»
 							this.a«i» = a«i»;
 						«ENDFOR»
-						i = «arity-1»;
+						this.i = «arity-1»;
 					}
 
 					@Override
 					public boolean hasNext() {
-						return (i >= 0);
+						return (this.i >= 0);
 					}
 
 					@Override
 					public «type.iteratorReturnType» «type.iteratorNext»() {
-						switch (i) {
+						switch (this.i) {
 							«FOR i : arity .. 1»
-								case «i-1»: i--; return a«i»;
+								case «i-1»: this.i--; return this.a«i»;
 							«ENDFOR»
 							default: throw new NoSuchElementException();
 						}
