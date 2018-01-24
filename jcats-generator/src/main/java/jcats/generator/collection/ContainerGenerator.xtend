@@ -540,29 +540,29 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			public int size() {
-				return container.size();
+				return this.container.size();
 			}
 
 			«IF type == Type.OBJECT»
 				@Override
 				public Object[] toArray() {
-					return container.toObjectArray();
+					return this.container.toObjectArray();
 				}
 
 			«ENDIF»
 			@Override
 			public Iterator<«type.genericBoxedName»> iterator() {
-				return container.iterator();
+				return this.container.iterator();
 			}
 
 			@Override
 			public Spliterator<«type.genericBoxedName»> spliterator() {
-				return container.spliterator();
+				return this.container.spliterator();
 			}
 
 			@Override
 			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
-				container.forEach(action);
+				this.container.forEach(action);
 			}
 		}
 		«IF type == Type.OBJECT»
@@ -576,17 +576,17 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 				@Override
 				public boolean isEmpty() {
-					return collection.isEmpty();
+					return this.collection.isEmpty();
 				}
 
 				@Override
 				public boolean isNotEmpty() {
-					return !collection.isEmpty();
+					return !this.collection.isEmpty();
 				}
 
 				@Override
 				public int size() {
-					return collection.size();
+					return this.collection.size();
 				}
 
 				@Override
@@ -597,33 +597,33 @@ final class ContainerGenerator implements InterfaceGenerator {
 				@Override
 				public boolean contains(final A value) {
 					requireNonNull(value);
-					return collection.contains(value);
+					return this.collection.contains(value);
 				}
 
 				@Override
 				public void forEach(final Consumer<? super A> action) {
-					collection.forEach(action);
+					this.collection.forEach(action);
 				}
 
 				@Override
 				public void foreach(final Eff<A> eff) {
-					collection.forEach(eff.toConsumer());
+					this.collection.forEach(eff.toConsumer());
 				}
 
 				@Override
 				public Iterator<A> iterator() {
-					return collection.iterator();
+					return this.collection.iterator();
 				}
 
 				@Override
 				public Spliterator<A> spliterator() {
-					return collection.spliterator();
+					return this.collection.spliterator();
 				}
 
 				@Override
 				public Iterator<A> reverseIterator() {
-					if (collection instanceof NavigableSet) {
-						return ((NavigableSet<A>) collection).descendingIterator();
+					if (this.collection instanceof NavigableSet) {
+						return ((NavigableSet<A>) this.collection).descendingIterator();
 					} else {
 						return Container.super.reverseIterator();
 					}
@@ -631,27 +631,27 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 				@Override
 				public Stream2<A> stream() {
-					return new Stream2<>(collection.stream());
+					return new Stream2<>(this.collection.stream());
 				}
 
 				@Override
 				public Stream2<A> parallelStream() {
-					return new Stream2<>(collection.parallelStream());
+					return new Stream2<>(this.collection.parallelStream());
 				}
 
 				@Override
 				public Object[] toObjectArray() {
-					return collection.toArray();
+					return this.collection.toArray();
 				}
 
 				@Override
 				public Collection<A> asCollection() {
-					return Collections.unmodifiableCollection(collection);
+					return Collections.unmodifiableCollection(this.collection);
 				}
 
 				@Override
 				public String toString() {
-					return collection.toString();
+					return this.collection.toString();
 				}
 			}
 		«ENDIF»

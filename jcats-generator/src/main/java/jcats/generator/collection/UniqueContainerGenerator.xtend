@@ -73,7 +73,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			public int size() {
-				return container.size();
+				return this.container.size();
 			}
 
 			@Override
@@ -82,11 +82,11 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 					if (obj == null) {
 						return false;
 					} else {
-						return container.contains((A) obj);
+						return this.container.contains((A) obj);
 					}
 				«ELSE»
 					if (obj instanceof «type.boxedName») {
-						return container.contains((«type.javaName») obj);
+						return this.container.contains((«type.javaName») obj);
 					} else {
 						return false;
 					}
@@ -96,23 +96,23 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			«IF type == Type.OBJECT»
 				@Override
 				public Object[] toArray() {
-					return container.toObjectArray();
+					return this.container.toObjectArray();
 				}
 
 			«ENDIF»
 			@Override
 			public Iterator<«type.genericBoxedName»> iterator() {
-				return container.iterator();
+				return this.container.iterator();
 			}
 
 			@Override
 			public Spliterator<«type.genericBoxedName»> spliterator() {
-				return container.spliterator();
+				return this.container.spliterator();
 			}
 
 			@Override
 			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
-				container.forEach(action);
+				this.container.forEach(action);
 			}
 		}
 		«IF type == Type.OBJECT»
@@ -125,7 +125,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 
 				@Override
 				public Set<A> asCollection() {
-					return Collections.unmodifiableSet((Set<A>) collection);
+					return Collections.unmodifiableSet((Set<A>) this.collection);
 				}
 
 				@Override

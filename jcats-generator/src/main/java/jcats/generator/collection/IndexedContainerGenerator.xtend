@@ -105,34 +105,34 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.genericBoxedName» get(final int index) {
-				return container.get(index);
+				return this.container.get(index);
 			}
 
 			@Override
 			public int size() {
-				return container.size();
+				return this.container.size();
 			}
 
 			«IF type == Type.OBJECT»
 				@Override
 				public Object[] toArray() {
-					return container.toObjectArray();
+					return this.container.toObjectArray();
 				}
 
 			«ENDIF»
 			@Override
 			public Iterator<«type.genericBoxedName»> iterator() {
-				return container.iterator();
+				return this.container.iterator();
 			}
 
 			@Override
 			public Spliterator<«type.genericBoxedName»> spliterator() {
-				return container.spliterator();
+				return this.container.spliterator();
 			}
 
 			@Override
 			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
-				container.forEach(action);
+				this.container.forEach(action);
 			}
 		}
 		«IF type == Type.OBJECT»
@@ -145,25 +145,25 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 				@Override
 				public A get(final int index) {
-					return ((List<A>) collection).get(index);
+					return ((List<A>) this.collection).get(index);
 				}
 
 				@Override
 				public IntOption indexOf(final A value) {
-					final int index = ((List<A>) collection).indexOf(value);
+					final int index = ((List<A>) this.collection).indexOf(value);
 					return (index >= 0) ? intSome(index) : intNone();
 				}
 
 				@Override
 				public IntOption lastIndexOf(final A value) {
-					final int index = ((List<A>) collection).lastIndexOf(value);
+					final int index = ((List<A>) this.collection).lastIndexOf(value);
 					return (index >= 0) ? intSome(index) : intNone();
 				}
 
 				@Override
 				public Iterator<A> reverseIterator() {
-					if (collection instanceof RandomAccess) {
-						final List<A> list = (List<A>) collection;
+					if (this.collection instanceof RandomAccess) {
+						final List<A> list = (List<A>) this.collection;
 						final int size = list.size();
 						if (size == 0) {
 							return Collections.emptyIterator();
@@ -177,7 +177,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 				@Override
 				public List<A> asCollection() {
-					return Collections.unmodifiableList((List<A>) collection);
+					return Collections.unmodifiableList((List<A>) this.collection);
 				}
 
 				@Override
