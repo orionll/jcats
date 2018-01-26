@@ -266,13 +266,8 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.spliteratorGenericName» spliterator() {
-				if (isEmpty()) {
-					return Spliterators.«type.emptySpliteratorName»();
-				} else {
-					return Spliterators.spliterator(iterator(), size(),
-						Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE);
-				}
+			public int spliteratorCharacteristics() {
+				return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE;
 			}
 
 			@Override

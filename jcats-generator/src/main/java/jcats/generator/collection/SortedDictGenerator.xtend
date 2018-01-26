@@ -152,13 +152,8 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public Spliterator<P<K, A>> spliterator() {
-				if (this.entry == null) {
-					return Spliterators.emptySpliterator();
-				} else {
-					return Spliterators.spliterator(iterator(), size(),
-						Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE);
-				}
+			public int spliteratorCharacteristics() {
+				return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE;
 			}
 
 			@Override

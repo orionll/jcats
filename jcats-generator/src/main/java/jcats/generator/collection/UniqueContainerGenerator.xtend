@@ -46,12 +46,8 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			default «type.spliteratorGenericName» spliterator() {
-				if (isEmpty()) {
-					return Spliterators.«type.emptySpliteratorName»();
-				} else {
-					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE);
-				}
+			default int spliteratorCharacteristics() {
+				return Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE;
 			}
 			«IF type == Type.OBJECT»
 

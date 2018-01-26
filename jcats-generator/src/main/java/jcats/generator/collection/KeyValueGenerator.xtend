@@ -102,12 +102,18 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				return new KeyValueAsMap<>(this);
 			}
 
+			default int spliteratorCharacteristics() {
+				return Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE;
+			}
+
 			@Override
 			default Spliterator<P<K, A>> spliterator() {
 				if (isEmpty()) {
 					return Spliterators.emptySpliterator();
+				} else if (hasFixedSize()) {
+					return Spliterators.spliterator(iterator(), size(), spliteratorCharacteristics());
 				} else {
-					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE);
+					return Spliterators.spliteratorUnknownSize(iterator(), spliteratorCharacteristics());
 				}
 			}
 
@@ -131,36 +137,47 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			public int size() {
-				return keyValue.size();
+				return this.keyValue.size();
+			}
+
+			@Override
+			public boolean hasFixedSize() {
+				return this.keyValue.hasFixedSize();
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return this.keyValue.isEmpty();
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return this.keyValue.isNotEmpty();
 			}
 
 			@Override
 			public boolean contains(final A value) {
-				return keyValue.containsValue(value);
+				return this.keyValue.containsValue(value);
 			}
 
 			@Override
 			public void foreach(final Eff<A> eff) {
-				keyValue.forEach((final P<?, A> p) -> eff.apply(p.get2()));
+				this.keyValue.forEach((final P<?, A> p) -> eff.apply(p.get2()));
 			}
 
 			@Override
 			public void forEach(final Consumer<? super A> consumer) {
-				keyValue.forEach((final P<?, A> p) -> consumer.accept(p.get2()));
+				this.keyValue.forEach((final P<?, A> p) -> consumer.accept(p.get2()));
 			}
 
 			@Override
 			public Iterator<A> iterator() {
-				return new MappedIterator<>(keyValue.iterator(), P::get2);
+				return new MappedIterator<>(this.keyValue.iterator(), P::get2);
 			}
 
 			@Override
-			public Spliterator<A> spliterator() {
-				if (isEmpty()) {
-					return Spliterators.emptySpliterator();
-				} else {
-					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.IMMUTABLE);
-				}
+			public int spliteratorCharacteristics() {
+				return Spliterator.NONNULL | Spliterator.IMMUTABLE;
 			}
 
 			@Override
@@ -178,27 +195,47 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			public int size() {
-				return keyValue.size();
+				return this.keyValue.size();
+			}
+
+			@Override
+			public boolean hasFixedSize() {
+				return this.keyValue.hasFixedSize();
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return this.keyValue.isEmpty();
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return this.keyValue.isNotEmpty();
 			}
 
 			@Override
 			public boolean contains(final K key) {
-				return keyValue.containsKey(key);
+				return this.keyValue.containsKey(key);
 			}
 
 			@Override
 			public void foreach(final Eff<K> eff) {
-				keyValue.forEach((final P<K, ?> p) -> eff.apply(p.get1()));
+				this.keyValue.forEach((final P<K, ?> p) -> eff.apply(p.get1()));
 			}
 
 			@Override
 			public void forEach(final Consumer<? super K> consumer) {
-				keyValue.forEach((final P<K, ?> p) -> consumer.accept(p.get1()));
+				this.keyValue.forEach((final P<K, ?> p) -> consumer.accept(p.get1()));
 			}
 
 			@Override
 			public Iterator<K> iterator() {
-				return new MappedIterator<>(keyValue.iterator(), P::get1);
+				return new MappedIterator<>(this.keyValue.iterator(), P::get1);
+			}
+
+			@Override
+			public int spliteratorCharacteristics() {
+				return this.keyValue.spliteratorCharacteristics();
 			}
 
 			«uniqueHashCode»
@@ -220,33 +257,53 @@ final class KeyValueGenerator implements InterfaceGenerator {
 		
 			@Override
 			public int size() {
-				return keyValue.size();
+				return this.keyValue.size();
 			}
-		
+
+			@Override
+			public boolean hasFixedSize() {
+				return this.keyValue.hasFixedSize();
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return this.keyValue.isEmpty();
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return this.keyValue.isNotEmpty();
+			}
+
 			@Override
 			public boolean contains(final P<K, A> p) {
 				requireNonNull(p);
-				return p.get2().equals(keyValue.getOrNull(p.get1()));
+				return p.get2().equals(this.keyValue.getOrNull(p.get1()));
 			}
 		
 			@Override
 			public void forEach(final Consumer<? super P<K, A>> action) {
-				keyValue.forEach(action);
+				this.keyValue.forEach(action);
 			}
 		
 			@Override
 			public void foreach(final Eff<P<K, A>> eff) {
-				keyValue.forEach(eff.toConsumer());
+				this.keyValue.forEach(eff.toConsumer());
 			}
 		
 			@Override
 			public Iterator<P<K, A>> iterator() {
-				return keyValue.iterator();
+				return this.keyValue.iterator();
 			}
-		
+
+			@Override
+			public int spliteratorCharacteristics() {
+				return this.keyValue.spliteratorCharacteristics();
+			}
+
 			@Override
 			public Spliterator<P<K, A>> spliterator() {
-				return keyValue.spliterator();
+				return this.keyValue.spliterator();
 			}
 		
 			«uniqueHashCode»
@@ -255,7 +312,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 		
 			@Override
 			public String toString() {
-				return keyValue.toString();
+				return this.keyValue.toString();
 			}
 		}
 
@@ -268,22 +325,22 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			public int size() {
-				return keyValue.size();
+				return this.keyValue.size();
 			}
 
 			@Override
 			public boolean isEmpty() {
-				return keyValue.isEmpty();
+				return this.keyValue.isEmpty();
 			}
 
 			@Override
 			public boolean containsKey(final Object key) {
-				return (key != null) && keyValue.containsKey((K) key);
+				return (key != null) && this.keyValue.containsKey((K) key);
 			}
 
 			@Override
 			public boolean containsValue(final Object value) {
-				return (value != null) && keyValue.containsValue((A) value);
+				return (value != null) && this.keyValue.containsValue((A) value);
 			}
 
 			@Override
@@ -291,7 +348,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				if (key == null) {
 					return null;
 				} else {
-					return keyValue.getOrNull((K) key);
+					return this.keyValue.getOrNull((K) key);
 				}
 			}
 
@@ -300,29 +357,29 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				if (key == null) {
 					return defaultValue;
 				} else {
-					final A value = keyValue.getOrNull((K) key);
+					final A value = this.keyValue.getOrNull((K) key);
 					return (value == null) ? defaultValue : value;
 				}
 			}
 
 			@Override
 			public Set<Entry<K, A>> entrySet() {
-				return new KeyValueEntrySet<>(keyValue);
+				return new KeyValueEntrySet<>(this.keyValue);
 			}
 
 			@Override
 			public Set<K> keySet() {
-				return keyValue.keys().asCollection();
+				return this.keyValue.keys().asCollection();
 			}
 
 			@Override
 			public Collection<A> values() {
-				return keyValue.values().asCollection();
+				return this.keyValue.values().asCollection();
 			}
 
 			@Override
 			public void forEach(final BiConsumer<? super K, ? super A> action) {
-				keyValue.forEach((final P<K, A> entry) -> action.accept(entry.get1(), entry.get2()));
+				this.keyValue.forEach((final P<K, A> entry) -> action.accept(entry.get1(), entry.get2()));
 			}
 		}
 
@@ -335,7 +392,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			public int size() {
-				return keyValue.size();
+				return this.keyValue.size();
 			}
 
 			@Override
@@ -347,7 +404,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 						return false;
 					} else {
 						final Object value = entry.getValue();
-						return (value != null) && value.equals(keyValue.getOrNull((K) key));
+						return (value != null) && value.equals(this.keyValue.getOrNull((K) key));
 					}
 				} else {
 					return false;
@@ -356,7 +413,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			public Iterator<Entry<K, A>> iterator() {
-				return new MappedIterator<>(keyValue.iterator(), P::toEntry);
+				return new MappedIterator<>(this.keyValue.iterator(), P::toEntry);
 			}
 
 			@Override
@@ -370,7 +427,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			public void forEach(final Consumer<? super Entry<K, A>> action) {
-				keyValue.forEach((final P<K, A> p) -> action.accept(p.toEntry()));
+				this.keyValue.forEach((final P<K, A> p) -> action.accept(p.toEntry()));
 			}
 		}
 	''' }

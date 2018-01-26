@@ -442,14 +442,18 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
+			default int spliteratorCharacteristics() {
+				return Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE;
+			}
+
 			@Override
 			default «type.spliteratorGenericName» spliterator() {
 				if (isEmpty()) {
 					return Spliterators.«type.emptySpliteratorName»();
 				} else if (hasFixedSize()) {
-					return Spliterators.spliterator(iterator(), size(), Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
+					return Spliterators.spliterator(iterator(), size(), spliteratorCharacteristics());
 				} else {
-					return Spliterators.spliteratorUnknownSize(iterator(), Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
+					return Spliterators.spliteratorUnknownSize(iterator(), spliteratorCharacteristics());
 				}
 			}
 
