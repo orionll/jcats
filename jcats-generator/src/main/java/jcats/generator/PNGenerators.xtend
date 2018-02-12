@@ -44,30 +44,30 @@ final class PNGenerators {
 
 					«FOR i : 1 .. arity»
 						public A«i» get«i»() {
-							return a«i»;
+							return this.a«i»;
 						}
 
 					«ENDFOR»
 					«FOR i : 1 .. arity»
 						public <B> «shortName»<«(1 .. arity).map[if (it == i) "B" else "A" + it].join(", ")»> set«i»(final B value) {
-							return new «shortName»<>(«(1 .. arity).map[if (it == i) '''requireNonNull(value)''' else "a" + it].join(", ")»);
+							return new «shortName»<>(«(1 .. arity).map[if (it == i) '''requireNonNull(value)''' else "this.a" + it].join(", ")»);
 						}
 
 					«ENDFOR»
 					public <B> B match(final F«arity»<«(1 .. arity).map["A" + it + ", "].join»B> f) {
-						final B b = f.apply(«(1 .. arity).map["a" + it].join(", ")»);
+						final B b = f.apply(«(1 .. arity).map["this.a" + it].join(", ")»);
 						return requireNonNull(b);
 					}
 
 					«FOR i : 1 .. arity»
 						public <B> «shortName»<«(1 .. arity).map[if (it == i) "B" else "A" + it].join(", ")»> map«i»(final F<A«i», B> f) {
-							final B b = f.apply(a«i»);
-							return new «shortName»<>(«(1 .. arity).map[if (it == i) "requireNonNull(b)" else "a" + it].join(", ")»);
+							final B b = f.apply(this.a«i»);
+							return new «shortName»<>(«(1 .. arity).map[if (it == i) "requireNonNull(b)" else "this.a" + it].join(", ")»);
 						}
 
 					«ENDFOR»
 					public «shortName»<«(arity .. 1).map["A" + it].join(", ")»> reverse() {
-						return new «shortName»<>(«(arity .. 1).map["a" + it].join(", ")»);
+						return new «shortName»<>(«(arity .. 1).map["this.a" + it].join(", ")»);
 					}
 
 					public static «parameters(arity)» «shortName»«parameters(arity)» «shortName.toLowerCase»(«(1 .. arity).map["final A" + it + " a" + it].join(", ")») {
@@ -86,7 +86,7 @@ final class PNGenerators {
 					public int hashCode() {
 						int result = 1;
 						«FOR index : 1 .. arity»
-							result = 31 * result + a«index».hashCode();
+							result = 31 * result + this.a«index».hashCode();
 						«ENDFOR»
 						return result;
 					}
@@ -97,9 +97,9 @@ final class PNGenerators {
 							return true;
 						} else if (obj instanceof «shortName»<«Collections.nCopies(arity, "?").join(", ")»>) {
 							final «shortName»<«Collections.nCopies(arity, "?").join(", ")»> «shortName.toLowerCase» = («shortName»<«Collections.nCopies(arity, "?").join(", ")»>) obj;
-							return a1.equals(«shortName.toLowerCase».a1)
+							return this.a1.equals(«shortName.toLowerCase».a1)
 								«FOR index : 2 .. arity»
-									&& a«index».equals(«shortName.toLowerCase».a«index»)«IF index == arity»;«ENDIF»
+									&& this.a«index».equals(«shortName.toLowerCase».a«index»)«IF index == arity»;«ENDIF»
 								«ENDFOR»
 						} else {
 							return false;
@@ -108,7 +108,7 @@ final class PNGenerators {
 
 					@Override
 					public String toString() {
-						return "(" + «(1 .. arity).map["a" + it].join(''' + ", " + ''')» + ")";
+						return "(" + «(1 .. arity).map["this.a" + it].join(''' + ", " + ''')» + ")";
 					}
 
 					«cast((1 .. arity).map["A" + it], #[], (1 .. arity).map["A" + it])»

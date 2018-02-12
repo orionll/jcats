@@ -133,11 +133,11 @@ class PGenerator implements ClassGenerator {
 			}
 
 			public «type1Name» get1() {
-				return a1;
+				return this.a1;
 			}
 
 			public «type2Name» get2() {
-				return a2;
+				return this.a2;
 			}
 
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
@@ -148,9 +148,9 @@ class PGenerator implements ClassGenerator {
 				public <B> Object«type2.typeName»P<B> set1(final B value) {
 			«ENDIF»
 				«IF type2 == Type.OBJECT»
-					return new P<>(requireNonNull(value), a2);
+					return new P<>(requireNonNull(value), this.a2);
 				«ELSE»
-					return new Object«type2.typeName»P<>(requireNonNull(value), a2);
+					return new Object«type2.typeName»P<>(requireNonNull(value), this.a2);
 				«ENDIF»
 			}
 
@@ -162,30 +162,30 @@ class PGenerator implements ClassGenerator {
 				public <B> «type1.typeName»ObjectP<B> set2(final B value) {
 			«ENDIF»
 				«IF type1 == Type.OBJECT»
-					return new P<>(a1, requireNonNull(value));
+					return new P<>(this.a1, requireNonNull(value));
 				«ELSE»
-					return new «type1.typeName»ObjectP<>(a1, requireNonNull(value));
+					return new «type1.typeName»ObjectP<>(this.a1, requireNonNull(value));
 				«ENDIF»
 			}
 
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 				public <B> B match(final F2<A1, A2, B>  f) {
-					final B b = f.apply(a1, a2);
+					final B b = f.apply(this.a1, this.a2);
 					return requireNonNull(b);
 				}
 			«ELSEIF type1 == Type.OBJECT && type2 != Type.OBJECT»
 				public <B> B match(final Object«type2.typeName»ObjectF2<A, B>  f) {
-					final B b = f.apply(a1, a2);
+					final B b = f.apply(this.a1, this.a2);
 					return requireNonNull(b);
 				}
 			«ELSEIF type1 != Type.OBJECT && type2 == Type.OBJECT»
 				public <B> B match(final «type1.typeName»ObjectObjectF2<A, B>  f) {
-					final B b = f.apply(a1, a2);
+					final B b = f.apply(this.a1, this.a2);
 					return requireNonNull(b);
 				}
 			«ELSE»
 				public <A> A match(final «type1.typeName»«type2.typeName»ObjectF2<A>  f) {
-					final A a = f.apply(a1, a2);
+					final A a = f.apply(this.a1, this.a2);
 					return requireNonNull(a);
 				}
 			«ENDIF»
@@ -199,11 +199,11 @@ class PGenerator implements ClassGenerator {
 			«ELSE»
 				public <B> Object«type2.typeName»P<B> map1(final «type1.typeName»ObjectF<B> f) {
 			«ENDIF»
-				final B value = f.apply(a1);
+				final B value = f.apply(this.a1);
 				«IF type2 == Type.OBJECT»
-					return new P<>(requireNonNull(value), a2);
+					return new P<>(requireNonNull(value), this.a2);
 				«ELSE»
-					return new Object«type2.typeName»P<>(requireNonNull(value), a2);
+					return new Object«type2.typeName»P<>(requireNonNull(value), this.a2);
 				«ENDIF»
 			}
 
@@ -216,23 +216,23 @@ class PGenerator implements ClassGenerator {
 			«ELSE»
 				public <B> «type1.typeName»ObjectP<B> map2(final «type2.typeName»ObjectF<B> f) {
 			«ENDIF»
-				final B value = f.apply(a2);
+				final B value = f.apply(this.a2);
 				«IF type1 == Type.OBJECT»
-					return new P<>(a1, requireNonNull(value));
+					return new P<>(this.a1, requireNonNull(value));
 				«ELSE»
-					return new «type1.typeName»ObjectP<>(a1, requireNonNull(value));
+					return new «type1.typeName»ObjectP<>(this.a1, requireNonNull(value));
 				«ENDIF»
 			}
 
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 				public P<A2, A1> reverse() {
-					return new P<>(a2, a1);
+					return new P<>(this.a2, this.a1);
 			«ELSEIF type1 == Type.OBJECT || type2 == Type.OBJECT»
 				public «type2.typeName»«type1.typeName»P<A> reverse() {
-					return new «type2.typeName»«type1.typeName»P<>(a2, a1);
+					return new «type2.typeName»«type1.typeName»P<>(this.a2, this.a1);
 			«ELSE»
 				public «type2.typeName»«type1.typeName»P reverse() {
-					return new «type2.typeName»«type1.typeName»P(a2, a1);
+					return new «type2.typeName»«type1.typeName»P(this.a2, this.a1);
 			«ENDIF»
 			}
 
@@ -245,17 +245,17 @@ class PGenerator implements ClassGenerator {
 			«ELSE»
 				public <B1, B2> P<B1, B2> biMap(final «type1.typeName»ObjectF<B1> f1, final «type2.typeName»ObjectF<B2> f2) {
 			«ENDIF»			
-				return p(f1.apply(a1), f2.apply(a2));
+				return p(f1.apply(this.a1), f2.apply(this.a2));
 			}
 
 			public Entry<«type1BoxedName», «type2BoxedName»> toEntry() {
-				return new SimpleImmutableEntry<>(a1, a2);
+				return new SimpleImmutableEntry<>(this.a1, this.a2);
 			}
 
 			@Override
 			public int hashCode() {
-				final int hashCode1 = «IF type1 == Type.OBJECT»a1.hashCode()«ELSE»«type1.boxedName».hashCode(a1)«ENDIF»;
-				final int hashCode2 = «IF type2 == Type.OBJECT»a2.hashCode()«ELSE»«type2.boxedName».hashCode(a2)«ENDIF»;
+				final int hashCode1 = «IF type1 == Type.OBJECT»this.a1.hashCode()«ELSE»«type1.boxedName».hashCode(this.a1)«ENDIF»;
+				final int hashCode2 = «IF type2 == Type.OBJECT»this.a2.hashCode()«ELSE»«type2.boxedName».hashCode(this.a2)«ENDIF»;
 				return hashCode1 ^ hashCode2;
 			}
 
@@ -266,14 +266,14 @@ class PGenerator implements ClassGenerator {
 				} else if (obj instanceof «wildcardName») {
 					final «wildcardName» p = («wildcardName») obj;
 					«IF type1 == Type.OBJECT»
-						return a1.equals(p.a1)
+						return this.a1.equals(p.a1)
 					«ELSE»
-						return (a1 == p.a1)
+						return (this.a1 == p.a1)
 					«ENDIF»
 						«IF type2 == Type.OBJECT»
-							&& a2.equals(p.a2);
+							&& this.a2.equals(p.a2);
 						«ELSE»
-							&& (a2 == p.a2);
+							&& (this.a2 == p.a2);
 						«ENDIF»
 				} else {
 					return false;
@@ -282,7 +282,7 @@ class PGenerator implements ClassGenerator {
 
 			@Override
 			public String toString() {
-				return "(" + a1 + ", " + a2 + ")";
+				return "(" + this.a1 + ", " + this.a2 + ")";
 			}
 
 			public static «paramGenericName» «shortName.firstToLowerCase»(final «type1Name» a1, final «type2Name» a2) {

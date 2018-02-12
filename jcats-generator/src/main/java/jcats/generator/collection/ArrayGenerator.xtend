@@ -20,6 +20,7 @@ final class ArrayGenerator implements ClassGenerator {
 	def shortName() { type.arrayShortName }
 	def genericName() { type.arrayGenericName }
 	def diamondName() { type.diamondName("Array") }
+	def wildcardName() { type.wildcardName("Array") }
 	def paramGenericName() { type.paramGenericName("Array") }
 	def arrayBuilderName() { type.genericName("ArrayBuilder") }
 	def arrayBuilderDiamondName() { type.diamondName("ArrayBuilder") }
@@ -63,7 +64,7 @@ final class ArrayGenerator implements ClassGenerator {
 
 
 		public final class «type.covariantName("Array")» implements «type.indexedContainerGenericName», Serializable {
-			static final «shortName» EMPTY = new «shortName»(«type.emptyArrayName»);
+			static final «wildcardName» EMPTY = new «diamondName»(«type.emptyArrayName»);
 
 			final «type.javaName»[] array;
 
@@ -76,7 +77,7 @@ final class ArrayGenerator implements ClassGenerator {
 			 */
 			@Override
 			public int size() {
-				return array.length;
+				return this.array.length;
 			}
 
 			/**
@@ -90,7 +91,7 @@ final class ArrayGenerator implements ClassGenerator {
 			 * O(1)
 			 */
 			public «type.genericName» last() {
-				return get(array.length - 1);
+				return get(this.array.length - 1);
 			}
 
 			/**
@@ -98,7 +99,7 @@ final class ArrayGenerator implements ClassGenerator {
 			 */
 			@Override
 			public «type.genericName» get(final int index) {
-				return «type.genericCast»array[index];
+				return «type.genericCast»this.array[index];
 			}
 
 			/**
@@ -108,7 +109,7 @@ final class ArrayGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				final «type.javaName»[] result = array.clone();
+				final «type.javaName»[] result = this.array.clone();
 				result[index] = value;
 				return new «diamondName»(result);
 			}
@@ -120,8 +121,8 @@ final class ArrayGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				final «type.javaName»[] result = new «type.javaName»[array.length + 1];
-				System.arraycopy(array, 0, result, 1, array.length);
+				final «type.javaName»[] result = new «type.javaName»[this.array.length + 1];
+				System.arraycopy(this.array, 0, result, 1, this.array.length);
 				result[0] = value;
 				return new «diamondName»(result);
 			}
@@ -133,14 +134,14 @@ final class ArrayGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				final «type.javaName»[] result = new «type.javaName»[array.length + 1];
-				System.arraycopy(array, 0, result, 0, array.length);
-				result[array.length] = value;
+				final «type.javaName»[] result = new «type.javaName»[this.array.length + 1];
+				System.arraycopy(this.array, 0, result, 0, this.array.length);
+				result[this.array.length] = value;
 				return new «diamondName»(result);
 			}
 
 			public «genericName» removeAt(final int index) {
-				if (index < 0 || index >= array.length) {
+				if (index < 0 || index >= this.array.length) {
 					throw new IndexOutOfBoundsException(Integer.toString(index));
 				} else {
 					return remove(index);
@@ -182,12 +183,12 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			private «genericName» remove(final int index) {
-				if (array.length == 1) {
+				if (this.array.length == 1) {
 					return empty«shortName»();
 				} else {
-					final «type.javaName»[] result = new «type.javaName»[array.length - 1];
-					System.arraycopy(array, 0, result, 0, index);
-					System.arraycopy(array, index + 1, result, index, array.length - index - 1);
+					final «type.javaName»[] result = new «type.javaName»[this.array.length - 1];
+					System.arraycopy(this.array, 0, result, 0, index);
+					System.arraycopy(this.array, index + 1, result, index, this.array.length - index - 1);
 					return new «diamondName»(result);
 				}
 			}
@@ -209,7 +210,7 @@ final class ArrayGenerator implements ClassGenerator {
 				} else if (suffix.isEmpty()) {
 					return this;
 				} else {
-					return new «diamondName»(concatArrays(array, suffix.array));
+					return new «diamondName»(concatArrays(this.array, suffix.array));
 				}
 			}
 
@@ -235,9 +236,9 @@ final class ArrayGenerator implements ClassGenerator {
 				if (suffixSize == 0) {
 					return this;
 				} else {
-					final «type.javaName»[] result = new «type.javaName»[array.length + suffixSize];
-					System.arraycopy(array, 0, result, 0, array.length);
-					fillArray(result, array.length, suffix);
+					final «type.javaName»[] result = new «type.javaName»[this.array.length + suffixSize];
+					System.arraycopy(this.array, 0, result, 0, this.array.length);
+					fillArray(result, this.array.length, suffix);
 					return new «diamondName»(result);
 				}
 			}
@@ -246,9 +247,9 @@ final class ArrayGenerator implements ClassGenerator {
 				if (prefixSize == 0) {
 					return this;
 				} else {
-					final «type.javaName»[] result = new «type.javaName»[prefixSize + array.length];
+					final «type.javaName»[] result = new «type.javaName»[prefixSize + this.array.length];
 					fillArray(result, 0, prefix);
-					System.arraycopy(array, 0, result, prefixSize, array.length);
+					System.arraycopy(this.array, 0, result, prefixSize, this.array.length);
 					return new «diamondName»(result);
 				}
 			}
@@ -257,7 +258,7 @@ final class ArrayGenerator implements ClassGenerator {
 			 * O(this.size + suffix.size)
 			 */
 			public «genericName» appendAll(final Iterable<«type.genericBoxedName»> suffix) {
-				if (array.length == 0) {
+				if (this.array.length == 0) {
 					return ofAll(suffix);
 				} else if (suffix instanceof «shortName») {
 					return concat((«genericName») suffix);
@@ -271,11 +272,11 @@ final class ArrayGenerator implements ClassGenerator {
 							return this;
 						} else {
 							final int suffixSize = col.size();
-							builder = builderWithCapacity(array.length + suffixSize);
-							builder.appendArray(array);
+							builder = builderWithCapacity(this.array.length + suffixSize);
+							builder.appendArray(this.array);
 						}
 					} else {
-						builder = new «arrayBuilderDiamondName»(array, array.length);
+						builder = new «arrayBuilderDiamondName»(this.array, this.array.length);
 					}
 					suffix.forEach(builder::append);
 					return builder.build();
@@ -286,7 +287,7 @@ final class ArrayGenerator implements ClassGenerator {
 			 * O(prefix.size + this.size)
 			 */
 			public «genericName» prependAll(final Iterable<«type.genericBoxedName»> prefix) {
-				if (array.length == 0) {
+				if (this.array.length == 0) {
 					return ofAll(prefix);
 				} else if (prefix instanceof «shortName») {
 					return ((«genericName») prefix).concat(this);
@@ -300,35 +301,35 @@ final class ArrayGenerator implements ClassGenerator {
 							return this;
 						} else {
 							final int prefixSize = col.size();
-							builder = builderWithCapacity(prefixSize + array.length);
+							builder = builderWithCapacity(prefixSize + this.array.length);
 						}
 					} else {
 						builder = builder();
 					}
 					prefix.forEach(builder::append);
-					builder.appendArray(array);
+					builder.appendArray(this.array);
 					return builder.build();
 				}
 			}
 
 			public final «genericName» slice(final int fromIndex, final int toIndex) {
-				sliceRangeCheck(fromIndex, toIndex, array.length);
-				if (fromIndex == 0 && toIndex == array.length) {
+				sliceRangeCheck(fromIndex, toIndex, this.array.length);
+				if (fromIndex == 0 && toIndex == this.array.length) {
 					return this;
 				} else {
 					final «type.javaName»[] result = new «type.javaName»[toIndex - fromIndex];
-					System.arraycopy(array, fromIndex, result, 0, toIndex - fromIndex);
+					System.arraycopy(this.array, fromIndex, result, 0, toIndex - fromIndex);
 					return new «diamondName»(result);
 				}
 			}
 
 			public «genericName» reverse() {
-				if (array.length == 0 || array.length == 1) {
+				if (this.array.length == 0 || this.array.length == 1) {
 					return this;
 				} else {
-					final «type.javaName»[] result = new «type.javaName»[array.length];
-					for (int i = 0; i < array.length; i++) {
-						result[array.length - i - 1] = array[i];
+					final «type.javaName»[] result = new «type.javaName»[this.array.length];
+					for (int i = 0; i < this.array.length; i++) {
+						result[this.array.length - i - 1] = this.array[i];
 					}
 					return new «diamondName»(result);
 				}
@@ -347,9 +348,9 @@ final class ArrayGenerator implements ClassGenerator {
 						return (Array<B>) this;
 				«ENDIF»
 				} else {
-					final Object[] result = new Object[array.length];
-					for (int i = 0; i < array.length; i++) {
-						result[i] = requireNonNull(f.apply(«type.genericCast»array[i]));
+					final Object[] result = new Object[this.array.length];
+					for (int i = 0; i < this.array.length; i++) {
+						result[i] = requireNonNull(f.apply(«type.genericCast»this.array[i]));
 					}
 					return new Array<>(result);
 				}
@@ -365,9 +366,9 @@ final class ArrayGenerator implements ClassGenerator {
 						return this;
 					«ENDIF»
 					} else {
-						final «toType.javaName»[] result = new «toType.javaName»[array.length];
-						for (int i = 0; i < array.length; i++) {
-							result[i] = f.apply(«type.genericCast»array[i]);
+						final «toType.javaName»[] result = new «toType.javaName»[this.array.length];
+						for (int i = 0; i < this.array.length; i++) {
+							result[i] = f.apply(«type.genericCast»this.array[i]);
 						}
 						return new «toType.typeName»Array(result);
 					}
@@ -388,7 +389,7 @@ final class ArrayGenerator implements ClassGenerator {
 					«ELSE»
 						final ArrayBuilder<A> builder = Array.builder();
 					«ENDIF»
-					for (final «type.javaName» value : array) {
+					for (final «type.javaName» value : this.array) {
 						builder.appendArray(f.apply(«type.genericCast»value).array);
 					}
 					return builder.build();
@@ -401,12 +402,12 @@ final class ArrayGenerator implements ClassGenerator {
 					return empty«shortName»();
 				} else {
 					final «arrayBuilderName» builder = builder();
-					for (final «type.javaName» value : array) {
+					for (final «type.javaName» value : this.array) {
 						if (predicate.apply(«type.genericCast»value)) {
 							builder.append(«type.genericCast»value);
 						}
 					}
-					if (builder.size() == array.length) {
+					if (builder.size() == this.array.length) {
 						return this;
 					} else {
 						return builder.build();
@@ -424,23 +425,23 @@ final class ArrayGenerator implements ClassGenerator {
 			public «genericName» take(final int n) {
 				if (n <= 0) {
 					return empty«shortName»();
-				} else if (n >= array.length) {
+				} else if (n >= this.array.length) {
 					return this;
 				} else {
 					final «type.javaName»[] result = new «type.javaName»[n];
-					System.arraycopy(array, 0, result, 0, n);
+					System.arraycopy(this.array, 0, result, 0, n);
 					return new «diamondName»(result);
 				}
 			}
 
 			public «genericName» drop(final int n) {
-				if (n >= array.length) {
+				if (n >= this.array.length) {
 					return empty«shortName»();
 				} else if (n <= 0) {
 					return this;
 				} else {
-					final «type.javaName»[] result = new «type.javaName»[array.length - n];
-					System.arraycopy(array, n, result, 0, result.length);
+					final «type.javaName»[] result = new «type.javaName»[this.array.length - n];
+					System.arraycopy(this.array, n, result, 0, result.length);
 					return new «diamondName»(result);
 				}
 			}
@@ -452,7 +453,7 @@ final class ArrayGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				for (final «type.javaName» a : array) {
+				for (final «type.javaName» a : this.array) {
 					«IF type == Type.OBJECT»
 						if (a.equals(value)) {
 					«ELSE»
@@ -470,7 +471,7 @@ final class ArrayGenerator implements ClassGenerator {
 					requireNonNull(value);
 				«ENDIF»
 				int index = 0;
-				for (final «type.javaName» a : array) {
+				for (final «type.javaName» a : this.array) {
 					«IF type == Type.OBJECT»
 						if (a.equals(value)) {
 					«ELSE»
@@ -486,7 +487,7 @@ final class ArrayGenerator implements ClassGenerator {
 			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
-				for (final «type.javaName» value : array) {
+				for (final «type.javaName» value : this.array) {
 					eff.apply(«type.genericCast»value);
 				}
 			}
@@ -498,15 +499,15 @@ final class ArrayGenerator implements ClassGenerator {
 				public void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
 			«ENDIF»
 				requireNonNull(eff);
-				for (int i = 0; i < array.length; i++) {
-					eff.apply(i, «type.genericCast»array[i]);
+				for (int i = 0; i < this.array.length; i++) {
+					eff.apply(i, «type.genericCast»this.array[i]);
 				}
 			}
 
 			@Override
 			public void foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
-				for (final «type.javaName» value : array) {
+				for (final «type.javaName» value : this.array) {
 					if (!eff.apply(«type.genericCast»value)) {
 						return;
 					}
@@ -522,30 +523,30 @@ final class ArrayGenerator implements ClassGenerator {
 			«IF type == Type.OBJECT»
 				@Override
 				public Seq<A> toSeq() {
-					if (array.length == 0) {
+					if (this.array.length == 0) {
 						return Seq.emptySeq();
 					} else {
-						return Seq.seqFromArray(array);
+						return Seq.seqFromArray(this.array);
 					}
 				}
 			«ELSE»
 				@Override
 				public «type.typeName»Seq to«type.typeName»Seq() {
-					if (array.length == 0) {
+					if (this.array.length == 0) {
 						return «type.typeName»Seq.empty«type.typeName»Seq();
 					} else {
-						return «type.typeName»Seq.seqFromArray(array);
+						return «type.typeName»Seq.seqFromArray(this.array);
 					}
 				}
 			«ENDIF»
 
 			@Override
 			public «type.javaName»[] «type.toArrayName»() {
-				if (array.length == 0) {
-					return array;
+				if (this.array.length == 0) {
+					return this.array;
 				} else {
-					final «type.javaName»[] result = new «type.javaName»[array.length];
-					System.arraycopy(array, 0, result, 0, array.length);
+					final «type.javaName»[] result = new «type.javaName»[this.array.length];
+					System.arraycopy(this.array, 0, result, 0, this.array.length);
 					return result;
 				}
 			}
@@ -553,14 +554,18 @@ final class ArrayGenerator implements ClassGenerator {
 
 				@Override
 				public A[] toPreciseArray(final IntObjectF<A[]> supplier) {
-					final A[] result = supplier.apply(array.length);
-					System.arraycopy(array, 0, result, 0, array.length);
+					final A[] result = supplier.apply(this.array.length);
+					System.arraycopy(this.array, 0, result, 0, this.array.length);
 					return result;
 				}
 			«ENDIF»
 
 			public static «paramGenericName» empty«shortName»() {
-				return EMPTY;
+				«IF type == Type.OBJECT»
+					return («genericName») EMPTY;
+				«ELSE»
+					return EMPTY;
+				«ENDIF»
 			}
 
 			public static «paramGenericName» single«shortName»(final «type.genericName» value) {
@@ -691,18 +696,18 @@ final class ArrayGenerator implements ClassGenerator {
 			@Override
 			public «type.iteratorGenericName» iterator() {
 				«IF type.javaUnboxedType»
-					return isEmpty() ? «type.noneName»().iterator() : new «shortName»Iterator(array);
+					return isEmpty() ? «type.noneName»().iterator() : new «shortName»Iterator(this.array);
 				«ELSE»
-					return isEmpty() ? emptyIterator() : new «shortName»Iterator«IF type == Type.OBJECT»<>«ENDIF»(array);
+					return isEmpty() ? emptyIterator() : new «shortName»Iterator«IF type == Type.OBJECT»<>«ENDIF»(this.array);
 				«ENDIF»
 			}
 
 			@Override
 			public «type.iteratorGenericName» reverseIterator() {
 				«IF type.javaUnboxedType»
-					return isEmpty() ? «type.noneName»().iterator() : new «shortName»ReverseIterator(array);
+					return isEmpty() ? «type.noneName»().iterator() : new «shortName»ReverseIterator(this.array);
 				«ELSE»
-					return isEmpty() ? emptyIterator() : new «shortName»ReverseIterator«IF type == Type.OBJECT»<>«ENDIF»(array);
+					return isEmpty() ? emptyIterator() : new «shortName»ReverseIterator«IF type == Type.OBJECT»<>«ENDIF»(this.array);
 				«ENDIF»
 			}
 
@@ -717,13 +722,13 @@ final class ArrayGenerator implements ClassGenerator {
 				if (isEmpty()) {
 					return Spliterators.«type.emptySpliteratorName»();
 				} else {
-					return Spliterators.spliterator(«IF type == Type.BOOLEAN»new BooleanArrayIterator(array), size()«ELSE»array«ENDIF», Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
+					return Spliterators.spliterator(«IF type == Type.BOOLEAN»new BooleanArrayIterator(this.array), size()«ELSE»this.array«ENDIF», Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 				}
 			}
 
 			@Override
 			public int hashCode() {
-				return Arrays.hashCode(array);
+				return Arrays.hashCode(this.array);
 			}
 
 			«equals(type, type.indexedContainerWildcardName, false)»
@@ -732,7 +737,7 @@ final class ArrayGenerator implements ClassGenerator {
 				if (other == this) {
 					return true;
 				} else {
-					return Arrays.equals(array, other.array);
+					return Arrays.equals(this.array, other.array);
 				}
 			}
 
@@ -748,10 +753,10 @@ final class ArrayGenerator implements ClassGenerator {
 					if (isEmpty() || that.isEmpty()) {
 						return emptyArray();
 					} else {
-						final Object[] result = new Object[min(array.length, that.size())];
+						final Object[] result = new Object[min(this.array.length, that.size())];
 						final Iterator<B> iterator = that.iterator();
 						for (int i = 0; i < result.length; i++) {
-							result[i] = requireNonNull(f.apply((A) array[i], iterator.next()));
+							result[i] = requireNonNull(f.apply((A) this.array[i], iterator.next()));
 						}
 						return new Array<>(result);
 					}
@@ -761,9 +766,9 @@ final class ArrayGenerator implements ClassGenerator {
 					if (isEmpty()) {
 						return emptyArray();
 					} else {
-						final Object[] result = new Object[array.length];
-						for (int i = 0; i < array.length; i++) {
-							result[i] = intObjectP(i, array[i]);
+						final Object[] result = new Object[this.array.length];
+						for (int i = 0; i < this.array.length; i++) {
+							result[i] = intObjectP(i, this.array[i]);
 						}
 						return new Array<>(result);
 					}
@@ -778,10 +783,10 @@ final class ArrayGenerator implements ClassGenerator {
 					if (isEmpty() || that.isEmpty()) {
 						return emptyArray();
 					} else {
-						final Object[] result = new Object[min(array.length, that.size())];
+						final Object[] result = new Object[min(this.array.length, that.size())];
 						final Iterator<A> iterator = that.iterator();
 						for (int i = 0; i < result.length; i++) {
-							result[i] = requireNonNull(f.apply(array[i], iterator.next()));
+							result[i] = requireNonNull(f.apply(this.array[i], iterator.next()));
 						}
 						return new Array<>(result);
 					}
@@ -791,9 +796,9 @@ final class ArrayGenerator implements ClassGenerator {
 					if (isEmpty()) {
 						return emptyArray();
 					} else {
-						final Object[] result = new Object[array.length];
-						for (int i = 0; i < array.length; i++) {
-							result[i] = int«type.typeName»P(i, array[i]);
+						final Object[] result = new Object[this.array.length];
+						for (int i = 0; i < this.array.length; i++) {
+							result[i] = int«type.typeName»P(i, this.array[i]);
 						}
 						return new Array<>(result);
 					}
