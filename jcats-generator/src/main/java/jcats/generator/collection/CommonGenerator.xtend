@@ -185,22 +185,16 @@ final class CommonGenerator implements ClassGenerator {
 
 			«ENDFOR»
 			static int iterableHashCode(final Iterable<?> iterable) {
-				int hashCode = 1;
-				for (final Object value : iterable) {
-					hashCode = 31 * hashCode + value.hashCode();
-				}
-				return hashCode;
+				final HashCodeAccumulator acc = new HashCodeAccumulator();
+				iterable.forEach(acc);
+				return acc.hashCode;
 			}
 
 			«FOR type : Type.javaUnboxedTypes»
 				static int «type.containerShortName.firstToLowerCase»HashCode(final «type.containerWildcardName» container) {
-					int hashCode = 1;
-					final «type.iteratorGenericName» iterator = container.iterator();
-					while (iterator.hasNext()) {
-						final «type.javaName» value = iterator.«type.iteratorNext»();
-						hashCode = 31 * hashCode + «type.boxedName».hashCode(value);
-					}
-					return hashCode;
+					final «type.typeName»HashCodeAccumulator acc = new «type.typeName»HashCodeAccumulator();
+					container.foreach(acc);
+					return acc.hashCode;
 				}
 
 			«ENDFOR»
@@ -768,5 +762,25 @@ final class CommonGenerator implements ClassGenerator {
 				return Spliterators.spliterator(arr, Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 		}
+
+		final class HashCodeAccumulator implements Consumer<Object> {
+			int hashCode = 1;
+		
+			@Override
+			public void accept(final Object value) {
+				this.hashCode = 31 * this.hashCode + value.hashCode();
+			}
+		}		
+		«FOR type : Type.javaUnboxedTypes»
+
+			final class «type.typeName»HashCodeAccumulator implements «type.effGenericName» {
+				int hashCode = 1;
+			
+				@Override
+				public void apply(final «type.javaName» value) {
+					this.hashCode = 31 * this.hashCode + «type.genericBoxedName».hashCode(value);
+				}
+			}
+		«ENDFOR»
 	''' }
 }
