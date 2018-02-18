@@ -262,7 +262,7 @@ final class UniqueGenerator implements ClassGenerator {
 
 			«uniqueEquals(Type.OBJECT)»
 
-			«uniqueHashCode»
+			«uniqueHashCode(Type.OBJECT)»
 
 			@Override
 			public String toString() {

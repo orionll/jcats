@@ -54,18 +54,22 @@ interface Generator {
 	def static hashcode(Type type, boolean isFinal) { '''
 		@Override
 		public «IF isFinal»final «ENDIF»int hashCode() {
-			«IF type.javaUnboxedType»
+			«IF type.primitive»
 				return «type.containerShortName.firstToLowerCase»HashCode(this);
 			«ELSE»
-				return iterableHashCode(this);
+				return containerHashCode(this);
 			«ENDIF»
 		}
 	'''}
 
-	def static uniqueHashCode() { '''
+	def static uniqueHashCode(Type type) { '''
 		@Override
 		public int hashCode() {
-			return uniqueContainerHashCode(this);
+			«IF type.primitive»
+				return «type.uniqueContainerShortName.firstToLowerCase»HashCode(this);
+			«ELSE»
+				return uniqueContainerHashCode(this);
+			«ENDIF»
 		}
 	'''}
 

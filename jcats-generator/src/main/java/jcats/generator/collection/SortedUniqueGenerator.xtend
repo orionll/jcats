@@ -305,7 +305,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			«uniqueEquals(type)»
 
-			«uniqueHashCode»
+			«uniqueHashCode(type)»
 
 			@Override
 			public String toString() {

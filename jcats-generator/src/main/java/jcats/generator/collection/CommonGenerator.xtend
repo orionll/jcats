@@ -184,37 +184,23 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
-			static int iterableHashCode(final Iterable<?> iterable) {
-				final HashCodeAccumulator acc = new HashCodeAccumulator();
-				iterable.forEach(acc);
-				return acc.hashCode;
+			static <A> int containerHashCode(final Container<A> container) {
+				return container.foldLeftToInt(1, (hashCode, value) -> 31 * hashCode + value.hashCode());
 			}
 
-			«FOR type : Type.javaUnboxedTypes»
+			«FOR type : Type.primitives»
 				static int «type.containerShortName.firstToLowerCase»HashCode(final «type.containerWildcardName» container) {
-					final «type.typeName»HashCodeAccumulator acc = new «type.typeName»HashCodeAccumulator();
-					container.foreach(acc);
-					return acc.hashCode;
+					return container.foldLeftToInt(1, (hashCode, value) -> 31 * hashCode + «type.genericBoxedName».hashCode(value));
 				}
 
 			«ENDFOR»
-			static int uniqueContainerHashCode(final Iterable<?> uniqueContainer) {
-				int hashCode = 0;
-				for (final Object value : uniqueContainer) {
-					hashCode += value.hashCode();
-				}
-				return hashCode;
+			static <A> int uniqueContainerHashCode(final UniqueContainer<A> container) {
+				return container.foldLeftToInt(0, (hashCode, value) -> hashCode + value.hashCode());
 			}
 
-			«FOR type : Type.javaUnboxedTypes»
+			«FOR type : Type.primitives.filter[it != Type.BOOLEAN]»
 				static int «type.uniqueContainerShortName.firstToLowerCase»HashCode(final «type.containerWildcardName» container) {
-					int hashCode = 1;
-					final «type.iteratorGenericName» iterator = container.iterator();
-					while (iterator.hasNext()) {
-						final «type.javaName» value = iterator.«type.iteratorNext»();
-						hashCode += «type.boxedName».hashCode(value);
-					}
-					return hashCode;
+					return container.foldLeftToInt(0, (hashCode, value) -> hashCode + «type.genericBoxedName».hashCode(value));
 				}
 
 			«ENDFOR»
@@ -762,25 +748,5 @@ final class CommonGenerator implements ClassGenerator {
 				return Spliterators.spliterator(arr, Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 		}
-
-		final class HashCodeAccumulator implements Consumer<Object> {
-			int hashCode = 1;
-		
-			@Override
-			public void accept(final Object value) {
-				this.hashCode = 31 * this.hashCode + value.hashCode();
-			}
-		}		
-		«FOR type : Type.javaUnboxedTypes»
-
-			final class «type.typeName»HashCodeAccumulator implements «type.effGenericName» {
-				int hashCode = 1;
-			
-				@Override
-				public void apply(final «type.javaName» value) {
-					this.hashCode = 31 * this.hashCode + «type.genericBoxedName».hashCode(value);
-				}
-			}
-		«ENDFOR»
 	''' }
 }

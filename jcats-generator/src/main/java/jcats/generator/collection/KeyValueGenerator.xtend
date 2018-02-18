@@ -238,7 +238,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				return this.keyValue.spliteratorCharacteristics();
 			}
 
-			«uniqueHashCode»
+			«uniqueHashCode(Type.OBJECT)»
 
 			«uniqueEquals(Type.OBJECT)»
 
@@ -306,7 +306,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				return this.keyValue.spliterator();
 			}
 		
-			«uniqueHashCode»
+			«uniqueHashCode(Type.OBJECT)»
 
 			«uniqueEquals(Type.OBJECT)»
 		

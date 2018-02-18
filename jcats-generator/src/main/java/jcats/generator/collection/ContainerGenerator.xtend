@@ -208,63 +208,31 @@ final class ContainerGenerator implements InterfaceGenerator {
 				return !anyMatch(predicate);
 			}
 
-			«IF type.javaUnboxedType»
+			«IF type.primitive»
 				default <A> A foldLeft(final A start, final Object«type.typeName»ObjectF2<A, A> f2) {
 					requireNonNull(start);
 					requireNonNull(f2);
-					A result = start;
-					final «type.iteratorGenericName» iterator = iterator();
-					while (iterator.hasNext()) {
-						final «type.javaName» value = iterator.«type.iteratorNext»();
-						result = requireNonNull(f2.apply(result, value));
-					}
-					return result;
-				}
-			«ELSEIF type == Type.BOOLEAN»
-				default <A> A foldLeft(final A start, final Object«type.typeName»ObjectF2<A, A> f2) {
-					requireNonNull(start);
-					requireNonNull(f2);
-					A result = start;
-					for (final boolean value : this) {
-						result = requireNonNull(f2.apply(result, value));
-					}
-					return result;
+					final «type.typeName»Folder<A> folder = new «type.typeName»Folder<>(start, f2);
+					foreach(folder);
+					return folder.acc;
 				}
 			«ELSE»
 				default <B> B foldLeft(final B start, final F2<B, A, B> f2) {
 					requireNonNull(start);
 					requireNonNull(f2);
-					B result = start;
-					for (final A a : this) {
-						result = requireNonNull(f2.apply(result, a));
-					}
-					return result;
+					final Folder<A, B> folder = new Folder<>(start, f2);
+					foreach(folder);
+					return folder.acc;
 				}
 			«ENDIF»
 
-			«IF type.javaUnboxedType»
+			«IF type.primitive»
 				«FOR returnType : Type.primitives»
 					default «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»«type.typeName»«returnType.typeName»F2 f2) {
 						requireNonNull(f2);
-						«returnType.javaName» result = start;
-						final «type.iteratorGenericName» iterator = iterator();
-						while (iterator.hasNext()) {
-							final «type.javaName» value = iterator.«type.iteratorNext»();
-							result = f2.apply(result, value);
-						}
-						return result;
-					}
-
-				«ENDFOR»
-			«ELSEIF type == Type.BOOLEAN»
-				«FOR returnType : Type.primitives»
-					default «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»«type.typeName»«returnType.typeName»F2 f2) {
-						requireNonNull(f2);
-						«returnType.javaName» result = start;
-						for (final boolean value : this) {
-							result = f2.apply(result, value);
-						}
-						return result;
+						final «type.typeName»FolderTo«returnType.typeName» folder = new «type.typeName»FolderTo«returnType.typeName»(start, f2);
+						foreach(folder);
+						return folder.acc;
 					}
 
 				«ENDFOR»
@@ -272,11 +240,9 @@ final class ContainerGenerator implements InterfaceGenerator {
 				«FOR returnType : Type.primitives»
 					default «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»Object«returnType.typeName»F2<A> f2) {
 						requireNonNull(f2);
-						«returnType.javaName» result = start;
-						for (final A a : this) {
-							result = f2.apply(result, a);
-						}
-						return result;
+						final FolderTo«returnType.typeName»<A> folder = new FolderTo«returnType.typeName»<>(start, f2);
+						foreach(folder);
+						return folder.acc;
 					}
 
 				«ENDFOR»
@@ -658,6 +624,70 @@ final class ContainerGenerator implements InterfaceGenerator {
 					return this.collection.toString();
 				}
 			}
+		«ENDIF»
+
+		«IF type == Type.OBJECT»
+			final class Folder<A, B> implements Eff<A> {
+				B acc;
+				final F2<B, A, B> f2;
+
+				Folder(final B start, final F2<B, A, B> f2) {
+					this.acc = start;
+					this.f2 = f2;
+				}
+
+				public void apply(final A value) {
+					this.acc = this.f2.apply(this.acc, value);
+				}
+			}
+
+			«FOR returnType : Type.primitives»
+				final class FolderTo«returnType.typeName»<A> implements Eff<A> {
+					«returnType.javaName» acc;
+					final «returnType.typeName»«type.typeName»«returnType.typeName»F2<A> f2;
+
+					FolderTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»«type.typeName»«returnType.typeName»F2<A> f2) {
+						this.acc = start;
+						this.f2 = f2;
+					}
+
+					public void apply(final A value) {
+						this.acc = this.f2.apply(this.acc, value);
+					}
+				}
+
+			«ENDFOR»
+		«ELSE»
+			final class «type.typeName»Folder<A> implements «type.effGenericName» {
+				A acc;
+				final Object«type.typeName»ObjectF2<A, A> f2;
+
+				«type.typeName»Folder(final A start, final Object«type.typeName»ObjectF2<A, A> f2) {
+					this.acc = start;
+					this.f2 = f2;
+				}
+
+				public void apply(final «type.javaName» value) {
+					this.acc = this.f2.apply(this.acc, value);
+				}
+			}
+
+			«FOR returnType : Type.primitives»
+				final class «type.typeName»FolderTo«returnType.typeName» implements «type.effGenericName» {
+					«returnType.javaName» acc;
+					final «returnType.typeName»«type.typeName»«returnType.typeName»F2 f2;
+
+					«type.typeName»FolderTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»«type.typeName»«returnType.typeName»F2 f2) {
+						this.acc = start;
+						this.f2 = f2;
+					}
+
+					public void apply(final «type.javaName» value) {
+						this.acc = this.f2.apply(this.acc, value);
+					}
+				}
+
+			«ENDFOR»
 		«ENDIF»
 	''' }
 }

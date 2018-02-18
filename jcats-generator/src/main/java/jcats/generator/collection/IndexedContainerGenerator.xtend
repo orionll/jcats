@@ -180,10 +180,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 					return Collections.unmodifiableList((List<A>) this.collection);
 				}
 
-				@Override
-				public int hashCode() {
-					return iterableHashCode(this);
-				}
+				«hashcode(Type.OBJECT)»
 
 				@Override
 				public boolean equals(final Object obj) {
