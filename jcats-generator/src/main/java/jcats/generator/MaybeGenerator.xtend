@@ -238,6 +238,16 @@ final class MaybeGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public boolean isEmpty() {
+				return this.maybe.isEmpty();
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return this.maybe.isNotEmpty();
+			}
+
+			@Override
 			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
 				this.maybe.forEach(action);
 			}
