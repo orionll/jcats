@@ -24,66 +24,66 @@ final class String1Generator implements ClassGenerator {
 
 			@Override
 			public int length() {
-				return str.length();
+				return this.str.length();
 			}
 
 			@Override
 			public char charAt(final int index) {
-				return str.charAt(index);
+				return this.str.charAt(index);
 			}
 
 			@Override
 			public CharSequence subSequence(final int start, final int end) {
-				return str.subSequence(start, end);
+				return this.str.subSequence(start, end);
 			}
 
 			@Override
 			public IntStream2 chars() {
-				return IntStream2.from(str.chars());
+				return IntStream2.from(this.str.chars());
 			}
 
 			@Override
 			public IntStream2 codePoints() {
-				return IntStream2.from(str.codePoints());
+				return IntStream2.from(this.str.codePoints());
 			}
 
 			public boolean startsWith(final String1 prefix) {
-				return str.startsWith(prefix.str);
+				return this.str.startsWith(prefix.str);
 			}
 
 			public boolean endsWith(final String1 suffix) {
-				return str.endsWith(suffix.str);
+				return this.str.endsWith(suffix.str);
 			}
 
 			public int indexOf(final int ch) {
-				return str.indexOf(ch);
+				return this.str.indexOf(ch);
 			}
 
 			public int lastIndexOf(final int ch) {
-				return str.lastIndexOf(ch);
+				return this.str.lastIndexOf(ch);
 			}
 
 			public String1 concat(final String1 other) {
-				return new String1(str.concat(other.str));
+				return new String1(this.str.concat(other.str));
 			}
 
 			public String1 appendString(final String suffix) {
-				return new String1(str.concat(suffix));
+				return new String1(this.str.concat(suffix));
 			}
 
 			public String1 prependString(final String prefix) {
-				return new String1(prefix.concat(str));
+				return new String1(prefix.concat(this.str));
 			}
 
 			public String1 replace(final char oldChar, final char newChar) {
-				return new String1(str.replace(oldChar, newChar));
+				return new String1(this.str.replace(oldChar, newChar));
 			}
 
 			public String1 reverse() {
-				if (str.length() == 1) {
+				if (this.str.length() == 1) {
 					return this;
 				} else {
-					return new String1(new StringBuilder(str).reverse().toString());
+					return new String1(new StringBuilder(this.str).reverse().toString());
 				}
 			}
 
@@ -93,7 +93,7 @@ final class String1Generator implements ClassGenerator {
 
 			public String1 toUpperCase(final Locale locale) {
 				final String upper = this.str.toUpperCase(locale);
-				return (str == upper) ? this : new String1(upper);
+				return (this.str == upper) ? this : new String1(upper);
 			}
 
 			public String1 toLowerCase() {
@@ -102,7 +102,7 @@ final class String1Generator implements ClassGenerator {
 
 			public String1 toLowerCase(final Locale locale) {
 				final String lower = this.str.toLowerCase(locale);
-				return (str == lower) ? this : new String1(lower);
+				return (this.str == lower) ? this : new String1(lower);
 			}
 
 			@Override
@@ -110,37 +110,37 @@ final class String1Generator implements ClassGenerator {
 				if (this == obj) {
 					return true;
 				} else if (obj instanceof String1) {
-					return str.equals(((String1) obj).str);
+					return this.str.equals(((String1) obj).str);
 				} else {
 					return false;
 				}
 			}
 
 			public boolean isEqualToString(final String other) {
-				return str.equals(other);
+				return this.str.equals(other);
 			}
 
 			public boolean equalsIgnoreCase(final String1 other) {
-				return str.equalsIgnoreCase(other.str);
+				return this.str.equalsIgnoreCase(other.str);
 			}
 
 			@Override
 			public int hashCode() {
-				return str.hashCode();
+				return this.str.hashCode();
 			}
 
 			@Override
 			public int compareTo(final String1 other) {
-				return str.compareTo(other.str);
+				return this.str.compareTo(other.str);
 			}
 
 			public int compareToIgnoreCase(final String1 other) {
-				return str.compareToIgnoreCase(other.str);
+				return this.str.compareToIgnoreCase(other.str);
 			}
 
 			@Override
 			public String toString() {
-				return str;
+				return this.str;
 			}
 
 			«javadocSynonym("string1")»
