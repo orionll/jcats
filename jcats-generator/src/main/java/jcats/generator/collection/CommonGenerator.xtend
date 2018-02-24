@@ -204,14 +204,6 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
-			static int keyValueHashCode(final KeyValue<?, ?> keyValue) {
-				int result = 0;
-				for (final P<?, ?> entry : keyValue) {
-					result += entry.hashCode();
-				}
-				return result;
-			}
-
 			static void sliceRangeCheck(final int fromIndex, final int toIndex, final int size) {
 				if (fromIndex < 0) {
 					throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);

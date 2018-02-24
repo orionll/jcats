@@ -76,7 +76,7 @@ interface Generator {
 	def static keyValueHashCode() { '''
 		@Override
 		public int hashCode() {
-			return keyValueHashCode(this);
+			return asUniqueContainer().hashCode();
 		}
 	'''}
 
@@ -85,7 +85,7 @@ interface Generator {
 		public «IF isFinal»final «ENDIF»boolean equals(final Object obj) {
 			if (obj == this) {
 				return true;
-			} else if (obj instanceof «wildcardName.replaceAll("<\\?>", "")») {
+			} else if (obj instanceof «wildcardName») {
 				return «type.indexedContainerShortName.firstToLowerCase»sEqual(this, («wildcardName») obj);
 			} else {
 				return false;
@@ -111,8 +111,8 @@ interface Generator {
 		public boolean equals(final Object obj) {
 			if (obj == this) {
 				return true;
-			} else if (obj instanceof KeyValue) {
-				return keyValuesEqual((KeyValue) this, (KeyValue) obj);
+			} else if (obj instanceof KeyValue<?, ?>) {
+				return keyValuesEqual((KeyValue<Object, ?>) this, (KeyValue<Object, ?>) obj);
 			} else {
 				return false;
 			}
