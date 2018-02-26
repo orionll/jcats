@@ -67,25 +67,10 @@ final class OptionGenerator implements ClassGenerator {
 				this.value = value;
 			}
 
-			«IF type == Type.OBJECT»
-				@Override
-				public boolean isEmpty() {
-					return (this.value == null);
-				}
-
-				@Override
-				public boolean isNotEmpty() {
-					return (this.value != null);
-				}
-			«ELSE»
+			«IF type != Type.OBJECT»
 				@Override
 				public boolean isEmpty() {
 					return (this == NONE);
-				}
-
-				@Override
-				public boolean isNotEmpty() {
-					return (this != NONE);
 				}
 
 				@Override
@@ -96,8 +81,8 @@ final class OptionGenerator implements ClassGenerator {
 						return this.value;
 					}
 				}
-			«ENDIF»
 
+			«ENDIF»
 			public «genericName» set(final «type.genericName» newValue) {
 				«IF type == Type.OBJECT»
 					requireNonNull(newValue);

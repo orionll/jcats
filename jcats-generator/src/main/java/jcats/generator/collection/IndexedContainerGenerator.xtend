@@ -113,6 +113,11 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				return this.container.size();
 			}
 
+			@Override
+			public boolean isEmpty() {
+				return this.container.isEmpty();
+			}
+
 			«IF type == Type.OBJECT»
 				@Override
 				public Object[] toArray() {

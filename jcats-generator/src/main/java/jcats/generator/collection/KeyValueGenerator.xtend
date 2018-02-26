@@ -396,6 +396,11 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public boolean isEmpty() {
+				return this.keyValue.isEmpty();
+			}
+
+			@Override
 			public boolean contains(final Object obj) {
 				if (obj instanceof Entry) {
 					final Entry<?, ?> entry = (Entry<?, ?>) obj;

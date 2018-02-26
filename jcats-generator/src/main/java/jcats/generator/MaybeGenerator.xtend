@@ -248,6 +248,11 @@ final class MaybeGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public boolean hasFixedSize() {
+				return this.maybe.hasFixedSize();
+			}
+
+			@Override
 			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
 				this.maybe.forEach(action);
 			}

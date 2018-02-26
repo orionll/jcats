@@ -70,9 +70,6 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			private final int size;
 			private final «type.ordGenericName» ord;
 			private final int balance;
-			«IF type.primitive»
-				private final boolean isEmpty;
-			«ENDIF»
 
 			«IF type == Type.OBJECT»
 				private «shortName»(final «type.genericName» entry, final «genericName» left, final «genericName» right,
@@ -97,7 +94,6 @@ final class SortedUniqueGenerator implements ClassGenerator {
 					this.size = ((left == null) ? 0 : left.size) + ((right == null) ? 0 : right.size) + 1;
 					this.ord = ord;
 					this.balance = balance;
-					this.isEmpty = false;
 				}
 
 				private «shortName»(final «type.ordGenericName» ord) {
@@ -107,27 +103,8 @@ final class SortedUniqueGenerator implements ClassGenerator {
 					this.size = 0;
 					this.ord = ord;
 					this.balance = 0;
-					this.isEmpty = true;
 				}
 			«ENDIF»
-
-			@Override
-			public boolean isEmpty() {
-				«IF type == Type.OBJECT»
-					return (this.entry == null);
-				«ELSE»
-					return this.isEmpty;
-				«ENDIF»
-			}
-
-			@Override
-			public boolean isNotEmpty() {
-				«IF type == Type.OBJECT»
-					return (this.entry != null);
-				«ELSE»
-					return !this.isEmpty;
-				«ENDIF»
-			}
 
 			public «type.ordGenericName» ord() {
 				return this.ord;

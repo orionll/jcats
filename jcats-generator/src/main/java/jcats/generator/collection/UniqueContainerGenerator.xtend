@@ -73,6 +73,11 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public boolean isEmpty() {
+				return this.container.isEmpty();
+			}
+
+			@Override
 			public boolean contains(final Object obj) {
 				«IF type == Type.OBJECT»
 					if (obj == null) {
