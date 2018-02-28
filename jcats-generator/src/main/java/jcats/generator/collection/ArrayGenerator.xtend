@@ -32,6 +32,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import java.util.Arrays;
 		import java.util.Iterator;
 		import java.util.Collection;
+		import java.util.NoSuchElementException;
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
@@ -54,6 +55,11 @@ final class ArrayGenerator implements ClassGenerator {
 			import static «Constants.COLLECTION».«toType.typeName»Array.empty«toType.typeName»Array;
 		«ENDFOR»
 		import static «Constants.F».id;
+		«IF type == Type.OBJECT»
+			import static «Constants.FUNCTION».F.*;
+		«ELSEIF type != Type.INT»
+			import static «Constants.FUNCTION».«type.typeName»«type.typeName»F.*;
+		«ENDIF»
 		import static «Constants.FUNCTION».Int«type.typeName»F.*;
 		import static «Constants.JCATS».Int«type.typeName»P.*;
 		import static «Constants.COMMON».*;
@@ -83,35 +89,49 @@ final class ArrayGenerator implements ClassGenerator {
 			/**
 			 * O(1)
 			 */
-			public «type.genericName» head() {
-				return get(0);
+			public «type.genericName» head() throws NoSuchElementException {
+				try {
+					return get(0);
+				} catch (IndexOutOfBoundsException __) {
+					throw new NoSuchElementException();
+				}
 			}
 
 			/**
 			 * O(1)
 			 */
-			public «type.genericName» last() {
-				return get(this.array.length - 1);
+			public «type.genericName» last() throws NoSuchElementException {
+				try {
+					return get(this.array.length - 1);
+				} catch (IndexOutOfBoundsException __) {
+					throw new NoSuchElementException();
+				}
 			}
 
 			/**
 			 * O(1)
 			 */
 			@Override
-			public «type.genericName» get(final int index) {
+			public «type.genericName» get(final int index) throws IndexOutOfBoundsException {
 				return «type.genericCast»this.array[index];
 			}
 
 			/**
 			 * O(size)
 			 */
-			public «genericName» set(final int index, final «type.genericName» value) {
+			public «genericName» set(final int index, final «type.genericName» value) throws IndexOutOfBoundsException {
 				«IF type == Type.OBJECT»
-					requireNonNull(value);
+					return update(index, always(value));
+				«ELSE»
+					return update(index, «type.typeName.firstToLowerCase»«type.typeName»Always(value));
 				«ENDIF»
-				final «type.javaName»[] result = this.array.clone();
-				result[index] = value;
-				return new «diamondName»(result);
+			}
+
+			/**
+			 * O(size)
+			 */
+			public «genericName» update(final int index, final «type.updateFunction» f) throws IndexOutOfBoundsException {
+				return new «diamondName»(«type.updateArray("this.array", "index")»);
 			}
 
 			/**
@@ -140,7 +160,7 @@ final class ArrayGenerator implements ClassGenerator {
 				return new «diamondName»(result);
 			}
 
-			public «genericName» removeAt(final int index) {
+			public «genericName» removeAt(final int index) throws IndexOutOfBoundsException {
 				if (index < 0 || index >= this.array.length) {
 					throw new IndexOutOfBoundsException(Integer.toString(index));
 				} else {

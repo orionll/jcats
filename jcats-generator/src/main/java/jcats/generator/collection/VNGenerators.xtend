@@ -53,6 +53,11 @@ final class VNGenerators {
 					import static «Constants.P»«arity».p«arity»;
 				«ENDIF»
 				import static «Constants.COMMON».*;
+				«IF type == Type.OBJECT»
+					import static «Constants.FUNCTION».F.*;
+				«ELSE»
+					import static «Constants.FUNCTION».«type.typeName»«type.typeName»F.*;
+				«ENDIF»
 
 				public final class «type.covariantName(baseName)» implements «type.indexedContainerGenericName», Serializable {
 					final «type.genericName» «(1 .. arity).map["a" + it].join(", ")»;
@@ -88,7 +93,7 @@ final class VNGenerators {
 
 					«ENDFOR»
 					@Override
-					public «type.genericName» get(final int index) {
+					public «type.genericName» get(final int index) throws IndexOutOfBoundsException {
 						switch (index) {
 							«FOR i : 1 .. arity»
 								case «i-1»: return this.a«i»;
@@ -103,13 +108,12 @@ final class VNGenerators {
 						}
 
 					«ENDFOR»
-					public «genericName» set(final int index, final «type.genericName» value) {
-						switch (index) {
-							«FOR i : 1 .. arity»
-								case «i-1»: return new «diamondName»(«(1 .. arity).map[if (it == i) '''«IF type == Type.OBJECT»requireNonNull(value)«ELSE»value«ENDIF»''' else "this.a" + it].join(", ")»);
-							«ENDFOR»
-							default: throw new IndexOutOfBoundsException(Integer.toString(index));
-						}
+					public «genericName» set(final int index, final «type.genericName» value) throws IndexOutOfBoundsException {
+						«IF type == Type.OBJECT»
+							return update(index, always(value));
+						«ELSE»
+							return update(index, «type.typeName.firstToLowerCase»«type.typeName»Always(value));
+						«ENDIF»
 					}
 
 					«FOR i : 1 .. arity»
@@ -119,7 +123,7 @@ final class VNGenerators {
 						}
 
 					«ENDFOR»
-					public «genericName» update(final int index, final «type.updateFunction» f) {
+					public «genericName» update(final int index, final «type.updateFunction» f) throws IndexOutOfBoundsException {
 						switch (index) {
 							«FOR i : 1 .. arity»
 								case «i-1»: {

@@ -38,6 +38,7 @@ class SeqGenerator implements ClassGenerator {
 		import java.io.Serializable;
 		import java.util.Collection;
 		import java.util.Iterator;
+		import java.util.NoSuchElementException;
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
@@ -90,33 +91,33 @@ class SeqGenerator implements ClassGenerator {
 			/**
 			 * O(1)
 			 */
-			public abstract «type.genericName» head();
+			public abstract «type.genericName» head() throws NoSuchElementException;
 
 			/**
 			 * O(1)
 			 */
-			public abstract «type.genericName» last();
+			public abstract «type.genericName» last() throws NoSuchElementException;
 
 			/**
 			 * O(1)
 			 */
-			public abstract «genericName» init();
+			public abstract «genericName» init() throws NoSuchElementException;
 
 			/**
 			 * O(1)
 			 */
-			public abstract «genericName» tail();
+			public abstract «genericName» tail() throws NoSuchElementException;
 
 			/**
 			 * O(log(size))
 			 */
 			@Override
-			public abstract «type.genericName» get(final int index);
+			public abstract «type.genericName» get(final int index) throws IndexOutOfBoundsException;
 
 			/**
 			 * O(log(size))
 			 */
-			public final «genericName» set(final int index, final «type.genericName» value) {
+			public final «genericName» set(final int index, final «type.genericName» value) throws IndexOutOfBoundsException {
 				«IF type == Type.OBJECT»
 					return update(index, always(value));
 				«ELSE»
@@ -127,7 +128,7 @@ class SeqGenerator implements ClassGenerator {
 			/**
 			 * O(log(size))
 			 */
-			public abstract «genericName» update(final int index, final «type.updateFunction» f);
+			public abstract «genericName» update(final int index, final «type.updateFunction» f) throws IndexOutOfBoundsException;
 
 			public abstract «genericName» take(final int n);
 
@@ -145,7 +146,7 @@ class SeqGenerator implements ClassGenerator {
 			 */
 			public abstract «genericName» append(final «type.genericName» value);
 
-			public final «genericName» removeAt(final int index) {
+			public final «genericName» removeAt(final int index) throws IndexOutOfBoundsException {
 				final int size = size();
 				if (index < 0 || index >= size) {
 					throw new IndexOutOfBoundsException(Integer.toString(index));
