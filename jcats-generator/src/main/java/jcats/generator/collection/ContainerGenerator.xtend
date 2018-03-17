@@ -78,63 +78,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 				return false;
 			}
 
-			default IntOption indexOf(final «type.genericName» value) {
-				«IF type == Type.OBJECT»
-					requireNonNull(value);
-				«ENDIF»
-				«IF type == Type.OBJECT»
-					return indexWhere(value::equals);
-				«ELSE»
-					return indexWhere((final «type.javaName» a) -> a == value);
-				«ENDIF»
-			}
-
-			default IntOption indexWhere(final «type.boolFName» predicate) {
-				requireNonNull(predicate);
-				int index = 0;
-				«IF type.javaUnboxedType»
-					final «type.iteratorGenericName» iterator = iterator();
-					while (iterator.hasNext()) {
-						if (predicate.apply(iterator.«type.iteratorNext»())) {
-							return intSome(index);
-						}
-						index++;
-					}
-				«ELSE»
-					for (final «type.genericName» value : this) {
-						if (predicate.apply(value)) {
-							return intSome(index);
-						}
-						index++;
-					}
-				«ENDIF»
-				return intNone();
-			}
-
-			default IntOption lastIndexOf(final «type.genericName» value) {
-				«IF type == Type.OBJECT»
-					requireNonNull(value);
-				«ENDIF»
-				«IF type == Type.OBJECT»
-					return lastIndexWhere(value::equals);
-				«ELSE»
-					return lastIndexWhere((final «type.javaName» a) -> a == value);
-				«ENDIF»
-			}
-
-			default IntOption lastIndexWhere(final «type.boolFName» predicate) {
-				requireNonNull(predicate);
-				int index = size() - 1;
-				final «type.iteratorGenericName» iterator = reverseIterator();
-				while (iterator.hasNext()) {
-					if (predicate.apply(iterator.«type.iteratorNext»())) {
-						return intSome(index);
-					}
-					index--;
-				}
-				return intNone();
-			}
-
 			default «type.optionGenericName» firstMatch(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
 				«IF type.javaUnboxedType»

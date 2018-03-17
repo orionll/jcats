@@ -37,12 +37,14 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		«ENDIF»
 
 		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
 		«IF type == Type.OBJECT»
 			import static «Constants.JCATS».IntOption.*;
 		«ENDIF»
-		«IF type.javaUnboxedType»
+		import static «Constants.JCATS».IntOption.*;
+		«IF type != Type.INT»
 			import static «Constants.JCATS».«type.optionShortName».*;
 		«ENDIF»
 		«IF type == Type.OBJECT»
@@ -58,6 +60,56 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				} else {
 					return new «type.diamondName("IndexedContainerIterator")»(this);
 				}
+			}
+
+			default IntOption indexOf(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
+				«IF type == Type.OBJECT»
+					return indexWhere(value::equals);
+				«ELSE»
+					return indexWhere((final «type.javaName» a) -> a == value);
+				«ENDIF»
+			}
+
+			default IntOption indexWhere(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				«IF type.primitive»
+					final «type.typeName»IndexFinder finder = new «type.typeName»IndexFinder(predicate);
+				«ELSE»
+					final IndexFinder<A> finder = new IndexFinder<>(predicate);
+				«ENDIF»
+				foreachUntil(finder);
+				if (finder.found) {
+					return intSome(finder.index);
+				} else {
+					return intNone();
+				}
+			}
+
+			default IntOption lastIndexOf(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
+				«IF type == Type.OBJECT»
+					return lastIndexWhere(value::equals);
+				«ELSE»
+					return lastIndexWhere((final «type.javaName» a) -> a == value);
+				«ENDIF»
+			}
+
+			default IntOption lastIndexWhere(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				int index = size() - 1;
+				final «type.iteratorGenericName» iterator = reverseIterator();
+				while (iterator.hasNext()) {
+					if (predicate.apply(iterator.«type.iteratorNext»())) {
+						return intSome(index);
+					}
+					index--;
+				}
+				return intNone();
 			}
 
 			@Override
@@ -196,6 +248,52 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 					} else {
 						return false;
 					}
+				}
+			}
+		«ENDIF»
+
+		«IF type == Type.OBJECT»
+			final class IndexFinder<A> implements BooleanF<A> {
+				int index;
+				boolean found;
+				final BooleanF<A> predicate;
+			
+				IndexFinder(final BooleanF<A> predicate) {
+					this.predicate = predicate;
+				}
+
+				@Override
+				public boolean apply(final A value) {
+					if (this.predicate.apply(value)) {
+						this.found = true;
+						return false;
+					}
+					if (++this.index < 0) {
+						throw new IndexOutOfBoundsException("Integer overflow");
+					}
+					return true;
+				}
+			}
+		«ELSE»
+			final class «type.typeName»IndexFinder implements «type.typeName»BooleanF {
+				int index;
+				boolean found;
+				final «type.typeName»BooleanF predicate;
+			
+				«type.typeName»IndexFinder(final «type.typeName»BooleanF predicate) {
+					this.predicate = predicate;
+				}
+
+				@Override
+				public boolean apply(final «type.javaName» value) {
+					if (this.predicate.apply(value)) {
+						this.found = true;
+						return false;
+					}
+					if (++this.index < 0) {
+						throw new IndexOutOfBoundsException("Integer overflow");
+					}
+					return true;
 				}
 			}
 		«ENDIF»

@@ -486,25 +486,6 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public IntOption indexOf(final «type.genericName» value) {
-				«IF type == Type.OBJECT»
-					requireNonNull(value);
-				«ENDIF»
-				int index = 0;
-				for (final «type.javaName» a : this.array) {
-					«IF type == Type.OBJECT»
-						if (a.equals(value)) {
-					«ELSE»
-						if (a == value) {
-					«ENDIF»
-						return intSome(index);
-					}
-					index++;
-				}
-				return intNone();
-			}
-
-			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
 				for (final «type.javaName» value : this.array) {
