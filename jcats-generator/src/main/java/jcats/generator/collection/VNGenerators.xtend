@@ -140,23 +140,38 @@ final class VNGenerators {
 							final B b = f.apply(«(1 .. arity).map["this.a" + it].join(", ")»);
 							return requireNonNull(b);
 						}
+						«IF arity == 2»
 
+							«FOR to : Type.primitives»
+								public «to.genericName» matchTo«to.typeName»(final «to.typeName»F2<A, A> f) {
+									return f.apply(this.a1, this.a2);
+								}
+
+							«ENDFOR»
+						«ENDIF»
 						public <B> V«arity»<B> map(final F<A, B> f) {
 							return v«arity»(«(1 .. arity).map["f.apply(this.a" + it + ")"].join(", ")»);
 						}
 					«ELSE»
 						«IF arity == 2»
-							public <A> A match (final «type.typeName»«type.typeName»ObjectF2<A> f) {
-								final A a = f.apply(a1, a2);
+							public <A> A match(final «type.typeName»«type.typeName»ObjectF2<A> f) {
+								final A a = f.apply(this.a1, this.a2);
 								return requireNonNull(a);
 							}
+
+							«FOR to : Type.primitives»
+								public «to.genericName» matchTo«to.typeName»(final «type.typeName»«type.typeName»«to.typeName»F2 f) {
+									return f.apply(this.a1, this.a2);
+								}
+
+							«ENDFOR»
 						«ELSE»
 							public <A> A match(final F«arity»<«(1 .. arity).map[type.boxedName + ", "].join»A> f) {
 								final A a = f.apply(«(1 .. arity).map["this.a" + it].join(", ")»);
 								return requireNonNull(a);
 							}
-						«ENDIF»
 
+						«ENDIF»
 						public <A> V«arity»<A> map(final «type.typeName»ObjectF<A> f) {
 							return v«arity»(«(1 .. arity).map["f.apply(a" + it + ")"].join(", ")»);
 						}
