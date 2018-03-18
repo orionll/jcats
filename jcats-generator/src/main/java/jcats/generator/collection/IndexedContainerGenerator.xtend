@@ -29,6 +29,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		«ENDIF»
 		import java.util.Iterator;
 		import java.util.List;
+		import java.util.NoSuchElementException;
 		import java.util.RandomAccess;
 		import java.util.Spliterator;
 		import java.util.function.Consumer;
@@ -59,6 +60,15 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 					return «type.emptyIterator»;
 				} else {
 					return new «type.diamondName("IndexedContainerIterator")»(this);
+				}
+			}
+
+			@Override
+			default «type.iteratorGenericName» reverseIterator() {
+				if (isEmpty()) {
+					return «type.emptyIterator»;
+				} else {
+					return new «type.diamondName("IndexedContainerReverseIterator")»(this);
 				}
 			}
 
@@ -126,7 +136,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
 		}
-		
+
 		final class «type.iteratorGenericName(baseName)» implements «type.iteratorGenericName» {
 			private int i;
 			private final «genericName» container;
@@ -136,15 +146,47 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				this.container = container;
 				this.size = container.size();
 			}
-		
+
 			@Override
 			public boolean hasNext() {
 				return (this.i < this.size);
 			}
-		
+
 			@Override
 			public «type.iteratorReturnType» «type.iteratorNext»() {
-				return this.container.get(this.i++);
+				try {
+					final «type.genericName» next = this.container.get(this.i);
+					this.i++;
+					return next;
+				} catch (final IndexOutOfBoundsException __) {
+					throw new NoSuchElementException();
+				}
+			}
+		}
+
+		final class «type.genericName(baseName + "ReverseIterator")» implements «type.iteratorGenericName» {
+			private int i;
+			private final «genericName» container;
+
+			«type.shortName("IndexedContainerReverseIterator")»(final «genericName» container) {
+				this.container = container;
+				this.i = container.size() - 1;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (this.i >= 0);
+			}
+
+			@Override
+			public «type.iteratorReturnType» «type.iteratorNext»() {
+				try {
+					final «type.genericName» next = this.container.get(this.i);
+					this.i--;
+					return next;
+				} catch (final IndexOutOfBoundsException __) {
+					throw new NoSuchElementException();
+				}
 			}
 		}
 

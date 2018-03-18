@@ -227,12 +227,18 @@ final class CommonGenerator implements ClassGenerator {
 
 				@Override
 				public boolean hasNext() {
-					return (i < array.length);
+					return (this.i < this.array.length);
 				}
 
 				@Override
 				public «type.genericJavaUnboxedName» «type.iteratorNext»() {
-					return «type.genericCast»array[i++];
+					try {
+						final «type.genericName» next = «type.genericCast»this.array[this.i];
+						this.i++;
+						return next;
+					} catch (final IndexOutOfBoundsException __) {
+						throw new NoSuchElementException();
+					}
 				}
 			}
 
@@ -250,12 +256,18 @@ final class CommonGenerator implements ClassGenerator {
 
 				@Override
 				public boolean hasNext() {
-					return (i >= 0);
+					return (this.i >= 0);
 				}
 
 				@Override
 				public «type.genericJavaUnboxedName» «type.iteratorNext»() {
-					return «type.genericCast»array[i--];
+					try {
+						final «type.genericName» next = «type.genericCast»this.array[this.i];
+						this.i--;
+						return next;
+					} catch (final IndexOutOfBoundsException __) {
+						throw new NoSuchElementException();
+					}
 				}
 			}
 

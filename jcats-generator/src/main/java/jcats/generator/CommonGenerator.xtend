@@ -35,24 +35,24 @@ final class CommonGenerator implements ClassGenerator {
 
 		«ENDFOR»
 		final class SingletonIterator<A> implements Iterator<A> {
-			private A a;
+			private A value;
 
-			SingletonIterator(final A a) {
-				this.a = a;
+			SingletonIterator(final A value) {
+				this.value = value;
 			}
 
 			@Override
 			public boolean hasNext() {
-				return (a != null);
+				return (this.value != null);
 			}
 
 			@Override
 			public A next() {
-				if (a == null) {
+				if (this.value == null) {
 					throw new NoSuchElementException();
 				} else {
-					final A n = a;
-					a = null;
+					final A n = this.value;
+					this.value = null;
 					return n;
 				}
 			}
@@ -69,14 +69,14 @@ final class CommonGenerator implements ClassGenerator {
 
 				@Override
 				public boolean hasNext() {
-					return hasNext;
+					return this.hasNext;
 				}
 
 				@Override
 				public «type.iteratorReturnType» «type.iteratorNext»() {
-					if (hasNext) {
-						hasNext = false;
-						return value;
+					if (this.hasNext) {
+						this.hasNext = false;
+						return this.value;
 					} else {
 						throw new NoSuchElementException();
 					}
