@@ -189,7 +189,20 @@ class PGenerator implements ClassGenerator {
 					return requireNonNull(a);
 				}
 			«ENDIF»
+			«FOR to : Type.primitives»
+				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+					public «to.genericName» matchTo«to.typeName»(final «to.typeName»F2<A1, A2>  f) {
+				«ELSEIF type1 == Type.OBJECT && type2 != Type.OBJECT»
+					public «to.genericName» matchTo«to.typeName»(final Object«type2.typeName»«to.typeName»F2<A>  f) {
+				«ELSEIF type1 != Type.OBJECT && type2 == Type.OBJECT»
+					public «to.genericName» matchTo«to.typeName»(final «type1.typeName»Object«to.typeName»F2<A>  f) {
+				«ELSE»
+					public «to.genericName» matchTo«to.typeName»(final «type1.typeName»«type2.typeName»«to.typeName»F2  f) {
+				«ENDIF»
+					return f.apply(this.a1, this.a2);
+				}
 
+			«ENDFOR»
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 				public <B> P<B, A2> map1(final F<A1, B> f) {
 			«ELSEIF type2 == Type.OBJECT»
