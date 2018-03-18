@@ -157,6 +157,22 @@ final class OptionGenerator implements ClassGenerator {
 				}
 			}
 
+			«FOR to : Type.primitives»
+				«IF type == Type.OBJECT»
+					public «to.genericName» matchTo«to.typeName»(final «to.typeName»F<A> ifNotEmpty, final «to.typeName»F0 ifEmpty) {
+				«ELSE»
+					public «to.genericName» matchTo«to.typeName»(final «type.typeName»«to.typeName»F ifNotEmpty, final «to.typeName»F0 ifEmpty) {
+				«ENDIF»
+					requireNonNull(ifNotEmpty);
+					requireNonNull(ifEmpty);
+					if (isEmpty()) {
+						return ifEmpty.apply();
+					} else {
+						return ifNotEmpty.apply(this.value);
+					}
+				}
+
+			«ENDFOR»
 			«IF type == Type.OBJECT»
 				public <B> Option<B> map(final F<A, B> f) {
 			«ELSE»

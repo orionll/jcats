@@ -131,21 +131,21 @@ final class EitherGenerator implements ClassGenerator {
 
 			public boolean isLeft() {
 				«IF leftType == Type.OBJECT»
-					return (left != null);
+					return (this.left != null);
 				«ELSEIF rightType == Type.OBJECT»
-					return (right == null);
+					return (this.right == null);
 				«ELSE»
-					return isLeft;
+					return this.isLeft;
 				«ENDIF»
 			}
 
 			public boolean isRight() {
 				«IF rightType == Type.OBJECT»
-					return (right != null);
+					return (this.right != null);
 				«ELSEIF leftType == Type.OBJECT»
-					return (left == null);
+					return (this.left == null);
 				«ELSE»
-					return !isLeft;
+					return !this.isLeft;
 				«ENDIF»
 			}
 
@@ -153,7 +153,7 @@ final class EitherGenerator implements ClassGenerator {
 				@Override
 				public «rightType.javaName» get() {
 					if (isRight()) {
-						return right;
+						return this.right;
 					} else {
 						throw new NoSuchElementException();
 					}
@@ -167,7 +167,7 @@ final class EitherGenerator implements ClassGenerator {
 			«ENDIF»
 			public «leftTypeGenericName» getLeft() throws NoSuchElementException {
 				if (isLeft()) {
-					return left;
+					return this.left;
 				} else {
 					throw new NoSuchElementException();
 				}
@@ -177,7 +177,7 @@ final class EitherGenerator implements ClassGenerator {
 				@Override
 				public «rightType.genericBoxedName» getOrNull() {
 					if (isRight()) {
-						return right;
+						return this.right;
 					} else {
 						return null;
 					}
@@ -186,7 +186,7 @@ final class EitherGenerator implements ClassGenerator {
 			«ENDIF»
 			public «leftTypeGenericBoxedName» getLeftOrNull() {
 				if (isLeft()) {
-					return left;
+					return this.left;
 				} else {
 					return null;
 				}
@@ -196,14 +196,14 @@ final class EitherGenerator implements ClassGenerator {
 				«IF rightType == Type.OBJECT»
 					requireNonNull(other);
 				«ENDIF»
-				return isRight() ? right : other;
+				return isRight() ? this.right : other;
 			}
 
 			public «leftTypeGenericName» getLeftOr(final «leftTypeGenericName» other) {
 				«IF leftType == Type.OBJECT»
 					requireNonNull(other);
 				«ENDIF»
-				return isLeft() ? left : other;
+				return isLeft() ? this.left : other;
 			}
 
 			«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
@@ -218,17 +218,37 @@ final class EitherGenerator implements ClassGenerator {
 				requireNonNull(ifLeft);
 				requireNonNull(ifRight);
 				if (isLeft()) {
-					return ifLeft.apply(left);
+					return ifLeft.apply(this.left);
 				} else {
-					return ifRight.apply(right);
+					return ifRight.apply(this.right);
 				}
 			}
 
+			«FOR to : Type.primitives»
+				«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
+					public «to.genericName» matchTo«to.typeName»(final «to.typeName»F<X> ifLeft, final «to.typeName»F<A> ifRight) {
+				«ELSEIF leftType != Type.OBJECT && rightType == Type.OBJECT»
+					public «to.genericName» matchTo«to.typeName»(final «leftType.typeName»«to.typeName»F ifLeft, final «to.typeName»F<A> ifRight) {
+				«ELSEIF leftType == Type.OBJECT && rightType != Type.OBJECT»
+					public «to.genericName» matchTo«to.typeName»(final «to.typeName»F<X> ifLeft, final «rightType.typeName»«to.typeName»F ifRight) {
+				«ELSE»
+					public «to.genericName» matchTo«to.typeName»(final «leftType.typeName»«to.typeName»F ifLeft, final «rightType.typeName»«to.typeName»F ifRight) {
+				«ENDIF»
+					requireNonNull(ifLeft);
+					requireNonNull(ifRight);
+					if (isLeft()) {
+						return ifLeft.apply(this.left);
+					} else {
+						return ifRight.apply(this.right);
+					}
+				}
+
+			«ENDFOR»
 			«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
 				public <B> Either<X, B> map(final F<A, B> f) {
 					requireNonNull(f);
 					if (isRight()) {
-						final B newRight = requireNonNull(f.apply(right));
+						final B newRight = requireNonNull(f.apply(this.right));
 						return new Either<>(null, newRight);
 					} else {
 						return (Either)this;
@@ -238,7 +258,7 @@ final class EitherGenerator implements ClassGenerator {
 				public <B> «leftType.typeName»ObjectEither<B> map(final F<A, B> f) {
 					requireNonNull(f);
 					if (isRight()) {
-						final B newRight = requireNonNull(f.apply(right));
+						final B newRight = requireNonNull(f.apply(this.right));
 						return new «leftType.typeName»ObjectEither<>(«leftType.defaultValue», newRight);
 					} else {
 						return («leftType.typeName»ObjectEither)this;
@@ -248,20 +268,20 @@ final class EitherGenerator implements ClassGenerator {
 				public <A> Either<X, A> map(final «rightType.typeName»ObjectF<A> f) {
 					requireNonNull(f);
 					if (isRight()) {
-						final A newRight = requireNonNull(f.apply(right));
+						final A newRight = requireNonNull(f.apply(this.right));
 						return new Either<>(null, newRight);
 					} else {
-						return new Either<>(left, null);
+						return new Either<>(this.left, null);
 					}
 				}
 			«ELSE»
 				public <A> «leftType.typeName»ObjectEither<A> map(final «rightType.typeName»ObjectF<A> f) {
 					requireNonNull(f);
 					if (isRight()) {
-						final A newRight = requireNonNull(f.apply(right));
+						final A newRight = requireNonNull(f.apply(this.right));
 						return new «leftType.typeName»ObjectEither<>(«leftType.defaultValue», newRight);
 					} else {
-						return new «leftType.typeName»ObjectEither<>(left, null);
+						return new «leftType.typeName»ObjectEither<>(this.left, null);
 					}
 				}
 			«ENDIF»
@@ -270,7 +290,7 @@ final class EitherGenerator implements ClassGenerator {
 				public <Y> Either<Y, A> mapLeft(final F<X, Y> f) {
 					requireNonNull(f);
 					if (isLeft()) {
-						final Y newLeft = requireNonNull(f.apply(left));
+						final Y newLeft = requireNonNull(f.apply(this.left));
 						return new Either<>(newLeft, null);
 					} else {
 						return (Either)this;
@@ -280,30 +300,30 @@ final class EitherGenerator implements ClassGenerator {
 				public <X> Either<X, A> mapLeft(final «leftType.typeName»ObjectF<X> f) {
 					requireNonNull(f);
 					if (isLeft()) {
-						final X newLeft = requireNonNull(f.apply(left));
+						final X newLeft = requireNonNull(f.apply(this.left));
 						return new Either<>(newLeft, null);
 					} else {
-						return new Either<>(null, right);
+						return new Either<>(null, this.right);
 					}
 				}
 			«ELSEIF leftType == Type.OBJECT && rightType != Type.OBJECT»
 				public <Y> Object«rightType.typeName»Either<Y> mapLeft(final F<X, Y> f) {
 					requireNonNull(f);
 					if (isLeft()) {
-						final Y newLeft = requireNonNull(f.apply(left));
+						final Y newLeft = requireNonNull(f.apply(this.left));
 						return new Object«rightType.typeName»Either<>(newLeft, «rightType.defaultValue»);
 					} else {
-						return new Object«rightType.typeName»Either<>(null, right);
+						return new Object«rightType.typeName»Either<>(null, this.right);
 					}
 				}
 			«ELSE»
 				public <X> Object«rightType.typeName»Either<X> mapLeft(final «leftType.typeName»ObjectF<X> f) {
 					requireNonNull(f);
 					if (isLeft()) {
-						final X newLeft = requireNonNull(f.apply(left));
+						final X newLeft = requireNonNull(f.apply(this.left));
 						return new Object«rightType.typeName»Either<>(newLeft, «rightType.defaultValue»);
 					} else {
-						return new Object«rightType.typeName»Either<>(null, right);
+						return new Object«rightType.typeName»Either<>(null, this.right);
 					}
 				}
 			«ENDIF»
@@ -312,7 +332,7 @@ final class EitherGenerator implements ClassGenerator {
 				public <B> Either<X, B> flatMap(final F<A, Either<X, B>> f) {
 					requireNonNull(f);
 					if (isRight()) {
-						return requireNonNull(f.apply(right));
+						return requireNonNull(f.apply(this.right));
 					} else {
 						return (Either)this;
 					}
@@ -321,7 +341,7 @@ final class EitherGenerator implements ClassGenerator {
 				public <B> «leftType.typeName»ObjectEither<B> flatMap(final F<A, «leftType.typeName»ObjectEither<B>> f) {
 					requireNonNull(f);
 					if (isRight()) {
-						return requireNonNull(f.apply(right));
+						return requireNonNull(f.apply(this.right));
 					} else {
 						return («leftType.typeName»ObjectEither)this;
 					}
@@ -330,18 +350,18 @@ final class EitherGenerator implements ClassGenerator {
 				public <A> Either<X, A> flatMap(final «rightType.typeName»ObjectF<Either<X, A>> f) {
 					requireNonNull(f);
 					if (isRight()) {
-						return requireNonNull(f.apply(right));
+						return requireNonNull(f.apply(this.right));
 					} else {
-						return new Either<>(left, null);
+						return new Either<>(this.left, null);
 					}
 				}
 			«ELSE»
 				public <A> «leftType.typeName»ObjectEither<A> flatMap(final «rightType.typeName»ObjectF<«leftType.typeName»ObjectEither<A>> f) {
 					requireNonNull(f);
 					if (isRight()) {
-						return requireNonNull(f.apply(right));
+						return requireNonNull(f.apply(this.right));
 					} else {
-						return new «leftType.typeName»ObjectEither<>(left, null);
+						return new «leftType.typeName»ObjectEither<>(this.left, null);
 					}
 				}
 			«ENDIF»
@@ -350,7 +370,7 @@ final class EitherGenerator implements ClassGenerator {
 				public <Y> Either<Y, A> flatMapLeft(final F<X, Either<Y, A>> f) {
 					requireNonNull(f);
 					if (isLeft()) {
-						return requireNonNull(f.apply(left));
+						return requireNonNull(f.apply(this.left));
 					} else {
 						return (Either)this;
 					}
@@ -359,16 +379,16 @@ final class EitherGenerator implements ClassGenerator {
 				public <X> Either<X, A> flatMapLeft(final «leftType.typeName»ObjectF<Either<X, A>> f) {
 					requireNonNull(f);
 					if (isLeft()) {
-						return requireNonNull(f.apply(left));
+						return requireNonNull(f.apply(this.left));
 					} else {
-						return new Either<>(null, right);
+						return new Either<>(null, this.right);
 					}
 				}
 			«ELSEIF leftType == Type.OBJECT && rightType != Type.OBJECT»
 				public <Y> Object«rightType.typeName»Either<Y> flatMapLeft(final F<X, Object«rightType.typeName»Either<Y>> f) {
 					requireNonNull(f);
 					if (isLeft()) {
-						return requireNonNull(f.apply(left));
+						return requireNonNull(f.apply(this.left));
 					} else {
 						return (Object«rightType.typeName»Either)this;
 					}
@@ -377,9 +397,9 @@ final class EitherGenerator implements ClassGenerator {
 				public <X> Object«rightType.typeName»Either<X> flatMapLeft(final «leftType.typeName»ObjectF<Object«rightType.typeName»Either<X>> f) {
 					requireNonNull(f);
 					if (isLeft()) {
-						return requireNonNull(f.apply(left));
+						return requireNonNull(f.apply(this.left));
 					} else {
-						return new Object«rightType.typeName»Either<>(null, right);
+						return new Object«rightType.typeName»Either<>(null, this.right);
 					}
 				}
 			«ENDIF»
@@ -387,40 +407,40 @@ final class EitherGenerator implements ClassGenerator {
 			«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
 				public <Y, B> Either<Y, B> biMap(final F<X, Y> f, final F<A, B> g) {
 					if (isLeft()) {
-						final Y newLeft = requireNonNull(f.apply(left));
+						final Y newLeft = requireNonNull(f.apply(this.left));
 						return new Either<>(newLeft, null);
 					} else {
-						final B newRight = requireNonNull(g.apply(right));
+						final B newRight = requireNonNull(g.apply(this.right));
 						return new Either<>(null, newRight);
 					}
 				}
 			«ELSEIF leftType != Type.OBJECT && rightType == Type.OBJECT»
 				public <X, B> Either<X, B> biMap(final «leftType.typeName»ObjectF<X> f, final F<A, B> g) {
 					if (isLeft()) {
-						final X newLeft = requireNonNull(f.apply(left));
+						final X newLeft = requireNonNull(f.apply(this.left));
 						return new Either<>(newLeft, null);
 					} else {
-						final B newRight = requireNonNull(g.apply(right));
+						final B newRight = requireNonNull(g.apply(this.right));
 						return new Either<>(null, newRight);
 					}
 				}
 			«ELSEIF leftType == Type.OBJECT && rightType != Type.OBJECT»
 				public <Y, A> Either<Y, A> biMap(final F<X, Y> f, final «rightType.typeName»ObjectF<A> g) {
 					if (isLeft()) {
-						final Y newLeft = requireNonNull(f.apply(left));
+						final Y newLeft = requireNonNull(f.apply(this.left));
 						return new Either<>(newLeft, null);
 					} else {
-						final A newRight = requireNonNull(g.apply(right));
+						final A newRight = requireNonNull(g.apply(this.right));
 						return new Either<>(null, newRight);
 					}
 				}
 			«ELSE»
 				public <X, A> Either<X, A> biMap(final «leftType.typeName»ObjectF<X> f, final «rightType.typeName»ObjectF<A> g) {
 					if (isLeft()) {
-						final X newLeft = requireNonNull(f.apply(left));
+						final X newLeft = requireNonNull(f.apply(this.left));
 						return new Either<>(newLeft, null);
 					} else {
-						final A newRight = requireNonNull(g.apply(right));
+						final A newRight = requireNonNull(g.apply(this.right));
 						return new Either<>(null, newRight);
 					}
 				}
@@ -428,39 +448,39 @@ final class EitherGenerator implements ClassGenerator {
 
 			«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
 				public Either<A, X> reverse() {
-					return new Either<>(right, left);
+					return new Either<>(this.right, this.left);
 				}
 			«ELSEIF leftType == Type.OBJECT && rightType != Type.OBJECT»
 				public «rightType.typeName»«leftType.typeName»Either<X> reverse() {
-					return new «rightType.typeName»«leftType.typeName»Either<>(right, left);
+					return new «rightType.typeName»«leftType.typeName»Either<>(this.right, this.left);
 				}
 			«ELSEIF leftType != Type.OBJECT && rightType == Type.OBJECT»
 				public «rightType.typeName»«leftType.typeName»Either<A> reverse() {
-					return new «rightType.typeName»«leftType.typeName»Either<>(right, left);
+					return new «rightType.typeName»«leftType.typeName»Either<>(this.right, this.left);
 				}
 			«ELSE»
 				public «rightType.typeName»«leftType.typeName»Either reverse() {
-					return new «rightType.typeName»«leftType.typeName»Either(right, left, !isLeft);
+					return new «rightType.typeName»«leftType.typeName»Either(this.right, this.left, !this.isLeft);
 				}
 			«ENDIF»
 
 			public «rightType.optionGenericName» toOption() {
-				return isRight() ? «rightType.someName»(right) : «rightType.noneName»();
+				return isRight() ? «rightType.someName»(this.right) : «rightType.noneName»();
 			}
 
 			«IF leftType != Type.OBJECT || rightType != Type.OBJECT»
 				public Either<«leftTypeGenericBoxedName», «rightType.genericBoxedName»> toEither() {
 					if (isLeft()) {
-						return left(left);
+						return left(this.left);
 					} else {
-						return right(right);
+						return right(this.right);
 					}
 				}
 
 			«ENDIF»
 			@Override
 			public int hashCode() {
-				return isRight() ? «IF rightType == Type.OBJECT»right.hashCode()«ELSE»«rightType.boxedName».hashCode(right)«ENDIF» : ~«IF leftType == Type.OBJECT»left.hashCode()«ELSE»«leftType.boxedName».hashCode(left)«ENDIF»;
+				return isRight() ? «IF rightType == Type.OBJECT»this.right.hashCode()«ELSE»«rightType.boxedName».hashCode(this.right)«ENDIF» : ~«IF leftType == Type.OBJECT»this.left.hashCode()«ELSE»«leftType.boxedName».hashCode(this.left)«ENDIF»;
 			}
 
 			@Override
@@ -470,13 +490,13 @@ final class EitherGenerator implements ClassGenerator {
 				} else if (obj instanceof «shortName») {
 					final «wildcardName» either = («wildcardName») obj;
 					«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
-						return Objects.equals(left, either.left) && Objects.equals(right, either.right);
+						return Objects.equals(this.left, either.left) && Objects.equals(this.right, either.right);
 					«ELSEIF leftType == Type.OBJECT && rightType != Type.OBJECT»
-						return Objects.equals(left, either.left) && right == either.right;
+						return Objects.equals(this.left, either.left) && this.right == either.right;
 					«ELSEIF leftType != Type.OBJECT && rightType == Type.OBJECT»
-						return left == either.left && Objects.equals(right, either.right);
+						return this.left == either.left && Objects.equals(this.right, either.right);
 					«ELSE»
-						return left == either.left && right == either.right && isLeft == either.isLeft;
+						return this.left == either.left && this.right == either.right && this.isLeft == either.isLeft;
 					«ENDIF»
 				} else {
 					return false;
@@ -485,7 +505,7 @@ final class EitherGenerator implements ClassGenerator {
 
 			@Override
 			public String toString() {
-				return isLeft() ? "«shortName.replace("Either", "")»Left(" + left + ")" : "«shortName.replace("Either", "")»Right(" + right + ")";
+				return isLeft() ? "«shortName.replace("Either", "")»Left(" + this.left + ")" : "«shortName.replace("Either", "")»Right(" + this.right + ")";
 			}
 
 			public static «paramGenericName» «leftName»(final «leftTypeGenericName» left) {
