@@ -339,47 +339,69 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
-			default «type.optionGenericName» max(final «type.ordGenericName» ord) {
-				return reduceLeft(ord::max);
-			}
+			«IF type == Type.OBJECT»
+				default «type.optionGenericName» max(final «type.ordGenericName» ord) {
+					return reduceLeft(ord::max);
+				}
 
-			default «type.optionGenericName» min(final «type.ordGenericName» ord) {
-				return reduceLeft(ord::min);
-			}
+				default «type.optionGenericName» min(final «type.ordGenericName» ord) {
+					return reduceLeft(ord::min);
+				}
+			«ELSE»
+				default «type.optionGenericName» max() {
+					return maxByOrd(«type.ordShortName.firstToLowerCase»());
+				}
+
+				default «type.optionGenericName» min() {
+					return minByOrd(«type.ordShortName.firstToLowerCase»());
+				}
+
+				default «type.optionGenericName» maxByOrd(final «type.ordGenericName» ord) {
+					return reduceLeft(ord::max);
+				}
+
+				default «type.optionGenericName» minByOrd(final «type.ordGenericName» ord) {
+					return reduceLeft(ord::min);
+				}
+			«ENDIF»
 
 			«IF type == Type.OBJECT»
 				default <B extends Comparable<B>> «type.optionGenericName» maxBy(final F<A, B> f) {
+					return max(by(f));
 			«ELSE»
 				default <A extends Comparable<A>> «type.optionGenericName» maxBy(final «type.typeName»ObjectF<A> f) {
+					return maxByOrd(by(f));
 			«ENDIF»
-				return max(by(f));
 			}
-			
+
 			«FOR to : Type.primitives»
 				«IF type == Type.OBJECT»
 					default «type.optionGenericName» maxBy«to.typeName»(final «to.typeName»F<A> f) {
+						return max(by«to.typeName»(f));
 				«ELSE»
 					default «type.optionGenericName» maxBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
+						return maxByOrd(by«to.typeName»(f));
 				«ENDIF»
-					return max(by«to.typeName»(f));
 				}
 
 			«ENDFOR»
 			«IF type == Type.OBJECT»
 				default <B extends Comparable<B>> «type.optionGenericName» minBy(final F<A, B> f) {
+					return min(by(f));
 			«ELSE»
 				default <A extends Comparable<A>> «type.optionGenericName» minBy(final «type.typeName»ObjectF<A> f) {
+					return minByOrd(by(f));
 			«ENDIF»
-				return min(by(f));
 			}
 			
 			«FOR to : Type.primitives»
 				«IF type == Type.OBJECT»
 					default «type.optionGenericName» minBy«to.typeName»(final «to.typeName»F<A> f) {
+						return min(by«to.typeName»(f));
 				«ELSE»
 					default «type.optionGenericName» minBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
+						return minByOrd(by«to.typeName»(f));
 				«ENDIF»
-					return min(by«to.typeName»(f));
 				}
 
 			«ENDFOR»
