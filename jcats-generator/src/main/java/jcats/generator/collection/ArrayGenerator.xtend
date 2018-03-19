@@ -47,7 +47,6 @@ final class ArrayGenerator implements ClassGenerator {
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
 
-		import static java.lang.Math.min;
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.ARRAY».emptyArray;
@@ -754,7 +753,7 @@ final class ArrayGenerator implements ClassGenerator {
 					if (isEmpty() || that.isEmpty()) {
 						return emptyArray();
 					} else {
-						final Object[] result = new Object[min(this.array.length, that.size())];
+						final Object[] result = new Object[Math.min(this.array.length, that.size())];
 						final Iterator<B> iterator = that.iterator();
 						for (int i = 0; i < result.length; i++) {
 							result[i] = requireNonNull(f.apply((A) this.array[i], iterator.next()));
@@ -784,7 +783,7 @@ final class ArrayGenerator implements ClassGenerator {
 					if (isEmpty() || that.isEmpty()) {
 						return emptyArray();
 					} else {
-						final Object[] result = new Object[min(this.array.length, that.size())];
+						final Object[] result = new Object[Math.min(this.array.length, that.size())];
 						final Iterator<A> iterator = that.iterator();
 						for (int i = 0; i < result.length; i++) {
 							result[i] = requireNonNull(f.apply(this.array[i], iterator.next()));

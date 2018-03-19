@@ -51,7 +51,6 @@ class SeqGenerator implements ClassGenerator {
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
 
-		import static java.lang.Math.min;
 		import static java.util.Objects.requireNonNull;
 		«FOR t : Type.values»
 			«IF t != type»
@@ -1235,7 +1234,7 @@ class SeqGenerator implements ClassGenerator {
 					if (isEmpty() || that.isEmpty()) {
 						return emptySeq();
 					} else {
-						final int size = min(size(), that.size());
+						final int size = Math.min(size(), that.size());
 						final Iterator<A> iterator1 = iterator();
 						final Iterator<B> iterator2 = that.iterator();
 						return fill(size, () -> f.apply(iterator1.next(), iterator2.next()));
@@ -1260,7 +1259,7 @@ class SeqGenerator implements ClassGenerator {
 					if (isEmpty() || that.isEmpty()) {
 						return emptySeq();
 					} else {
-						final int size = min(size(), that.size());
+						final int size = Math.min(size(), that.size());
 						final «type.iteratorGenericName» iterator1 = iterator();
 						final Iterator<A> iterator2 = that.iterator();
 						return Seq.fill(size, () -> f.apply(iterator1.next(), iterator2.next()));

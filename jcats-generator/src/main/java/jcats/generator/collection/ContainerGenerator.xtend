@@ -50,6 +50,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			import static «Constants.JCATS».«type.optionShortName».*;
 		«ENDIF»
 		import static «Constants.COLLECTION».Common.*;
+		import static «Constants.JCATS».«type.ordShortName».*;
 
 		public interface «type.covariantName("Container")» extends Iterable<«type.genericBoxedName»>, Sized {
 
@@ -337,6 +338,50 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
+			default «type.optionGenericName» max(final «type.ordGenericName» ord) {
+				return reduceLeft(ord::max);
+			}
+
+			default «type.optionGenericName» min(final «type.ordGenericName» ord) {
+				return reduceLeft(ord::min);
+			}
+
+			«IF type == Type.OBJECT»
+				default <B extends Comparable<B>> «type.optionGenericName» maxBy(final F<A, B> f) {
+			«ELSE»
+				default <A extends Comparable<A>> «type.optionGenericName» maxBy(final «type.typeName»ObjectF<A> f) {
+			«ENDIF»
+				return max(by(f));
+			}
+			
+			«FOR to : Type.primitives»
+				«IF type == Type.OBJECT»
+					default «type.optionGenericName» maxBy«to.typeName»(final «to.typeName»F<A> f) {
+				«ELSE»
+					default «type.optionGenericName» maxBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
+				«ENDIF»
+					return max(by«to.typeName»(f));
+				}
+
+			«ENDFOR»
+			«IF type == Type.OBJECT»
+				default <B extends Comparable<B>> «type.optionGenericName» minBy(final F<A, B> f) {
+			«ELSE»
+				default <A extends Comparable<A>> «type.optionGenericName» minBy(final «type.typeName»ObjectF<A> f) {
+			«ENDIF»
+				return min(by(f));
+			}
+			
+			«FOR to : Type.primitives»
+				«IF type == Type.OBJECT»
+					default «type.optionGenericName» minBy«to.typeName»(final «to.typeName»F<A> f) {
+				«ELSE»
+					default «type.optionGenericName» minBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
+				«ENDIF»
+					return min(by«to.typeName»(f));
+				}
+
+			«ENDFOR»
 			default int spliteratorCharacteristics() {
 				return Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE;
 			}
