@@ -212,24 +212,25 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 			«ENDFOR»
-
-			default «type.optionGenericName» reduceLeft(final «IF type == Type.OBJECT»F2<A, A, A>«ELSE»«type.typeName»«type.typeName»«type.typeName»F2«ENDIF» f2) {
-				requireNonNull(f2);
-				final «type.iteratorGenericName» iterator = iterator();
-				if (iterator.hasNext()) {
-					«type.genericName» result = iterator.«type.iteratorNext»();
-					while (iterator.hasNext()) {
-						«IF type == Type.OBJECT»
-							result = requireNonNull(f2.apply(result, iterator.«type.iteratorNext»()));
-						«ELSE»
-							result = f2.apply(result, iterator.«type.iteratorNext»());
-						«ENDIF»
-					}
-					return «type.someName»(result);
-				} else {
-					return «type.noneName»();
+			«IF type == Type.OBJECT»
+				default Option<A> reduceLeft(final F2<A, A, A> f2) {
+					requireNonNull(f2);
+					final Reducer<A> reducer = new Reducer<>(f2);
+					foreach(reducer);
+					return Option.fromNullable(reducer.acc);
 				}
-			}
+			«ELSE»
+				default «type.optionGenericName» reduceLeft(final «type.typeName»«type.typeName»«type.typeName»F2 f2) {
+					requireNonNull(f2);
+					final «type.typeName»Reducer reducer = new «type.typeName»Reducer(f2);
+					foreach(reducer);
+					if (reducer.nonEmpty) {
+						return «type.someName»(reducer.acc);
+					} else {
+						return «type.noneName»();
+					}
+				}
+			«ENDIF»
 
 			«IF type.javaUnboxedType»
 				default «type.javaName» sum() {
@@ -616,7 +617,8 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 				public void apply(final A value) {
-					this.acc = this.f2.apply(this.acc, value);
+					requireNonNull(value);
+					this.acc = requireNonNull(this.f2.apply(this.acc, value));
 				}
 			}
 
@@ -636,6 +638,23 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 			«ENDFOR»
+			final class Reducer<A> implements Eff<A> {
+				A acc;
+				final F2<A, A, A> f2;
+
+				Reducer(final F2<A, A, A> f2) {
+					this.f2 = f2;
+				}
+
+				public void apply(final A value) {
+					requireNonNull(value);
+					if (this.acc == null) {
+						this.acc = value;
+					} else {
+						this.acc = requireNonNull(this.f2.apply(this.acc, value));
+					}
+				}
+			}
 		«ELSE»
 			final class «type.typeName»Folder<A> implements «type.effGenericName» {
 				A acc;
@@ -647,7 +666,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 				public void apply(final «type.javaName» value) {
-					this.acc = this.f2.apply(this.acc, value);
+					this.acc = requireNonNull(this.f2.apply(this.acc, value));
 				}
 			}
 
@@ -667,6 +686,24 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 			«ENDFOR»
+			final class «type.typeName»Reducer implements «type.typeName»Eff {
+				«type.javaName» acc;
+				boolean nonEmpty;
+				final «type.typeName»«type.typeName»«type.typeName»F2 f2;
+
+				«type.typeName»Reducer(final «type.typeName»«type.typeName»«type.typeName»F2 f2) {
+					this.f2 = f2;
+				}
+
+				public void apply(final «type.javaName» value) {
+					if (this.nonEmpty) {
+						this.acc = this.f2.apply(this.acc, value);
+					} else {
+						this.acc = value;
+						this.nonEmpty = true;
+					}
+				}
+			}
 		«ENDIF»
 	''' }
 }
