@@ -151,7 +151,7 @@ final class EitherGenerator implements ClassGenerator {
 
 			«IF rightType != Type.OBJECT»
 				@Override
-				public «rightType.javaName» get() {
+				public «rightType.javaName» get() throws NoSuchElementException {
 					if (isRight()) {
 						return this.right;
 					} else {

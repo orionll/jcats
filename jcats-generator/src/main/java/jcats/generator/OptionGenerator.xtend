@@ -41,7 +41,10 @@ final class OptionGenerator implements ClassGenerator {
 		«ELSE»
 			import static «Constants.FUNCTION».«type.typeName»«type.typeName»F.id;
 		«ENDIF»
-		«IF type != Type.OBJECT»
+		«IF type == Type.OBJECT»
+			import static «Constants.EITHER».*;
+		«ELSE»
+			import static «Constants.JCATS».Object«type.typeName»Either.*;
 			import static «Constants.OPTION».*;
 		«ENDIF»
 		«FOR returnType : Type.primitives»
@@ -74,7 +77,7 @@ final class OptionGenerator implements ClassGenerator {
 				}
 
 				@Override
-				public «type.genericName» get() {
+				public «type.genericName» get() throws NoSuchElementException {
 					if (isEmpty()) {
 						throw new NoSuchElementException();
 					} else {
@@ -99,7 +102,7 @@ final class OptionGenerator implements ClassGenerator {
 
 			public «type.genericName» getOrElse(final «type.f0GenericName» other) {
 				requireNonNull(other);
-				return isEmpty() ? other.apply() : this.value;
+				return isEmpty() ? «type.requireNonNull("other.apply()")» : this.value;
 			}
 
 			«IF type == Type.OBJECT»
@@ -108,7 +111,17 @@ final class OptionGenerator implements ClassGenerator {
 					return this.value;
 				}
 
+				public <X> Either<X, A> toEither(final F0<X> f) {
+					requireNonNull(f);
+					return isEmpty() ? left(f.apply()) : right(this.value);
+				}
+			«ELSE»
+				public <X> Object«type.typeName»Either<X> toObject«type.typeName»Either(final F0<X> f) {
+					requireNonNull(f);
+					return isEmpty() ? object«type.typeName»Left(f.apply()) : object«type.typeName»Right(this.value);
+				}
 			«ENDIF»
+
 			public «genericName» or(final «genericName» other) {
 				requireNonNull(other);
 				return isEmpty() ? other : this;
@@ -116,7 +129,7 @@ final class OptionGenerator implements ClassGenerator {
 
 			public «genericName» orElse(final F0<«genericName»> other) {
 				requireNonNull(other);
-				return isEmpty() ? other.apply() : this;
+				return isEmpty() ? requireNonNull(other.apply()) : this;
 			}
 
 			public void ifEmpty(final Eff0 eff) {
@@ -235,7 +248,7 @@ final class OptionGenerator implements ClassGenerator {
 				public <A> Option<A> flatMap(final «type.typeName»ObjectF<Option<A>> f) {
 			«ENDIF»
 				requireNonNull(f);
-				return isEmpty() ? none() : f.apply(this.value);
+				return isEmpty() ? none() : requireNonNull(f.apply(this.value));
 			}
 
 			public «genericName» filter(final «type.boolFName» predicate) {
