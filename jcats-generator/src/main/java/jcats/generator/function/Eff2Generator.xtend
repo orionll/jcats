@@ -189,6 +189,78 @@ class Eff2Generator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
+			«FOR from : Type.primitives»
+				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+					default «from.typeName»ObjectEff2<A2> contraMapFrom«from.typeName»1(final «from.typeName»ObjectF<A1> f) {
+						requireNonNull(f);
+						return (final «from.javaName» value1, final A2 value2) -> {
+							requireNonNull(value2);
+							final A1 value = requireNonNull(f.apply(value1));
+							apply(value, value2);
+						};
+					}
+
+					default Object«from.typeName»Eff2<A1> contraMapFrom«from.typeName»2(final «from.typeName»ObjectF<A2> f) {
+						requireNonNull(f);
+						return (final A1 value1, final «from.javaName» value2) -> {
+							requireNonNull(value1);
+							final A2 value = requireNonNull(f.apply(value2));
+							apply(value1, value);
+						};
+					}
+				«ELSEIF type1 == Type.OBJECT»
+					default «from.typeName»«type2.typeName»Eff2 contraMapFrom«from.typeName»1(final «from.typeName»ObjectF<A> f) {
+						requireNonNull(f);
+						return (final «from.javaName» value1, final «type2.javaName» value2) -> {
+							final A value = requireNonNull(f.apply(value1));
+							apply(value, value2);
+						};
+					}
+
+					default Object«from.typeName»Eff2<A> contraMapFrom«from.typeName»2(final «from.typeName»«type2.typeName»F f) {
+						requireNonNull(f);
+						return (final A value1, final «from.javaName» value2) -> {
+							requireNonNull(value1);
+							final «type2.javaName» value = f.apply(value2);
+							apply(value1, value);
+						};
+					}
+				«ELSEIF type2 == Type.OBJECT»
+					default «from.typeName»ObjectEff2<A> contraMapFrom«from.typeName»1(final «from.typeName»«type1.typeName»F f) {
+						requireNonNull(f);
+						return (final «from.javaName» value1, final A value2) -> {
+							requireNonNull(value2);
+							final «type1.javaName» value = f.apply(value1);
+							apply(value, value2);
+						};
+					}
+
+					default «type1.typeName»«from.typeName»Eff2 contraMapFrom«from.typeName»2(final «from.typeName»ObjectF<A> f) {
+						requireNonNull(f);
+						return (final «type1.javaName» value1, final «from.javaName» value2) -> {
+							final A value = requireNonNull(f.apply(value2));
+							apply(value1, value);
+						};
+					}
+				«ELSE»
+					default «from.typeName»«type2.typeName»Eff2 contraMapFrom«from.typeName»1(final «from.typeName»«type1.typeName»F f) {
+						requireNonNull(f);
+						return (final «from.javaName» value1, final «type2.javaName» value2) -> {
+							final «type1.javaName» value = f.apply(value1);
+							apply(value, value2);
+						};
+					}
+
+					default «type1.typeName»«from.typeName»Eff2 contraMapFrom«from.typeName»2(final «from.typeName»«type2.typeName»F f) {
+						requireNonNull(f);
+						return (final «type1.javaName» value1, final «from.javaName» value2) -> {
+							final «type2.javaName» value = f.apply(value2);
+							apply(value1, value);
+						};
+					}
+				«ENDIF»
+
+			«ENDFOR»
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 				default F<A1, Eff<A2>> curry() {
 					return (final A1 value1) -> {
