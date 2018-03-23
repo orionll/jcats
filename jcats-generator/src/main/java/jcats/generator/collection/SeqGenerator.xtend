@@ -1225,53 +1225,65 @@ class SeqGenerator implements ClassGenerator {
 			«toStr(type, true)»
 
 			«IF type == Type.OBJECT»
-				public <B> Seq<P<A, B>> zip(final Container<B> that) {
-					return zipWith(that, P::p);
-				}
-
-				public <B, C> Seq<C> zipWith(final Container<B> that, final F2<A, B, C> f) {
+				public final <B, C> Seq<C> zip(final Container<B> that, final F2<A, B, C> f) {
 					requireNonNull(f);
 					if (isEmpty() || that.isEmpty()) {
 						return emptySeq();
-					} else {
+					} else if (that.hasFixedSize()) {
 						final int size = Math.min(size(), that.size());
 						final Iterator<A> iterator1 = iterator();
 						final Iterator<B> iterator2 = that.iterator();
 						return fill(size, () -> f.apply(iterator1.next(), iterator2.next()));
+					} else {
+						final SeqBuilder<C> builder = builder();
+						final Iterator<A> iterator1 = iterator();
+						final Iterator<B> iterator2 = that.iterator();
+						while (iterator1.hasNext() && iterator2.hasNext()) {
+							final A a = iterator1.next();
+							final B b = requireNonNull(iterator2.next());
+							builder.append(f.apply(a, b));
+						}
+						return builder.build();
 					}
 				}
 
-				public final Seq<IntObjectP<A>> zipWithIndex() {
+				public final <B> Seq<B> zipWithIndex(final IntObjectObjectF2<A, B> f) {
 					if (isEmpty()) {
 						return emptySeq();
 					} else {
 						final Iterator<A> iterator = iterator();
-						return tabulate(size(), (final int i) -> intObjectP(i, iterator.next()));
+						return tabulate(size(), (final int i) -> f.apply(i, iterator.next()));
 					}
 				}
 			«ELSE»
-				public <A> Seq<«type.typeName»ObjectP<A>> zip(final Container<A> that) {
-					return zipWith(that, «type.typeName»ObjectP::«type.typeName.firstToLowerCase»ObjectP);
-				}
-
-				public <A, B> Seq<B> zipWith(final Container<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
+				public <A, B> Seq<B> zip(final Container<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
 					requireNonNull(f);
 					if (isEmpty() || that.isEmpty()) {
 						return emptySeq();
-					} else {
+					} else if (that.hasFixedSize()) {
 						final int size = Math.min(size(), that.size());
 						final «type.iteratorGenericName» iterator1 = iterator();
 						final Iterator<A> iterator2 = that.iterator();
-						return Seq.fill(size, () -> f.apply(iterator1.next(), iterator2.next()));
+						return Seq.fill(size, () -> f.apply(iterator1.«type.iteratorNext»(), iterator2.next()));
+					} else {
+						final SeqBuilder<B> builder = Seq.builder();
+						final «type.iteratorGenericName» iterator1 = iterator();
+						final Iterator<A> iterator2 = that.iterator();
+						while (iterator1.hasNext() && iterator2.hasNext()) {
+							final «type.javaName» a = iterator1.«type.iteratorNext»();
+							final A b = requireNonNull(iterator2.next());
+							builder.append(f.apply(a, b));
+						}
+						return builder.build();
 					}
 				}
 
-				public final Seq<Int«type.typeName»P> zipWithIndex() {
+				public final <A> Seq<A> zipWithIndex(final Int«type.typeName»ObjectF2<A> f) {
 					if (isEmpty()) {
 						return emptySeq();
 					} else {
 						final «type.iteratorGenericName» iterator = iterator();
-						return Seq.tabulate(size(), (final int i) -> int«type.typeName»P(i, iterator.next()));
+						return Seq.tabulate(size(), (final int i) -> f.apply(i, iterator.«type.iteratorNext»()));
 					}
 				}
 			«ENDIF»
