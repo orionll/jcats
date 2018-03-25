@@ -47,122 +47,128 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 
 			@Override
 			public «shortName» filter(final «type.typeName»Predicate predicate) {
-				return new «shortName»(stream.filter(predicate));
+				return new «shortName»(this.stream.filter(predicate));
 			}
 
 			@Override
 			public «shortName» map(final «type.typeName»UnaryOperator mapper) {
-				return new «shortName»(stream.map(mapper));
+				return new «shortName»(this.stream.map(mapper));
 			}
 
 			@Override
 			public <U> Stream2<U> mapToObj(final «type.typeName»Function<? extends U> mapper) {
-				return new Stream2<>(stream.mapToObj(mapper));
+				return new Stream2<>(this.stream.mapToObj(mapper));
 			}
 
 			«IF type != Type.INT»
 				@Override
 				public IntStream2 mapToInt(final «type.typeName»ToIntFunction mapper) {
-					return new IntStream2(stream.mapToInt(mapper));
+					return new IntStream2(this.stream.mapToInt(mapper));
 				}
 
 			«ENDIF»
 			«IF type != Type.LONG»
 				@Override
 				public LongStream2 mapToLong(final «type.typeName»ToLongFunction mapper) {
-					return new LongStream2(stream.mapToLong(mapper));
+					return new LongStream2(this.stream.mapToLong(mapper));
 				}
 
 			«ENDIF»
 			«IF type != Type.DOUBLE»
 				@Override
 				public DoubleStream2 mapToDouble(final «type.typeName»ToDoubleFunction mapper) {
-					return new DoubleStream2(stream.mapToDouble(mapper));
+					return new DoubleStream2(this.stream.mapToDouble(mapper));
 				}
 
 			«ENDIF»
 			@Override
 			public «shortName» flatMap(final «type.typeName»Function<? extends «type.streamName»> mapper) {
-				return new «shortName»(stream.flatMap(mapper));
+				return new «shortName»(this.stream.flatMap(mapper));
 			}
 
 			@Override
 			public «shortName» distinct() {
-				return new «shortName»(stream.distinct());
+				return new «shortName»(this.stream.distinct());
 			}
 
 			@Override
 			public «shortName» sorted() {
-				return new «shortName»(stream.sorted());
+				return new «shortName»(this.stream.sorted());
 			}
 
 			@Override
 			public «shortName» peek(final «type.typeName»Consumer action) {
-				return new «shortName»(stream.peek(action));
+				return new «shortName»(this.stream.peek(action));
 			}
 
 			@Override
 			public «shortName» limit(final long maxSize) {
-				return new «shortName»(stream.limit(maxSize));
+				return new «shortName»(this.stream.limit(maxSize));
 			}
 
 			@Override
 			public «shortName» skip(final long n) {
-				return new «shortName»(stream.skip(n));
+				return new «shortName»(this.stream.skip(n));
 			}
 
 			@Override
 			public void forEach(final «type.typeName»Consumer action) {
-				stream.forEach(action);
+				this.stream.forEach(action);
 			}
 
 			@Override
 			public void forEachOrdered(final «type.typeName»Consumer action) {
-				stream.forEachOrdered(action);
+				this.stream.forEachOrdered(action);
 			}
 
 			@Override
 			public «type.javaName»[] toArray() {
-				return stream.toArray();
+				return this.stream.toArray();
 			}
 
 			@Override
 			public «type.javaName» reduce(final «type.javaName» identity, final «type.typeName»BinaryOperator op) {
-				return stream.reduce(identity, op);
+				return this.stream.reduce(identity, op);
 			}
 
 			@Override
 			public Optional«type.typeName» reduce(final «type.typeName»BinaryOperator op) {
-				return stream.reduce(op);
+				return this.stream.reduce(op);
 			}
 
 			@Override
 			public <R> R collect(final Supplier<R> supplier, final Obj«type.typeName»Consumer<R> accumulator, final BiConsumer<R, R> combiner) {
-				return stream.collect(supplier, accumulator, combiner);
+				return this.stream.collect(supplier, accumulator, combiner);
 			}
 
 			@Override
 			public «type.javaName» sum() {
-				return stream.sum();
+				return this.stream.sum();
 			}
 
+			«IF type == Type.INT»
+				public long sumToLong() {
+					return this.stream.sum();
+				}
+
+			«ENDIF»
 			@Override
 			public Optional«type.typeName» min() {
-				return stream.min();
+				return this.stream.min();
 			}
 
 			@Override
 			public Optional«type.typeName» max() {
-				return stream.max();
+				return this.stream.max();
 			}
 
 			@Override
 			public long count() {
-				return stream.count();
+				return this.stream.count();
 			}
 
 			public int size() {
-				final long count = stream.count();
+				final long count = this.stream.count();
 				if (count == (int) count) {
 					return (int) count;
 				} else {
@@ -172,37 +178,37 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 
 			@Override
 			public OptionalDouble average() {
-				return stream.average();
+				return this.stream.average();
 			}
 
 			@Override
 			public «type.typeName»SummaryStatistics summaryStatistics() {
-				return stream.summaryStatistics();
+				return this.stream.summaryStatistics();
 			}
 
 			@Override
 			public boolean anyMatch(final «type.typeName»Predicate predicate) {
-				return stream.anyMatch(predicate);
+				return this.stream.anyMatch(predicate);
 			}
 
 			@Override
 			public boolean allMatch(final «type.typeName»Predicate predicate) {
-				return stream.allMatch(predicate);
+				return this.stream.allMatch(predicate);
 			}
 
 			@Override
 			public boolean noneMatch(final «type.typeName»Predicate predicate) {
-				return stream.noneMatch(predicate);
+				return this.stream.noneMatch(predicate);
 			}
 
 			@Override
 			public Optional«type.typeName» findFirst() {
-				return stream.findFirst();
+				return this.stream.findFirst();
 			}
 
 			@Override
 			public Optional«type.typeName» findAny() {
-				return stream.findAny();
+				return this.stream.findAny();
 			}
 
 			public boolean contains(final «type.javaName» value) {
@@ -212,76 +218,76 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 			«IF type == Type.INT»
 				@Override
 				public LongStream2 asLongStream() {
-					return new LongStream2(stream.asLongStream());
+					return new LongStream2(this.stream.asLongStream());
 				}
 
 			«ENDIF»
 			«IF type != Type.DOUBLE»
 				@Override
 				public DoubleStream2 asDoubleStream() {
-					return new DoubleStream2(stream.asDoubleStream());
+					return new DoubleStream2(this.stream.asDoubleStream());
 				}
 
 			«ENDIF»
 			@Override
 			public Stream2<«type.boxedName»> boxed() {
-				return new Stream2<>(stream.boxed());
+				return new Stream2<>(this.stream.boxed());
 			}
 
 			@Override
 			public «shortName» sequential() {
-				return new «shortName»(stream.sequential());
+				return new «shortName»(this.stream.sequential());
 			}
 
 			@Override
 			public «shortName» parallel() {
-				return new «shortName»(stream.parallel());
+				return new «shortName»(this.stream.parallel());
 			}
 
 			@Override
 			public «shortName» unordered() {
-				return new «shortName»(stream.unordered());
+				return new «shortName»(this.stream.unordered());
 			}
 
 			@Override
 			public «shortName» onClose(final Runnable closeHandler) {
-				return new «shortName»(stream.onClose(closeHandler));
+				return new «shortName»(this.stream.onClose(closeHandler));
 			}
 
 			@Override
 			public void close() {
-				stream.close();
+				this.stream.close();
 			}
 
 			public String joinToString() {
-				return stream.mapToObj(«type.boxedName»::toString).collect(Collectors.joining());
+				return this.stream.mapToObj(«type.boxedName»::toString).collect(Collectors.joining());
 			}
 
 			public String joinToStringWithSeparator(final String separator) {
-				return stream.mapToObj(«type.boxedName»::toString).collect(Collectors.joining(separator));
+				return this.stream.mapToObj(«type.boxedName»::toString).collect(Collectors.joining(separator));
 			}
 
 			@Override
 			public «type.iteratorGenericName» iterator() {
-				return stream.iterator();
+				return this.stream.iterator();
 			}
 
 			@Override
 			public «type.spliteratorGenericName» spliterator() {
-				return stream.spliterator();
+				return this.stream.spliterator();
 			}
 
 			@Override
 			public boolean isParallel() {
-				return stream.isParallel();
+				return this.stream.isParallel();
 			}
 
 			public «type.seqShortName» to«type.seqShortName»() {
-				return stream.collect(«type.seqShortName»::builder, «type.seqShortName»Builder::append, «type.seqShortName»Builder::appendSeqBuilder).build();
+				return this.stream.collect(«type.seqShortName»::builder, «type.seqShortName»Builder::append, «type.seqShortName»Builder::appendSeqBuilder).build();
 			}
 
 			public «type.arrayShortName» to«type.arrayShortName»() {
-				return stream.collect(«type.arrayShortName»::builder, «type.arrayShortName»Builder::append, «type.arrayShortName»Builder::appendArrayBuilder).build();
+				return this.stream.collect(«type.arrayShortName»::builder, «type.arrayShortName»Builder::append, «type.arrayShortName»Builder::appendArrayBuilder).build();
 			}
 
 			public static «shortName» from(final «type.streamName» stream) {

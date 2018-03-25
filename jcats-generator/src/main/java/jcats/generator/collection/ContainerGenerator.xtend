@@ -238,6 +238,12 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 			«ENDIF»
+			«IF type == Type.INT»
+				default long sumToLong() {
+					return foldLeftToLong(0L, (final long sum, final int i) -> sum + i);
+				}
+
+			«ENDIF»
 			default void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
 				«IF type.javaUnboxedType»
