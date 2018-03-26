@@ -31,7 +31,11 @@ final class Stream2Generator implements ClassGenerator {
 		import java.util.stream.Stream;
 		import java.util.stream.StreamSupport;
 
+		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
+
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.ORD».*;
 
 		public final class Stream2<A> implements Stream<A>, Iterable<A> {
 			private final Stream<A> stream;
@@ -41,130 +45,158 @@ final class Stream2Generator implements ClassGenerator {
 			}
 
 			public Stream<A> stream() {
-				return stream;
+				return this.stream;
 			}
 
 			@Override
 			public Stream2<A> filter(final Predicate<? super A> predicate) {
-				return new Stream2<>(stream.filter(predicate));
+				return new Stream2<>(this.stream.filter(predicate));
 			}
 
 			@Override
 			public <R> Stream2<R> map(final Function<? super A, ? extends R> mapper) {
-				return new Stream2<>(stream.map(mapper));
+				return new Stream2<>(this.stream.map(mapper));
 			}
 
 			«FOR type : Type.javaUnboxedTypes»
 				@Override
 				public «type.typeName»Stream2 mapTo«type.typeName»(final To«type.typeName»Function<? super A> mapper) {
-					return new «type.typeName»Stream2(stream.mapTo«type.typeName»(mapper));
+					return new «type.typeName»Stream2(this.stream.mapTo«type.typeName»(mapper));
 				}
 
 			«ENDFOR»
 			@Override
 			public <R> Stream2<R> flatMap(final Function<? super A, ? extends Stream<? extends R>> mapper) {
-				return new Stream2<>(stream.flatMap(mapper));
+				return new Stream2<>(this.stream.flatMap(mapper));
 			}
 
 			«FOR type : Type.javaUnboxedTypes»
 				@Override
 				public «type.typeName»Stream2 flatMapTo«type.typeName»(final Function<? super A, ? extends «type.typeName»Stream> mapper) {
-					return new «type.typeName»Stream2(stream.flatMapTo«type.typeName»(mapper));
+					return new «type.typeName»Stream2(this.stream.flatMapTo«type.typeName»(mapper));
 				}
 
 			«ENDFOR»
 			@Override
 			public Stream2<A> distinct() {
-				return new Stream2<>(stream.distinct());
+				return new Stream2<>(this.stream.distinct());
 			}
 
 			@Override
 			public Stream2<A> sorted() {
-				return new Stream2<>(stream.sorted());
+				return new Stream2<>(this.stream.sorted());
 			}
 
 			@Override
 			public Stream2<A> sorted(final Comparator<? super A> comparator) {
-				return new Stream2<>(stream.sorted(comparator));
+				return new Stream2<>(this.stream.sorted(comparator));
 			}
 
 			@Override
 			public Stream2<A> peek(final Consumer<? super A> action) {
-				return new Stream2<>(stream.peek(action));
+				return new Stream2<>(this.stream.peek(action));
 			}
 
 			@Override
 			public Stream2<A> limit(final long maxSize) {
-				return new Stream2<>(stream.limit(maxSize));
+				return new Stream2<>(this.stream.limit(maxSize));
 			}
 
 			@Override
 			public Stream2<A> skip(final long n) {
-				return new Stream2<>(stream.skip(n));
+				return new Stream2<>(this.stream.skip(n));
 			}
 
 			@Override
 			public void forEach(final Consumer<? super A> action) {
-				stream.forEach(action);
+				this.stream.forEach(action);
 			}
 
 			@Override
 			public void forEachOrdered(final Consumer<? super A> action) {
-				stream.forEachOrdered(action);
+				this.stream.forEachOrdered(action);
 			}
 
 			@Override
 			public Object[] toArray() {
-				return stream.toArray();
+				return this.stream.toArray();
 			}
 
 			@Override
 			public <A1> A1[] toArray(final IntFunction<A1[]> generator) {
-				return stream.toArray(generator);
+				return this.stream.toArray(generator);
 			}
 
 			@Override
 			public A reduce(final A identity, final BinaryOperator<A> accumulator) {
-				return stream.reduce(identity, accumulator);
+				return this.stream.reduce(identity, accumulator);
 			}
 
 			@Override
 			public Optional<A> reduce(final BinaryOperator<A> accumulator) {
-				return stream.reduce(accumulator);
+				return this.stream.reduce(accumulator);
 			}
 
 			@Override
 			public <U> U reduce(final U identity, final BiFunction<U, ? super A, U> accumulator, final BinaryOperator<U> combiner) {
-				return stream.reduce(identity, accumulator, combiner);
+				return this.stream.reduce(identity, accumulator, combiner);
 			}
 
 			@Override
 			public <R> R collect(final Supplier<R> supplier, final BiConsumer<R, ? super A> accumulator, final BiConsumer<R, R> combiner) {
-				return stream.collect(supplier, accumulator, combiner);
+				return this.stream.collect(supplier, accumulator, combiner);
 			}
 
 			@Override
 			public <R, A1> R collect(final Collector<? super A, A1, R> collector) {
-				return stream.collect(collector);
-			}
-
-			@Override
-			public Optional<A> min(final Comparator<? super A> comparator) {
-				return stream.min(comparator);
+				return this.stream.collect(collector);
 			}
 
 			@Override
 			public Optional<A> max(final Comparator<? super A> comparator) {
-				return stream.max(comparator);
+				return this.stream.max(comparator);
 			}
 
 			@Override
+			public Optional<A> min(final Comparator<? super A> comparator) {
+				return this.stream.min(comparator);
+			}
+
+			public Option<A> maxByOrd(final Ord<A> ord) {
+				return Option.fromOptional(reduce(ord::max));
+			}
+
+			public Option<A> minByOrd(final Ord<A> ord) {
+				return Option.fromOptional(reduce(ord::min));
+			}
+
+			public <B extends Comparable<B>> Option<A> maxBy(final F<A, B> f) {
+				return maxByOrd(by(f));
+			}
+
+			«FOR to : Type.primitives»
+				public Option<A> maxBy«to.typeName»(final «to.typeName»F<A> f) {
+					return maxByOrd(by«to.typeName»(f));
+				}
+
+			«ENDFOR»
+			public <B extends Comparable<B>> Option<A> minBy(final F<A, B> f) {
+				return minByOrd(by(f));
+			}
+
+			«FOR to : Type.primitives»
+				public Option<A> minBy«to.typeName»(final «to.typeName»F<A> f) {
+					return minByOrd(by«to.typeName»(f));
+				}
+
+			«ENDFOR»
+			@Override
 			public long count() {
-				return stream.count();
+				return this.stream.count();
 			}
 
 			public int size() {
-				final long count = stream.count();
+				final long count = this.stream.count();
 				if (count == (int) count) {
 					return (int) count;
 				} else {
@@ -174,27 +206,27 @@ final class Stream2Generator implements ClassGenerator {
 
 			@Override
 			public boolean anyMatch(final Predicate<? super A> predicate) {
-				return stream.anyMatch(predicate);
+				return this.stream.anyMatch(predicate);
 			}
 
 			@Override
 			public boolean allMatch(final Predicate<? super A> predicate) {
-				return stream.allMatch(predicate);
+				return this.stream.allMatch(predicate);
 			}
 
 			@Override
 			public boolean noneMatch(final Predicate<? super A> predicate) {
-				return stream.noneMatch(predicate);
+				return this.stream.noneMatch(predicate);
 			}
 
 			@Override
 			public Optional<A> findFirst() {
-				return stream.findFirst();
+				return this.stream.findFirst();
 			}
 
 			@Override
 			public Optional<A> findAny() {
-				return stream.findAny();
+				return this.stream.findAny();
 			}
 
 			public boolean contains(final A value) {
@@ -203,54 +235,54 @@ final class Stream2Generator implements ClassGenerator {
 
 			@Override
 			public Iterator<A> iterator() {
-				return stream.iterator();
+				return this.stream.iterator();
 			}
 
 			@Override
 			public Spliterator<A> spliterator() {
-				return stream.spliterator();
+				return this.stream.spliterator();
 			}
 
 			@Override
 			public boolean isParallel() {
-				return stream.isParallel();
+				return this.stream.isParallel();
 			}
 
 			@Override
 			public Stream2<A> sequential() {
-				return new Stream2<>(stream.sequential());
+				return new Stream2<>(this.stream.sequential());
 			}
 
 			@Override
 			public Stream2<A> parallel() {
-				return new Stream2<>(stream.parallel());
+				return new Stream2<>(this.stream.parallel());
 			}
 
 			@Override
 			public Stream2<A> unordered() {
-				return new Stream2<>(stream.unordered());
+				return new Stream2<>(this.stream.unordered());
 			}
 
 			@Override
 			public Stream2<A> onClose(final Runnable closeHandler) {
-				return new Stream2<>(stream.onClose(closeHandler));
+				return new Stream2<>(this.stream.onClose(closeHandler));
 			}
 
 			@Override
 			public void close() {
-				stream.close();
+				this.stream.close();
 			}
 
 			public String joinToString() {
-				return stream.map(Object::toString).collect(Collectors.joining());
+				return this.stream.map(Object::toString).collect(Collectors.joining());
 			}
 
 			public String joinToStringWithSeparator(final String separator) {
-				return stream.map(Object::toString).collect(Collectors.joining(separator));
+				return this.stream.map(Object::toString).collect(Collectors.joining(separator));
 			}
 
 			public List<A> toUnmodifiableList() {
-				final Object[] array = stream.toArray();
+				final Object[] array = this.stream.toArray();
 				if (array.length == 0) {
 					return Collections.emptyList();
 				} else {
@@ -259,23 +291,23 @@ final class Stream2Generator implements ClassGenerator {
 			}
 
 			public ArrayList<A> toArrayList() {
-				return new ArrayList<>(new ArrayCollection<>(stream.toArray()));
+				return new ArrayList<>(new ArrayCollection<>(this.stream.toArray()));
 			}
 
 			public HashSet<A> toHashSet() {
-				return stream.collect(Collectors.toCollection(HashSet::new));
+				return this.stream.collect(Collectors.toCollection(HashSet::new));
 			}
 
 			public LinkedHashSet<A> toLinkedHashSet() {
-				return stream.collect(Collectors.toCollection(LinkedHashSet::new));
+				return this.stream.collect(Collectors.toCollection(LinkedHashSet::new));
 			}
 
 			public Seq<A> toSeq() {
-				return stream.collect(Seq.collector());
+				return this.stream.collect(Seq.collector());
 			}
 
 			public Array<A> toArr() {
-				return stream.collect(Array.collector());
+				return this.stream.collect(Array.collector());
 			}
 
 			public static <A> Stream2<A> from(final Stream<A> stream) {
