@@ -80,7 +80,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 
 			«ENDIF»
 			public void ensureCapacity(final int minCapacity) {
-				if (minCapacity > 0 && (minCapacity > MIN_CAPACITY || array.length != 0)) {
+				if (minCapacity > 0 && (minCapacity > MIN_CAPACITY || this.array.length != 0)) {
 					ensureCapacityInternal(minCapacity);
 				}
 			}
@@ -88,25 +88,25 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			private void ensureCapacityInternal(final int minCapacity) {
 				if (minCapacity < 0) {
 					throw new OutOfMemoryError("ArrayBuilder size limit exceeded");
-				} else if (minCapacity > array.length) {
-					final int newCapacity = expandedCapacity(array.length, minCapacity);
+				} else if (minCapacity > this.array.length) {
+					final int newCapacity = expandedCapacity(this.array.length, minCapacity);
 					final «type.javaName»[] newArray = new «type.javaName»[newCapacity];
-					System.arraycopy(array, 0, newArray, 0, array.length);
-					array = newArray;
+					System.arraycopy(this.array, 0, newArray, 0, this.array.length);
+					this.array = newArray;
 				}
 			}
 
 			«genericName» appendArray(final «type.javaName»[] values) {
-				ensureCapacityInternal(size + values.length);
-				System.arraycopy(values, 0, array, size, values.length);
-				size += values.length;
+				ensureCapacityInternal(this.size + values.length);
+				System.arraycopy(values, 0, this.array, this.size, values.length);
+				this.size += values.length;
 				return this;
 			}
 
 			«genericName» appendArrayBuilder(final «genericName» builder) {
-				ensureCapacityInternal(size + builder.size);
-				System.arraycopy(builder.array, 0, array, size, builder.size);
-				size += builder.size;
+				ensureCapacityInternal(this.size + builder.size);
+				System.arraycopy(builder.array, 0, this.array, this.size, builder.size);
+				this.size += builder.size;
 				return this;
 			}
 
@@ -114,15 +114,15 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				if (iterableLength == 0) {
 					return this;
 				} else {
-					ensureCapacityInternal(size + iterableLength);
+					ensureCapacityInternal(this.size + iterableLength);
 					«IF type.javaUnboxedType»
 						final PrimitiveIterator.Of«type.typeName» iterator = «type.typeName»Iterator.getIterator(iterable.iterator());
 						while (iterator.hasNext()) {
-							array[size++] = iterator.next«type.typeName»();
+							this.array[this.size++] = iterator.next«type.typeName»();
 						}
 					«ELSE»
 						for (final «type.genericBoxedName» value : iterable) {
-							array[size++] = «IF type == Type.OBJECT»requireNonNull(value)«ELSE»value«ENDIF»;
+							this.array[this.size++] = «IF type == Type.OBJECT»requireNonNull(value)«ELSE»value«ENDIF»;
 						}
 					«ENDIF»
 					return this;
@@ -136,8 +136,8 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				ensureCapacityInternal(size + 1);
-				array[size++] = value;
+				ensureCapacityInternal(this.size + 1);
+				this.array[this.size++] = value;
 				return this;
 			}
 
@@ -161,22 +161,36 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			 */
 			public «genericName» appendAll(final Iterable<«type.genericBoxedName»> iterable) {
 				requireNonNull(iterable);
-				if (iterable instanceof «type.arrayShortName») {
+				if (iterable instanceof «type.arrayWildcardName») {
 					return appendArray(((«arrayGenericName») iterable).array);
+				} else if (iterable instanceof «type.containerWildcardName») {
+					return append«type.containerShortName»((«type.containerGenericName») iterable);
 				} else if (iterable instanceof Sized && ((Sized) iterable).hasFixedSize()) {
 					return appendSized(iterable, ((Sized) iterable).size());
 				} else {
-					if (iterable instanceof Collection) {
+					if (iterable instanceof Collection<?>) {
 						final Collection<«type.genericBoxedName»> col = (Collection<«type.genericBoxedName»>) iterable;
 						if (col.isEmpty()) {
 							return this;
 						} else {
-							ensureCapacityInternal(size + col.size());
+							ensureCapacityInternal(this.size + col.size());
 						}
 					}
 					iterable.forEach(this::append);
 					return this;
 				}
+			}
+
+			private «genericName» append«type.containerShortName»(final «type.containerGenericName» container) {
+				if (container.isNotEmpty()) {
+					if (container.hasFixedSize()) {
+						ensureCapacityInternal(this.size + container.size());
+						container.foreach((final «type.genericName» value) -> this.array[this.size++] = value);
+					} else {
+						container.foreach(this::append);
+					}
+				}
+				return this;
 			}
 
 			public «genericName» appendIterator(final Iterator<«type.genericBoxedName»> iterator) {
@@ -194,31 +208,31 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			}
 
 			public boolean isEmpty() {
-				return (size == 0);
+				return (this.size == 0);
 			}
 
 			public int size() {
-				return size;
+				return this.size;
 			}
 
 			public «arrayGenericName» build() {
-				if (size == 0) {
+				if (this.size == 0) {
 					return empty«type.arrayShortName»();
-				} else if (size < array.length) {
-					final «type.javaName»[] result = new «type.javaName»[size];
-					System.arraycopy(array, 0, result, 0, size);
+				} else if (this.size < this.array.length) {
+					final «type.javaName»[] result = new «type.javaName»[this.size];
+					System.arraycopy(this.array, 0, result, 0, this.size);
 					return new «type.arrayDiamondName»(result);
 				} else {
-					return new «type.arrayDiamondName»(array);
+					return new «type.arrayDiamondName»(this.array);
 				}
 			}
 
 			@Override
 			public String toString() {
 				final StringBuilder builder = new StringBuilder("«shortName»(");
-				for (int i = 0; i < size; i++) {
-					builder.append(array[i]);
-					if (i < size - 1) {
+				for (int i = 0; i < this.size; i++) {
+					builder.append(this.array[i]);
+					if (i < this.size - 1) {
 						builder.append(", ");
 					}
 				}

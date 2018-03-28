@@ -147,6 +147,10 @@ public enum Type {
 		return diamondName("Array");
 	}
 
+	public String arrayWildcardName() {
+		return wildcardName("Array");
+	}
+
 	public String seqShortName() {
 		return shortName("Seq");
 	}
