@@ -24,9 +24,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		«IF !type.javaUnboxedType»
-			import java.util.Collections;
-		«ENDIF»
+		import java.util.Collections;
 		import java.util.Iterator;
 		import java.util.List;
 		import java.util.NoSuchElementException;
@@ -48,9 +46,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		«IF type != Type.INT»
 			import static «Constants.JCATS».«type.optionShortName».*;
 		«ENDIF»
-		«IF type == Type.OBJECT»
-			import static «Constants.COMMON».*;
-		«ENDIF»
+		import static «Constants.COMMON».*;
 
 		public interface «type.covariantName("IndexedContainer")» extends «type.containerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
 
@@ -126,12 +122,19 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			default List<«type.genericBoxedName»> asCollection() {
 				return new «shortName»AsList«IF type == Type.OBJECT»<>«ENDIF»(this);
 			}
-			«IF type == Type.OBJECT»
 
+			«IF type == Type.OBJECT»
 				static <A> IndexedContainer<A> asIndexedContainer(final List<A> list) {
 					requireNonNull(list);
 					return new ListAsIndexedContainer<>(list);
 				}
+			«ELSE»
+				static «type.indexedContainerGenericName» as«type.typeName»IndexedContainer(final List<«type.boxedName»> list) {
+					requireNonNull(list);
+					return new «type.typeName»ListAs«type.typeName»IndexedContainer(list);
+				}
+			«ENDIF»
+			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
@@ -234,65 +237,70 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				this.container.forEach(action);
 			}
 		}
+
 		«IF type == Type.OBJECT»
-
 			final class ListAsIndexedContainer<A> extends CollectionAsContainer<A> implements IndexedContainer<A> {
+		«ELSE»
+			final class «type.typeName»ListAs«type.typeName»IndexedContainer extends «type.typeName»CollectionAs«type.typeName»Container implements «type.typeName»IndexedContainer {
+		«ENDIF»
 
-				ListAsIndexedContainer(final List<A> collection) {
-					super(collection);
-				}
+			«IF type == Type.OBJECT»
+				ListAsIndexedContainer(final List<A> list) {
+			«ELSE»
+				«type.typeName»ListAs«type.typeName»IndexedContainer(final List<«type.boxedName»> list) {
+			«ENDIF»
+				super(list);
+			}
 
-				@Override
-				public A get(final int index) {
-					return ((List<A>) this.collection).get(index);
-				}
+			@Override
+			public «type.genericName» get(final int index) {
+				return ((List<«type.genericBoxedName»>) this.collection).get(index);
+			}
 
-				@Override
-				public IntOption indexOf(final A value) {
-					final int index = ((List<A>) this.collection).indexOf(value);
-					return (index >= 0) ? intSome(index) : intNone();
-				}
+			@Override
+			public IntOption indexOf(final «type.genericName» value) {
+				final int index = ((List<«type.genericBoxedName»>) this.collection).indexOf(value);
+				return (index >= 0) ? intSome(index) : intNone();
+			}
 
-				@Override
-				public IntOption lastIndexOf(final A value) {
-					final int index = ((List<A>) this.collection).lastIndexOf(value);
-					return (index >= 0) ? intSome(index) : intNone();
-				}
+			@Override
+			public IntOption lastIndexOf(final «type.genericName» value) {
+				final int index = ((List<«type.genericBoxedName»>) this.collection).lastIndexOf(value);
+				return (index >= 0) ? intSome(index) : intNone();
+			}
 
-				@Override
-				public Iterator<A> reverseIterator() {
-					if (this.collection instanceof RandomAccess) {
-						final List<A> list = (List<A>) this.collection;
-						final int size = list.size();
-						if (size == 0) {
+			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				if (this.collection instanceof RandomAccess) {
+					final List<«type.genericBoxedName»> list = (List<«type.genericBoxedName»>) this.collection;
+					final int size = list.size();
+					if (size == 0) {
+						«IF type.javaUnboxedType»
+							return «type.noneName»().iterator();
+						«ELSE»
 							return Collections.emptyIterator();
-						} else {
+						«ENDIF»
+					} else {
+						«IF type.javaUnboxedType»
+							return new «type.typeName»ListReverseIterator(list, size);
+						«ELSE»
 							return new ListReverseIterator<>(list, size);
-						}
-					} else {
-						return toArray().reverseIterator();
+						«ENDIF»
 					}
-				}
-
-				@Override
-				public List<A> asCollection() {
-					return Collections.unmodifiableList((List<A>) this.collection);
-				}
-
-				«hashcode(Type.OBJECT)»
-
-				@Override
-				public boolean equals(final Object obj) {
-					if (obj == this) {
-						return true;
-					} else if (obj instanceof IndexedContainer) {
-						return indexedContainersEqual(this, (IndexedContainer<?>) obj);
-					} else {
-						return false;
-					}
+				} else {
+					return to«type.arrayShortName»().reverseIterator();
 				}
 			}
-		«ENDIF»
+
+			@Override
+			public List<«type.genericBoxedName»> asCollection() {
+				return Collections.unmodifiableList((List<«type.genericBoxedName»>) this.collection);
+			}
+
+			«hashcode(type)»
+
+			«equals(type, type.indexedContainerWildcardName, false)»
+		}
 
 		«IF type == Type.OBJECT»
 			final class IndexFinder<A> implements BooleanF<A> {

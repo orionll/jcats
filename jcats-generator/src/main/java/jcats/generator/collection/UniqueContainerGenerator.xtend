@@ -24,9 +24,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.util.Collection;
-		«IF type == Type.OBJECT»
-			import java.util.Collections;
-		«ENDIF»
+		import java.util.Collections;
 		import java.util.Iterator;
 		import java.util.Set;
 		import java.util.Spliterator;
@@ -49,12 +47,19 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			default int spliteratorCharacteristics() {
 				return Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE;
 			}
-			«IF type == Type.OBJECT»
 
+			«IF type == Type.OBJECT»
 				static <A> UniqueContainer<A> asUniqueContainer(final Set<A> set) {
 					requireNonNull(set);
 					return new SetAsUniqueContainer<>(set);
 				}
+			«ELSE»
+				static «type.uniqueContainerGenericName» as«type.typeName»UniqueContainer(final Set<«type.boxedName»> set) {
+					requireNonNull(set);
+					return new «type.typeName»SetAs«type.typeName»UniqueContainer(set);
+				}
+			«ENDIF»
+			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
@@ -116,35 +121,29 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 				this.container.forEach(action);
 			}
 		}
+
 		«IF type == Type.OBJECT»
-
 			final class SetAsUniqueContainer<A> extends CollectionAsContainer<A> implements UniqueContainer<A> {
-
-				SetAsUniqueContainer(final Set<A> collection) {
-					super(collection);
-				}
-
-				@Override
-				public Set<A> asCollection() {
-					return Collections.unmodifiableSet((Set<A>) this.collection);
-				}
-
-				@Override
-				public int hashCode() {
-					return uniqueContainerHashCode(this);
-				}
-
-				@Override
-				public boolean equals(final Object obj) {
-					if (obj == this) {
-						return true;
-					} else if (obj instanceof UniqueContainer) {
-						return uniqueContainersEqual(this, (UniqueContainer<?>) obj);
-					} else {
-						return false;
-					}
-				}
-			}
+		«ELSE»
+			final class «type.typeName»SetAs«type.typeName»UniqueContainer extends «type.typeName»CollectionAs«type.typeName»Container implements «type.typeName»UniqueContainer {
 		«ENDIF»
+			
+			«IF type == Type.OBJECT»
+				SetAsUniqueContainer(final Set<A> set) {
+			«ELSE»
+				«type.typeName»SetAs«type.typeName»UniqueContainer(final Set<«type.boxedName»> set) {
+			«ENDIF»
+				super(set);
+			}
+
+			@Override
+			public Set<«type.genericBoxedName»> asCollection() {
+				return Collections.unmodifiableSet((Set<«type.genericBoxedName»>) this.collection);
+			}
+
+			«uniqueHashCode(type)»
+
+			«uniqueEquals(type)»
+		}
 	''' }
 }

@@ -28,6 +28,9 @@ final class CommonGenerator implements ClassGenerator {
 		import java.util.Spliterators;
 		import java.util.function.BiFunction;
 		import java.util.function.Consumer;
+		import java.util.function.IntConsumer;
+		import java.util.function.DoubleConsumer;
+		import java.util.function.LongConsumer;
 		import java.util.function.Function;
 		import java.util.function.Predicate;
 		import java.util.function.UnaryOperator;
@@ -281,15 +284,35 @@ final class CommonGenerator implements ClassGenerator {
 
 			@Override
 			public boolean hasNext() {
-				return iterator.hasPrevious();
+				return this.iterator.hasPrevious();
 			}
 
 			@Override
 			public A next() {
-				return iterator.previous();
+				return this.iterator.previous();
 			}
 		}
 
+		«FOR type : Type.javaUnboxedTypes»
+			final class «type.typeName»ListReverseIterator<A> implements «type.iteratorGenericName» {
+				private final ListIterator<«type.boxedName»> iterator;
+
+				«type.typeName»ListReverseIterator(final List<«type.boxedName»> list, final int index) {
+					this.iterator = list.listIterator(index);
+				}
+
+				@Override
+				public boolean hasNext() {
+					return this.iterator.hasPrevious();
+				}
+
+				@Override
+				public «type.javaName» next«type.typeName»() {
+					return this.iterator.previous();
+				}
+			}
+
+		«ENDFOR»
 		final class MappedIterator<A, B> implements Iterator<B> {
 			private final Iterator<A> iterator;
 			private final F<A, B> f;
@@ -398,12 +421,12 @@ final class CommonGenerator implements ClassGenerator {
 
 				@Override
 				public boolean hasNext() {
-					return iterator.hasNext();
+					return this.iterator.hasNext();
 				}
 
 				@Override
 				public «type.javaName» next«type.typeName»() {
-					return iterator.next();
+					return this.iterator.next();
 				}
 
 				static PrimitiveIterator.Of«type.typeName» getIterator(final Iterator<«type.boxedName»> iterator) {
@@ -411,6 +434,49 @@ final class CommonGenerator implements ClassGenerator {
 						return (PrimitiveIterator.Of«type.typeName») iterator;
 					} else {
 						return new «type.typeName»Iterator(iterator);
+					}
+				}
+			}
+
+		«ENDFOR»
+		«FOR type : Type.javaUnboxedTypes»
+			final class «type.typeName»Spliterator implements Spliterator.Of«type.typeName» {
+				final Spliterator<«type.boxedName»> spliterator;
+
+				private «type.typeName»Spliterator(final Spliterator<«type.boxedName»> spliterator) {
+					this.spliterator = spliterator;
+				}
+
+				@Override
+				public Spliterator.Of«type.typeName» trySplit() {
+					final Spliterator<«type.boxedName»> split = this.spliterator.trySplit();
+					if (split == null) {
+						return null;
+					} else {
+						return getSpliterator(split);
+					}
+				}
+
+				@Override
+				public long estimateSize() {
+					return this.spliterator.estimateSize();
+				}
+
+				@Override
+				public int characteristics() {
+					return this.spliterator.characteristics();
+				}
+
+				@Override
+				public boolean tryAdvance(final «type.typeName»Consumer action) {
+					return this.spliterator.tryAdvance(action::accept);
+				}
+
+				static Spliterator.Of«type.typeName» getSpliterator(final Spliterator<«type.boxedName»> iterator) {
+					if (iterator instanceof Spliterator.Of«type.typeName») {
+						return (Spliterator.Of«type.typeName») iterator;
+					} else {
+						return new «type.typeName»Spliterator(iterator);
 					}
 				}
 			}

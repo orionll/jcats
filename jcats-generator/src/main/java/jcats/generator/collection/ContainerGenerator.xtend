@@ -25,16 +25,14 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 		import java.util.ArrayList;
 		import java.util.Collection;
+		import java.util.Collections;
 		import java.util.HashSet;
 		import java.util.Iterator;
 		import java.util.LinkedHashSet;
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
-		«IF type == Type.OBJECT»
-			import java.util.NavigableSet;
-			import java.util.Collections;
-		«ENDIF»
+		import java.util.NavigableSet;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.function.Consumer;
@@ -493,12 +491,19 @@ final class ContainerGenerator implements InterfaceGenerator {
 			default «type.stream2GenericName» parallelStream() {
 				return new «type.stream2DiamondName»(StreamSupport.«type.streamFunction»(spliterator(), true));
 			}
-			«IF type == Type.OBJECT»
 
+			«IF type == Type.OBJECT»
 				static <A> Container<A> asContainer(final Collection<A> collection) {
 					requireNonNull(collection);
 					return new CollectionAsContainer<>(collection);
 				}
+			«ELSE»
+				static «type.containerGenericName» as«type.typeName»Container(final Collection<«type.boxedName»> collection) {
+					requireNonNull(collection);
+					return new «type.typeName»CollectionAs«type.typeName»Container(collection);
+				}
+			«ENDIF»
+			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
@@ -543,96 +548,126 @@ final class ContainerGenerator implements InterfaceGenerator {
 				this.container.forEach(action);
 			}
 		}
+
 		«IF type == Type.OBJECT»
-
 			class CollectionAsContainer<A> implements Container<A> {
-				final Collection<A> collection;
+		«ELSE»
+			class «type.typeName»CollectionAs«type.typeName»Container implements «type.typeName»Container {
+		«ENDIF»
+			final Collection<«type.genericBoxedName»> collection;
 
+			«IF type == Type.OBJECT»
 				CollectionAsContainer(final Collection<A> collection) {
-					this.collection = collection;
-				}
+			«ELSE»
+				«type.typeName»CollectionAs«type.typeName»Container(final Collection<«type.boxedName»> collection) {
+			«ENDIF»
+				this.collection = collection;
+			}
 
-				@Override
-				public boolean isEmpty() {
-					return this.collection.isEmpty();
-				}
+			@Override
+			public boolean isEmpty() {
+				return this.collection.isEmpty();
+			}
 
-				@Override
-				public boolean isNotEmpty() {
-					return !this.collection.isEmpty();
-				}
+			@Override
+			public boolean isNotEmpty() {
+				return !this.collection.isEmpty();
+			}
 
-				@Override
-				public int size() {
-					return this.collection.size();
-				}
+			@Override
+			public int size() {
+				return this.collection.size();
+			}
 
-				@Override
-				public boolean hasFixedSize() {
-					return false;
-				}
+			@Override
+			public boolean hasFixedSize() {
+				return false;
+			}
 
-				@Override
-				public boolean contains(final A value) {
+			@Override
+			public boolean contains(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
 					requireNonNull(value);
-					return this.collection.contains(value);
-				}
+				«ENDIF»
+				return this.collection.contains(value);
+			}
 
-				@Override
-				public void forEach(final Consumer<? super A> action) {
-					this.collection.forEach(action);
-				}
+			@Override
+			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
+				this.collection.forEach(action);
+			}
 
-				@Override
-				public void foreach(final Eff<A> eff) {
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				«IF type == Type.OBJECT»
 					this.collection.forEach(eff.toConsumer());
-				}
+				«ELSE»
+					this.collection.forEach(eff::apply);
+				«ENDIF»
+			}
 
-				@Override
-				public Iterator<A> iterator() {
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				«IF type.javaUnboxedType»
+					return «type.typeName»Iterator.getIterator(this.collection.iterator());
+				«ELSE»
 					return this.collection.iterator();
-				}
+				«ENDIF»
+			}
 
-				@Override
-				public Spliterator<A> spliterator() {
+			@Override
+			public «type.spliteratorGenericName» spliterator() {
+				«IF type.javaUnboxedType»
+					return «type.typeName»Spliterator.getSpliterator(this.collection.spliterator());
+				«ELSE»
 					return this.collection.spliterator();
-				}
+				«ENDIF»
+			}
 
-				@Override
-				public Iterator<A> reverseIterator() {
-					if (this.collection instanceof NavigableSet) {
-						return ((NavigableSet<A>) this.collection).descendingIterator();
-					} else {
-						return Container.super.reverseIterator();
-					}
+			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				if (this.collection instanceof NavigableSet) {
+					«IF type.javaUnboxedType»
+						return «type.typeName»Iterator.getIterator(((NavigableSet<«type.boxedName»>) this.collection).descendingIterator());
+					«ELSE»
+						return ((NavigableSet<«type.genericBoxedName»>) this.collection).descendingIterator();
+					«ENDIF»
+				} else {
+					return «type.containerShortName».super.reverseIterator();
 				}
+			}
 
-				@Override
-				public Stream2<A> stream() {
-					return new Stream2<>(this.collection.stream());
-				}
+			@Override
+			public «type.stream2GenericName» stream() {
+				return «type.stream2Name».from«IF type.javaUnboxedType»Stream«ENDIF»(this.collection.stream());
+			}
 
-				@Override
-				public Stream2<A> parallelStream() {
-					return new Stream2<>(this.collection.parallelStream());
-				}
+			@Override
+			public «type.stream2GenericName» parallelStream() {
+				return «type.stream2Name».from«IF type.javaUnboxedType»Stream«ENDIF»(this.collection.parallelStream());
+			}
 
-				@Override
+			@Override
+			«IF type == Type.OBJECT»
 				public Object[] toObjectArray() {
 					return this.collection.toArray();
 				}
-
-				@Override
-				public Collection<A> asCollection() {
-					return Collections.unmodifiableCollection(this.collection);
+			«ELSE»
+				public «type.javaName»[] toPrimitiveArray() {
+					return new Array<>(this.collection.toArray()).mapTo«type.typeName»(i -> («type.javaName») i).array;
 				}
+			«ENDIF»
 
-				@Override
-				public String toString() {
-					return this.collection.toString();
-				}
+			@Override
+			public Collection<«type.genericBoxedName»> asCollection() {
+				return Collections.unmodifiableCollection(this.collection);
 			}
-		«ENDIF»
+
+			@Override
+			public String toString() {
+				return this.collection.toString();
+			}
+		}
 
 		«IF type == Type.OBJECT»
 			final class Folder<A, B> implements Eff<A> {

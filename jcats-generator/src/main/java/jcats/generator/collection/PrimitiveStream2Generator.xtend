@@ -34,6 +34,7 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 		import java.util.function.*;
 		import java.util.stream.«type.streamName»;
 		import java.util.stream.Collectors;
+		import java.util.stream.Stream;
 		import java.util.stream.StreamSupport;
 
 		import static java.util.Objects.requireNonNull;
@@ -324,6 +325,10 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 				} else {
 					return new «shortName»(StreamSupport.stream(spliterator, false).mapTo«type.typeName»(«type.boxedName»::«type.javaName»Value));
 				}
+			}
+
+			public static «shortName» fromStream(final Stream<«type.boxedName»> stream) {
+				return new «shortName»(stream.mapTo«type.typeName»(«type.boxedName»::intValue));
 			}
 		}
 	''' }
