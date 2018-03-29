@@ -33,14 +33,15 @@ final class SeqBuilderGenerator implements ClassGenerator {
 		«ENDIF»
 		import java.util.stream.«type.streamName»;
 
-		import static «Constants.COLLECTION».«shortSeqName».empty«shortSeqName»;
-		import static «Constants.COMMON».*;
+		import «Constants.JCATS».*; 
 
 		«IF type == Type.OBJECT»
 			import static java.util.Objects.requireNonNull;
 		«ENDIF»
+		import static «Constants.COLLECTION».«shortSeqName».empty«shortSeqName»;
+		import static «Constants.COMMON».*;
 
-		public final class «genericName» {
+		public final class «genericName» implements Sized {
 			«type.javaName»[][][][][][] node6;
 			«type.javaName»[][][][][] node5;
 			«type.javaName»[][][][] node4;
@@ -202,10 +203,12 @@ final class SeqBuilderGenerator implements ClassGenerator {
 				return this;
 			}
 
-			public boolean isEmpty() {
-				return (this.size == 0);
+			@Override
+			public boolean hasFixedSize() {
+				return false;
 			}
 
+			@Override
 			public int size() {
 				return this.size;
 			}
