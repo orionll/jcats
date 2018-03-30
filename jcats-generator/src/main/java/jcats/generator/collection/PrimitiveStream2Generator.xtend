@@ -37,7 +37,11 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 		import java.util.stream.Stream;
 		import java.util.stream.StreamSupport;
 
+		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
+
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.JCATS».«type.ordShortName».*;
 
 		public final class «shortName» implements «type.streamName» {
 			private final «type.streamName» stream;
@@ -154,15 +158,43 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 
 			«ENDIF»
 			@Override
-			public Optional«type.typeName» min() {
-				return this.stream.min();
-			}
-
-			@Override
 			public Optional«type.typeName» max() {
 				return this.stream.max();
 			}
 
+			@Override
+			public Optional«type.typeName» min() {
+				return this.stream.min();
+			}
+
+			public «type.optionGenericName» maxByOrd(final «type.ordGenericName» ord) {
+				return «type.optionShortName».fromOptional«type.typeName»(reduce(ord::max));
+			}
+
+			public «type.optionGenericName» minByOrd(final «type.ordGenericName» ord) {
+				return «type.optionShortName».fromOptional«type.typeName»(reduce(ord::min));
+			}
+
+			public <A extends Comparable<A>> «type.optionGenericName» maxBy(final «type.typeName»ObjectF<A> f) {
+				return maxByOrd(by(f));
+			}
+
+			«FOR to : Type.primitives»
+				public «type.optionGenericName» maxBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
+					return maxByOrd(by«to.typeName»(f));
+				}
+
+			«ENDFOR»
+			public <A extends Comparable<A>> «type.optionGenericName» minBy(final «type.typeName»ObjectF<A> f) {
+				return minByOrd(by(f));
+			}
+
+			«FOR to : Type.primitives»
+				public «type.optionGenericName» minBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
+					return minByOrd(by«to.typeName»(f));
+				}
+
+			«ENDFOR»
 			@Override
 			public long count() {
 				return this.stream.count();
