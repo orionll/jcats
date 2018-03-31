@@ -222,7 +222,7 @@ class OrdDictGenerator implements ClassGenerator {
 			@Override
 			public P<K, A> next() {
 				if (stack == null) {
-					stack = Stack.nil();
+					stack = emptyStack();
 					for (OrdDict<K, A> dict = root; dict != null; dict = dict.left) {
 						stack = stack.prepend(dict);
 					}

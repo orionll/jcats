@@ -55,6 +55,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		«IF type.primitive»
 			import static «Constants.JCATS».«type.ordShortName».*;
 		«ENDIF»
+		import static «Constants.STACK».*;
 
 		public final class «type.covariantName(baseName)» implements «type.uniqueContainerGenericName», Serializable {
 
@@ -406,7 +407,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			@Override
 			public «type.iteratorReturnType» «type.iteratorNext»() {
 				if (this.stack == null) {
-					this.stack = Stack.nil();
+					this.stack = emptyStack();
 					for («genericName» unique = this.root; unique != null; unique = unique.left) {
 						this.stack = this.stack.prepend(unique);
 					}

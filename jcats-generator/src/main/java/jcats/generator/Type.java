@@ -151,6 +151,14 @@ public enum Type {
 		return wildcardName("Array");
 	}
 
+	public String stackShortName() {
+		return shortName("Stack");
+	}
+
+	public String stackGenericName() {
+		return genericName("Stack");
+	}
+
 	public String seqShortName() {
 		return shortName("Seq");
 	}

@@ -35,6 +35,7 @@ final class SortedDictGenerator implements ClassGenerator {
 		import static «Constants.JCATS».Order.*;
 		import static «Constants.P».p;
 		import static «Constants.COMMON».*;
+		import static «Constants.STACK».*;
 
 		public final class SortedDict<K, @Covariant A> implements KeyValue<K, A>, Serializable {
 			private static final SortedDict<?, ?> EMPTY =
@@ -406,7 +407,7 @@ final class SortedDictGenerator implements ClassGenerator {
 			@Override
 			public P<K, A> next() {
 				if (this.stack == null) {
-					this.stack = Stack.nil();
+					this.stack = emptyStack();
 					for (SortedDict<K, A> dict = this.root; dict != null; dict = dict.left) {
 						this.stack = this.stack.prepend(dict);
 					}

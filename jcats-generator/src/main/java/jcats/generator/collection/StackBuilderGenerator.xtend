@@ -1,82 +1,130 @@
 package jcats.generator.collection
 
+import java.util.List
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
+import jcats.generator.Generator
+import jcats.generator.Type
+import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 
+@FinalFieldsConstructor
 final class StackBuilderGenerator implements ClassGenerator {
-	override className() { Constants.STACK + "Builder" }
-	
+	val Type type
+
+	def static List<Generator> generators() {
+		Type.values.toList.map[new StackBuilderGenerator(it) as Generator]
+	}
+
+	override className() { Constants.COLLECTION + "." + shortName }
+
+	def shortName() { type.shortName("StackBuilder") }
+	def genericName() { type.genericName("StackBuilder") }
+
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		import static «Constants.STACK».nil;
-		import static «Constants.STACK».singleStack;
+		import java.util.Iterator;
+		«IF type.javaUnboxedType»
+			import java.util.function.«type.typeName»Consumer;
+		«ENDIF»
+		import java.util.stream.«type.streamName»;
 
-		public final class StackBuilder<A> {
-			private Stack<A> start = nil();
-			private Stack<A> tail;
+		import static «Constants.COLLECTION».«type.stackShortName».*;
+
+		public final class «genericName» {
+			private «type.stackGenericName» start = empty«type.stackShortName»();
+			private «type.stackGenericName» tail;
 			private boolean exported;
 
-			StackBuilder() {}
+			«shortName»() {
+			}
 
-			public StackBuilder<A> append(final A value) {
-				if (exported) {
+			public «genericName» append(final «type.genericName» value) {
+				if (this.exported) {
 					copy();
 				}
 
-				final Stack<A> t = singleStack(value);
+				final «type.stackGenericName» t = single«type.stackShortName»(value);
 
-				if (tail == null) {
-					start = t;
+				if (this.tail == null) {
+					this.start = t;
 				} else {
-					tail.tail = t;
+					this.tail.tail = t;
 				}
 
-				tail = t;
+				this.tail = t;
 				return this;
 			}
 
-			StackBuilder<A> appendStack(Stack<A> stack) {
-				while (stack.isNotEmpty()) {
-					append(stack.head);
-					stack = stack.tail;
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			public final «genericName» appendValues(final «type.genericName»... values) {
+				for (final «type.genericName» value : values) {
+					append(value);
 				}
 				return this;
 			}
 
-			public StackBuilder<A> appendAll(final Iterable<A> iterable) {
-				iterable.forEach(this::append);
+			public «genericName» appendAll(final Iterable<«type.genericBoxedName»> iterable) {
+				«IF type.javaUnboxedType»
+					if (iterable instanceof «type.containerShortName») {
+						((«type.containerShortName») iterable).foreach(this::append);
+					} else {
+						appendIterator(iterable.iterator());
+					}
+				«ELSE»
+					if (iterable instanceof «type.containerWildcardName») {
+						((«type.containerGenericName») iterable).foreach(this::append);
+					} else {
+						iterable.forEach(this::append);
+					}
+				«ENDIF»
+				return this;
+			}
+
+			public «genericName» appendIterator(final Iterator<«type.genericBoxedName»> iterator) {
+				«IF type.javaUnboxedType»
+					«type.typeName»Iterator.getIterator(iterator).forEachRemaining((«type.typeName»Consumer) this::append);
+				«ELSE»
+					iterator.forEachRemaining(this::append);
+				«ENDIF»
+				return this;
+			}
+
+			public «genericName» append«type.streamName»(final «type.streamGenericName» stream) {
+				stream.forEachOrdered(this::append);
 				return this;
 			}
 
 			public boolean isEmpty() {
-				return start.isEmpty();
+				return this.start.isEmpty();
 			}
 
-			public Stack<A> build() {
-				exported = !start.isEmpty();
-				return start;
+			public «type.stackGenericName» build() {
+				this.exported = this.start.isNotEmpty();
+				return this.start;
 			}
 
-			public Stack<A> prependToStack(final Stack<A> stack) {
+			public «type.stackGenericName» prependToStack(final «type.stackGenericName» stack) {
 				if (isEmpty()) {
 					return stack;
 				} else {
-					if (exported) {
+					if (this.exported) {
 						copy();
 					}
 
-					tail.tail = stack;
+					this.tail.tail = stack;
 					return build();
 				}
 			}
 
 			private void copy() {
-				Stack<A> s = start;
-				final Stack<A> t = tail;
-				start = nil();
-				tail = null;
-				exported = false;
+				«type.stackGenericName» s = this.start;
+				final «type.stackGenericName» t = this.tail;
+				this.start = empty«type.stackShortName»();
+				this.tail = null;
+				this.exported = false;
 				while (s != t) {
 					append(s.head);
 					s = s.tail;
