@@ -161,6 +161,12 @@ interface Generator {
 		}
 	''' }
 
+	def joinCollection() { '''
+		public static <A, C extends Iterable<A>> «name»<A> join(final «name»<C> «name.toLowerCase») {
+			return «name.toLowerCase».flatMap((F) id());
+		}
+	'''}
+
 	def join() { joinMultiple(#[], "A") }
 
 	def joinMultiple(Iterable<String> typeParams, String typeParam) { '''

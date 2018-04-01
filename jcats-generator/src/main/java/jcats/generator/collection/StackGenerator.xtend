@@ -341,9 +341,7 @@ final class StackGenerator implements ClassGenerator {
 			}
 			«IF type == Type.OBJECT»
 
-				public static <A> Stack<A> join(final Stack<Iterable<A>> stack) {
-					return stack.flatMap(id());
-				}
+				«joinCollection»
 
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»

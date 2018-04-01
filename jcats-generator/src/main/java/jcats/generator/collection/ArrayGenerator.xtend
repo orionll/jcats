@@ -395,7 +395,7 @@ final class ArrayGenerator implements ClassGenerator {
 
 			«ENDFOR»
 			«IF type == Type.OBJECT»
-				public <B> Array<B> flatMap(final F<A, Array<B>> f) {
+				public <B> Array<B> flatMap(final F<A, Iterable<B>> f) {
 			«ELSE»
 				public <A> Array<A> flatMap(final «type.typeName»ObjectF<Array<A>> f) {
 			«ENDIF»
@@ -409,7 +409,7 @@ final class ArrayGenerator implements ClassGenerator {
 						final ArrayBuilder<A> builder = Array.builder();
 					«ENDIF»
 					for (final «type.javaName» value : this.array) {
-						builder.appendArray(f.apply(«type.genericCast»value).array);
+						builder.appendAll(f.apply(«type.genericCast»value));
 					}
 					return builder.build();
 				}
@@ -560,6 +560,132 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			«ENDIF»
 
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				«IF type.javaUnboxedType»
+					return isEmpty() ? «type.noneName»().iterator() : new «shortName»Iterator(this.array);
+				«ELSE»
+					return isEmpty() ? emptyIterator() : new «shortName»Iterator«IF type == Type.OBJECT»<>«ENDIF»(this.array);
+				«ENDIF»
+			}
+
+			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				«IF type.javaUnboxedType»
+					return isEmpty() ? «type.noneName»().iterator() : new «shortName»ReverseIterator(this.array);
+				«ELSE»
+					return isEmpty() ? emptyIterator() : new «shortName»ReverseIterator«IF type == Type.OBJECT»<>«ENDIF»(this.array);
+				«ENDIF»
+			}
+
+			@Override
+			«IF type == Type.OBJECT»
+				public Spliterator<A> spliterator() {
+			«ELSEIF type == Type.BOOLEAN»
+				public Spliterator<Boolean> spliterator() {
+			«ELSE»
+				public Spliterator.Of«type.typeName» spliterator() {
+			«ENDIF»
+				if (isEmpty()) {
+					return Spliterators.«type.emptySpliteratorName»();
+				} else {
+					return Spliterators.spliterator(«IF type == Type.BOOLEAN»new BooleanArrayIterator(this.array), size()«ELSE»this.array«ENDIF», Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
+				}
+			}
+
+			@Override
+			public int hashCode() {
+				return Arrays.hashCode(this.array);
+			}
+
+			«equals(type, type.indexedContainerWildcardName, false)»
+
+			public boolean isStrictlyEqualTo(final «genericName» other) {
+				if (other == this) {
+					return true;
+				} else {
+					return Arrays.equals(this.array, other.array);
+				}
+			}
+
+			«toStr(type, false)»
+
+			«IF type == Type.OBJECT»
+				public <B, C> Array<C> zip(final Container<B> that, final F2<A, B, C> f) {
+					requireNonNull(f);
+					if (isEmpty() || that.isEmpty()) {
+						return emptyArray();
+					} else if (that.hasFixedSize()) {
+						final Object[] result = new Object[Math.min(this.array.length, that.size())];
+						final Iterator<B> iterator = that.iterator();
+						for (int i = 0; i < result.length; i++) {
+							result[i] = requireNonNull(f.apply((A) this.array[i], iterator.next()));
+						}
+						return new Array<>(result);
+					} else {
+						final ArrayBuilder<C> builder = builder();
+						final Iterator<B> iterator = that.iterator();
+						for (final Object value : this.array) {
+							if (iterator.hasNext()) {
+								builder.append(requireNonNull(f.apply((A) value, iterator.next())));
+							} else {
+								break;
+							}
+						}
+						return builder.build();
+					}
+				}
+
+				public <B> Array<B> zipWithIndex(final IntObjectObjectF2<A, B> f) {
+					if (isEmpty()) {
+						return emptyArray();
+					} else {
+						final Object[] result = new Object[this.array.length];
+						for (int i = 0; i < this.array.length; i++) {
+							result[i] = requireNonNull(f.apply(i, (A) this.array[i]));
+						}
+						return new Array<>(result);
+					}
+				}
+			«ELSE»
+				public <A, B> Array<B> zip(final Container<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
+					requireNonNull(f);
+					if (isEmpty() || that.isEmpty()) {
+						return emptyArray();
+					} else if (that.hasFixedSize()) {
+						final Object[] result = new Object[Math.min(this.array.length, that.size())];
+						final Iterator<A> iterator = that.iterator();
+						for (int i = 0; i < result.length; i++) {
+							result[i] = requireNonNull(f.apply(this.array[i], iterator.next()));
+						}
+						return new Array<>(result);
+					} else {
+						final ArrayBuilder<B> builder = Array.builder();
+						final Iterator<A> iterator = that.iterator();
+						for (final «type.javaName» value : this.array) {
+							if (iterator.hasNext()) {
+								builder.append(requireNonNull(f.apply(value, iterator.next())));
+							} else {
+								break;
+							}
+						}
+						return builder.build();
+					}
+				}
+
+				public <A> Array<A> zipWithIndex(final Int«type.typeName»ObjectF2<A> f) {
+					if (isEmpty()) {
+						return emptyArray();
+					} else {
+						final Object[] result = new Object[this.array.length];
+						for (int i = 0; i < this.array.length; i++) {
+							result[i] = requireNonNull(f.apply(i, this.array[i]));
+						}
+						return new Array<>(result);
+					}
+				}
+			«ENDIF»
+
 			public static «paramGenericName» empty«shortName»() {
 				«IF type == Type.OBJECT»
 					return («genericName») EMPTY;
@@ -690,136 +816,8 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			«IF type == Type.OBJECT»
-				«join»
+				«joinCollection»
 
-			«ENDIF»
-			@Override
-			public «type.iteratorGenericName» iterator() {
-				«IF type.javaUnboxedType»
-					return isEmpty() ? «type.noneName»().iterator() : new «shortName»Iterator(this.array);
-				«ELSE»
-					return isEmpty() ? emptyIterator() : new «shortName»Iterator«IF type == Type.OBJECT»<>«ENDIF»(this.array);
-				«ENDIF»
-			}
-
-			@Override
-			public «type.iteratorGenericName» reverseIterator() {
-				«IF type.javaUnboxedType»
-					return isEmpty() ? «type.noneName»().iterator() : new «shortName»ReverseIterator(this.array);
-				«ELSE»
-					return isEmpty() ? emptyIterator() : new «shortName»ReverseIterator«IF type == Type.OBJECT»<>«ENDIF»(this.array);
-				«ENDIF»
-			}
-
-			@Override
-			«IF type == Type.OBJECT»
-				public Spliterator<A> spliterator() {
-			«ELSEIF type == Type.BOOLEAN»
-				public Spliterator<Boolean> spliterator() {
-			«ELSE»
-				public Spliterator.Of«type.typeName» spliterator() {
-			«ENDIF»
-				if (isEmpty()) {
-					return Spliterators.«type.emptySpliteratorName»();
-				} else {
-					return Spliterators.spliterator(«IF type == Type.BOOLEAN»new BooleanArrayIterator(this.array), size()«ELSE»this.array«ENDIF», Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
-				}
-			}
-
-			@Override
-			public int hashCode() {
-				return Arrays.hashCode(this.array);
-			}
-
-			«equals(type, type.indexedContainerWildcardName, false)»
-
-			public boolean isStrictlyEqualTo(final «genericName» other) {
-				if (other == this) {
-					return true;
-				} else {
-					return Arrays.equals(this.array, other.array);
-				}
-			}
-
-			«toStr(type, false)»
-
-			«IF type == Type.OBJECT»
-				public <B, C> Array<C> zip(final Container<B> that, final F2<A, B, C> f) {
-					requireNonNull(f);
-					if (isEmpty() || that.isEmpty()) {
-						return emptyArray();
-					} else if (that.hasFixedSize()) {
-						final Object[] result = new Object[Math.min(this.array.length, that.size())];
-						final Iterator<B> iterator = that.iterator();
-						for (int i = 0; i < result.length; i++) {
-							result[i] = requireNonNull(f.apply((A) this.array[i], iterator.next()));
-						}
-						return new Array<>(result);
-					} else {
-						final ArrayBuilder<C> builder = builder();
-						final Iterator<B> iterator = that.iterator();
-						for (final Object value : this.array) {
-							if (iterator.hasNext()) {
-								builder.append(requireNonNull(f.apply((A) value, iterator.next())));
-							} else {
-								break;
-							}
-						}
-						return builder.build();
-					}
-				}
-
-				public <B> Array<B> zipWithIndex(final IntObjectObjectF2<A, B> f) {
-					if (isEmpty()) {
-						return emptyArray();
-					} else {
-						final Object[] result = new Object[this.array.length];
-						for (int i = 0; i < this.array.length; i++) {
-							result[i] = requireNonNull(f.apply(i, (A) this.array[i]));
-						}
-						return new Array<>(result);
-					}
-				}
-			«ELSE»
-				public <A, B> Array<B> zip(final Container<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
-					requireNonNull(f);
-					if (isEmpty() || that.isEmpty()) {
-						return emptyArray();
-					} else if (that.hasFixedSize()) {
-						final Object[] result = new Object[Math.min(this.array.length, that.size())];
-						final Iterator<A> iterator = that.iterator();
-						for (int i = 0; i < result.length; i++) {
-							result[i] = requireNonNull(f.apply(this.array[i], iterator.next()));
-						}
-						return new Array<>(result);
-					} else {
-						final ArrayBuilder<B> builder = Array.builder();
-						final Iterator<A> iterator = that.iterator();
-						for (final «type.javaName» value : this.array) {
-							if (iterator.hasNext()) {
-								builder.append(requireNonNull(f.apply(value, iterator.next())));
-							} else {
-								break;
-							}
-						}
-						return builder.build();
-					}
-				}
-
-				public <A> Array<A> zipWithIndex(final Int«type.typeName»ObjectF2<A> f) {
-					if (isEmpty()) {
-						return emptyArray();
-					} else {
-						final Object[] result = new Object[this.array.length];
-						for (int i = 0; i < this.array.length; i++) {
-							result[i] = requireNonNull(f.apply(i, this.array[i]));
-						}
-						return new Array<>(result);
-					}
-				}
-			«ENDIF»
-
-			«IF type == Type.OBJECT»
 				«cast(#["A"], #[], #["A"])»
 
 			«ENDIF»
