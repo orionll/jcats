@@ -38,6 +38,9 @@ final class MaybeGenerator implements InterfaceGenerator {
 		import «Constants.COLLECTION».*;
 		import «Constants.FUNCTION».*;
 
+		«IF type.primitive»
+			import static «Constants.OPTION».*;
+		«ENDIF»
 		«IF type.javaUnboxedType»
 			import static «Constants.JCATS».Empty«type.typeName»Iterator.empty«type.typeName»Iterator;
 		«ELSE»
@@ -171,6 +174,12 @@ final class MaybeGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
+			«IF type.primitive»
+				default Option<«type.genericBoxedName»> toOption() {
+					return isEmpty() ? none() : some(get());
+				}
+
+			«ENDIF»
 			default «type.containerGenericName» as«type.containerShortName»() {
 				return new «type.diamondName("MaybeAsContainer")»(this);
 			}

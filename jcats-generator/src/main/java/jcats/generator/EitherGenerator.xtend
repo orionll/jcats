@@ -464,7 +464,7 @@ final class EitherGenerator implements ClassGenerator {
 				}
 			«ENDIF»
 
-			public «rightType.optionGenericName» toOption() {
+			public «rightType.optionGenericName» to«rightType.optionShortName»() {
 				return isRight() ? «rightType.someName»(this.right) : «rightType.noneName»();
 			}
 
