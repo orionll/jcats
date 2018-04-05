@@ -49,6 +49,9 @@ final class ContainerGenerator implements InterfaceGenerator {
 		«ENDIF»
 		import static «Constants.COLLECTION».Common.*;
 		import static «Constants.JCATS».«type.ordShortName».*;
+		«IF type.primitive»
+			import static «Constants.ARRAY».*;
+		«ENDIF»
 
 		public interface «type.covariantName("Container")» extends Iterable<«type.genericBoxedName»>, Sized {
 
@@ -432,10 +435,32 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
+			«IF type.primitive»
+				default Array<«type.boxedName»> toArray() {
+					if (isEmpty()) {
+						return emptyArray();
+					} else if (hasFixedSize()) {
+						final Object[] array = new Object[size()];
+						foreachWithIndex((final int index, final «type.javaName» value) -> array[index] = value);
+						return new Array<>(array);
+					} else {
+						final ArrayBuilder<«type.boxedName»> builder = Array.builder();
+						foreach(builder::append);
+						return builder.build();
+					}
+				}
+
+			«ENDIF»
 			default «type.seqGenericName» to«type.seqShortName»() {
 				return «type.seqShortName».sizedToSeq(iterator(), size());
 			}
 
+			«IF type.primitive»
+				default Seq<«type.boxedName»> toSeq() {
+					return Seq.ofAll(this);
+				}
+
+			«ENDIF»
 			default «type.javaName»[] «type.toArrayName»() {
 				if (isEmpty()) {
 					return «type.emptyArrayName»;
