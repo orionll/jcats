@@ -415,6 +415,25 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
+			«FOR toType : Type.primitives»
+				«IF type == Type.OBJECT»
+					public final «toType.arrayGenericName» flatMapTo«toType.typeName»(final F<A, Iterable<«toType.genericBoxedName»>> f) {
+				«ELSE»
+					public final «toType.arrayGenericName» flatMapTo«toType.typeName»(final «type.typeName»ObjectF<Iterable<«toType.genericBoxedName»>> f) {
+				«ENDIF»
+					requireNonNull(f);
+					if (isEmpty()) {
+						return empty«toType.arrayShortName»();
+					} else {
+						final «toType.arrayBuilderGenericName» builder = «toType.arrayShortName».builder();
+						for (final «type.javaName» value : this.array) {
+							builder.appendAll(f.apply(«type.genericCast»value));
+						}
+						return builder.build();
+					}
+				}
+
+			«ENDFOR»
 			public «genericName» filter(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
 				if (isEmpty()) {
