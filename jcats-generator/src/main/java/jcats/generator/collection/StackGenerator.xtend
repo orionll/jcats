@@ -265,6 +265,15 @@ final class StackGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				«genericName» stack = this;
+				while (stack.isNotEmpty()) {
+					eff.apply(stack.head);
+					stack = stack.tail;
+				}
+			}
+
+			@Override
 			public «type.iteratorGenericName» iterator() {
 				«IF type.javaUnboxedType»
 					return isEmpty() ? «type.noneName»().iterator() : new «type.typeName»StackIterator(this);
