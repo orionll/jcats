@@ -357,7 +357,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			«ELSE»
 				default «type.optionGenericName» max() {
 					«IF type.javaUnboxedType»
-						return reduceLeft(Math::max);
+						return reduceLeft(«type.boxedName»::max);
 					«ELSE»
 						return maxByOrd(«type.ordShortName.firstToLowerCase»());
 					«ENDIF»
@@ -365,7 +365,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 				default «type.optionGenericName» min() {
 					«IF type.javaUnboxedType»
-						return reduceLeft(Math::min);
+						return reduceLeft(«type.boxedName»::min);
 					«ELSE»
 						return minByOrd(«type.ordShortName.firstToLowerCase»());
 					«ENDIF»
@@ -412,11 +412,26 @@ final class ContainerGenerator implements InterfaceGenerator {
 			«FOR to : Type.primitives»
 				«IF type == Type.OBJECT»
 					default «type.optionGenericName» minBy«to.typeName»(final «to.typeName»F<A> f) {
-						return min(by«to.typeName»(f));
 				«ELSE»
 					default «type.optionGenericName» minBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
-						return minByOrd(by«to.typeName»(f));
 				«ENDIF»
+					«IF to == Type.DOUBLE»
+						return reduceLeft((final «type.genericName» min, final «type.genericName» value) -> {
+							final double minResult = f.apply(min);
+							final double valueResult = f.apply(value);
+							if (Double.isNaN(minResult)) {
+								return min;
+							} else if (Double.isNaN(valueResult)) {
+								return value;
+							} else {
+								return Double.compare(minResult, valueResult) < 0 ? min : value;
+							}
+						});
+					«ELSEIF type == Type.OBJECT»
+						return min(by«to.typeName»(f));
+					«ELSE»
+						return minByOrd(by«to.typeName»(f));
+					«ENDIF»
 				}
 
 			«ENDFOR»
