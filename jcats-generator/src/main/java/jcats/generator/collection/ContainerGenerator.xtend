@@ -356,11 +356,19 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 			«ELSE»
 				default «type.optionGenericName» max() {
-					return maxByOrd(«type.ordShortName.firstToLowerCase»());
+					«IF type.javaUnboxedType»
+						return reduceLeft(Math::max);
+					«ELSE»
+						return maxByOrd(«type.ordShortName.firstToLowerCase»());
+					«ENDIF»
 				}
 
 				default «type.optionGenericName» min() {
-					return minByOrd(«type.ordShortName.firstToLowerCase»());
+					«IF type.javaUnboxedType»
+						return reduceLeft(Math::min);
+					«ELSE»
+						return minByOrd(«type.ordShortName.firstToLowerCase»());
+					«ENDIF»
 				}
 
 				default «type.optionGenericName» maxByOrd(final «type.ordGenericName» ord) {
