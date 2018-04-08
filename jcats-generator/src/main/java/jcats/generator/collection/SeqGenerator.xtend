@@ -1193,16 +1193,8 @@ class SeqGenerator implements ClassGenerator {
 
 			abstract void initSeqBuilder(final «seqBuilderName» builder);
 
-			«IF type == Type.OBJECT»
-				«joinCollection»
+			«joinCollection(type, "Seq")»
 
-				«FOR toType : Type.primitives»
-					public static «toType.seqGenericName» joinTo«toType.typeName»(final Seq<Iterable<«toType.genericBoxedName»>> seq) {
-						return seq.flatMapTo«toType.typeName»(id());
-					}
-
-				«ENDFOR»
-			«ENDIF»
 			«IF type.javaUnboxedType»
 				@Override
 				public abstract «type.iteratorGenericName» iterator();

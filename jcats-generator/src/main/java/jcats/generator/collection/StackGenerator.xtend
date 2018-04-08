@@ -51,6 +51,9 @@ final class StackGenerator implements ClassGenerator {
 		«IF type != Type.OBJECT»
 			import static «Constants.STACK».*;
 		«ENDIF»
+		«FOR toType : Type.primitives.filter[it != type]»
+			import static «Constants.COLLECTION».«toType.stackShortName».empty«toType.stackShortName»;
+		«ENDFOR»
 
 		public final class «type.covariantName("Stack")» implements «type.containerGenericName», Equatable<«genericName»>, Serializable {
 			private static final «wildcardName» EMPTY = new «diamondName»(«type.defaultValue», null);
@@ -231,6 +234,27 @@ final class StackGenerator implements ClassGenerator {
 				}
 			}
 
+			«FOR toType : Type.primitives»
+				«IF type == Type.OBJECT»
+					public final «toType.stackGenericName» flatMapTo«toType.typeName»(final F<A, Iterable<«toType.genericBoxedName»>> f) {
+				«ELSE»
+					public final «toType.stackGenericName» flatMapTo«toType.typeName»(final «type.typeName»ObjectF<Iterable<«toType.genericBoxedName»>> f) {
+				«ENDIF»
+					requireNonNull(f);
+					if (isEmpty()) {
+						return empty«toType.stackShortName»();
+					} else {
+						final «toType.stackBuilderGenericName» builder = «toType.stackShortName».builder();
+						«genericName» stack = this;
+						while (stack.isNotEmpty()) {
+							builder.appendAll(f.apply(stack.head));
+							stack = stack.tail;
+						}
+						return builder.build();
+					}
+				}
+
+			«ENDFOR»
 			public «genericName» filter(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
 				if (isEmpty()) {
@@ -348,9 +372,9 @@ final class StackGenerator implements ClassGenerator {
 			public static «type.paramGenericName("StackBuilder")» builder() {
 				return new «type.diamondName("StackBuilder")»();
 			}
-			«IF type == Type.OBJECT»
 
-				«joinCollection»
+			«joinCollection(type, "Stack")»
+			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»

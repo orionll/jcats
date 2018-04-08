@@ -51,7 +51,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.ARRAY».emptyArray;
 		«FOR toType : Type.primitives.filter[it != type]»
-			import static «Constants.COLLECTION».«toType.typeName»Array.empty«toType.typeName»Array;
+			import static «Constants.COLLECTION».«toType.arrayShortName».empty«toType.arrayShortName»;
 		«ENDFOR»
 		import static «Constants.F».id;
 		«IF type == Type.OBJECT»
@@ -834,9 +834,9 @@ final class ArrayGenerator implements ClassGenerator {
 				return builder.build();
 			}
 
-			«IF type == Type.OBJECT»
-				«joinCollection»
+			«joinCollection(type, "Array")»
 
+			«IF type == Type.OBJECT»
 				«cast(#["A"], #[], #["A"])»
 
 			«ENDIF»

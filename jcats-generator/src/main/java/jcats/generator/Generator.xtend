@@ -161,10 +161,16 @@ interface Generator {
 		}
 	''' }
 
-	def joinCollection() { '''
-		public static <A, C extends Iterable<A>> «name»<A> join(final «name»<C> «name.toLowerCase») {
-			return «name.toLowerCase».flatMap((F) id());
-		}
+	def joinCollection(Type type, String boxedShortName) { '''
+		«IF type == Type.OBJECT»
+			public static <A, C extends Iterable<A>> «name»<A> join(final Iterable<C> iterable) {
+				return «boxedShortName».ofAll(iterable).flatMap((F) id());
+			}
+		«ELSE»
+			public static <C extends Iterable<«type.boxedName»>> «name» join(final Iterable<C> iterable) {
+				return «boxedShortName».ofAll(iterable).flatMapTo«type.typeName»((F) F.id());
+			}
+		«ENDIF»
 	'''}
 
 	def join() { joinMultiple(#[], "A") }

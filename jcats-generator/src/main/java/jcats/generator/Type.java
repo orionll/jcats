@@ -163,6 +163,10 @@ public enum Type {
 		return genericName("Stack");
 	}
 
+	public String stackBuilderGenericName() {
+		return genericName("StackBuilder");
+	}
+
 	public String seqShortName() {
 		return shortName("Seq");
 	}
