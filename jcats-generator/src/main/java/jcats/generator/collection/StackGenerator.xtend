@@ -215,6 +215,27 @@ final class StackGenerator implements ClassGenerator {
 				}
 			}
 
+			«FOR toType : Type.primitives»
+				public «toType.stackGenericName» mapTo«toType.typeName»(final «IF type != Type.OBJECT»«type.typeName»«ENDIF»«toType.typeName»F«IF type == Type.OBJECT»<A>«ENDIF» f) {
+					requireNonNull(f);
+					if (isEmpty()) {
+						return empty«toType.stackShortName»();
+					«IF type == toType»
+					} else if (f == «type.typeName»«type.typeName»F.id()) {
+						return this;
+					«ENDIF»
+					} else {
+						final «toType.stackBuilderGenericName» builder = «toType.stackShortName».builder();
+						«genericName» stack = this;
+						while (stack.isNotEmpty()) {
+							builder.append(f.apply(stack.head));
+							stack = stack.tail;
+						}
+						return builder.build();
+					}
+				}
+
+			«ENDFOR»
 			«IF type == Type.OBJECT»
 				public final <B> Stack<B> flatMap(final F<A, Iterable<B>> f) {
 			«ELSE»
@@ -272,6 +293,13 @@ final class StackGenerator implements ClassGenerator {
 				}
 			}
 
+			«IF type == Type.OBJECT»
+				public final <B> Stack<B> filterByClass(final Class<B> clazz) {
+					requireNonNull(clazz);
+					return (Stack<B>) filter(clazz::isInstance);
+				}
+
+			«ENDIF»
 			public «genericName» take(final int n) {
 				if (isEmpty() || n <= 0) {
 					return empty«shortName»();
