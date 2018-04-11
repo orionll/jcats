@@ -834,6 +834,38 @@ final class ArrayGenerator implements ClassGenerator {
 				return builder.build();
 			}
 
+			«IF type == Type.OBJECT»
+				«FOR arity : 2 .. Constants.MAX_PRODUCT_ARITY»
+					public static <«(1..arity).map['''A«it», '''].join»B> Array<B> map«arity»(«(1..arity).map['''final Array<A«it»> array«it», '''].join»final F«arity»<«(1..arity).map['''A«it», '''].join»B> f) {
+						requireNonNull(f);
+						if («(1 .. arity).map["array" + it + ".isEmpty()"].join(" || ")») {
+							return emptyArray();
+						} else {
+							«FOR i : 1 .. arity»
+								final Object[] arr«i» = array«i».array;
+							«ENDFOR»
+							final long size1 = arr1.length;
+							«FOR i : 2 .. arity»
+								final long size«i» = size«i-1» * arr«i».length;
+								if (size«i» != (int) size«i») {
+									throw new IndexOutOfBoundsException("Size overflow");
+								}
+							«ENDFOR»
+							final Object[] array = new Object[(int) size«arity»];
+							int i = 0;
+							«FOR i : 1 .. arity»
+								«(1 ..< i).map["\t"].join»for (final Object a«i» : arr«i») {
+							«ENDFOR»
+								«(1 ..< arity).map["\t"].join»array[i++] = requireNonNull(f.apply(«(1 .. arity).map['''(A«it») a«it»'''].join(", ")»));
+							«FOR i : 1 .. arity»
+								«(1 ..< arity - i + 1).map["\t"].join»}
+							«ENDFOR»
+							return new Array<>(array);
+						}
+					}
+
+				«ENDFOR»
+			«ENDIF»
 			«joinCollection(type, "Array")»
 
 			«IF type == Type.OBJECT»
