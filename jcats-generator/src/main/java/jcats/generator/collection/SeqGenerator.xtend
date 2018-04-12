@@ -1305,6 +1305,26 @@ class SeqGenerator implements ClassGenerator {
 
 			«ENDIF»
 			«IF type == Type.OBJECT»
+				«FOR arity : 2 .. Constants.MAX_PRODUCT_ARITY»
+					public static <«(1..arity).map['''A«it», '''].join»B> Seq<B> map«arity»(«(1..arity).map['''final Seq<A«it»> seq«it», '''].join»final F«arity»<«(1..arity).map['''A«it», '''].join»B> f) {
+						requireNonNull(f);
+						if («(1 .. arity).map["seq" + it + ".isEmpty()"].join(" || ")») {
+							return emptySeq();
+						} else {
+							final long size1 = seq1.size();
+							«FOR i : 2 .. arity»
+								final long size«i» = size«i-1» * seq«i».size();
+								if (size«i» != (int) size«i») {
+									throw new IndexOutOfBoundsException("Size overflow");
+								}
+							«ENDFOR»
+							return sizedToSeq(new Product«arity»Iterator<>(«(1 .. arity).map['''seq«it»'''].join(", ")», f), (int) size«arity»);
+						}
+					}
+
+				«ENDFOR»
+			«ENDIF»
+			«IF type == Type.OBJECT»
 				«cast(#["A"], #[], #["A"])»
 
 			«ENDIF»

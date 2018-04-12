@@ -397,6 +397,21 @@ final class StackGenerator implements ClassGenerator {
 				}
 			}
 
+			«IF type == Type.OBJECT»
+				«FOR arity : 2 .. Constants.MAX_PRODUCT_ARITY»
+					public static <«(1..arity).map['''A«it», '''].join»B> Stack<B> map«arity»(«(1..arity).map['''final Stack<A«it»> stack«it», '''].join»final F«arity»<«(1..arity).map['''A«it», '''].join»B> f) {
+						requireNonNull(f);
+						final StackBuilder<B> builder = builder();
+						«FOR i : 1 .. arity»
+							«(1 ..< i).map["\t"].join»stack«i».forEach(value«i» ->
+						«ENDFOR»
+							«(1 ..< arity).map["\t"].join»builder.append(f.apply(«(1 .. arity).map['''value«it»'''].join(", ")»))
+						«(1 .. arity).map[")"].join»;
+						return builder.build();
+					}
+
+				«ENDFOR»
+			«ENDIF»
 			public static «type.paramGenericName("StackBuilder")» builder() {
 				return new «type.diamondName("StackBuilder")»();
 			}
