@@ -503,8 +503,8 @@ final class ContainerGenerator implements InterfaceGenerator {
 					return array;
 				}
 			}
-			«IF type == Type.OBJECT»
 
+			«IF type == Type.OBJECT»
 				default A[] toPreciseArray(final IntObjectF<A[]> supplier) {
 					final A[] array = supplier.apply(size());
 					requireNonNull(array);
@@ -514,8 +514,14 @@ final class ContainerGenerator implements InterfaceGenerator {
 					}
 					return array;
 				}
-			«ENDIF»
 
+			«ENDIF»
+			«IF type.primitive»
+				default Container<«type.boxedName»> asContainer() {
+					return new «shortName»AsContainer(this);
+				}
+
+			«ENDIF»
 			default Collection<«type.genericBoxedName»> asCollection() {
 				return new «shortName»AsCollection«IF type == Type.OBJECT»<>«ENDIF»(this);
 			}
@@ -557,6 +563,229 @@ final class ContainerGenerator implements InterfaceGenerator {
 			«ENDIF»
 		}
 
+		«IF type.primitive»
+			final class «type.genericName("ContainerAsContainer")» implements Container<«type.boxedName»> {
+				final «shortName» container;
+
+				«shortName»AsContainer(final «shortName» container) {
+					this.container = container;
+				}
+
+				@Override
+				public int size() {
+					return this.container.size();
+				}
+
+				@Override
+				public boolean isEmpty() {
+					return this.container.isEmpty();
+				}
+
+				@Override
+				public boolean isNotEmpty() {
+					return this.container.isNotEmpty();
+				}
+
+				@Override
+				public boolean hasFixedSize() {
+					return this.container.hasFixedSize();
+				}
+
+				@Override
+				public boolean contains(final «type.boxedName» value) {
+					return this.container.contains(value);
+				}
+
+				@Override
+				public Option<«type.boxedName»> firstMatch(final BooleanF<«type.boxedName»> predicate) {
+					return this.container.firstMatch(predicate::apply).toOption();
+				}
+
+				@Override
+				public Option<«type.boxedName»> lastMatch(final BooleanF<«type.boxedName»> predicate) {
+					return this.container.lastMatch(predicate::apply).toOption();
+				}
+
+				@Override
+				public boolean anyMatch(final BooleanF<«type.boxedName»> predicate) {
+					return this.container.anyMatch(predicate::apply);
+				}
+
+				@Override
+				public boolean allMatch(final BooleanF<«type.boxedName»> predicate) {
+					return this.container.allMatch(predicate::apply);
+				}
+
+				@Override
+				public boolean noneMatch(final BooleanF<«type.boxedName»> predicate) {
+					return this.container.noneMatch(predicate::apply);
+				}
+
+				@Override
+				public <A> A foldLeft(final A start, final F2<A, «type.boxedName», A> f2) {
+					return this.container.foldLeft(start, f2::apply);
+				}
+
+				«FOR returnType : Type.primitives»
+					@Override
+					public «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»Object«returnType.typeName»F2<«type.boxedName»> f2) {
+						return this.container.foldLeftTo«returnType.typeName»(start, f2::apply);
+					}
+
+				«ENDFOR»
+				@Override
+				public <A> A foldRight(final A start, final F2<«type.boxedName», A, A> f2) {
+					return this.container.foldRight(start, f2::apply);
+				}
+
+				«FOR returnType : Type.primitives»
+					@Override
+					public «returnType.javaName» foldRightTo«returnType.typeName»(final «returnType.javaName» start, final Object«returnType.typeName»«returnType.typeName»F2<«type.boxedName»> f2) {
+						return this.container.foldRightTo«returnType.typeName»(start, f2::apply);
+					}
+
+				«ENDFOR»
+				@Override
+				public Option<«type.boxedName»> reduceLeft(final F2<«type.boxedName», «type.boxedName», «type.boxedName»> f2) {
+					return this.container.reduceLeft(f2::apply).toOption();
+				}
+
+				@Override
+				public void forEach(final Consumer<? super «type.boxedName»> action) {
+					this.container.forEach(action);
+				}
+
+				@Override
+				public void foreach(final Eff<«type.boxedName»> eff) {
+					this.container.foreach(eff::apply);
+				}
+
+				@Override
+				public void foreachWithIndex(final IntObjectEff2<«type.boxedName»> eff) {
+					this.container.foreachWithIndex(eff::apply);
+				}
+
+				@Override
+				public void foreachUntil(final BooleanF<«type.boxedName»> eff) {
+					this.container.foreachUntil(eff::apply);
+				}
+
+				@Override
+				public void printAll() {
+					this.container.printAll();
+				}
+
+				@Override
+				public «type.iteratorGenericName» iterator() {
+					return this.container.iterator();
+				}
+
+				@Override
+				public «type.spliteratorGenericName» spliterator() {
+					return this.container.spliterator();
+				}
+
+				@Override
+				public «type.iteratorGenericName» reverseIterator() {
+					return this.container.reverseIterator();
+				}
+
+				@Override
+				public String joinToString() {
+					return this.container.joinToString();
+				}
+
+				@Override
+				public String joinToStringWithSeparator(final String separator) {
+					return this.container.joinToStringWithSeparator(separator);
+				}
+
+				@Override
+				public Option<«type.boxedName»> max(final Ord<«type.boxedName»> ord) {
+					return this.container.maxByOrd(ord::compare).toOption();
+				}
+
+				@Override
+				public Option<«type.boxedName»> min(final Ord<«type.boxedName»> ord) {
+					return this.container.minByOrd(ord::compare).toOption();
+				}
+
+				@Override
+				public <B extends Comparable<B>> Option<«type.boxedName»> maxBy(final F<«type.boxedName», B> f) {
+					return this.container.maxBy(f::apply).toOption();
+				}
+
+				«FOR to : Type.primitives»
+					@Override
+					public Option<«type.boxedName»> maxBy«to.typeName»(final «to.typeName»F<«type.boxedName»> f) {
+						return this.container.maxBy«to.typeName»(f::apply).toOption();
+					}
+
+				«ENDFOR»
+				@Override
+				public <B extends Comparable<B>> Option<«type.boxedName»> minBy(final F<«type.boxedName», B> f) {
+					return this.container.minBy(f::apply).toOption();
+				}
+
+				«FOR to : Type.primitives»
+					@Override
+					public Option<«type.boxedName»> minBy«to.typeName»(final «to.typeName»F<«type.boxedName»> f) {
+						return this.container.minBy«to.typeName»(f::apply).toOption();
+					}
+
+				«ENDFOR»
+				@Override
+				public Array<«type.boxedName»> toArray() {
+					return this.container.toArray();
+				}
+
+				@Override
+				public Seq<«type.boxedName»> toSeq() {
+					return this.container.toSeq();
+				}
+
+				@Override
+				public Object[] toObjectArray() {
+					return this.container.toArray().array;
+				}
+
+				@Override
+				public Collection<«type.boxedName»> asCollection() {
+					return this.container.asCollection();
+				}
+
+				@Override
+				public ArrayList<«type.boxedName»> toArrayList() {
+					return this.container.toArrayList();
+				}
+
+				@Override
+				public HashSet<«type.boxedName»> toHashSet() {
+					return this.container.toHashSet();
+				}
+
+				@Override
+				public LinkedHashSet<«type.boxedName»> toLinkedHashSet() {
+					return this.container.toLinkedHashSet();
+				}
+
+				@Override
+				public Stream2<«type.boxedName»> stream() {
+					return this.container.stream()«IF type.javaUnboxedType».boxed()«ENDIF»;
+				}
+
+				@Override
+				public Stream2<«type.boxedName»> parallelStream() {
+					return this.container.parallelStream()«IF type.javaUnboxedType».boxed()«ENDIF»;
+				}
+
+				@Override
+				public String toString() {
+					return this.container.toString();
+				}
+			}
+
+		«ENDIF»
 		final class «type.genericName("ContainerAsCollection")» extends AbstractImmutableCollection<«type.genericBoxedName»> {
 			final «genericName» container;
 
