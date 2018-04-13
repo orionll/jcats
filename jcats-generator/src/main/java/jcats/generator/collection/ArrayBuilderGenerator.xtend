@@ -39,9 +39,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			import static «Constants.ARRAY»Builder.*;
 		«ENDIF»
 		import static «Constants.COLLECTION».«IF type != Type.OBJECT»«type.typeName»«ENDIF»Array.empty«IF type != Type.OBJECT»«type.typeName»«ENDIF»Array;
-		«IF type == Type.OBJECT»
-			import static «Constants.COMMON».*;
-		«ENDIF»
+		import static «Constants.COMMON».*;
 
 
 		public final class «genericName» {
@@ -213,6 +211,18 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 
 			public int size() {
 				return this.size;
+			}
+
+			«type.javaName»[] buildArray() {
+				if (this.size == 0) {
+					return EMPTY_«type.typeName.toUpperCase»_ARRAY;
+				} else if (this.size < this.array.length) {
+					final «type.javaName»[] result = new «type.javaName»[this.size];
+					System.arraycopy(this.array, 0, result, 0, this.size);
+					return result;
+				} else {
+					return this.array;
+				}
 			}
 
 			public «arrayGenericName» build() {

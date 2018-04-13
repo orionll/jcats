@@ -487,20 +487,14 @@ final class ContainerGenerator implements InterfaceGenerator {
 			default «type.javaName»[] «type.toArrayName»() {
 				if (isEmpty()) {
 					return «type.emptyArrayName»;
-				} else {
+				} else if (hasFixedSize()) {
 					final «type.javaName»[] array = new «type.javaName»[size()];
-					int i = 0;
-					«IF type.javaUnboxedType»
-						final «type.iteratorGenericName» iterator = iterator();
-						while (iterator.hasNext()) {
-							array[i++] = iterator.«type.iteratorNext»();
-						}
-					«ELSE»
-						for (final «type.javaName» value : this) {
-							array[i++] = value;
-						}
-					«ENDIF»
+					foreachWithIndex((final int index, final «type.genericName» value) -> array[index] = value);
 					return array;
+				} else {
+					final «type.arrayBuilderGenericName» builder = «type.arrayShortName».builder();
+					foreach(builder::append);
+					return builder.buildArray();
 				}
 			}
 
