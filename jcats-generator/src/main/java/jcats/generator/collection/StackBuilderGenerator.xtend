@@ -92,6 +92,15 @@ final class StackBuilderGenerator implements ClassGenerator {
 				return this;
 			}
 
+			«genericName» appendStackBuilder(final «genericName» builder) {
+				«type.stackGenericName» stack = builder.start;
+				while (stack.isNotEmpty()) {
+					append(stack.head);
+					stack = stack.tail;
+				}
+				return this;
+			}
+
 			public «genericName» append«type.streamName»(final «type.streamGenericName» stream) {
 				stream.forEachOrdered(this::append);
 				return this;
@@ -133,6 +142,21 @@ final class StackBuilderGenerator implements ClassGenerator {
 				if (t != null) {
 					append(t.head);
 				}
+			}
+
+			@Override
+			public String toString() {
+				final StringBuilder builder = new StringBuilder("«shortName»(");
+				«type.stackGenericName» stack = this.start;
+				while (stack.isNotEmpty()) {
+					builder.append(stack.head);
+					stack = stack.tail;
+					if (stack.isNotEmpty()) {
+						builder.append(", ");
+					}
+				}
+				builder.append(")");
+				return builder.toString();
 			}
 		}
 	''' }
