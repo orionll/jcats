@@ -151,6 +151,10 @@ public enum Type {
 		return wildcardName("Array");
 	}
 
+	public String arrayBuilderShortName() {
+		return shortName("ArrayBuilder");
+	}
+
 	public String arrayBuilderGenericName() {
 		return genericName("ArrayBuilder");
 	}
@@ -163,6 +167,10 @@ public enum Type {
 		return genericName("Stack");
 	}
 
+	public String stackBuilderShortName() {
+		return shortName("StackBuilder");
+	}
+
 	public String stackBuilderGenericName() {
 		return genericName("StackBuilder");
 	}
@@ -173,6 +181,10 @@ public enum Type {
 
 	public String seqGenericName() {
 		return genericName("Seq");
+	}
+
+	public String seqBuilderShortName() {
+		return shortName("SeqBuilder");
 	}
 
 	public String seqBuilderGenericName() {

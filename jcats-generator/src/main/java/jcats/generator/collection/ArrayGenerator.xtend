@@ -868,10 +868,6 @@ final class ArrayGenerator implements ClassGenerator {
 			«ENDIF»
 			«joinCollection(type, "Array")»
 
-			«IF type == Type.OBJECT»
-				«cast(#["A"], #[], #["A"])»
-
-			«ENDIF»
 			public static «IF type == Type.OBJECT»<A> «ENDIF»«arrayBuilderName» builder() {
 				return new «arrayBuilderDiamondName»(«type.emptyArrayName», 0);
 			}
@@ -883,11 +879,18 @@ final class ArrayGenerator implements ClassGenerator {
 					return new «arrayBuilderDiamondName»(new «type.javaName»[initialCapacity], 0);
 				}
 			}
+
+			public static «IF type == Type.OBJECT»<A> «ENDIF»Collector<«type.genericBoxedName», ?, «genericName»> collector() {
+				«IF type == Type.OBJECT»
+					return Collector.<«type.genericBoxedName», «type.arrayBuilderGenericName», «genericName»> of(
+				«ELSE»
+					return Collector.of(
+				«ENDIF»
+					«shortName»::builder, «type.arrayBuilderShortName»::append, «type.arrayBuilderShortName»::appendArrayBuilder, «type.arrayBuilderShortName»::build);
+			}
 			«IF type == Type.OBJECT»
 
-				public static <A> Collector<A, ArrayBuilder<A>, Array<A>> collector() {
-					return Collector.of(Array::builder, ArrayBuilder::append, ArrayBuilder::appendArrayBuilder, ArrayBuilder::build);
-				}
+				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
 		}
 	''' }

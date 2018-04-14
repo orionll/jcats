@@ -1325,21 +1325,24 @@ class SeqGenerator implements ClassGenerator {
 				«ENDFOR»
 			«ENDIF»
 			«IF type == Type.OBJECT»
-				«cast(#["A"], #[], #["A"])»
-
-			«ENDIF»
-			«IF type == Type.OBJECT»
 				public static <A> SeqBuilder<A> builder() {
 			«ELSE»
 				public static «seqBuilderName» builder() {
 			«ENDIF»
 				return new «seqBuilderDiamondName»();
 			}
+
+			public static «IF type == Type.OBJECT»<A> «ENDIF»Collector<«type.genericBoxedName», ?, «genericName»> collector() {
+				«IF type == Type.OBJECT»
+					return Collector.<«type.genericBoxedName», «type.seqBuilderGenericName», «genericName»> of(
+				«ELSE»
+					return Collector.of(
+				«ENDIF»
+					«shortName»::builder, «type.seqBuilderShortName»::append, «type.seqBuilderShortName»::appendSeqBuilder, «type.seqBuilderShortName»::build);
+			}
 			«IF type == Type.OBJECT»
 
-				public static <A> Collector<A, SeqBuilder<A>, Seq<A>> collector() {
-					return Collector.of(Seq::builder, SeqBuilder::append, SeqBuilder::appendSeqBuilder, SeqBuilder::build);
-				}
+				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
 		}
 	''' }

@@ -35,10 +35,8 @@ final class StackGenerator implements ClassGenerator {
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
+		import java.util.stream.Collector;
 		import java.util.Spliterator;
-		«IF type == Type.OBJECT»
-			import java.util.stream.Collector;
-		«ENDIF»
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -420,11 +418,16 @@ final class StackGenerator implements ClassGenerator {
 			}
 
 			«joinCollection(type, "Stack")»
-			«IF type == Type.OBJECT»
 
-				public static <A> Collector<A, StackBuilder<A>, Stack<A>> collector() {
-					return Collector.of(Stack::builder, StackBuilder::append, StackBuilder::appendStackBuilder, StackBuilder::build);
-				}
+			public static «IF type == Type.OBJECT»<A> «ENDIF»Collector<«type.genericBoxedName», ?, «genericName»> collector() {
+				«IF type == Type.OBJECT»
+					return Collector.<«type.genericBoxedName», «type.stackBuilderGenericName», «genericName»> of(
+				«ELSE»
+					return Collector.of(
+				«ENDIF»
+					«shortName»::builder, «type.stackBuilderShortName»::append, «type.stackBuilderShortName»::appendStackBuilder, «type.stackBuilderShortName»::build);
+			}
+			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
