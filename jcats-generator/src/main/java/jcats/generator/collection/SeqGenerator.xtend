@@ -752,8 +752,8 @@ class SeqGenerator implements ClassGenerator {
 
 			public static «paramGenericName» ofAll(final Iterable<«type.genericBoxedName»> iterable) {
 				requireNonNull(iterable);
-				if (iterable instanceof «wildcardName») {
-					return («genericName») iterable;
+				if (iterable instanceof «type.containerWildcardName») {
+					return ((«type.containerGenericName») iterable).to«shortName»();
 				} else if (iterable instanceof Sized && ((Sized) iterable).hasFixedSize()) {
 					return sizedToSeq(«type.getIterator("iterable.iterator()")», ((Sized) iterable).size());
 				} else {

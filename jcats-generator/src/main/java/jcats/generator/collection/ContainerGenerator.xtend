@@ -475,12 +475,24 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			«ENDIF»
 			default «type.seqGenericName» to«type.seqShortName»() {
-				return «type.seqShortName».sizedToSeq(iterator(), size());
+				if (hasFixedSize()) {
+					return «type.seqShortName».sizedToSeq(iterator(), size());
+				} else {
+					final «type.seqBuilderGenericName» builder = new «type.seqBuilderDiamondName»();
+					foreach(builder::append);
+					return builder.build();
+				}
 			}
 
 			«IF type.primitive»
 				default Seq<«type.boxedName»> toSeq() {
-					return Seq.ofAll(this);
+					if (hasFixedSize()) {
+						return Seq.sizedToSeq(iterator(), size());
+					} else {
+						final SeqBuilder<«type.boxedName»> builder = new SeqBuilder<>();
+						foreach(builder::append);
+						return builder.build();
+					}
 				}
 
 			«ENDIF»
