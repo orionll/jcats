@@ -33,6 +33,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 		import java.util.stream.«type.streamName»;
 
 		import «Constants.SIZED»;
+		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
 		«IF type != Type.OBJECT»
@@ -225,6 +226,14 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				}
 			}
 
+			«IF type == Type.OBJECT»
+				A[] buildPreciseArray(final IntObjectF<A[]> supplier) {
+					final A[] result = supplier.apply(this.size);
+					System.arraycopy(this.array, 0, result, 0, this.size);
+					return result;
+				}
+
+			«ENDIF»
 			public «arrayGenericName» build() {
 				if (this.size == 0) {
 					return empty«type.arrayShortName»();

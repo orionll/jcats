@@ -512,13 +512,16 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			«IF type == Type.OBJECT»
 				default A[] toPreciseArray(final IntObjectF<A[]> supplier) {
-					final A[] array = supplier.apply(size());
-					requireNonNull(array);
-					int i = 0;
-					for (final A value : this) {
-						array[i++] = value;
+					if (hasFixedSize()) {
+						final A[] array = supplier.apply(size());
+						requireNonNull(array);
+						foreachWithIndex((final int index, final A value) -> array[index] = value);
+						return array;
+					} else {
+						final ArrayBuilder<A> builder = Array.builder();
+						foreach(builder::append);
+						return builder.buildPreciseArray(supplier);
 					}
-					return array;
 				}
 
 			«ENDIF»
