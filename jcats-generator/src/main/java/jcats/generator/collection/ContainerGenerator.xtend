@@ -836,16 +836,16 @@ final class ContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			class CollectionAsContainer<A> implements Container<A> {
+			class CollectionAsContainer<C extends Collection<A>, A> implements Container<A> {
 		«ELSE»
-			class «type.typeName»CollectionAs«type.typeName»Container implements «type.typeName»Container {
+			class «type.typeName»CollectionAs«type.typeName»Container<C extends Collection<«type.boxedName»>> implements «type.typeName»Container {
 		«ENDIF»
-			final Collection<«type.genericBoxedName»> collection;
+			final C collection;
 
 			«IF type == Type.OBJECT»
-				CollectionAsContainer(final Collection<A> collection) {
+				CollectionAsContainer(final C collection) {
 			«ELSE»
-				«type.typeName»CollectionAs«type.typeName»Container(final Collection<«type.boxedName»> collection) {
+				«type.typeName»CollectionAs«type.typeName»Container(final C collection) {
 			«ENDIF»
 				this.collection = collection;
 			}

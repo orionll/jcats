@@ -239,9 +239,9 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			final class ListAsIndexedContainer<A> extends CollectionAsContainer<A> implements IndexedContainer<A> {
+			final class ListAsIndexedContainer<A> extends CollectionAsContainer<List<A>, A> implements IndexedContainer<A> {
 		«ELSE»
-			final class «type.typeName»ListAs«type.typeName»IndexedContainer extends «type.typeName»CollectionAs«type.typeName»Container implements «type.typeName»IndexedContainer {
+			final class «type.typeName»ListAs«type.typeName»IndexedContainer extends «type.typeName»CollectionAs«type.typeName»Container<List<«type.boxedName»>> implements «type.typeName»IndexedContainer {
 		«ENDIF»
 
 			«IF type == Type.OBJECT»
@@ -254,26 +254,25 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.genericName» get(final int index) {
-				return ((List<«type.genericBoxedName»>) this.collection).get(index);
+				return this.collection.get(index);
 			}
 
 			@Override
 			public IntOption indexOf(final «type.genericName» value) {
-				final int index = ((List<«type.genericBoxedName»>) this.collection).indexOf(value);
+				final int index = this.collection.indexOf(value);
 				return (index >= 0) ? intSome(index) : intNone();
 			}
 
 			@Override
 			public IntOption lastIndexOf(final «type.genericName» value) {
-				final int index = ((List<«type.genericBoxedName»>) this.collection).lastIndexOf(value);
+				final int index = this.collection.lastIndexOf(value);
 				return (index >= 0) ? intSome(index) : intNone();
 			}
 
 			@Override
 			public «type.iteratorGenericName» reverseIterator() {
 				if (this.collection instanceof RandomAccess) {
-					final List<«type.genericBoxedName»> list = (List<«type.genericBoxedName»>) this.collection;
-					final int size = list.size();
+					final int size = this.collection.size();
 					if (size == 0) {
 						«IF type.javaUnboxedType»
 							return «type.noneName»().iterator();
@@ -282,9 +281,9 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 						«ENDIF»
 					} else {
 						«IF type.javaUnboxedType»
-							return new «type.typeName»ListReverseIterator(list, size);
+							return new «type.typeName»ListReverseIterator(this.collection, size);
 						«ELSE»
-							return new ListReverseIterator<>(list, size);
+							return new ListReverseIterator<>(this.collection, size);
 						«ENDIF»
 					}
 				} else {
@@ -294,7 +293,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			public List<«type.genericBoxedName»> asCollection() {
-				return Collections.unmodifiableList((List<«type.genericBoxedName»>) this.collection);
+				return Collections.unmodifiableList(this.collection);
 			}
 
 			«hashcode(type)»

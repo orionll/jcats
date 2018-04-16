@@ -123,9 +123,9 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			final class SetAsUniqueContainer<A> extends CollectionAsContainer<A> implements UniqueContainer<A> {
+			final class SetAsUniqueContainer<A> extends CollectionAsContainer<Set<A>, A> implements UniqueContainer<A> {
 		«ELSE»
-			final class «type.typeName»SetAs«type.typeName»UniqueContainer extends «type.typeName»CollectionAs«type.typeName»Container implements «type.typeName»UniqueContainer {
+			final class «type.typeName»SetAs«type.typeName»UniqueContainer extends «type.typeName»CollectionAs«type.typeName»Container<Set<«type.boxedName»>> implements «type.typeName»UniqueContainer {
 		«ENDIF»
 			
 			«IF type == Type.OBJECT»
@@ -138,7 +138,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			public Set<«type.genericBoxedName»> asCollection() {
-				return Collections.unmodifiableSet((Set<«type.genericBoxedName»>) this.collection);
+				return Collections.unmodifiableSet(this.collection);
 			}
 
 			«uniqueHashCode(type)»
