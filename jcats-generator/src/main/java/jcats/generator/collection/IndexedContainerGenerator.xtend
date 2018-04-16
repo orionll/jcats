@@ -118,6 +118,12 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				return intNone();
 			}
 
+			«IF type.primitive»
+				default IndexedContainer<«type.boxedName»> asContainer() {
+					return new «shortName»AsIndexedContainer(this);
+				}
+
+			«ENDIF»
 			@Override
 			default List<«type.genericBoxedName»> asCollection() {
 				return new «shortName»AsList«IF type == Type.OBJECT»<>«ENDIF»(this);
@@ -193,6 +199,49 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			}
 		}
 
+		«IF type.primitive»
+			final class «shortName»AsIndexedContainer extends «type.typeName»ContainerAsContainer<«shortName»> implements IndexedContainer<«type.boxedName»> {
+
+				«shortName»AsIndexedContainer(final «shortName» container) {
+					super(container);
+				}
+
+				@Override
+				public «type.boxedName» get(final int index) throws IndexOutOfBoundsException {
+					return this.container.get(index);
+				}
+
+				@Override
+				public IntOption indexOf(final «type.boxedName» value) {
+					return this.container.indexOf(value);
+				}
+
+				@Override
+				public IntOption indexWhere(final BooleanF<«type.boxedName»> predicate) {
+					return this.container.indexWhere(predicate::apply);
+				}
+
+				@Override
+				public IntOption lastIndexOf(final «type.boxedName» value) {
+					return this.container.lastIndexOf(value);
+				}
+
+				@Override
+				public IntOption lastIndexWhere(final BooleanF<«type.boxedName»> predicate) {
+					return this.container.lastIndexWhere(predicate::apply);
+				}
+
+				@Override
+				public List<«type.boxedName»> asCollection() {
+					return this.container.asCollection();
+				}
+
+				«hashcode(Type.OBJECT)»
+
+				«equals(Type.OBJECT, Type.OBJECT.indexedContainerWildcardName, false)»
+			}
+
+		«ENDIF»
 		final class «type.genericName("IndexedContainerAsList")» extends AbstractImmutableList<«type.genericBoxedName»> implements RandomAccess {
 			final «genericName» container;
 

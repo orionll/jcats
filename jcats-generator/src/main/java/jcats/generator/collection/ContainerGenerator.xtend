@@ -527,7 +527,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			«ENDIF»
 			«IF type.primitive»
 				default Container<«type.boxedName»> asContainer() {
-					return new «shortName»AsContainer(this);
+					return new «shortName»AsContainer<>(this);
 				}
 
 			«ENDIF»
@@ -573,10 +573,10 @@ final class ContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type.primitive»
-			final class «type.genericName("ContainerAsContainer")» implements Container<«type.boxedName»> {
-				final «shortName» container;
+			class «type.genericName("ContainerAsContainer")»<C extends «shortName»> implements Container<«type.boxedName»> {
+				final C container;
 
-				«shortName»AsContainer(final «shortName» container) {
+				«shortName»AsContainer(final C container) {
 					this.container = container;
 				}
 

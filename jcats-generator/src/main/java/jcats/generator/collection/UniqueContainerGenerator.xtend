@@ -38,6 +38,12 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 
 		public interface «type.covariantName("UniqueContainer")» extends «type.containerGenericName», Equatable<«genericName»> {
 
+			«IF type.primitive»
+				default UniqueContainer<«type.boxedName»> asContainer() {
+					return new «shortName»AsUniqueContainer(this);
+				}
+
+			«ENDIF»
 			@Override
 			default Set<«type.genericBoxedName»> asCollection() {
 				return new «type.diamondName("UniqueContainerAsSet")»(this);
@@ -65,6 +71,24 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			«ENDIF»
 		}
 
+		«IF type.primitive»
+			final class «shortName»AsUniqueContainer extends «type.typeName»ContainerAsContainer<«shortName»> implements UniqueContainer<«type.boxedName»> {
+
+				«shortName»AsUniqueContainer(final «shortName» container) {
+					super(container);
+				}
+
+				@Override
+				public Set<«type.boxedName»> asCollection() {
+					return this.container.asCollection();
+				}
+
+				«uniqueHashCode(Type.OBJECT)»
+
+				«uniqueEquals(Type.OBJECT)»
+			}
+
+		«ENDIF»
 		final class «type.genericName("UniqueContainerAsSet")» extends AbstractImmutableSet<«type.genericBoxedName»> {
 			final «genericName» container;
 
