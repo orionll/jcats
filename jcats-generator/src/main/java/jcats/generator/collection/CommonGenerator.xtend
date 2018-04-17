@@ -439,6 +439,51 @@ final class CommonGenerator implements ClassGenerator {
 			}
 
 		«ENDFOR»
+		final class MappedSpliterator<A, B> implements Spliterator<B> {
+			private final Spliterator<A> spliterator;
+			private final F<A, B> f;
+
+			MappedSpliterator(final Spliterator<A> spliterator, final F<A, B> f) {
+				this.spliterator = spliterator;
+				this.f = f;
+			}
+
+			@Override
+			public boolean tryAdvance(final Consumer<? super B> action) {
+				return this.spliterator.tryAdvance((final A value) -> action.accept(this.f.apply(value)));
+			}
+
+			@Override
+			public void forEachRemaining(final Consumer<? super B> action) {
+				this.spliterator.forEachRemaining((final A value) -> action.accept(this.f.apply(value)));
+			}
+
+			@Override
+			public Spliterator<B> trySplit() {
+				return new MappedSpliterator<>(this.spliterator.trySplit(), this.f);
+			}
+
+			@Override
+			public long estimateSize() {
+				return this.spliterator.estimateSize();
+			}
+
+			@Override
+			public long getExactSizeIfKnown() {
+				return this.spliterator.getExactSizeIfKnown();
+			}
+
+			@Override
+			public int characteristics() {
+				return this.spliterator.characteristics();
+			}
+
+			@Override
+			public boolean hasCharacteristics(final int characteristics) {
+				return this.spliterator.hasCharacteristics(characteristics);
+			}
+		}
+
 		«FOR type : Type.javaUnboxedTypes»
 			final class «type.typeName»Spliterator implements Spliterator.Of«type.typeName» {
 				final Spliterator<«type.boxedName»> spliterator;
