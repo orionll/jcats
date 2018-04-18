@@ -16,14 +16,32 @@ final class EquatableGenerator implements InterfaceGenerator {
 			}
 
 			default boolean isNotEqualTo(final A other) {
-				return !isEqualTo(other);
+				requireNonNull(other);
+				return !equals(other);
 			}
 
-			default boolean isEqualToAny(final A value, final A... values) {
-				requireNonNull(value);
-				if (equals(value)) {
-					return true;
+			«FOR i : 2 .. Constants.MAX_ARITY»
+				default boolean isEqualToAny(«(1..i).map['''final A value«it»'''].join(", ")») {
+					«FOR j : 1 .. i»
+						requireNonNull(value«j»);
+					«ENDFOR»
+					return equals(value1)
+						«FOR j : 2 .. i»
+							|| equals(value«j»)«IF j == i»;«ENDIF»
+						«ENDFOR»
 				}
+
+			«ENDFOR»
+			default boolean isEqualToAny(«(1..Constants.MAX_ARITY+1).map['''final A value«it»'''].join(", ")», final A... values) {
+				«FOR j : 1 .. Constants.MAX_ARITY+1»
+					requireNonNull(value«j»);
+				«ENDFOR»
+				requireNonNull(values);
+				«FOR j : 1 .. Constants.MAX_ARITY+1»
+					if (equals(value«j»)) {
+						return true;
+					}
+				«ENDFOR»
 				for (final A val : values) {
 					requireNonNull(val);
 					if (equals(val)) {
