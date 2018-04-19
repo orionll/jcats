@@ -105,7 +105,11 @@ final class String1Generator implements ClassGenerator {
 				return (this.str == lower) ? this : new String1(lower);
 			}
 
+			/**
+			 * «equalsDeprecatedJavaDoc»
+			 */
 			@Override
+			@Deprecated
 			public boolean equals(final Object obj) {
 				if (this == obj) {
 					return true;

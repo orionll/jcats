@@ -272,7 +272,11 @@ class PGenerator implements ClassGenerator {
 				return hashCode1 ^ hashCode2;
 			}
 
+			/**
+			 * «equalsDeprecatedJavaDoc»
+			 */
 			@Override
+			@Deprecated
 			public boolean equals(final Object obj) {
 				if (obj == this) {
 					return true;

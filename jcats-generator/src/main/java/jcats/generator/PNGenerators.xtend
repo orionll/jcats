@@ -91,7 +91,11 @@ final class PNGenerators {
 						return result;
 					}
 
+					/**
+					 * «equalsDeprecatedJavaDoc»
+					 */
 					@Override
+					@Deprecated
 					public boolean equals(final Object obj) {
 						if (obj == this) {
 							return true;

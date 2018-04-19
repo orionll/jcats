@@ -81,7 +81,11 @@ interface Generator {
 	'''}
 
 	def static equals(Type type, String wildcardName, boolean isFinal) {'''
+		/**
+		 * «equalsDeprecatedJavaDoc»
+		 */
 		@Override
+		@Deprecated
 		public «IF isFinal»final «ENDIF»boolean equals(final Object obj) {
 			if (obj == this) {
 				return true;
@@ -94,7 +98,11 @@ interface Generator {
 	'''}
 
 	def static uniqueEquals(Type type) {'''
+		/**
+		 * «equalsDeprecatedJavaDoc»
+		 */
 		@Override
+		@Deprecated
 		public boolean equals(final Object obj) {
 			if (obj == this) {
 				return true;
@@ -107,7 +115,11 @@ interface Generator {
 	'''}
 
 	def static keyValueEquals() {'''
+		/**
+		 * «equalsDeprecatedJavaDoc»
+		 */
 		@Override
+		@Deprecated
 		public boolean equals(final Object obj) {
 			if (obj == this) {
 				return true;
@@ -118,6 +130,8 @@ interface Generator {
 			}
 		}
 	'''}
+
+	def static equalsDeprecatedJavaDoc() { "@deprecated This method is not type-safe. Use {@link #isEqualTo} instead." }
 
 	def static repeat(Type type, String paramGenericName) { '''
 		public static «paramGenericName» repeat(final int size, final «type.genericName» value) {

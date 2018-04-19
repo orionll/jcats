@@ -271,7 +271,11 @@ final class OptionGenerator implements ClassGenerator {
 				«ENDIF»
 			}
 
+			/**
+			 * «equalsDeprecatedJavaDoc»
+			 */
 			@Override
+			@Deprecated
 			public boolean equals(final Object obj) {
 				if (obj == this) {
 					return true;

@@ -483,7 +483,11 @@ final class EitherGenerator implements ClassGenerator {
 				return isRight() ? «IF rightType == Type.OBJECT»this.right.hashCode()«ELSE»«rightType.boxedName».hashCode(this.right)«ENDIF» : ~«IF leftType == Type.OBJECT»this.left.hashCode()«ELSE»«leftType.boxedName».hashCode(this.left)«ENDIF»;
 			}
 
+			/**
+			 * «equalsDeprecatedJavaDoc»
+			 */
 			@Override
+			@Deprecated
 			public boolean equals(final Object obj) {
 				if (obj == this) {
 					return true;
