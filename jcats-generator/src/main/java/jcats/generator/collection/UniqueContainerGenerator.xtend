@@ -54,6 +54,13 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 				return Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE;
 			}
 
+			/**
+			 * «equalsDeprecatedJavaDoc»
+			 */
+			@Override
+			@Deprecated
+			boolean equals(final Object other);
+
 			«IF type == Type.OBJECT»
 				static <A> UniqueContainer<A> asUniqueContainer(final Set<A> set) {
 					requireNonNull(set);

@@ -129,6 +129,13 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				return new «shortName»AsList«IF type == Type.OBJECT»<>«ENDIF»(this);
 			}
 
+			/**
+			 * «equalsDeprecatedJavaDoc»
+			 */
+			@Override
+			@Deprecated
+			boolean equals(final Object other);
+
 			«IF type == Type.OBJECT»
 				static <A> IndexedContainer<A> asIndexedContainer(final List<A> list) {
 					requireNonNull(list);

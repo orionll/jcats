@@ -127,6 +127,13 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				return new Stream2<>(StreamSupport.stream(spliterator(), true));
 			}
 
+			/**
+			 * «equalsDeprecatedJavaDoc»
+			 */
+			@Override
+			@Deprecated
+			boolean equals(final Object other);
+
 			static <K, A> KeyValue<K, A> asKeyValue(final Map<K, A> map) {
 				return new MapAsKeyValue<>(map);
 			}
