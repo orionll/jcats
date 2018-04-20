@@ -508,8 +508,18 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 				@Override
+				public long getExactSizeIfKnown() {
+					return this.spliterator.getExactSizeIfKnown();
+				}
+
+				@Override
 				public int characteristics() {
 					return this.spliterator.characteristics();
+				}
+
+				@Override
+				public boolean hasCharacteristics(final int characteristics) {
+					return this.spliterator.hasCharacteristics(characteristics);
 				}
 
 				@Override
