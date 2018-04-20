@@ -80,7 +80,11 @@ final class Seq1Generator extends SeqGenerator {
 
 			@Override
 			public «type.genericName» get(final int index) {
-				return «type.genericCast»node1[index];
+				try {
+					return «type.genericCast»node1[index];
+				} catch (final ArrayIndexOutOfBoundsException __) {
+					«indexOutOfBounds(shortName)»
+				}
 			}
 
 			@Override

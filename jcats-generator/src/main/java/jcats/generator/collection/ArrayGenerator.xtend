@@ -112,7 +112,11 @@ final class ArrayGenerator implements ClassGenerator {
 			 */
 			@Override
 			public «type.genericName» get(final int index) throws IndexOutOfBoundsException {
-				return «type.genericCast»this.array[index];
+				try {
+					return «type.genericCast»this.array[index];
+				} catch (final ArrayIndexOutOfBoundsException __) {
+					«indexOutOfBounds(shortName)»
+				}
 			}
 
 			/**

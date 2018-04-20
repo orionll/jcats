@@ -297,7 +297,7 @@ final class Seq4Generator extends SeqGenerator {
 						return «type.genericCast»node1[index1];
 					}
 				} catch (final ArrayIndexOutOfBoundsException __) {
-					throw new IndexOutOfBoundsException(Integer.toString(index));
+					«indexOutOfBounds(shortName)»
 				}
 			}
 

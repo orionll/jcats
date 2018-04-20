@@ -67,7 +67,7 @@ class Seq0Generator extends SeqGenerator {
 
 			@Override
 			public «type.genericName» get(final int index) {
-				throw new IndexOutOfBoundsException(Integer.toString(index));
+				«indexOutOfBounds(shortName)»
 			}
 
 			@Override
