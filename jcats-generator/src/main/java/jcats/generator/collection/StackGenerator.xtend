@@ -169,10 +169,6 @@ final class StackGenerator implements ClassGenerator {
 					return ofAll(suffix);
 				} else if (suffix instanceof «wildcardName») {
 					return concat((«genericName») suffix);
-				} else if (suffix instanceof Sized && ((Sized) suffix).isEmpty()) {
-					return this;
-				} else if (suffix instanceof Collection<?> && ((Collection<?>) suffix).isEmpty()) {
-					return this;
 				} else {
 					final «builderGenericName» builder = new «builderDiamondName»();
 					foreach(builder::append);

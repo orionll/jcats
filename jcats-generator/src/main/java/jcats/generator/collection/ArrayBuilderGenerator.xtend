@@ -26,6 +26,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 
 		import java.util.Collection;
 		import java.util.Iterator;
+		import java.util.RandomAccess;
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 			import java.util.function.«type.typeName»Consumer;
@@ -167,7 +168,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				} else if (iterable instanceof Sized && ((Sized) iterable).hasFixedSize()) {
 					return appendSized(iterable, ((Sized) iterable).size());
 				} else {
-					if (iterable instanceof Collection<?>) {
+					if (iterable instanceof Collection<?> && iterable instanceof RandomAccess) {
 						final Collection<«type.genericBoxedName»> col = (Collection<«type.genericBoxedName»>) iterable;
 						if (col.isEmpty()) {
 							return this;

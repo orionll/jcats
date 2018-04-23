@@ -1217,13 +1217,17 @@ class SeqGenerator implements ClassGenerator {
 			«IF type == Type.OBJECT»
 				public final <B, C> Seq<C> zip(final Container<B> that, final F2<A, B, C> f) {
 					requireNonNull(f);
-					if (isEmpty() || that.isEmpty()) {
+					if (isEmpty()) {
 						return emptySeq();
 					} else if (that.hasFixedSize()) {
-						final int size = Math.min(size(), that.size());
-						final Iterator<A> iterator1 = iterator();
-						final Iterator<B> iterator2 = that.iterator();
-						return fill(size, () -> f.apply(iterator1.next(), iterator2.next()));
+						if (that.isEmpty()) {
+							return emptySeq();
+						} else {
+							final int size = Math.min(size(), that.size());
+							final Iterator<A> iterator1 = iterator();
+							final Iterator<B> iterator2 = that.iterator();
+							return fill(size, () -> f.apply(iterator1.next(), iterator2.next()));
+						}
 					} else {
 						final SeqBuilder<C> builder = builder();
 						final Iterator<A> iterator1 = iterator();
@@ -1248,13 +1252,17 @@ class SeqGenerator implements ClassGenerator {
 			«ELSE»
 				public <A, B> Seq<B> zip(final Container<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
 					requireNonNull(f);
-					if (isEmpty() || that.isEmpty()) {
+					if (isEmpty()) {
 						return emptySeq();
 					} else if (that.hasFixedSize()) {
-						final int size = Math.min(size(), that.size());
-						final «type.iteratorGenericName» iterator1 = iterator();
-						final Iterator<A> iterator2 = that.iterator();
-						return Seq.fill(size, () -> f.apply(iterator1.«type.iteratorNext»(), iterator2.next()));
+						if (that.isEmpty()) {
+							return emptySeq();
+						} else {
+							final int size = Math.min(size(), that.size());
+							final «type.iteratorGenericName» iterator1 = iterator();
+							final Iterator<A> iterator2 = that.iterator();
+							return Seq.fill(size, () -> f.apply(iterator1.«type.iteratorNext»(), iterator2.next()));
+						}
 					} else {
 						final SeqBuilder<B> builder = Seq.builder();
 						final «type.iteratorGenericName» iterator1 = iterator();

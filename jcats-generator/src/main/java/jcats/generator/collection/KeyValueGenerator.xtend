@@ -110,9 +110,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			default Spliterator<P<K, A>> spliterator() {
-				if (isEmpty()) {
-					return Spliterators.emptySpliterator();
-				} else if (hasFixedSize()) {
+				if (hasFixedSize()) {
 					return Spliterators.spliterator(iterator(), size(), spliteratorCharacteristics());
 				} else {
 					return Spliterators.spliteratorUnknownSize(iterator(), spliteratorCharacteristics());

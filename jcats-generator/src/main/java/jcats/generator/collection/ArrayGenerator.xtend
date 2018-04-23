@@ -36,6 +36,7 @@ final class ArrayGenerator implements ClassGenerator {
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
+		import java.util.RandomAccess;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.stream.Collector;
@@ -289,7 +290,7 @@ final class ArrayGenerator implements ClassGenerator {
 					return appendSized(suffix, ((Sized) suffix).size());
 				} else {
 					final «arrayBuilderName» builder;
-					if (suffix instanceof Collection) {
+					if (suffix instanceof Collection<?> && suffix instanceof RandomAccess) {
 						final Collection<?> col = (Collection<?>) suffix;
 						if (col.isEmpty()) {
 							return this;
@@ -318,7 +319,7 @@ final class ArrayGenerator implements ClassGenerator {
 					return prependSized(prefix, ((Sized) prefix).size());
 				} else {
 					final «arrayBuilderName» builder;
-					if (prefix instanceof Collection) {
+					if (prefix instanceof Collection<?> && prefix instanceof RandomAccess) {
 						final Collection<?> col = (Collection<?>) prefix;
 						if (col.isEmpty()) {
 							return this;
@@ -636,15 +637,19 @@ final class ArrayGenerator implements ClassGenerator {
 			«IF type == Type.OBJECT»
 				public <B, C> Array<C> zip(final Container<B> that, final F2<A, B, C> f) {
 					requireNonNull(f);
-					if (isEmpty() || that.isEmpty()) {
+					if (isEmpty()) {
 						return emptyArray();
 					} else if (that.hasFixedSize()) {
-						final Object[] result = new Object[Math.min(this.array.length, that.size())];
-						final Iterator<B> iterator = that.iterator();
-						for (int i = 0; i < result.length; i++) {
-							result[i] = requireNonNull(f.apply((A) this.array[i], iterator.next()));
+						if (that.isEmpty()) {
+							return emptyArray();
+						} else {
+							final Object[] result = new Object[Math.min(this.array.length, that.size())];
+							final Iterator<B> iterator = that.iterator();
+							for (int i = 0; i < result.length; i++) {
+								result[i] = requireNonNull(f.apply((A) this.array[i], iterator.next()));
+							}
+							return new Array<>(result);
 						}
-						return new Array<>(result);
 					} else {
 						final ArrayBuilder<C> builder = builder();
 						final Iterator<B> iterator = that.iterator();
@@ -673,15 +678,19 @@ final class ArrayGenerator implements ClassGenerator {
 			«ELSE»
 				public <A, B> Array<B> zip(final Container<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
 					requireNonNull(f);
-					if (isEmpty() || that.isEmpty()) {
+					if (isEmpty()) {
 						return emptyArray();
 					} else if (that.hasFixedSize()) {
-						final Object[] result = new Object[Math.min(this.array.length, that.size())];
-						final Iterator<A> iterator = that.iterator();
-						for (int i = 0; i < result.length; i++) {
-							result[i] = requireNonNull(f.apply(this.array[i], iterator.next()));
+						if (that.isEmpty()) {
+							return emptyArray();
+						} else {
+							final Object[] result = new Object[Math.min(this.array.length, that.size())];
+							final Iterator<A> iterator = that.iterator();
+							for (int i = 0; i < result.length; i++) {
+								result[i] = requireNonNull(f.apply(this.array[i], iterator.next()));
+							}
+							return new Array<>(result);
 						}
-						return new Array<>(result);
 					} else {
 						final ArrayBuilder<B> builder = Array.builder();
 						final Iterator<A> iterator = that.iterator();
