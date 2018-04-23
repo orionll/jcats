@@ -724,6 +724,14 @@ final class ArrayGenerator implements ClassGenerator {
 				return new «diamondName»(new «type.javaName»[] { value });
 			}
 
+			static «paramGenericName» create(final «type.javaName»[] array) {
+				if (array.length == 0) {
+					return empty«shortName»();
+				} else {
+					return new «diamondName»(array);
+				}
+			}
+
 			«IF type == Type.OBJECT»
 				@SafeVarargs
 			«ENDIF»

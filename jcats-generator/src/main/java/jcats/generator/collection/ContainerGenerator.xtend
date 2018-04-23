@@ -321,29 +321,21 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			default String joinToString() {
-				if (isEmpty()) {
-					return "";
-				} else {
-					final StringBuilder builder = new StringBuilder();
-					foreach(builder::append);
-					return builder.toString();
-				}
+				final StringBuilder builder = new StringBuilder();
+				foreach(builder::append);
+				return builder.toString();
 			}
 
 			default String joinToStringWithSeparator(final String separator) {
-				if (isEmpty()) {
-					return "";
-				} else {
-					final StringBuilder builder = new StringBuilder();
-					final «type.iteratorGenericName» iterator = iterator();
-					while (iterator.hasNext()) {
-						builder.append(iterator.«type.iteratorNext»());
-						if (iterator.hasNext()) {
-							builder.append(separator);
-						}
+				final StringBuilder builder = new StringBuilder();
+				final «type.iteratorGenericName» iterator = iterator();
+				while (iterator.hasNext()) {
+					builder.append(iterator.«type.iteratorNext»());
+					if (iterator.hasNext()) {
+						builder.append(separator);
 					}
-					return builder.toString();
 				}
+				return builder.toString();
 			}
 
 			«IF type == Type.OBJECT»
@@ -441,9 +433,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			default «type.spliteratorGenericName» spliterator() {
-				if (isEmpty()) {
-					return Spliterators.«type.emptySpliteratorName»();
-				} else if (hasFixedSize()) {
+				if (hasFixedSize()) {
 					return Spliterators.spliterator(iterator(), size(), spliteratorCharacteristics());
 				} else {
 					return Spliterators.spliteratorUnknownSize(iterator(), spliteratorCharacteristics());
@@ -451,21 +441,19 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			default «type.arrayGenericName» to«type.arrayShortName»() {
-				if (isEmpty()) {
-					return «type.arrayShortName».empty«type.arrayShortName»();
-				} else {
-					return new «type.diamondName("Array")»(«type.toArrayName»());
-				}
+				return «type.arrayShortName».create(«type.toArrayName»());
 			}
 
 			«IF type.primitive»
 				default Array<«type.boxedName»> toArray() {
-					if (isEmpty()) {
-						return emptyArray();
-					} else if (hasFixedSize()) {
-						final Object[] array = new Object[size()];
-						foreachWithIndex((final int index, final «type.javaName» value) -> array[index] = value);
-						return new Array<>(array);
+					if (hasFixedSize()) {
+						if (isEmpty()) {
+							return emptyArray();
+						} else {
+							final Object[] array = new Object[size()];
+							foreachWithIndex((final int index, final «type.javaName» value) -> array[index] = value);
+							return new Array<>(array);
+						}
 					} else {
 						final ArrayBuilder<«type.boxedName»> builder = Array.builder();
 						foreach(builder::append);
@@ -497,12 +485,14 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			«ENDIF»
 			default «type.javaName»[] «type.toArrayName»() {
-				if (isEmpty()) {
-					return «type.emptyArrayName»;
-				} else if (hasFixedSize()) {
-					final «type.javaName»[] array = new «type.javaName»[size()];
-					foreachWithIndex((final int index, final «type.genericName» value) -> array[index] = value);
-					return array;
+				if (hasFixedSize()) {
+					if (isEmpty()) {
+						return «type.emptyArrayName»;
+					} else {
+						final «type.javaName»[] array = new «type.javaName»[size()];
+						foreachWithIndex((final int index, final «type.genericName» value) -> array[index] = value);
+						return array;
+					}
 				} else {
 					final «type.arrayBuilderGenericName» builder = «type.arrayShortName».builder();
 					foreach(builder::append);
