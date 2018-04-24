@@ -1,5 +1,6 @@
 package jcats.generator.collection
 
+import com.google.common.collect.Iterables
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
 import jcats.generator.Type
@@ -358,6 +359,115 @@ final class CommonGenerator implements ClassGenerator {
 
 				«ENDIF»
 			«ENDFOR»
+		«ENDFOR»
+		«FOR type : Iterables.concat(#[Type.OBJECT], Type.javaUnboxedTypes)»
+			final class «type.genericName("FilteredIterator")» implements «type.iteratorGenericName» {
+				private final «type.iteratorGenericName» iterator;
+				private final «type.boolFName» predicate;
+				private boolean valueReady;
+				private «type.iteratorReturnType» next;
+
+				«type.shortName("FilteredIterator")»(final «type.iteratorGenericName» iterator, final «type.boolFName» predicate) {
+					this.iterator = iterator;
+					this.predicate = predicate;
+				}
+
+				@Override
+				public boolean hasNext() {
+					getNext();
+					return this.valueReady;
+				}
+
+				@Override
+				public «type.iteratorReturnType» «type.iteratorNext»() {
+					getNext();
+					if (this.valueReady) {
+						this.valueReady = false;
+						«IF type.primitive»
+							return this.next;
+						«ELSE»
+							final «type.iteratorReturnType» result = this.next;
+							this.next = null;
+							return result;
+						«ENDIF»
+					} else {
+						throw new NoSuchElementException();
+					}
+				}
+
+				private void getNext() {
+					if (!this.valueReady) {
+						while (this.iterator.hasNext()) {
+							final «type.iteratorReturnType» value = «type.requireNonNull('''this.iterator.«type.iteratorNext»()''')»;
+							if (this.predicate.apply(value)) {
+								this.next = value;
+								this.valueReady = true;
+								return;
+							}
+						}
+					}
+				}
+			}
+
+		«ENDFOR»
+		«FOR type : Iterables.concat(#[Type.OBJECT], Type.javaUnboxedTypes)»
+			final class «type.genericName("LimitedIterator")» implements «type.iteratorGenericName» {
+				private final «type.iteratorGenericName» iterator;
+				private final int limit;
+				private int count;
+
+				«type.shortName("LimitedIterator")»(final «type.iteratorGenericName» iterator, final int limit) {
+					this.iterator = iterator;
+					this.limit = limit;
+				}
+
+				@Override
+				public boolean hasNext() {
+					return (this.count < this.limit) && this.iterator.hasNext();
+				}
+
+				@Override
+				public «type.iteratorReturnType» «type.iteratorNext»() {
+					if (hasNext()) {
+						this.count++;
+						return this.iterator.«type.iteratorNext»();
+					} else {
+						throw new NoSuchElementException();
+					}
+				}
+			}
+
+		«ENDFOR»
+		«FOR type : Iterables.concat(#[Type.OBJECT], Type.javaUnboxedTypes)»
+			final class «type.genericName("SkippedIterator")» implements «type.iteratorGenericName» {
+				private final «type.iteratorGenericName» iterator;
+				private int skip;
+			
+				«type.shortName("SkippedIterator")»(final «type.iteratorGenericName» iterator, final int skip) {
+					this.iterator = iterator;
+					this.skip = skip;
+				}
+			
+				@Override
+				public boolean hasNext() {
+					advance();
+					return this.iterator.hasNext();
+				}
+			
+				@Override
+				public «type.iteratorReturnType» «type.iteratorNext»() {
+					advance();
+					return this.iterator.«type.iteratorNext»();
+				}
+			
+				private void advance() {
+					while (this.skip > 0 && this.iterator.hasNext()) {
+						this.skip--;
+						this.iterator.«type.iteratorNext»();
+					}
+				}
+			}
+
 		«ENDFOR»
 		final class TableIterator<A> implements Iterator<A> {
 			private final int size;
