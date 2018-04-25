@@ -325,12 +325,13 @@ final class CommonGenerator implements ClassGenerator {
 
 			@Override
 			public boolean hasNext() {
-				return iterator.hasNext();
+				return this.iterator.hasNext();
 			}
 
 			@Override
 			public B next() {
-				return f.apply(requireNonNull(iterator.next()));
+				final A next = requireNonNull(this.iterator.next());
+				return requireNonNull(this.f.apply(next));
 			}
 		}
 
@@ -348,12 +349,13 @@ final class CommonGenerator implements ClassGenerator {
 
 						@Override
 						public boolean hasNext() {
-							return iterator.hasNext();
+							return this.iterator.hasNext();
 						}
 
 						@Override
 						public «toType.genericJavaUnboxedName» «toType.iteratorNext»() {
-							return f.apply(iterator.«fromType.iteratorNext»());
+							final «fromType.iteratorReturnType» value = «fromType.requireNonNull('''this.iterator.«fromType.iteratorNext»()''')»;
+							return «toType.requireNonNull("this.f.apply(value)")»;
 						}
 					}
 
