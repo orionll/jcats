@@ -129,9 +129,9 @@ class SeqGenerator implements ClassGenerator {
 			 */
 			public abstract «genericName» update(final int index, final «type.updateFunction» f) throws IndexOutOfBoundsException;
 
-			public abstract «genericName» take(final int n);
+			public abstract «genericName» limit(final int n);
 
-			public abstract «genericName» drop(final int n);
+			public abstract «genericName» skip(final int n);
 
 			«takeWhile(true, type)»
 
@@ -189,8 +189,8 @@ class SeqGenerator implements ClassGenerator {
 			}
 
 			private «genericName» remove(final int index) {
-				final «genericName» prefix = take(index);
-				final «genericName» suffix = drop(index + 1);
+				final «genericName» prefix = limit(index);
+				final «genericName» suffix = skip(index + 1);
 				return prefix.concat(suffix);
 			}
 
@@ -262,7 +262,7 @@ class SeqGenerator implements ClassGenerator {
 
 			public final «genericName» slice(final int fromIndex, final int toIndex) {
 				sliceRangeCheck(fromIndex, toIndex, size());
-				return drop(fromIndex).take(toIndex - fromIndex);
+				return skip(fromIndex).limit(toIndex - fromIndex);
 			}
 
 			public final «genericName» reverse() {

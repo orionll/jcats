@@ -297,8 +297,10 @@ final class StackGenerator implements ClassGenerator {
 				}
 
 			«ENDIF»
-			public «genericName» take(final int n) {
-				if (isEmpty() || n <= 0) {
+			public «genericName» limit(final int n) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (isEmpty() || n == 0) {
 					return empty«shortName»();
 				} else {
 					final «builderGenericName» builder = new «builderDiamondName»();

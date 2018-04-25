@@ -322,7 +322,7 @@ public class TestSeq {
 			if (isTestIndex(i + 31)) {
 				assertSeqsDeepEqual("Init is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.init());
 				// Seq.EA = true;
-				assertSeqsDeepEqual("Take is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.take(newSeq.size() - 1));
+				assertSeqsDeepEqual("Take is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.limit(newSeq.size() - 1));
 				// Seq.EA = false;
 			}
 			seq = newSeq;
@@ -333,7 +333,7 @@ public class TestSeq {
 			final Seq<Integer> newSeq = seq.append(i % 61);
 			if (isTestIndex(i)) {
 				assertSeqsDeepEqual("Init is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.init());
-				assertSeqsDeepEqual("Take is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.take(newSeq.size() - 1));
+				assertSeqsDeepEqual("Take is not equal to expected seq (size = " + seq.size() + ")", seq, newSeq.limit(newSeq.size() - 1));
 			}
 			seq = newSeq;
 		}
@@ -542,7 +542,7 @@ public class TestSeq {
 		for (int i = 0; i < 1500; i++) {
 			for (int n = 0; n <= i; n++) {
 				try {
-					final Seq<Integer> take = seq.take(n);
+					final Seq<Integer> take = seq.limit(n);
 					assertEquals(n, take.size());
 					assertTrue(Iterables.elementsEqual(Iterables.limit(seq, n), take));
 				} catch (final Throwable t) {
@@ -565,7 +565,7 @@ public class TestSeq {
 				final int n = randInt(random, 0, seq.size() / (j + 1));
 
 				try {
-					final Seq<Integer> take = seq.take(n);
+					final Seq<Integer> take = seq.limit(n);
 					assertEquals(n, take.size());
 					assertTrue(Iterables.elementsEqual(Iterables.limit(seq, n), take));
 				} catch (final Throwable t) {
@@ -581,7 +581,7 @@ public class TestSeq {
 		for (int i = 0; i < 1500; i++) {
 			for (int n = 0; n <= i; n++) {
 				try {
-					final Seq<Integer> drop = seq.drop(n);
+					final Seq<Integer> drop = seq.skip(n);
 					assertEquals(seq.size() - n, drop.size());
 					assertTrue(Iterables.elementsEqual(Iterables.skip(seq, n), drop));
 				} catch (final Throwable t) {
@@ -604,7 +604,7 @@ public class TestSeq {
 				final int n = randInt(random, seq.size() - seq.size() / (j + 1), seq.size());
 
 				try {
-					final Seq<Integer> drop = seq.drop(n);
+					final Seq<Integer> drop = seq.skip(n);
 					assertEquals(seq.size() - n, drop.size());
 					assertTrue(Iterables.elementsEqual(Iterables.skip(seq, n), drop));
 				} catch (final Throwable t) {

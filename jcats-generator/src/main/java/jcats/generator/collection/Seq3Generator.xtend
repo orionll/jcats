@@ -260,8 +260,10 @@ final class Seq3Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «genericName» take(final int n) {
-				if (n <= 0) {
+			public «genericName» limit(final int n) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (n == 0) {
 					return empty«shortName»();
 				} else if (n < init.length) {
 					final «type.javaName»[] node1 = new «type.javaName»[n];
@@ -336,8 +338,10 @@ final class Seq3Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «genericName» drop(final int n) {
-				if (n >= size) {
+			public «genericName» skip(final int n) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (n >= size) {
 					return empty«shortName»();
 				} else if (n > size - tail.length) {
 					final «type.javaName»[] node1 = new «type.javaName»[size - n];
@@ -345,7 +349,7 @@ final class Seq3Generator extends SeqGenerator {
 					return new «diamondName(1)»(node1);
 				} else if (n == size - tail.length) {
 					return new «diamondName(1)»(tail);
-				} else if (n <= 0) {
+				} else if (n == 0) {
 					return this;
 				} else if (n < init.length) {
 					final «type.javaName»[] newInit = new «type.javaName»[init.length - n];

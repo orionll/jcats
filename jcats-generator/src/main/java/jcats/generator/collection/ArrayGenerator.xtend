@@ -465,8 +465,10 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 
 			«ENDIF»
-			public «genericName» take(final int n) {
-				if (n <= 0) {
+			public «genericName» limit(final int n) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (n == 0) {
 					return empty«shortName»();
 				} else if (n >= this.array.length) {
 					return this;
@@ -477,10 +479,12 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			public «genericName» drop(final int n) {
-				if (n >= this.array.length) {
+			public «genericName» skip(final int n) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (n >= this.array.length) {
 					return empty«shortName»();
-				} else if (n <= 0) {
+				} else if (n == 0) {
 					return this;
 				} else {
 					final «type.javaName»[] result = new «type.javaName»[this.array.length - n];

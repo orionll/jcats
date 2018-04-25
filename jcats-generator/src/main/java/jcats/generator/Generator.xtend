@@ -32,7 +32,7 @@ interface Generator {
 					break;
 				}
 			}
-			return take(n);
+			return limit(n);
 		}
 	''' }
 

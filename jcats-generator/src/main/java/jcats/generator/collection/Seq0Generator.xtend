@@ -76,13 +76,21 @@ class Seq0Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «genericName» take(final int n) {
-				return empty«shortName»();
+			public «genericName» limit(final int n) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else {
+					return empty«shortName»();
+				}
 			}
 
 			@Override
-			public «genericName» drop(final int n) {
-				return empty«shortName»();
+			public «genericName» skip(final int n) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else {
+					return empty«shortName»();
+				}
 			}
 
 			@Override

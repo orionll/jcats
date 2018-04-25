@@ -93,8 +93,10 @@ final class Seq1Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «genericName» take(final int n) {
-				if (n <= 0) {
+			public «genericName» limit(final int n) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (n == 0) {
 					return empty«shortName»();
 				} else if (n >= node1.length) {
 					return this;
@@ -106,10 +108,12 @@ final class Seq1Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «genericName» drop(final int n) {
-				if (n >= node1.length) {
+			public «genericName» skip(final int n) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (n >= node1.length) {
 					return empty«shortName»();
-				} else if (n <= 0) {
+				} else if (n == 0) {
 					return this;
 				} else {
 					final «type.javaName»[] newNode1 = new «type.javaName»[node1.length - n];
