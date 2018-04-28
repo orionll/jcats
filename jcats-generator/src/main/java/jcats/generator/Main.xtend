@@ -9,9 +9,11 @@ import java.util.List
 import jcats.generator.collection.ArrayBuilderGenerator
 import jcats.generator.collection.ArrayGenerator
 import jcats.generator.collection.ContainerGenerator
+import jcats.generator.collection.ContainerViewGenerator
 import jcats.generator.collection.DictGenerator
 import jcats.generator.collection.HashTableCommonGenerator
 import jcats.generator.collection.IndexedContainerGenerator
+import jcats.generator.collection.IndexedContainerViewGenerator
 import jcats.generator.collection.KeyValueGenerator
 import jcats.generator.collection.PrimitiveStream2Generator
 import jcats.generator.collection.Seq0Generator
@@ -116,7 +118,9 @@ final class Main {
 			FNGenerators.generators,
 			EffNGenerators.generators,
 			ContainerGenerator.generators,
+			ContainerViewGenerator.generators,
 			IndexedContainerGenerator.generators,
+			IndexedContainerViewGenerator.generators,
 			UniqueContainerGenerator.generators,
 			ArrayGenerator.generators,
 			ArrayBuilderGenerator.generators,

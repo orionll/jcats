@@ -1200,6 +1200,11 @@ class SeqGenerator implements ClassGenerator {
 				public abstract «type.iteratorGenericName» iterator();
 
 			«ENDIF»
+			@Override
+			public «type.indexedContainerViewGenericName» view() {
+				return new «type.diamondName("SeqView")»(this);
+			}
+
 			«hashcode(type, true)»
 
 			«equals(type, type.indexedContainerWildcardName, true)»
@@ -1352,6 +1357,27 @@ class SeqGenerator implements ClassGenerator {
 
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
+		}
+
+		«IF type == Type.OBJECT»
+			final class SeqView<A> extends BaseIndexedContainerView<A, Seq<A>> {
+		«ELSE»
+			final class «shortName»View extends «type.typeName»BaseIndexedContainerView<«shortName»> {
+		«ENDIF»
+
+			«shortName»View(final «genericName» seq) {
+				super(seq);
+			}
+
+			@Override
+			public «type.indexedContainerViewGenericName» limit(final int n) {
+				return new «type.diamondName("SeqView")»(this.container.limit(n));
+			}
+
+			@Override
+			public «type.indexedContainerViewGenericName» skip(final int n) {
+				return new «type.diamondName("SeqView")»(this.container.skip(n));
+			}
 		}
 	''' }
 }

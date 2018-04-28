@@ -118,6 +118,10 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				return intNone();
 			}
 
+			default «type.indexedContainerViewGenericName» view() {
+				return new «type.shortName("BaseIndexedContainerView")»<>(this);
+			}
+
 			«IF type.primitive»
 				default IndexedContainer<«type.boxedName»> asContainer() {
 					return new «shortName»AsIndexedContainer(this);

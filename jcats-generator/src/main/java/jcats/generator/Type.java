@@ -223,6 +223,10 @@ public enum Type {
 		return wildcardName("Container");
 	}
 
+	public String containerViewGenericName() {
+		return genericName("ContainerView");
+	}
+
 	public String indexedContainerGenericName() {
 		return genericName("IndexedContainer");
 	}
@@ -233,6 +237,14 @@ public enum Type {
 
 	public String indexedContainerWildcardName() {
 		return wildcardName("IndexedContainer");
+	}
+
+	public String indexedContainerViewShortName() {
+		return shortName("IndexedContainerView");
+	}
+
+	public String indexedContainerViewGenericName() {
+		return genericName("IndexedContainerView");
 	}
 
 	public String indexedGenericName() {

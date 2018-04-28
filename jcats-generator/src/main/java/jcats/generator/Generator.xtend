@@ -36,9 +36,11 @@ interface Generator {
 		}
 	''' }
 
-	def toStr() { return toStr(Type.OBJECT, false) }
+	def toStr() { toStr(Type.OBJECT, false) }
 
-	def toStr(Type type, boolean isFinal) { '''
+	def toStr(Type type, boolean isFinal) { toStr(type, name, isFinal) }
+
+	def toStr(Type type, String name, boolean isFinal) { '''
 		@Override
 		public «IF isFinal»final «ENDIF»String toString() {
 			«IF type.javaUnboxedType»

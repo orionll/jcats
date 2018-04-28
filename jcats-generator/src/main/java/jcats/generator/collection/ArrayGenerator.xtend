@@ -622,6 +622,11 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public «type.indexedContainerViewGenericName» view() {
+				return new «type.diamondName("ArrayView")»(this);
+			}
+
+			@Override
 			public int hashCode() {
 				return Arrays.hashCode(this.array);
 			}
@@ -917,6 +922,27 @@ final class ArrayGenerator implements ClassGenerator {
 
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
+		}
+
+		«IF type == Type.OBJECT»
+			final class ArrayView<A> extends BaseIndexedContainerView<A, Array<A>> {
+		«ELSE»
+			final class «shortName»View extends «type.typeName»BaseIndexedContainerView<«shortName»> {
+		«ENDIF»
+
+			«shortName»View(final «genericName» array) {
+				super(array);
+			}
+
+			@Override
+			public «type.indexedContainerViewGenericName» limit(final int n) {
+				return new «type.diamondName("ArrayView")»(this.container.limit(n));
+			}
+
+			@Override
+			public «type.indexedContainerViewGenericName» skip(final int n) {
+				return new «type.diamondName("ArrayView")»(this.container.skip(n));
+			}
 		}
 	''' }
 }

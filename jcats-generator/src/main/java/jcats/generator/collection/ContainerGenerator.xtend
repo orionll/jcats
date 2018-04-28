@@ -537,6 +537,10 @@ final class ContainerGenerator implements InterfaceGenerator {
 				return new LinkedHashSet<>(asCollection());
 			}
 
+			default «type.containerViewGenericName» view() {
+				return new «type.shortName("BaseContainerView")»<>(this);
+			}
+
 			default «type.stream2GenericName» stream() {
 				return new «type.stream2DiamondName»(StreamSupport.«type.streamFunction»(spliterator(), false));
 			}
@@ -553,7 +557,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			«ELSE»
 				static «type.containerGenericName» as«type.typeName»Container(final Collection<«type.boxedName»> collection) {
 					requireNonNull(collection);
-					return new «type.typeName»CollectionAs«type.typeName»Container(collection);
+					return new «type.typeName»CollectionAs«type.typeName»Container<>(collection);
 				}
 			«ENDIF»
 			«IF type == Type.OBJECT»
