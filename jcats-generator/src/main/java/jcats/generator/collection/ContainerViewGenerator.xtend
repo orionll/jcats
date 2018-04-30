@@ -249,11 +249,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«toStr(type, filteredContainerViewShortName, false)»
 		}
 
-		final class «type.genericName("LimitedContainerView")» implements «genericName» {
-			private final «genericName» view;
-			private final int limit;
+		class «limitedContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> implements «genericName» {
+			final C view;
+			final int limit;
 
-			«limitedContainerViewShortName»(final «genericName» view, final int limit) {
+			«limitedContainerViewShortName»(final C view, final int limit) {
 				this.view = view;
 				this.limit = limit;
 			}
@@ -305,11 +305,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«toStr(type, limitedContainerViewShortName, false)»
 		}
 
-		final class «type.genericName("SkippedContainerView")» implements «genericName» {
-			private final «genericName» view;
-			private final int skip;
+		class «skippedContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> implements «genericName» {
+			final C view;
+			final int skip;
 
-			«skippedContainerViewShortName»(final «genericName» view, final int skip) {
+			«skippedContainerViewShortName»(final C view, final int skip) {
 				this.view = view;
 				this.skip = skip;
 			}

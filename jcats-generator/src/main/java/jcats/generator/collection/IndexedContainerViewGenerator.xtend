@@ -55,11 +55,11 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			default «genericName» limit(final int n) {
-				throw new UnsupportedOperationException();
+				return new «limitedIndexedContainerViewShortName»<>(this, n);
 			}
 
 			default «genericName» skip(final int n) {
-				throw new UnsupportedOperationException();
+				return new «skippedIndexedContainerViewShortName»<>(this, n);
 			}
 		}
 
@@ -113,6 +113,86 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			public String toString() {
 				return iterableToString(this, "«mappedIndexedContainerViewShortName»");
 			}
+		}
+
+		«IF type == Type.OBJECT»
+			class «limitedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends LimitedContainerView<A, C> implements IndexedContainerView<A> {
+		«ELSE»
+			class «limitedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»LimitedContainerView<C> implements «type.indexedContainerViewGenericName» {
+		«ENDIF»
+
+			«limitedIndexedContainerViewShortName»(final C view, final int limit) {
+				super(view, limit);
+			}
+
+			@Override
+			public «type.genericName» get(final int index) throws IndexOutOfBoundsException {
+				if (index < 0 || index >= this.limit) {
+					throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«limitedIndexedContainerViewShortName»"));
+				} else {
+					try {
+						return this.view.get(index);
+					} catch (final IndexOutOfBoundsException __) {
+						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«limitedIndexedContainerViewShortName»"));
+					}
+				}
+			}
+
+			@Override
+			public «type.indexedContainerViewGenericName» limit(final int n) {
+				if (n < this.limit && this.limit > 0) {
+					return new «limitedIndexedContainerViewShortName»<>(this.view, n);
+				} else {
+					return this;
+				}
+			}
+
+			«toStr(type, limitedIndexedContainerViewShortName, false)»
+		}
+
+		«IF type == Type.OBJECT»
+			class «skippedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends SkippedContainerView<A, C> implements IndexedContainerView<A> {
+		«ELSE»
+			class «skippedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»SkippedContainerView<C> implements «type.indexedContainerViewGenericName» {
+		«ENDIF»
+
+			«skippedIndexedContainerViewShortName»(final C view, final int skip) {
+				super(view, skip);
+			}
+
+			@Override
+			public «type.genericName» get(final int index) throws IndexOutOfBoundsException {
+				if (index < 0) {
+					throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«skippedIndexedContainerViewShortName»"));
+				} else {
+					final int newIndex = this.skip + index;
+					if (newIndex < 0) {
+						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«skippedIndexedContainerViewShortName»"));
+					}
+					try {
+						return this.view.get(newIndex);
+					} catch (final IndexOutOfBoundsException __) {
+						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«skippedIndexedContainerViewShortName»"));
+					}
+				}
+			}
+
+			@Override
+			public «type.indexedContainerViewGenericName» skip(final int n) {
+				if (n > 0) {
+					final int sum = this.skip + n;
+					if (sum < 0) {
+						// Overflow
+						return new «skippedIndexedContainerViewShortName»<>(this, n);
+					} else {
+						return new «skippedIndexedContainerViewShortName»<>(this.view, sum);
+					}
+				} else {
+					return this;
+				}
+			}
+
+			«toStr(type, skippedIndexedContainerViewShortName, false)»
 		}
 	''' }
 }

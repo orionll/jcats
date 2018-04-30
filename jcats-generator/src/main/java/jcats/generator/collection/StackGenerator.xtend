@@ -334,7 +334,7 @@ final class StackGenerator implements ClassGenerator {
 			}
 
 			«hashcode(type)»
-			
+
 			@Override
 			public boolean equals(final Object obj) {
 				if (obj == this) {

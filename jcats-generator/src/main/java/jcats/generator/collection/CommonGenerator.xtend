@@ -218,6 +218,15 @@ final class CommonGenerator implements ClassGenerator {
 							"fromIndex (" + fromIndex + ") > toIndex (" + toIndex + ")");
 				}
 			}
+
+			static String getIndexOutOfBoundsMessage(final int index, final Sized sized, final String name) {
+				final String message = "Index " + index + " is out of range";
+				if (sized.hasFixedSize()) {
+					return message + " (" + name + " length = " + sized.size() + ")";
+				} else {
+					return message;
+				}
+			}
 		}
 
 		«FOR type : Type.values»

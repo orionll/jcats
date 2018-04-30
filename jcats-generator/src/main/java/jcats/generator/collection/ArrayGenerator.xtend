@@ -933,16 +933,6 @@ final class ArrayGenerator implements ClassGenerator {
 			«shortName»View(final «genericName» array) {
 				super(array);
 			}
-
-			@Override
-			public «type.indexedContainerViewGenericName» limit(final int n) {
-				return new «type.diamondName("ArrayView")»(this.container.limit(n));
-			}
-
-			@Override
-			public «type.indexedContainerViewGenericName» skip(final int n) {
-				return new «type.diamondName("ArrayView")»(this.container.skip(n));
-			}
 		}
 	''' }
 }
