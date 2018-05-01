@@ -933,6 +933,8 @@ final class ArrayGenerator implements ClassGenerator {
 			«shortName»View(final «genericName» array) {
 				super(array);
 			}
+
+			«toStr(type, type.shortName("ArrayView"), false)»
 		}
 	''' }
 }
