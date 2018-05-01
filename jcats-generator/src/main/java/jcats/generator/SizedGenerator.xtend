@@ -7,7 +7,8 @@ final class SizedGenerator implements InterfaceGenerator {
 		package «Constants.JCATS»;
 
 		public interface Sized {
-			int size();
+
+			int size() throws ArithmeticException;
 
 			default boolean hasFixedSize() {
 				return true;

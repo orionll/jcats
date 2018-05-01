@@ -270,13 +270,13 @@ final class ContainerGenerator implements InterfaceGenerator {
 					final «type.iteratorGenericName» iterator = iterator();
 					while (iterator.hasNext()) {
 						if (i < 0) {
-							throw new IndexOutOfBoundsException("Integer overflow");
+							throw new ArithmeticException("Integer overflow");
 						}
 						eff.apply(i++, iterator.«type.iteratorNext»());
 				«ELSE»
 					for (final «type.genericName» value : this) {
 						if (i < 0) {
-							throw new IndexOutOfBoundsException("Integer overflow");
+							throw new ArithmeticException("Integer overflow");
 						}
 						eff.apply(i++, value);
 				«ENDIF»
