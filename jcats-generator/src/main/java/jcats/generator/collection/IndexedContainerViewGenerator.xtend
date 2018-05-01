@@ -91,9 +91,9 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			class «mappedIndexedContainerViewShortName»<A, B, C extends IndexedContainerView<A>> extends MappedContainerView<A, B, C> implements IndexedContainerView<B> {
+			final class «mappedIndexedContainerViewShortName»<A, B, C extends IndexedContainerView<A>> extends MappedContainerView<A, B, C> implements IndexedContainerView<B> {
 		«ELSE»
-			class «mappedIndexedContainerViewShortName»<A, C extends «type.indexedContainerViewShortName»> extends «type.typeName»MappedContainerView<A, C> implements IndexedContainerView<A> {
+			final class «mappedIndexedContainerViewShortName»<A, C extends «type.indexedContainerViewShortName»> extends «type.typeName»MappedContainerView<A, C> implements IndexedContainerView<A> {
 		«ENDIF»
 
 			«mappedIndexedContainerViewShortName»(final C view, final «IF type == Type.OBJECT»F<A, B>«ELSE»«type.typeName»ObjectF<A>«ENDIF» f) {
@@ -103,6 +103,15 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public «mapTargetType» get(final int index) throws IndexOutOfBoundsException {
 				return requireNonNull(this.f.apply(this.view.get(index)));
+			}
+
+			@Override
+			«IF type == Type.OBJECT»
+				public <D> IndexedContainerView<D> map(final F<B, D> g) {
+			«ELSE»
+				public <B> IndexedContainerView<B> map(final F<A, B> g) {
+			«ENDIF»
+				return new «mappedIndexedContainerViewShortName»<>(this.view, this.f.map(g));
 			}
 
 			@Override
@@ -122,9 +131,9 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			class «limitedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends LimitedContainerView<A, C> implements IndexedContainerView<A> {
+			final class «limitedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends LimitedContainerView<A, C> implements IndexedContainerView<A> {
 		«ELSE»
-			class «limitedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»LimitedContainerView<C> implements «type.indexedContainerViewGenericName» {
+			final class «limitedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»LimitedContainerView<C> implements «type.indexedContainerViewGenericName» {
 		«ENDIF»
 
 			«limitedIndexedContainerViewShortName»(final C view, final int limit) {
@@ -159,9 +168,9 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			class «skippedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends SkippedContainerView<A, C> implements IndexedContainerView<A> {
+			final class «skippedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends SkippedContainerView<A, C> implements IndexedContainerView<A> {
 		«ELSE»
-			class «skippedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»SkippedContainerView<C> implements «type.indexedContainerViewGenericName» {
+			final class «skippedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»SkippedContainerView<C> implements «type.indexedContainerViewGenericName» {
 		«ENDIF»
 
 			«skippedIndexedContainerViewShortName»(final C view, final int skip) {

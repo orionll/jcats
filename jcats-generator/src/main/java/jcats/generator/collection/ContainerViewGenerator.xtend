@@ -192,6 +192,15 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			«IF type == Type.OBJECT»
+				public <D> ContainerView<D> map(final F<B, D> g) {
+			«ELSE»
+				public <B> ContainerView<B> map(final F<A, B> g) {
+			«ENDIF»
+				return new «mappedContainerViewShortName»<>(this.view, this.f.map(g));
+			}
+
+			@Override
 			public ContainerView<«mapTargetType»> limit(final int n) {
 				return new «mappedContainerViewShortName»<>(this.view.limit(n), this.f);
 			}
