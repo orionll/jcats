@@ -83,10 +83,16 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			default «genericName» limit(final int limit) {
+				if (limit < 0) {
+					throw new IllegalArgumentException(Integer.toString(limit));
+				}
 				return new «type.diamondName("LimitedContainerView")»(this, limit);
 			}
 
 			default «genericName» skip(final int skip) {
+				if (skip < 0) {
+					throw new IllegalArgumentException(Integer.toString(skip));
+				}
 				return new «type.diamondName("SkippedContainerView")»(this, skip);
 			}
 		}
@@ -286,7 +292,9 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public «genericName» limit(final int n) {
-				if (n < this.limit && this.limit > 0) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (n < this.limit) {
 					return new «type.diamondName("LimitedContainerView")»(this.view, n);
 				} else {
 					return this;
@@ -352,7 +360,9 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public «genericName» skip(final int n) {
-				if (n > 0) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (n > 0) {
 					final int sum = this.skip + n;
 					if (sum < 0) {
 						// Overflow

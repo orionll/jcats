@@ -54,12 +54,18 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				return new «mappedIndexedContainerViewShortName»<>(this, f);
 			}
 
-			default «genericName» limit(final int n) {
-				return new «limitedIndexedContainerViewShortName»<>(this, n);
+			default «genericName» limit(final int limit) {
+				if (limit < 0) {
+					throw new IllegalArgumentException(Integer.toString(limit));
+				}
+				return new «limitedIndexedContainerViewShortName»<>(this, limit);
 			}
 
-			default «genericName» skip(final int n) {
-				return new «skippedIndexedContainerViewShortName»<>(this, n);
+			default «genericName» skip(final int skip) {
+				if (skip < 0) {
+					throw new IllegalArgumentException(Integer.toString(skip));
+				}
+				return new «skippedIndexedContainerViewShortName»<>(this, skip);
 			}
 		}
 
@@ -140,7 +146,9 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.indexedContainerViewGenericName» limit(final int n) {
-				if (n < this.limit && this.limit > 0) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (n < this.limit) {
 					return new «limitedIndexedContainerViewShortName»<>(this.view, n);
 				} else {
 					return this;
@@ -179,7 +187,9 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.indexedContainerViewGenericName» skip(final int n) {
-				if (n > 0) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (n > 0) {
 					final int sum = this.skip + n;
 					if (sum < 0) {
 						// Overflow
