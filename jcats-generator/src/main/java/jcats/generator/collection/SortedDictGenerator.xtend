@@ -33,13 +33,14 @@ final class SortedDictGenerator implements ClassGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.JCATS».Order.*;
+		import static «Constants.JCATS».Ord.*;
 		import static «Constants.P».p;
 		import static «Constants.COMMON».*;
 		import static «Constants.STACK».*;
 
 		public final class SortedDict<K, @Covariant A> implements KeyValue<K, A>, Serializable {
 			private static final SortedDict<?, ?> EMPTY =
-					new SortedDict<>(null, null, null, Ord.<Integer>ord(), 0);
+					new SortedDict<>(null, null, null, Ord.<Integer>asc(), 0);
 
 			final P<K, A> entry;
 			final SortedDict<K, A> left;
@@ -295,7 +296,7 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			public static <K, A> SortedDict<K, A> emptySortedDictBy(final Ord<K> ord) {
 				requireNonNull(ord);
-				if (ord == Ord.ord()) {
+				if (ord == asc()) {
 					return (SortedDict<K, A>) EMPTY;
 				} else {
 					return new SortedDict<>(null, null, null, ord, 0);

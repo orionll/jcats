@@ -52,17 +52,15 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		«IF type.javaUnboxedType»
 			import static «Constants.JCATS».«type.optionShortName».*;
 		«ENDIF»
-		«IF type.primitive»
-			import static «Constants.JCATS».«type.ordShortName».*;
-		«ENDIF»
+		import static «Constants.JCATS».«type.ordShortName».*;
 		import static «Constants.STACK».*;
 
 		public final class «type.covariantName(baseName)» implements «type.uniqueContainerGenericName», Serializable {
 
 			«IF type == Type.OBJECT»
-				private static final «wildcardName» EMPTY = new «diamondName»(null, null, null, Ord.<Integer>ord(), 0);
+				private static final «wildcardName» EMPTY = new «diamondName»(null, null, null, Ord.<Integer>asc(), 0);
 			«ELSE»
-				private static final «shortName» EMPTY = new «shortName»(«type.ordShortName.firstToLowerCase»());
+				private static final «shortName» EMPTY = new «shortName»(«type.asc»());
 			«ENDIF»
 
 			final «type.genericName» entry;
@@ -297,13 +295,13 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			public static «paramGenericName» empty«shortName»By(final «type.ordGenericName» ord) {
 				requireNonNull(ord);
 				«IF type == Type.OBJECT»
-					if (ord == Ord.ord()) {
+					if (ord == asc()) {
 						return («genericName») EMPTY;
 					} else {
 						return new «diamondName»(null, null, null, ord, 0«IF type.primitive», true«ENDIF»);
 					}
 				«ELSE»
-					if (ord == «type.ordShortName».«type.ordShortName.firstToLowerCase»()) {
+					if (ord == «type.asc»()) {
 						return EMPTY;
 					} else {
 						return new «diamondName»(ord);

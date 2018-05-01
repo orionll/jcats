@@ -135,6 +135,14 @@ public enum Type {
 		return genericName("Ord");
 	}
 
+	public String asc() {
+		return Generator.firstToLowerCase(shortName("Asc"));
+	}
+
+	public String desc() {
+		return Generator.firstToLowerCase(shortName("Desc"));
+	}
+
 	public String arrayShortName() {
 		return shortName("Array");
 	}

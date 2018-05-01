@@ -351,7 +351,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 					«IF type.javaUnboxedType»
 						return reduceLeft(«type.boxedName»::max);
 					«ELSE»
-						return maxByOrd(«type.ordShortName.firstToLowerCase»());
+						return maxByOrd(«type.asc»());
 					«ENDIF»
 				}
 
@@ -359,7 +359,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 					«IF type.javaUnboxedType»
 						return reduceLeft(«type.boxedName»::min);
 					«ELSE»
-						return minByOrd(«type.ordShortName.firstToLowerCase»());
+						return minByOrd(«type.desc»());
 					«ENDIF»
 				}
 
