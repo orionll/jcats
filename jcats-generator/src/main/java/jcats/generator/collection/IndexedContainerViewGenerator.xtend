@@ -167,6 +167,19 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				}
 			}
 
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				requireNonNull(eff);
+				if (this.view.hasFixedSize()) {
+					final int size = Math.min(this.limit, this.view.size());
+					for (int i = 0; i < size; i++) {
+						eff.apply(this.view.get(i));
+					}
+				} else {
+					super.foreach(eff);
+				}
+			}
+
 			«toStr(type, limitedIndexedContainerViewShortName, false)»
 		}
 
@@ -211,6 +224,19 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					}
 				} else {
 					return this;
+				}
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				requireNonNull(eff);
+				if (this.view.hasFixedSize()) {
+					final int size = this.view.size();
+					for (int i = this.skip; i < size; i++) {
+						eff.apply(this.view.get(i));
+					}
+				} else {
+					super.foreach(eff);
 				}
 			}
 
