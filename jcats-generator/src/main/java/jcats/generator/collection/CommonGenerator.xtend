@@ -304,7 +304,7 @@ final class CommonGenerator implements ClassGenerator {
 		}
 
 		«FOR type : Type.javaUnboxedTypes»
-			final class «type.typeName»ListReverseIterator<A> implements «type.iteratorGenericName» {
+			final class «type.typeName»ListReverseIterator implements «type.iteratorGenericName» {
 				private final ListIterator<«type.boxedName»> iterator;
 
 				«type.typeName»ListReverseIterator(final List<«type.boxedName»> list, final int index) {
