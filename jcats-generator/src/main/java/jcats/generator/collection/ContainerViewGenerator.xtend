@@ -86,14 +86,14 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				if (limit < 0) {
 					throw new IllegalArgumentException(Integer.toString(limit));
 				}
-				return new «type.diamondName("LimitedContainerView")»(this, limit);
+				return new «type.shortName("LimitedContainerView")»<>(this, limit);
 			}
 
 			default «genericName» skip(final int skip) {
 				if (skip < 0) {
 					throw new IllegalArgumentException(Integer.toString(skip));
 				}
-				return new «type.diamondName("SkippedContainerView")»(this, skip);
+				return new «type.shortName("SkippedContainerView")»<>(this, skip);
 			}
 		}
 
@@ -304,7 +304,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				if (n < 0) {
 					throw new IllegalArgumentException(Integer.toString(n));
 				} else if (n < this.limit) {
-					return new «type.diamondName("LimitedContainerView")»(this.view, n);
+					return new «type.shortName("LimitedContainerView")»<>(this.view, n);
 				} else {
 					return this;
 				}
@@ -375,9 +375,9 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 					final int sum = this.skip + n;
 					if (sum < 0) {
 						// Overflow
-						return new «type.diamondName("SkippedContainerView")»(this, n);
+						return new «type.shortName("SkippedContainerView")»<>(this, n);
 					} else {
-						return new «type.diamondName("SkippedContainerView")»(this.view, sum);
+						return new «type.shortName("SkippedContainerView")»<>(this.view, sum);
 					}
 				} else {
 					return this;
