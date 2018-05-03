@@ -102,6 +102,10 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				}
 				return new «type.shortName("SkippedContainerView")»<>(this, skip);
 			}
+			«IF type == Type.OBJECT»
+
+				«cast(#["A"], #[], #["A"])»
+			«ENDIF»
 		}
 
 		class «baseContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «type.containerGenericName»> implements «genericName» {

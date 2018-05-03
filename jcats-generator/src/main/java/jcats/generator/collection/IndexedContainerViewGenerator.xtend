@@ -70,6 +70,10 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				}
 				return new «skippedIndexedContainerViewShortName»<>(this, skip);
 			}
+			«IF type == Type.OBJECT»
+
+				«cast(#["A"], #[], #["A"])»
+			«ENDIF»
 		}
 
 		«IF type == Type.OBJECT»
