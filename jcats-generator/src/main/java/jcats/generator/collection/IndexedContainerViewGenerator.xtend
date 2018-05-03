@@ -29,6 +29,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.util.Iterator;
+		import java.util.List;
 		import java.util.PrimitiveIterator;
 
 		import «Constants.JCATS».*;
@@ -90,6 +91,42 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			public «type.genericName» get(final int index) throws IndexOutOfBoundsException {
 				return this.container.get(index);
 			}
+
+			@Override
+			public IntOption indexOf(final «type.genericName» value) {
+				return this.container.indexOf(value);
+			}
+
+			@Override
+			public IntOption indexWhere(final «type.boolFName» predicate) {
+				return this.container.indexWhere(predicate);
+			}
+
+			@Override
+			public IntOption lastIndexOf(final «type.genericName» value) {
+				return this.container.lastIndexOf(value);
+			}
+
+			@Override
+			public IntOption lastIndexWhere(final «type.boolFName» predicate) {
+				return this.container.lastIndexWhere(predicate);
+			}
+
+			«IF type.primitive»
+				@Override
+				public IndexedContainer<«type.boxedName»> asContainer() {
+					return this.container.asContainer();
+				}
+
+			«ENDIF»
+			@Override
+			public List<«type.genericBoxedName»> asCollection() {
+				return this.container.asCollection();
+			}
+
+			«hashcode(type)»
+
+			«equals(type, type.indexedContainerWildcardName, false)»
 
 			@Override
 			public String toString() {

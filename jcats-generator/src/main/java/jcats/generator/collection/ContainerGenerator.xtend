@@ -178,9 +178,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 				«ENDFOR»
 			«ENDIF»
-			«IF type.javaUnboxedType»
-				default <A> A foldRight(final A start, final «type.typeName»ObjectObjectF2<A, A> f2) {
-			«ELSEIF type == Type.BOOLEAN»
+			«IF type.primitive»
 				default <A> A foldRight(final A start, final «type.typeName»ObjectObjectF2<A, A> f2) {
 			«ELSE»
 				default <B> B foldRight(final B start, final F2<A, B, B> f2) {
