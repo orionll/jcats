@@ -359,7 +359,7 @@ class SeqGenerator implements ClassGenerator {
 			}
 
 			«IF type == Type.OBJECT»
-				public final <B> Seq<B> filterByClass(final Class<B> clazz) {
+				public final <B extends A> Seq<B> filterByClass(final Class<B> clazz) {
 					requireNonNull(clazz);
 					return (Seq<B>) filter(clazz::isInstance);
 				}

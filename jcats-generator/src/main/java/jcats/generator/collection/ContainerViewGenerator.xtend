@@ -82,6 +82,13 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return new «type.diamondName("FilteredContainerView")»(this, predicate);
 			}
 
+			«IF type == Type.OBJECT»
+				default <B extends A> ContainerView<B> filterByClass(final Class<B> clazz) {
+					requireNonNull(clazz);
+					return (ContainerView<B>) filter(clazz::isInstance);
+				}
+
+			«ENDIF»
 			default «genericName» limit(final int limit) {
 				if (limit < 0) {
 					throw new IllegalArgumentException(Integer.toString(limit));

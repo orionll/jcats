@@ -459,7 +459,7 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			«IF type == Type.OBJECT»
-				public <B> Array<B> filterByClass(final Class<B> clazz) {
+				public <B extends A> Array<B> filterByClass(final Class<B> clazz) {
 					requireNonNull(clazz);
 					return (Array<B>) filter(clazz::isInstance);
 				}
