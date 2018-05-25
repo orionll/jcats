@@ -13,7 +13,7 @@ final class String1Generator implements ClassGenerator {
 		/**
 		 * Nonempty string
 		 */
-		public final class String1 implements CharSequence, Equatable<String1>, Comparable<String1>, Serializable {
+		public final class String1 implements CharSequence, Equatable<String1>, Ordered<String1>, Serializable {
 			private static final String1CaseInsensitiveOrd CASE_INSENSITIVE_ORD = new String1CaseInsensitiveOrd();
 
 			final String str;
@@ -138,8 +138,17 @@ final class String1Generator implements ClassGenerator {
 				return this.str.compareTo(other.str);
 			}
 
+			@Override
+			public Order compare(final String1 other) {
+				return Order.fromInt(this.str.compareTo(other.str));
+			}
+
 			public int compareToIgnoreCase(final String1 other) {
 				return this.str.compareToIgnoreCase(other.str);
+			}
+
+			public Order compareIgnoreCase(final String1 other) {
+				return Order.fromInt(this.str.compareToIgnoreCase(other.str));
 			}
 
 			@Override

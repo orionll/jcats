@@ -24,6 +24,7 @@ final class Constants {
 	val public static KEY_VALUE = "jcats.KeyValue"
 	val public static OPTION = "jcats.Option"
 	val public static ORDER = "jcats.Order"
+	val public static ORDERED = "jcats.Ordered"
 	val public static ORD = "jcats.Ord"
 	val public static P = "jcats.P"
 	val public static P2 = "jcats.P2"

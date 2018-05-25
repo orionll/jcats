@@ -93,6 +93,7 @@ final class Main {
 			new EquatableGenerator,
 			new SizedGenerator,
 			new OrderGenerator,
+			new OrderedGenerator,
 			new KeyValueGenerator,
 			new DictGenerator,
 			new UniqueGenerator,

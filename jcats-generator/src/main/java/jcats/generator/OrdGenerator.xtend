@@ -25,6 +25,7 @@ final class OrdGenerator implements ClassGenerator {
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
+		import static jcats.Order.*;
 
 		@FunctionalInterface
 		public interface «type.contravariantName("Ord")» {
@@ -36,7 +37,15 @@ final class OrdGenerator implements ClassGenerator {
 					requireNonNull(x);
 					requireNonNull(y);
 				«ENDIF»
-				return compare(x, y).equals(Order.LT);
+				return compare(x, y).equals(LT);
+			}
+
+			default boolean lessOrEqual(final «type.genericName» x, final «type.genericName» y) {
+				«IF type == Type.OBJECT»
+					requireNonNull(x);
+					requireNonNull(y);
+				«ENDIF»
+				return !compare(x, y).equals(GT);
 			}
 
 			default boolean greater(final «type.genericName» x, final «type.genericName» y) {
@@ -44,23 +53,95 @@ final class OrdGenerator implements ClassGenerator {
 					requireNonNull(x);
 					requireNonNull(y);
 				«ENDIF»
-				return compare(x, y).equals(Order.GT);
+				return compare(x, y).equals(GT);
 			}
 
-			default boolean eq(final «type.genericName» x, final «type.genericName» y) {
+			default boolean greaterOrEqual(final «type.genericName» x, final «type.genericName» y) {
 				«IF type == Type.OBJECT»
 					requireNonNull(x);
 					requireNonNull(y);
 				«ENDIF»
-				return compare(x, y).equals(Order.EQ);
+				return !compare(x, y).equals(LT);
 			}
 
-			default «type.genericName» min(final «type.genericName» x, final «type.genericName» y) {
-				return less(x, y) ? x : y;
+			default boolean equal(final «type.genericName» x, final «type.genericName» y) {
+				«IF type == Type.OBJECT»
+					requireNonNull(x);
+					requireNonNull(y);
+				«ENDIF»
+				return compare(x, y).equals(EQ);
 			}
 
-			default «type.genericName» max(final «type.genericName» x, final «type.genericName» y) {
-				return greater(x, y) ? x : y;
+			«FOR i : 2 .. Constants.MAX_ARITY»
+				default «type.genericName» min(«(1..i).map['''final «type.genericName» value«it»'''].join(", ")») {
+					«type.genericName» min = «type.requireNonNull("value1")»;
+					«FOR j : 2 .. i»
+						«IF type == Type.OBJECT»
+							requireNonNull(value«j»);
+						«ENDIF»
+						if (compare(value«j», min).equals(LT)) {
+							min = value«j»;
+						}
+					«ENDFOR»
+					return min;
+				}
+
+			«ENDFOR»
+			default «type.genericName» min(«(1..Constants.MAX_ARITY+1).map['''final «type.genericName» value«it»'''].join(", ")», final «type.genericName»... values) {
+				«type.genericName» min = «type.requireNonNull("value1")»;
+				«FOR j : 2 .. Constants.MAX_ARITY+1»
+					«IF type == Type.OBJECT»
+						requireNonNull(value«j»);
+					«ENDIF»
+					if (compare(value«j», min).equals(LT)) {
+						min = value«j»;
+					}
+				«ENDFOR»
+				for (final «type.genericName» val : values) {
+					«IF type == Type.OBJECT»
+						requireNonNull(val);
+					«ENDIF»
+					if (compare(val, min).equals(LT)) {
+						min = val;
+					}
+				}
+				return min;
+			}
+
+			«FOR i : 2 .. Constants.MAX_ARITY»
+				default «type.genericName» max(«(1..i).map['''final «type.genericName» value«it»'''].join(", ")») {
+					«type.genericName» max = «type.requireNonNull("value1")»;
+					«FOR j : 2 .. i»
+						«IF type == Type.OBJECT»
+							requireNonNull(value«j»);
+						«ENDIF»
+						if (compare(value«j», max).equals(GT)) {
+							max = value«j»;
+						}
+					«ENDFOR»
+					return max;
+				}
+
+			«ENDFOR»
+			default «type.genericName» max(«(1..Constants.MAX_ARITY+1).map['''final «type.genericName» value«it»'''].join(", ")», final «type.genericName»... values) {
+				«type.genericName» max = «type.requireNonNull("value1")»;
+				«FOR j : 2 .. Constants.MAX_ARITY+1»
+					«IF type == Type.OBJECT»
+						requireNonNull(value«j»);
+					«ENDIF»
+					if (compare(value«j», max).equals(GT)) {
+						max = value«j»;
+					}
+				«ENDFOR»
+				for (final «type.genericName» val : values) {
+					«IF type == Type.OBJECT»
+						requireNonNull(val);
+					«ENDIF»
+					if (compare(val, max).equals(GT)) {
+						max = val;
+					}
+				}
+				return max;
 			}
 
 			default «genericName» reverse() {
@@ -130,7 +211,7 @@ final class OrdGenerator implements ClassGenerator {
 						requireNonNull(y);
 					«ENDIF»
 					final Order order = compare(x, y);
-					if (order.equals(Order.EQ)) {
+					if (order.equals(EQ)) {
 						return ord.compare(x, y);
 					} else {
 						return order;
