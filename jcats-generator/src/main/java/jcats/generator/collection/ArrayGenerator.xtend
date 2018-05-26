@@ -588,6 +588,75 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			«ENDIF»
 
+			«IF type == Type.OBJECT»
+				public Array<A> sort(final Ord<A> ord) {
+					requireNonNull(ord);
+					if (this.array.length <= 1) {
+						return this;
+					} else {
+						final Object[] sorted = new Object[this.array.length];
+						System.arraycopy(this.array, 0, sorted, 0, this.array.length);
+						Arrays.sort(sorted, (Ord<Object>) ord);
+						return new Array<>(sorted);
+					}
+				}
+			«ELSEIF type == Type.BOOLEAN»
+				public «genericName» sortAsc() {
+					if (this.array.length <= 1) {
+						return this;
+					} else {
+						int countTrue = 0;
+						for (final boolean value : this.array) {
+							if (value) {
+								countTrue++;
+							}
+						}
+						final boolean[] sorted = new boolean[this.array.length];
+						Arrays.fill(sorted, this.array.length - countTrue, this.array.length, true);
+						return new BooleanArray(sorted);
+					}
+				}
+
+				public «genericName» sortDesc() {
+					if (this.array.length <= 1) {
+						return this;
+					} else {
+						int countTrue = 0;
+						for (final boolean value : this.array) {
+							if (value) {
+								countTrue++;
+							}
+						}
+						final boolean[] sorted = new boolean[this.array.length];
+						Arrays.fill(sorted, 0, countTrue, true);
+						return new BooleanArray(sorted);
+					}
+				}
+			«ELSE»
+				public «genericName» sortAsc() {
+					if (this.array.length <= 1) {
+						return this;
+					} else {
+						final «type.javaName»[] sorted = new «type.javaName»[this.array.length];
+						System.arraycopy(this.array, 0, sorted, 0, this.array.length);
+						Arrays.sort(sorted);
+						return new «diamondName»(sorted);
+					}
+				}
+
+				public «genericName» sortDesc() {
+					if (this.array.length <= 1) {
+						return this;
+					} else {
+						final «type.javaName»[] sorted = new «type.javaName»[this.array.length];
+						System.arraycopy(this.array, 0, sorted, 0, this.array.length);
+						Arrays.sort(sorted);
+						Common.reverse«shortName»(sorted);
+						return new «diamondName»(sorted);
+					}
+				}
+			«ENDIF»
+
 			@Override
 			public «type.iteratorGenericName» iterator() {
 				«IF type.javaUnboxedType»

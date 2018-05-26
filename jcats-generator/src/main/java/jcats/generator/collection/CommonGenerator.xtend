@@ -60,6 +60,16 @@ final class CommonGenerator implements ClassGenerator {
 			private Common() {
 			}
 
+			«FOR type : Type.javaUnboxedTypes»
+				static void reverse«type.shortName("Array")»(final «type.javaName»[] array) {
+					for (int i = 0; i < array.length / 2; i++) {
+						final «type.javaName» tmp = array[i];
+						array[i] = array[array.length - i - 1];
+						array[array.length - i - 1] = tmp;
+					}
+				}
+
+			«ENDFOR»
 			«FOR type : Type.values»
 				static «type.javaName»[] update«type.shortName("Array")»(final «type.javaName»[] array, final int index, final «type.updateFunction.replaceAll("<A, A>", "")» f) {
 					final «type.javaName»[] result = new «type.javaName»[array.length];
