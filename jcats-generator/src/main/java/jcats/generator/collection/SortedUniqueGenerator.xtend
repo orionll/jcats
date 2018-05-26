@@ -120,7 +120,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 				«genericName» unique = this;
 				while (true) {
-					final Order order = this.ord.compare(value, unique.entry);
+					final Order order = this.ord.order(value, unique.entry);
 					if (order == EQ) {
 						return true;
 					} else if (order == LT) {
@@ -188,9 +188,9 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			private static NullPointerException nullOrder(final Order order) {
 				if (order == null) {
-					return new NullPointerException("Ord.compare() returned null");
+					return new NullPointerException("Ord.order() returned null");
 				} else {
-					throw new AssertionError("Ord.compare() returned unexpected value: " + order);
+					throw new AssertionError("Ord.order() returned unexpected value: " + order);
 				}
 			}
 

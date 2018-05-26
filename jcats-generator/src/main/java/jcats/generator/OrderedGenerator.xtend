@@ -11,32 +11,32 @@ final class OrderedGenerator implements ClassGenerator {
 
 		public interface Ordered<A> extends Comparable<A> {
 
-			Order compare(final A other);
+			Order order(final A other);
 
 			@Override
 			default int compareTo(final A other) {
 				requireNonNull(other);
-				return compare(other).toInt();
+				return order(other).toInt();
 			}
 
 			default boolean isLessThan(final A other) {
 				requireNonNull(other);
-				return compare(other).equals(LT);
+				return order(other).equals(LT);
 			}
 
 			default boolean isLessThanOrEqualTo(final A other) {
 				requireNonNull(other);
-				return !compare(other).equals(GT);
+				return !order(other).equals(GT);
 			}
 
 			default boolean isGreaterThan(final A other) {
 				requireNonNull(other);
-				return compare(other).equals(GT);
+				return order(other).equals(GT);
 			}
 
 			default boolean isGreaterThanOrEqualTo(final A other) {
 				requireNonNull(other);
-				return !compare(other).equals(LT);
+				return !order(other).equals(LT);
 			}
 		}
 	''' }

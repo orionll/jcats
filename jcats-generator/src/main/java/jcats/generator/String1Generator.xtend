@@ -138,16 +138,16 @@ final class String1Generator implements ClassGenerator {
 				return this.str.compareTo(other.str);
 			}
 
-			@Override
-			public Order compare(final String1 other) {
-				return Order.fromInt(this.str.compareTo(other.str));
-			}
-
 			public int compareToIgnoreCase(final String1 other) {
 				return this.str.compareToIgnoreCase(other.str);
 			}
 
-			public Order compareIgnoreCase(final String1 other) {
+			@Override
+			public Order order(final String1 other) {
+				return Order.fromInt(this.str.compareTo(other.str));
+			}
+
+			public Order orderIgnoreCase(final String1 other) {
 				return Order.fromInt(this.str.compareToIgnoreCase(other.str));
 			}
 
@@ -186,7 +186,7 @@ final class String1Generator implements ClassGenerator {
 
 		final class String1CaseInsensitiveOrd implements Ord<String1> {
 			@Override
-			public Order compare(final String1 x, final String1 y) {
+			public Order order(final String1 x, final String1 y) {
 				return Order.fromInt(String.CASE_INSENSITIVE_ORDER.compare(x.str, y.str));
 			}
 		}

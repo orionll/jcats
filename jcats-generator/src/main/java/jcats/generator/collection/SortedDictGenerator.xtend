@@ -75,7 +75,7 @@ final class SortedDictGenerator implements ClassGenerator {
 
 				SortedDict<K, A> dict = this;
 				while (true) {
-					final Order order = this.ord.compare(key, dict.entry.get1());
+					final Order order = this.ord.order(key, dict.entry.get1());
 					if (order == EQ) {
 						return dict.entry.get2();
 					} else if (order == LT) {
@@ -142,9 +142,9 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			private static NullPointerException nullOrder(final Order order) {
 				if (order == null) {
-					return new NullPointerException("Ord.compare() returned null");
+					return new NullPointerException("Ord.order() returned null");
 				} else {
-					throw new AssertionError("Ord.compare() returned unexpected value: " + order);
+					throw new AssertionError("Ord.order() returned unexpected value: " + order);
 				}
 			}
 

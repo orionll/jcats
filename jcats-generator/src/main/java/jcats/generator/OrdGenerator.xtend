@@ -28,16 +28,29 @@ final class OrdGenerator implements ClassGenerator {
 		import static jcats.Order.*;
 
 		@FunctionalInterface
-		public interface «type.contravariantName("Ord")» {
+		public interface «type.contravariantName("Ord")» extends Comparator<«type.genericBoxedName»> {
 
-			Order compare(final «type.genericName» x, final «type.genericName» y);
+			Order order(final «type.genericName» x, final «type.genericName» y);
+
+			/**
+			 * @deprecated Use {@link #order} instead
+			 */
+			@Override
+			@Deprecated
+			default int compare(final «type.genericBoxedName» x, final «type.genericBoxedName» y) {
+				«IF type == Type.OBJECT»
+					requireNonNull(x);
+					requireNonNull(y);
+				«ENDIF»
+				return order(x, y).toInt();
+			}
 
 			default boolean less(final «type.genericName» x, final «type.genericName» y) {
 				«IF type == Type.OBJECT»
 					requireNonNull(x);
 					requireNonNull(y);
 				«ENDIF»
-				return compare(x, y).equals(LT);
+				return order(x, y).equals(LT);
 			}
 
 			default boolean lessOrEqual(final «type.genericName» x, final «type.genericName» y) {
@@ -45,7 +58,7 @@ final class OrdGenerator implements ClassGenerator {
 					requireNonNull(x);
 					requireNonNull(y);
 				«ENDIF»
-				return !compare(x, y).equals(GT);
+				return !order(x, y).equals(GT);
 			}
 
 			default boolean greater(final «type.genericName» x, final «type.genericName» y) {
@@ -53,7 +66,7 @@ final class OrdGenerator implements ClassGenerator {
 					requireNonNull(x);
 					requireNonNull(y);
 				«ENDIF»
-				return compare(x, y).equals(GT);
+				return order(x, y).equals(GT);
 			}
 
 			default boolean greaterOrEqual(final «type.genericName» x, final «type.genericName» y) {
@@ -61,7 +74,7 @@ final class OrdGenerator implements ClassGenerator {
 					requireNonNull(x);
 					requireNonNull(y);
 				«ENDIF»
-				return !compare(x, y).equals(LT);
+				return !order(x, y).equals(LT);
 			}
 
 			default boolean equal(final «type.genericName» x, final «type.genericName» y) {
@@ -69,7 +82,7 @@ final class OrdGenerator implements ClassGenerator {
 					requireNonNull(x);
 					requireNonNull(y);
 				«ENDIF»
-				return compare(x, y).equals(EQ);
+				return order(x, y).equals(EQ);
 			}
 
 			«FOR i : 2 .. Constants.MAX_ARITY»
@@ -79,7 +92,7 @@ final class OrdGenerator implements ClassGenerator {
 						«IF type == Type.OBJECT»
 							requireNonNull(value«j»);
 						«ENDIF»
-						if (compare(value«j», min).equals(LT)) {
+						if (order(value«j», min).equals(LT)) {
 							min = value«j»;
 						}
 					«ENDFOR»
@@ -93,7 +106,7 @@ final class OrdGenerator implements ClassGenerator {
 					«IF type == Type.OBJECT»
 						requireNonNull(value«j»);
 					«ENDIF»
-					if (compare(value«j», min).equals(LT)) {
+					if (order(value«j», min).equals(LT)) {
 						min = value«j»;
 					}
 				«ENDFOR»
@@ -101,7 +114,7 @@ final class OrdGenerator implements ClassGenerator {
 					«IF type == Type.OBJECT»
 						requireNonNull(val);
 					«ENDIF»
-					if (compare(val, min).equals(LT)) {
+					if (order(val, min).equals(LT)) {
 						min = val;
 					}
 				}
@@ -115,7 +128,7 @@ final class OrdGenerator implements ClassGenerator {
 						«IF type == Type.OBJECT»
 							requireNonNull(value«j»);
 						«ENDIF»
-						if (compare(value«j», max).equals(GT)) {
+						if (order(value«j», max).equals(GT)) {
 							max = value«j»;
 						}
 					«ENDFOR»
@@ -129,7 +142,7 @@ final class OrdGenerator implements ClassGenerator {
 					«IF type == Type.OBJECT»
 						requireNonNull(value«j»);
 					«ENDIF»
-					if (compare(value«j», max).equals(GT)) {
+					if (order(value«j», max).equals(GT)) {
 						max = value«j»;
 					}
 				«ENDFOR»
@@ -137,7 +150,7 @@ final class OrdGenerator implements ClassGenerator {
 					«IF type == Type.OBJECT»
 						requireNonNull(val);
 					«ENDIF»
-					if (compare(val, max).equals(GT)) {
+					if (order(val, max).equals(GT)) {
 						max = val;
 					}
 				}
@@ -149,11 +162,11 @@ final class OrdGenerator implements ClassGenerator {
 					return (final «type.genericName» x, final «type.genericName» y) -> {
 						requireNonNull(x);
 						requireNonNull(y);
-						return compare(x, y).reverse();
+						return order(x, y).reverse();
 					};
 				«ELSE»
 					return (final «type.genericName» x, final «type.genericName» y) ->
-						compare(x, y).reverse();
+						order(x, y).reverse();
 				«ENDIF»
 			}
 
@@ -165,7 +178,7 @@ final class OrdGenerator implements ClassGenerator {
 						requireNonNull(b2);
 						final A a1 = requireNonNull(f.apply(b1));
 						final A a2 = requireNonNull(f.apply(b2));
-						return requireNonNull(compare(a1, a2));
+						return requireNonNull(order(a1, a2));
 					};
 				}
 			«ELSE»
@@ -176,7 +189,7 @@ final class OrdGenerator implements ClassGenerator {
 						requireNonNull(a2);
 						final «type.javaName» value1 = f.apply(a1);
 						final «type.javaName» value2 = f.apply(a2);
-						return requireNonNull(compare(value1, value2));
+						return requireNonNull(order(value1, value2));
 					};
 				}
 			«ENDIF»
@@ -188,7 +201,7 @@ final class OrdGenerator implements ClassGenerator {
 						return (final «t.javaName» value1, final «t.javaName» value2) -> {
 							final A a1 = requireNonNull(f.apply(value1));
 							final A a2 = requireNonNull(f.apply(value2));
-							return requireNonNull(compare(a1, a2));
+							return requireNonNull(order(a1, a2));
 						};
 					}
 				«ELSE»
@@ -197,7 +210,7 @@ final class OrdGenerator implements ClassGenerator {
 						return (final «t.javaName» value1, final «t.javaName» value2) -> {
 							final «type.javaName» result1 = f.apply(value1);
 							final «type.javaName» result2 = f.apply(value2);
-							return requireNonNull(compare(result1, result2));
+							return requireNonNull(order(result1, result2));
 						};
 					}
 				«ENDIF»
@@ -210,9 +223,9 @@ final class OrdGenerator implements ClassGenerator {
 						requireNonNull(x);
 						requireNonNull(y);
 					«ENDIF»
-					final Order order = compare(x, y);
+					final Order order = order(x, y);
 					if (order.equals(EQ)) {
-						return ord.compare(x, y);
+						return ord.order(x, y);
 					} else {
 						return order;
 					}
@@ -290,13 +303,13 @@ final class OrdGenerator implements ClassGenerator {
 					return (final «type.genericName» x, final «type.genericName» y) -> {
 						requireNonNull(x);
 						requireNonNull(y);
-						return requireNonNull(compare(x, y));
+						return requireNonNull(order(x, y));
 					};
 				}
 			«ELSE»
 				default «type.typeName»«type.typeName»ObjectF2<Order> toF() {
 					return (final «type.genericName» x, final «type.genericName» y) ->
-						requireNonNull(compare(x, y));
+						requireNonNull(order(x, y));
 				}
 			«ENDIF»
 
@@ -305,13 +318,23 @@ final class OrdGenerator implements ClassGenerator {
 					return (final «type.genericBoxedName» x, final «type.genericBoxedName» y) -> {
 						requireNonNull(x);
 						requireNonNull(y);
-						return compare(x, y).toInt();
+						return order(x, y).toInt();
 					};
 				«ELSE»
 					return (final «type.genericBoxedName» x, final «type.genericBoxedName» y) ->
-						compare(x, y).toInt();
+						order(x, y).toInt();
 				«ENDIF»
 			}
+
+			«IF type == Type.OBJECT»
+				static <A> Ord<A> ord(final Ord<A> ord) {
+					return requireNonNull(ord);
+				}
+			«ELSE»
+				static «genericName» «shortName.firstToLowerCase»(final «genericName» ord) {
+					return requireNonNull(ord);
+				}
+			«ENDIF»
 
 			«IF type == Type.OBJECT»
 				static <A> Ord<A> fromF(final F2<A, A, Order> f2) {
@@ -333,17 +356,25 @@ final class OrdGenerator implements ClassGenerator {
 			«IF type == Type.OBJECT»
 				static <A> Ord<A> fromComparator(final Comparator<A> comparator) {
 					requireNonNull(comparator);
-					return (final «type.genericName» x, final «type.genericName» y) -> {
-						requireNonNull(x);
-						requireNonNull(y);
-						return Order.fromInt(comparator.compare(x, y));
-					};
+					if (comparator instanceof Ord<?>) {
+						return (Ord<A>) comparator;
+					} else {
+						return (final «type.genericName» x, final «type.genericName» y) -> {
+							requireNonNull(x);
+							requireNonNull(y);
+							return Order.fromInt(comparator.compare(x, y));
+						};
+					}
 				}
 			«ELSE»
 				static «genericName» fromComparator(final Comparator<«type.genericBoxedName»> comparator) {
 					requireNonNull(comparator);
-					return (final «type.genericName» x, final «type.genericName» y) ->
-						Order.fromInt(comparator.compare(x, y));
+					if (comparator instanceof «shortName») {
+						return («genericName») comparator;
+					} else {
+						return (final «type.genericName» x, final «type.genericName» y) ->
+							Order.fromInt(comparator.compare(x, y));
+					}
 				}
 			«ENDIF»
 
@@ -444,7 +475,7 @@ final class OrdGenerator implements ClassGenerator {
 				static final NaturalOrd INSTANCE = new NaturalOrd();
 
 				@Override
-				public Order compare(final Comparable<Object> x, final Comparable<Object> y) {
+				public Order order(final Comparable<Object> x, final Comparable<Object> y) {
 					requireNonNull(x);
 					requireNonNull(y);
 					return Order.fromInt(x.compareTo(y));
@@ -465,7 +496,7 @@ final class OrdGenerator implements ClassGenerator {
 				static final «type.typeName»NaturalOrd INSTANCE = new «type.typeName»NaturalOrd();
 
 				@Override
-				public Order compare(final «type.javaName» x, final «type.javaName» y) {
+				public Order order(final «type.javaName» x, final «type.javaName» y) {
 					return Order.fromInt(«type.boxedName».compare(x, y));
 				}
 
@@ -486,7 +517,7 @@ final class OrdGenerator implements ClassGenerator {
 				static final ReverseOrd INSTANCE = new ReverseOrd();
 
 				@Override
-				public Order compare(final Comparable<Object> x, final Comparable<Object> y) {
+				public Order order(final Comparable<Object> x, final Comparable<Object> y) {
 					requireNonNull(x);
 					requireNonNull(y);
 					return Order.fromInt(y.compareTo(x));
@@ -507,7 +538,7 @@ final class OrdGenerator implements ClassGenerator {
 				static final «type.typeName»ReverseOrd INSTANCE = new «type.typeName»ReverseOrd();
 
 				@Override
-				public Order compare(final «type.javaName» x, final «type.javaName» y) {
+				public Order order(final «type.javaName» x, final «type.javaName» y) {
 					return Order.fromInt(«type.boxedName».compare(y, x));
 				}
 

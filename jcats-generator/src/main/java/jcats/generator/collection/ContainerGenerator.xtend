@@ -703,12 +703,12 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 				@Override
 				public Option<«type.boxedName»> max(final Ord<«type.boxedName»> ord) {
-					return this.container.maxByOrd(ord::compare).toOption();
+					return this.container.maxByOrd(ord::order).toOption();
 				}
 
 				@Override
 				public Option<«type.boxedName»> min(final Ord<«type.boxedName»> ord) {
-					return this.container.minByOrd(ord::compare).toOption();
+					return this.container.minByOrd(ord::order).toOption();
 				}
 
 				@Override

@@ -3,7 +3,7 @@ package jcats.generator.collection
 final class AVLCommon {
 
 	def static update(String genericName, String diamondName, String key, String getKey, String createEntry, String sameEntry, String updateArgs) '''
-		final Order order = this.ord.compare(«key», this.«getKey»);
+		final Order order = this.ord.order(«key», this.«getKey»);
 		if (order == EQ) {
 			result.heightIncreased = false;
 			if («sameEntry») {
@@ -109,7 +109,7 @@ final class AVLCommon {
 	'''
 
 	def static delete(String genericName, String diamondName, String key, String getKey) '''
-		final Order order = this.ord.compare(«key», this.«getKey»);
+		final Order order = this.ord.order(«key», this.«getKey»);
 		if (order == EQ) {
 			if (this.left == null) {
 				result.heightDecreased = true;
