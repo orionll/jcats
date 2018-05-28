@@ -314,12 +314,22 @@ final class Seq1Generator extends SeqGenerator {
 				void copyToArray(final Object[] array) {
 					System.arraycopy(node1, 0, array, 0, node1.length);
 				}
+
+				@Override
+				Object[] toSharedObjectArray() {
+					return this.node1;
+				}
 			«ELSE»
 				@Override
 				public «type.javaName»[] «type.toArrayName»() {
 					final «type.javaName»[] array = new «type.javaName»[node1.length];
 					System.arraycopy(node1, 0, array, 0, node1.length);
 					return array;
+				}
+
+				@Override
+				«type.javaName»[] toSharedPrimitiveArray() {
+					return this.node1;
 				}
 			«ENDIF»
 

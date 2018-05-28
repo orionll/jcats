@@ -30,8 +30,9 @@ final class ArrayGenerator implements ClassGenerator {
 
 		import java.io.Serializable;
 		import java.util.Arrays;
-		import java.util.Iterator;
 		import java.util.Collection;
+		import java.util.Comparator;
+		import java.util.Iterator;
 		import java.util.NoSuchElementException;
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
@@ -54,6 +55,9 @@ final class ArrayGenerator implements ClassGenerator {
 		«FOR toType : Type.primitives.filter[it != type]»
 			import static «Constants.COLLECTION».«toType.arrayShortName».empty«toType.arrayShortName»;
 		«ENDFOR»
+		«IF type == Type.OBJECT»
+			import static «Constants.ORD».*;
+		«ENDIF»
 		import static «Constants.F».id;
 		«IF type == Type.OBJECT»
 			import static «Constants.FUNCTION».F.*;
@@ -554,7 +558,7 @@ final class ArrayGenerator implements ClassGenerator {
 					if (this.array.length == 0) {
 						return Seq.emptySeq();
 					} else {
-						return Seq.seqFromArray(this.array);
+						return Seq.seqFromSharedArray(this.array);
 					}
 				}
 			«ELSE»
@@ -563,7 +567,7 @@ final class ArrayGenerator implements ClassGenerator {
 					if (this.array.length == 0) {
 						return «type.typeName»Seq.empty«type.typeName»Seq();
 					} else {
-						return «type.typeName»Seq.seqFromArray(this.array);
+						return «type.typeName»Seq.seqFromSharedArray(this.array);
 					}
 				}
 			«ENDIF»
@@ -845,6 +849,16 @@ final class ArrayGenerator implements ClassGenerator {
 				return «shortName.firstToLowerCase»(values);
 			}
 
+			«IF type == Type.OBJECT»
+				public static <A extends Comparable<A>> Array<A> sortAsc(final Array<A> array) {
+					return array.sort(asc());
+				}
+
+				public static <A extends Comparable<A>> Array<A> sortDesc(final Array<A> array) {
+					return array.sort(desc());
+				}
+
+			«ENDIF»
 			«repeat(type, paramGenericName)»
 
 			«fill(type, paramGenericName)»

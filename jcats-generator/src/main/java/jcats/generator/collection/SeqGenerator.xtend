@@ -36,6 +36,7 @@ class SeqGenerator implements ClassGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.io.Serializable;
+		import java.util.Arrays;
 		import java.util.Collection;
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
@@ -58,6 +59,7 @@ class SeqGenerator implements ClassGenerator {
 			«ENDIF»
 		«ENDFOR»
 		«IF type == Type.OBJECT»
+			import static «Constants.ORD».*;
 			import static «Constants.P».*;
 			import static «Constants.JCATS».IntObjectP.*;
 			import static «Constants.F».*;
@@ -365,6 +367,11 @@ class SeqGenerator implements ClassGenerator {
 				}
 
 				@Override
+				public final Array<A> toArray() {
+					return Array.create(toSharedObjectArray());
+				}
+
+				@Override
 				public final Object[] toObjectArray() {
 					if (isEmpty()) {
 						return EMPTY_OBJECT_ARRAY;
@@ -385,12 +392,79 @@ class SeqGenerator implements ClassGenerator {
 
 				abstract void copyToArray(final Object[] array);
 
+				Object[] toSharedObjectArray() {
+					return toObjectArray();
+				}
+			«ELSE»
+				@Override
+				public final «type.arrayGenericName» to«type.arrayShortName»() {
+					return «type.arrayShortName».create(toSharedPrimitiveArray());
+				}
+
+				«type.javaName»[] toSharedPrimitiveArray() {
+					return toPrimitiveArray();
+				}
 			«ENDIF»
+
 			@Override
 			@Deprecated
 			public final «type.seqGenericName» to«type.seqShortName»() {
 				return this;
 			}
+
+			«IF type == Type.OBJECT»
+				public Seq<A> sort(final Ord<A> ord) {
+					requireNonNull(ord);
+					if (size() <= 1) {
+						return this;
+					} else {
+						final Object[] sorted = toObjectArray();
+						Arrays.sort(sorted, (Ord<Object>) ord);
+						return seqFromSharedArray(sorted);
+					}
+				}
+			«ELSEIF type == Type.BOOLEAN»
+				public «genericName» sortAsc() {
+					final int size = size();
+					if (size <= 1) {
+						return this;
+					} else {
+						final int countFalse = foldLeftToInt(0, (int i, boolean value) -> value ? i : i + 1);
+						return tabulate(size, i -> i >= countFalse);
+					}
+				}
+
+				public «genericName» sortDesc() {
+					final int size = size();
+					if (size <= 1) {
+						return this;
+					} else {
+						final int countTrue = foldLeftToInt(0, (int i, boolean value) -> value ? i + 1 : i);
+						return tabulate(size, i -> i < countTrue);
+					}
+				}
+			«ELSE»
+				public «genericName» sortAsc() {
+					if (size() <= 1) {
+						return this;
+					} else {
+						final «type.javaName»[] sorted = toPrimitiveArray();
+						Arrays.sort(sorted);
+						return seqFromSharedArray(sorted);
+					}
+				}
+
+				public «genericName» sortDesc() {
+					if (size() <= 1) {
+						return this;
+					} else {
+						final «type.javaName»[] sorted = toPrimitiveArray();
+						Arrays.sort(sorted);
+						Common.reverse«type.arrayShortName»(sorted);
+						return seqFromSharedArray(sorted);
+					}
+				}
+			«ENDIF»
 
 			public static «paramGenericName» empty«shortName»() {
 				«IF type == Type.OBJECT»
@@ -429,6 +503,16 @@ class SeqGenerator implements ClassGenerator {
 				return «shortName.firstToLowerCase»(values);
 			}
 
+			«IF type == Type.OBJECT»
+				public static <A extends Comparable<A>> Seq<A> sortAsc(final Seq<A> seq) {
+					return seq.sort(asc());
+				}
+
+				public static <A extends Comparable<A>> Seq<A> sortDesc(final Seq<A> seq) {
+					return seq.sort(desc());
+				}
+
+			«ENDIF»
 			«repeat(type, paramGenericName)»
 
 			«fill(type, paramGenericName)»
@@ -623,6 +707,15 @@ class SeqGenerator implements ClassGenerator {
 				fillNode2(node2, 0, node2.length - fromEndIndex2, iterator);
 				fillArrayFromStart(node1, node1.length - fromEndIndex1, iterator);
 				return new «diamondName(6)»(node6, init, tail, startIndex, size);
+			}
+
+			static «paramGenericName» seqFromSharedArray(final «type.javaName»[] values) {
+				// Assume values.length != 0
+				if (values.length <= 32) {
+					return new «diamondName(1)»(values);
+				} else {
+					return seqFromArray(values);
+				}
 			}
 
 			static «paramGenericName» seqFromArray(final «type.javaName»[] values) {
