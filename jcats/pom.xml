@@ -5,6 +5,7 @@
 	<version>1.0-SNAPSHOT</version>
 	<groupId>org.lambdansk</groupId>
 	<artifactId>jcats</artifactId>
+	<packaging>bundle</packaging>
 	<name>JCats</name>
 
 	<properties>
@@ -56,18 +57,16 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.0.2</version>
-				<!-- Not required because we already have module-info.class
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>3.5.0</version>
+				<extensions>true</extensions>
 				<configuration>
-					<archive>
-						<manifestEntries>
-							<Automatic-Module-Name>jcats</Automatic-Module-Name>
-						</manifestEntries>
-					</archive>
+					<instructions>
+						<Export-Package>jcats.*</Export-Package>
+						<Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=${maven.compiler.target}))</Require-Capability>
+					</instructions>
 				</configuration>
-				-->
 			</plugin>
 		</plugins>
 	</build>
