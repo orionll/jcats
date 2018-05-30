@@ -14,11 +14,15 @@ final class OrdsGenerator implements ClassGenerator {
 	}
 
 	def ordShortName() { type.ordShortName }
-	def ord() { ordShortName + "." + (if (type == Type.OBJECT) "<A>" else  "") + type.asc + "()" }
+	def ord() { (if (type == Type.OBJECT) ordShortName + "." + "<A>" else  "") + type.asc + "()" }
 	def typeParam() { if (type == Type.OBJECT) "<A extends Comparable<A>> " else "" }
 
 	override sourceCode() { '''
 		package «Constants.JCATS»;
+
+		«IF type.primitive»
+			import static «Constants.JCATS».«type.ordShortName».*;
+		«ENDIF»
 
 		public final class «name» {
 
@@ -51,7 +55,9 @@ final class OrdsGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
-			@SafeVarargs
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
 			public static «typeParam»«type.genericName» min(«(1..Constants.MAX_ARITY+1).map['''final «type.genericName» value«it»'''].join(", ")», final «type.genericName»... values) {
 				return «ord».min(«(1..Constants.MAX_ARITY+1).map['''value«it»'''].join(", ")», values);
 			}
@@ -62,7 +68,9 @@ final class OrdsGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
-			@SafeVarargs
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
 			public static «typeParam»«type.genericName» max(«(1..Constants.MAX_ARITY+1).map['''final «type.genericName» value«it»'''].join(", ")», final «type.genericName»... values) {
 				return «ord».max(«(1..Constants.MAX_ARITY+1).map['''value«it»'''].join(", ")», values);
 			}
