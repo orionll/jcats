@@ -1,6 +1,6 @@
 package jcats.generator
 
-final class OrderedGenerator implements ClassGenerator {
+final class OrderedGenerator implements InterfaceGenerator {
 	override className() { Constants.ORDERED }
 
 	override sourceCode() { '''

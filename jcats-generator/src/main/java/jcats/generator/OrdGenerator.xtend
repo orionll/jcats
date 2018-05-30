@@ -4,7 +4,7 @@ import java.util.List
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 
 @FinalFieldsConstructor
-final class OrdGenerator implements ClassGenerator {
+final class OrdGenerator implements InterfaceGenerator {
 	val Type type
 		
 	override className() { Constants.JCATS + "." + shortName }
@@ -379,6 +379,7 @@ final class OrdGenerator implements ClassGenerator {
 			«ENDIF»
 
 			«IF type == Type.OBJECT»
+				«javadocSynonym("naturalOrd")»
 				static <A extends Comparable<A>> «genericName» «type.asc»() {
 					return (Ord) NaturalOrd.INSTANCE;
 				}
@@ -389,6 +390,7 @@ final class OrdGenerator implements ClassGenerator {
 			«ENDIF»
 
 			«IF type == Type.OBJECT»
+				«javadocSynonym("reverseOrd")»
 				static <A extends Comparable<A>> «genericName» «type.desc»() {
 					return (Ord) ReverseOrd.INSTANCE;
 				}
@@ -398,6 +400,16 @@ final class OrdGenerator implements ClassGenerator {
 				}
 			«ENDIF»
 
+			«IF type == Type.OBJECT»
+				static <A extends Comparable<A>> «genericName» naturalOrd() {
+					return (Ord) NaturalOrd.INSTANCE;
+				}
+
+				static <A extends Comparable<A>> «genericName» reverseOrd() {
+					return (Ord) ReverseOrd.INSTANCE;
+				}
+
+			«ENDIF»
 			«IF type == Type.OBJECT»
 				static <A, B extends Comparable<B>> «genericName» by(final F<A, B> f) {
 					return Ord.<B>asc().contraMap(f);
@@ -451,8 +463,8 @@ final class OrdGenerator implements ClassGenerator {
 					return ord.contraMapFrom«type.typeName»(f);
 				}
 			«ENDIF»
-
 			«FOR t : Type.primitives»
+
 				«IF type == Type.OBJECT»
 					static <A> Ord<A> by«t.ordShortName»(final «t.typeName»F<A> f, final «t.ordGenericName» ord) {
 						return ord.contraMap(f);
@@ -462,7 +474,6 @@ final class OrdGenerator implements ClassGenerator {
 						return ord.contraMapFrom«type.typeName»(f);
 					}
 				«ENDIF»
-
 			«ENDFOR»
 			«IF type == Type.OBJECT»
 

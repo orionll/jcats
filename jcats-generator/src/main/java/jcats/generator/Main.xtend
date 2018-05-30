@@ -108,6 +108,7 @@ final class Main {
 			new jcats.generator.collection.CommonGenerator
 		],
 			OrdGenerator.generators,
+			OrdsGenerator.generators,
 			MaybeGenerator.generators,
 			OptionGenerator.generators,
 			EitherGenerator.generators,
