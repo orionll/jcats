@@ -281,6 +281,15 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				}
 			}
 
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				if (this.view.hasFixedSize()) {
+					return «type.indexedContainerViewShortName».super.iterator();
+				} else {
+					return super.iterator();
+				}
+			}
+
 			«toStr(type, skippedIndexedContainerViewShortName, false)»
 		}
 	''' }

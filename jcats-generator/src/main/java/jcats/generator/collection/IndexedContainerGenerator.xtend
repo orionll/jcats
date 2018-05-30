@@ -52,19 +52,27 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			default «type.iteratorGenericName» iterator() {
-				if (isEmpty()) {
-					return «type.emptyIterator»;
+				if (hasFixedSize()) {
+					if (isEmpty()) {
+						return «type.emptyIterator»;
+					} else {
+						return new «type.diamondName("IndexedContainerIterator")»(this);
+					}
 				} else {
-					return new «type.diamondName("IndexedContainerIterator")»(this);
+					throw new UnsupportedOperationException("Cannot get default Iterator implementation if hasFixedSize() == false");
 				}
 			}
 
 			@Override
 			default «type.iteratorGenericName» reverseIterator() {
-				if (isEmpty()) {
-					return «type.emptyIterator»;
+				if (hasFixedSize()) {
+					if (isEmpty()) {
+						return «type.emptyIterator»;
+					} else {
+						return new «type.diamondName("IndexedContainerReverseIterator")»(this);
+					}
 				} else {
-					return new «type.diamondName("IndexedContainerReverseIterator")»(this);
+					throw new UnsupportedOperationException("Cannot get default Iterator implementation if hasFixedSize() == false");
 				}
 			}
 
