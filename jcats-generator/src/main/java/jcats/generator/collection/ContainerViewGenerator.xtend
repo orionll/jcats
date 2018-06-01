@@ -479,6 +479,15 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public Iterator<«mapTargetType»> reverseIterator() {
+				«IF type == Type.OBJECT»
+					return new MappedIterator<>(this.view.reverseIterator(), this.f);
+				«ELSE»
+					return new Mapped«type.typeName»ObjectIterator<>(this.view.reverseIterator(), this.f);
+				«ENDIF»
+			}
+
+			@Override
 			public void foreach(final Eff<«mapTargetType»> eff) {
 				requireNonNull(eff);
 				this.view.foreach((final «type.genericName» value) -> {
