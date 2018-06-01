@@ -72,7 +72,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 						return new «type.diamondName("IndexedContainerReverseIterator")»(this);
 					}
 				} else {
-					throw new UnsupportedOperationException("Cannot get default Iterator implementation if hasFixedSize() == false");
+					return «type.containerShortName».super.reverseIterator();
 				}
 			}
 
