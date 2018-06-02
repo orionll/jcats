@@ -68,8 +68,11 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			default «genericName» skip(final int skip) {
 				if (skip < 0) {
 					throw new IllegalArgumentException(Integer.toString(skip));
+				} else if (skip == 0) {
+					return this;
+				} else {
+					return new «skippedIndexedContainerViewShortName»<>(this, skip);
 				}
-				return new «skippedIndexedContainerViewShortName»<>(this, skip);
 			}
 			«IF type == Type.OBJECT»
 
