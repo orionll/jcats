@@ -525,8 +525,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		class «type.genericName("FilteredContainerView")» implements «genericName» {
-			private final «genericName» view;
-			private final «type.boolFName» predicate;
+			final «genericName» view;
+			final «type.boolFName» predicate;
 
 			«filteredContainerViewShortName»(final «genericName» view, final «type.boolFName» predicate) {
 				this.view = view;

@@ -22,6 +22,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 	def baseIndexedContainerViewShortName() { type.shortName("BaseIndexedContainerView") }
 	def mappedIndexedContainerViewShortName() { type.shortName("MappedIndexedContainerView") }
 	def mapTargetType() { if (type == Type.OBJECT) "B" else "A" }
+	def filteredIndexedContainerViewShortName() { type.shortName("FilteredIndexedContainerView") }
 	def limitedIndexedContainerViewShortName() { type.shortName("LimitedIndexedContainerView") }
 	def skippedIndexedContainerViewShortName() { type.shortName("SkippedIndexedContainerView") }
 
@@ -54,6 +55,12 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			«ENDIF»
 				requireNonNull(f);
 				return new «mappedIndexedContainerViewShortName»<>(this, f);
+			}
+
+			@Override
+			default «type.containerViewGenericName» filter(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				return new «type.diamondName("FilteredIndexedContainerView")»(this, predicate);
 			}
 
 			@Override
@@ -174,6 +181,24 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public String toString() {
 				return iterableToString(this, "«mappedIndexedContainerViewShortName»");
+			}
+		}
+
+		final class «type.genericName("FilteredIndexedContainerView")» extends «type.genericName("FilteredContainerView")» {
+
+			«filteredIndexedContainerViewShortName»(final «genericName» view, final «type.boolFName» predicate) {
+				super(view, predicate);
+			}
+
+			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				«IF type.javaUnboxedType»
+					return new «type.diamondName("FilteredIterator")»(this.view.reverseIterator(), this.predicate);
+				«ELSEIF type == Type.OBJECT»
+					return new FilteredIterator<>(this.view.reverseIterator(), this.predicate);
+				«ELSE»
+					return new FilteredIterator<>(this.view.reverseIterator(), this.predicate::apply);
+				«ENDIF»
 			}
 		}
 
