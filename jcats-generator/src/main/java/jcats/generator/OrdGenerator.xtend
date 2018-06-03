@@ -11,6 +11,7 @@ final class OrdGenerator implements InterfaceGenerator {
 
 	def shortName() { type.ordShortName }
 	def genericName() { type.ordGenericName }
+	def kind(boolean natural) { if (natural) "Natural" else "Reverse" }
 
 	def static List<Generator> generators() {
 		Type.values.toList.map[new OrdGenerator(it) as Generator]
@@ -85,74 +86,68 @@ final class OrdGenerator implements InterfaceGenerator {
 				return order(x, y).equals(EQ);
 			}
 
-			«FOR i : 2 .. Constants.MAX_ARITY»
+			default «type.genericName» min(final «type.genericName» value1, final «type.genericName» value2) {
+				«IF type == Type.OBJECT»
+					requireNonNull(value1);
+					requireNonNull(value2);
+				«ENDIF»
+				if (order(value1, value2).equals(GT)) {
+					return value2;
+				} else {
+					return value1;
+				}
+			}
+
+			«FOR i : 3 .. Constants.MAX_ARITY»
 				default «type.genericName» min(«(1..i).map['''final «type.genericName» value«it»'''].join(", ")») {
-					«type.genericName» min = «type.requireNonNull("value1")»;
-					«FOR j : 2 .. i»
-						«IF type == Type.OBJECT»
-							requireNonNull(value«j»);
-						«ENDIF»
-						if (order(value«j», min).equals(LT)) {
-							min = value«j»;
-						}
+					«type.genericName» min = min(value1, value2);
+					«FOR j : 3 .. i»
+						min = min(min, value«j»);
 					«ENDFOR»
 					return min;
 				}
 
 			«ENDFOR»
 			default «type.genericName» min(«(1..Constants.MAX_ARITY+1).map['''final «type.genericName» value«it»'''].join(", ")», final «type.genericName»... values) {
-				«type.genericName» min = «type.requireNonNull("value1")»;
-				«FOR j : 2 .. Constants.MAX_ARITY+1»
-					«IF type == Type.OBJECT»
-						requireNonNull(value«j»);
-					«ENDIF»
-					if (order(value«j», min).equals(LT)) {
-						min = value«j»;
-					}
+				«type.genericName» min = min(value1, value2);
+				«FOR j : 3 .. Constants.MAX_ARITY+1»
+					min = min(min, value«j»);
 				«ENDFOR»
-				for (final «type.genericName» val : values) {
-					«IF type == Type.OBJECT»
-						requireNonNull(val);
-					«ENDIF»
-					if (order(val, min).equals(LT)) {
-						min = val;
-					}
+				for (final «type.genericName» value : values) {
+					min = min(min, value);
 				}
 				return min;
 			}
 
-			«FOR i : 2 .. Constants.MAX_ARITY»
+			default «type.genericName» max(final «type.genericName» value1, final «type.genericName» value2) {
+				«IF type == Type.OBJECT»
+					requireNonNull(value1);
+					requireNonNull(value2);
+				«ENDIF»
+				if (order(value1, value2).equals(LT)) {
+					return value2;
+				} else {
+					return value1;
+				}
+			}
+
+			«FOR i : 3 .. Constants.MAX_ARITY»
 				default «type.genericName» max(«(1..i).map['''final «type.genericName» value«it»'''].join(", ")») {
-					«type.genericName» max = «type.requireNonNull("value1")»;
-					«FOR j : 2 .. i»
-						«IF type == Type.OBJECT»
-							requireNonNull(value«j»);
-						«ENDIF»
-						if (order(value«j», max).equals(GT)) {
-							max = value«j»;
-						}
+					«type.genericName» max = max(value1, value2);
+					«FOR j : 3 .. i»
+						max = max(max, value«j»);
 					«ENDFOR»
 					return max;
 				}
 
 			«ENDFOR»
 			default «type.genericName» max(«(1..Constants.MAX_ARITY+1).map['''final «type.genericName» value«it»'''].join(", ")», final «type.genericName»... values) {
-				«type.genericName» max = «type.requireNonNull("value1")»;
-				«FOR j : 2 .. Constants.MAX_ARITY+1»
-					«IF type == Type.OBJECT»
-						requireNonNull(value«j»);
-					«ENDIF»
-					if (order(value«j», max).equals(GT)) {
-						max = value«j»;
-					}
+				«type.genericName» max = max(value1, value2);
+				«FOR j : 3 .. Constants.MAX_ARITY+1»
+					max = max(max, value«j»);
 				«ENDFOR»
-				for (final «type.genericName» val : values) {
-					«IF type == Type.OBJECT»
-						requireNonNull(val);
-					«ENDIF»
-					if (order(val, max).equals(GT)) {
-						max = val;
-					}
+				for (final «type.genericName» value : values) {
+					max = max(max, value);
 				}
 				return max;
 			}
@@ -511,6 +506,32 @@ final class OrdGenerator implements InterfaceGenerator {
 					return Order.fromInt(«type.boxedName».compare(x, y));
 				}
 
+				«IF type.floatingPoint»
+					@Override
+					public «type.genericName» min(final «type.genericName» value1, final «type.genericName» value2) {
+						return «type.genericBoxedName».min(value1, value2);
+					}
+
+					@Override
+					public «type.genericName» max(final «type.genericName» value1, final «type.genericName» value2) {
+						return «type.genericBoxedName».max(value1, value2);
+					}
+
+					@Override
+					public <A> Ord<A> contraMap(final «type.typeName»F<A> f) {
+						requireNonNull(f);
+						return new ContraMapped«type.typeName»NaturalOrd<>(f);
+					}
+
+					«FOR from : Type.primitives»
+						@Override
+						public «from.typeName»Ord contraMapFrom«from.typeName»(final «from.typeName»«type.typeName»F f) {
+							requireNonNull(f);
+							return new ContraMapped«from.typeName»«type.typeName»NaturalOrd(f);
+						}
+
+					«ENDFOR»
+				«ENDIF»
 				@Override
 				public Comparator<«type.genericBoxedName»> toComparator() {
 					return Comparator.naturalOrder();
@@ -553,6 +574,32 @@ final class OrdGenerator implements InterfaceGenerator {
 					return Order.fromInt(«type.boxedName».compare(y, x));
 				}
 
+				«IF type.floatingPoint»
+					@Override
+					public «type.genericName» min(final «type.genericName» value1, final «type.genericName» value2) {
+						return «type.genericBoxedName».max(value1, value2);
+					}
+
+					@Override
+					public «type.genericName» max(final «type.genericName» value1, final «type.genericName» value2) {
+						return «type.genericBoxedName».min(value1, value2);
+					}
+
+					@Override
+					public <A> Ord<A> contraMap(final «type.typeName»F<A> f) {
+						requireNonNull(f);
+						return new ContraMapped«type.typeName»ReverseOrd<>(f);
+					}
+
+					«FOR from : Type.primitives»
+						@Override
+						public «from.typeName»Ord contraMapFrom«from.typeName»(final «from.typeName»«type.typeName»F f) {
+							requireNonNull(f);
+							return new ContraMapped«from.typeName»«type.typeName»ReverseOrd(f);
+						}
+
+					«ENDFOR»
+				«ENDIF»
 				@Override
 				public Comparator<«type.genericBoxedName»> toComparator() {
 					return Comparator.reverseOrder();
@@ -563,6 +610,58 @@ final class OrdGenerator implements InterfaceGenerator {
 					return «type.typeName»NaturalOrd.INSTANCE;
 				}
 			}
+		«ENDIF»
+		«IF type.floatingPoint»
+
+			«FOR natural : #[true, false]»
+				«FOR from : Type.values»
+					«IF from == Type.OBJECT»
+						final class ContraMapped«type.typeName»«kind(natural)»Ord<A> implements Ord<A> {
+							private final «type.typeName»F<A> f;
+
+							ContraMapped«type.typeName»«kind(natural)»Ord(final «type.typeName»F<A> f) {
+								this.f = f;
+							}
+					«ELSE»
+						final class ContraMapped«from.typeName»«type.typeName»«kind(natural)»Ord implements «from.typeName»Ord {
+							private final «from.typeName»«type.typeName»F f;
+
+							ContraMapped«from.typeName»«type.typeName»«kind(natural)»Ord(final «from.typeName»«type.typeName»F f) {
+								this.f = f;
+							}
+					«ENDIF»
+
+						@Override
+						public Order order(final «from.genericName» x, final «from.genericName» y) {
+							«IF from == Type.OBJECT»
+								requireNonNull(x);
+								requireNonNull(y);
+							«ENDIF»
+							final double value1 = this.f.apply(x);
+							final double value2 = this.f.apply(y);
+							return «type.typeName»«kind(natural)»Ord.INSTANCE.order(value1, value2);
+						}
+
+						@Override
+						public «from.genericName» «if (natural) "min" else "max"»(final «from.genericName» x, final «from.genericName» y) {
+							«IF from == Type.OBJECT»
+								requireNonNull(x);
+								requireNonNull(y);
+							«ENDIF»
+							final double value1 = this.f.apply(x);
+							final double value2 = this.f.apply(y);
+							if (Double.isNaN(value1)) {
+								return x;
+							} else if (Double.isNaN(value2)) {
+								return y;
+							} else {
+								return Double.compare(value1, value2) <= 0 ? x : y;
+							}
+						}
+					}
+
+				«ENDFOR»
+			«ENDFOR»
 		«ENDIF»
 	''' }
 }

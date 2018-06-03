@@ -405,19 +405,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 				«ELSE»
 					default «type.optionGenericName» minBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
 				«ENDIF»
-					«IF to == Type.DOUBLE»
-						return reduceLeft((final «type.genericName» min, final «type.genericName» value) -> {
-							final double minResult = f.apply(min);
-							final double valueResult = f.apply(value);
-							if (Double.isNaN(minResult)) {
-								return min;
-							} else if (Double.isNaN(valueResult)) {
-								return value;
-							} else {
-								return Double.compare(minResult, valueResult) < 0 ? min : value;
-							}
-						});
-					«ELSEIF type == Type.OBJECT»
+					«IF type == Type.OBJECT»
 						return min(by«to.typeName»(f));
 					«ELSE»
 						return minByOrd(by«to.typeName»(f));
@@ -957,6 +945,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 					this.f2 = f2;
 				}
 
+				@Override
 				public void apply(final A value) {
 					requireNonNull(value);
 					this.acc = requireNonNull(this.f2.apply(this.acc, value));
@@ -973,6 +962,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 						this.f2 = f2;
 					}
 
+					@Override
 					public void apply(final A value) {
 						this.acc = this.f2.apply(this.acc, value);
 					}
@@ -987,6 +977,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 					this.f2 = f2;
 				}
 
+				@Override
 				public void apply(final A value) {
 					requireNonNull(value);
 					if (this.acc == null) {
@@ -1006,6 +997,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 					this.f2 = f2;
 				}
 
+				@Override
 				public void apply(final «type.javaName» value) {
 					this.acc = requireNonNull(this.f2.apply(this.acc, value));
 				}
@@ -1021,6 +1013,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 						this.f2 = f2;
 					}
 
+					@Override
 					public void apply(final «type.javaName» value) {
 						this.acc = this.f2.apply(this.acc, value);
 					}
@@ -1036,6 +1029,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 					this.f2 = f2;
 				}
 
+				@Override
 				public void apply(final «type.javaName» value) {
 					if (this.nonEmpty) {
 						this.acc = this.f2.apply(this.acc, value);

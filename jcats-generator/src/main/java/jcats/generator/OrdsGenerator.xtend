@@ -29,6 +29,10 @@ final class OrdsGenerator implements ClassGenerator {
 			private «name»() {
 			}
 
+			public static «typeParam»Order order(final «type.genericName» x, final «type.genericName» y) {
+				return «ord».order(x, y);
+			}
+
 			public static «typeParam»boolean less(final «type.genericName» x, final «type.genericName» y) {
 				return «ord».less(x, y);
 			}

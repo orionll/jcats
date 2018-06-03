@@ -40,6 +40,10 @@ public enum Type {
 		return javaUnboxedTypes().contains(this);
 	}
 
+	public boolean isFloatingPoint() {
+		return (this == DOUBLE);
+	}
+
 	public String defaultValue() {
 		switch (this) {
 			case OBJECT: return "null";
