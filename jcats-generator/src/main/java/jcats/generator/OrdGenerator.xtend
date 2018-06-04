@@ -22,11 +22,14 @@ final class OrdGenerator implements InterfaceGenerator {
 
 		import java.io.Serializable;
 		import java.util.Comparator;
+		import java.util.function.Consumer;
 
+		import «Constants.COLLECTION».*;
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
-		import static jcats.Order.*;
+		import static «Constants.ORDER».*;
+		import static «Constants.JCATS».«type.optionShortName».*;
 
 		@FunctionalInterface
 		public interface «type.contravariantName("Ord")» extends Comparator<«type.genericBoxedName»> {
@@ -119,6 +122,37 @@ final class OrdGenerator implements InterfaceGenerator {
 				return min;
 			}
 
+			default «type.optionGenericName» arrayMin(final «type.genericName»[] values) {
+				if (values.length == 0) {
+					return «type.noneName»();
+				} else {
+					«type.genericName» min = «type.requireNonNull("values[0]")»;
+					for (int i = 1; i < values.length; i++) {
+						final «type.genericName» value = «type.requireNonNull("values[i]")»;
+						min = «type.requireNonNull("min(min, value)")»;
+					}
+					return «type.someName»(min);
+				}
+			}
+
+			default «type.optionGenericName» allMin(final Iterable<«type.genericBoxedName»> iterable) {
+				if (iterable instanceof «type.containerWildcardName») {
+					return ((«type.containerGenericName») iterable).min«IF type.primitive»ByOrd«ENDIF»(this);
+				} else {
+					final «type.genericName("MinCollector")» collector = new «type.diamondName("MinCollector")»(this);
+					iterable.forEach(collector);
+					«IF type == Type.OBJECT»
+						return Option.fromNullable(collector.min);
+					«ELSE»
+						if (collector.nonEmpty) {
+							return «type.someName»(collector.min);
+						} else {
+							return «type.noneName»();
+						}
+					«ENDIF»
+				}
+			}
+
 			default «type.genericName» max(final «type.genericName» value1, final «type.genericName» value2) {
 				«IF type == Type.OBJECT»
 					requireNonNull(value1);
@@ -150,6 +184,37 @@ final class OrdGenerator implements InterfaceGenerator {
 					max = max(max, value);
 				}
 				return max;
+			}
+
+			default «type.optionGenericName» arrayMax(final «type.genericName»[] values) {
+				if (values.length == 0) {
+					return «type.noneName»();
+				} else {
+					«type.genericName» max = «type.requireNonNull("values[0]")»;
+					for (int i = 1; i < values.length; i++) {
+						final «type.genericName» value = «type.requireNonNull("values[i]")»;
+						max = «type.requireNonNull("max(max, value)")»;
+					}
+					return «type.someName»(max);
+				}
+			}
+
+			default «type.optionGenericName» allMax(final Iterable<«type.genericBoxedName»> iterable) {
+				if (iterable instanceof «type.containerWildcardName») {
+					return ((«type.containerGenericName») iterable).max«IF type.primitive»ByOrd«ENDIF»(this);
+				} else {
+					final «type.genericName("MaxCollector")» collector = new «type.diamondName("MaxCollector")»(this);
+					iterable.forEach(collector);
+					«IF type == Type.OBJECT»
+						return Option.fromNullable(collector.max);
+					«ELSE»
+						if (collector.nonEmpty) {
+							return «type.someName»(collector.max);
+						} else {
+							return «type.noneName»();
+						}
+					«ENDIF»
+				}
 			}
 
 			default «genericName» reverse() {
@@ -506,17 +571,19 @@ final class OrdGenerator implements InterfaceGenerator {
 					return Order.fromInt(«type.boxedName».compare(x, y));
 				}
 
-				«IF type.floatingPoint»
-					@Override
-					public «type.genericName» min(final «type.genericName» value1, final «type.genericName» value2) {
-						return «type.genericBoxedName».min(value1, value2);
-					}
-
+				«IF type.javaUnboxedType»
 					@Override
 					public «type.genericName» max(final «type.genericName» value1, final «type.genericName» value2) {
 						return «type.genericBoxedName».max(value1, value2);
 					}
 
+					@Override
+					public «type.genericName» min(final «type.genericName» value1, final «type.genericName» value2) {
+						return «type.genericBoxedName».min(value1, value2);
+					}
+
+				«ENDIF»
+				«IF type.floatingPoint»
 					@Override
 					public <A> Ord<A> contraMap(final «type.typeName»F<A> f) {
 						requireNonNull(f);
@@ -574,7 +641,7 @@ final class OrdGenerator implements InterfaceGenerator {
 					return Order.fromInt(«type.boxedName».compare(y, x));
 				}
 
-				«IF type.floatingPoint»
+				«IF type.javaUnboxedType»
 					@Override
 					public «type.genericName» min(final «type.genericName» value1, final «type.genericName» value2) {
 						return «type.genericBoxedName».max(value1, value2);
@@ -585,6 +652,8 @@ final class OrdGenerator implements InterfaceGenerator {
 						return «type.genericBoxedName».min(value1, value2);
 					}
 
+				«ENDIF»
+				«IF type.floatingPoint»
 					@Override
 					public <A> Ord<A> contraMap(final «type.typeName»F<A> f) {
 						requireNonNull(f);
@@ -612,7 +681,6 @@ final class OrdGenerator implements InterfaceGenerator {
 			}
 		«ENDIF»
 		«IF type.floatingPoint»
-
 			«FOR natural : #[true, false]»
 				«FOR from : Type.values»
 					«IF from == Type.OBJECT»
@@ -662,6 +730,87 @@ final class OrdGenerator implements InterfaceGenerator {
 
 				«ENDFOR»
 			«ENDFOR»
+		«ELSE»
+
+		«ENDIF»
+		«IF type == Type.OBJECT»
+			final class MinCollector<A> implements Consumer<A> {
+				A min;
+				private final Ord<A> ord;
+
+				MinCollector(final Ord<A> ord) {
+					this.ord = ord;
+				}
+
+				@Override
+				public void accept(final A value) {
+					requireNonNull(value);
+					if (this.min == null) {
+						this.min = value;
+					} else {
+						this.min = requireNonNull(this.ord.min(this.min, value));
+					}
+				}
+			}
+
+			final class MaxCollector<A> implements Consumer<A> {
+				A max;
+				private final Ord<A> ord;
+
+				MaxCollector(final Ord<A> ord) {
+					this.ord = ord;
+				}
+
+				@Override
+				public void accept(final A value) {
+					requireNonNull(value);
+					if (this.max == null) {
+						this.max = value;
+					} else {
+						this.max = requireNonNull(this.ord.max(this.max, value));
+					}
+				}
+			}
+		«ELSE»
+			final class «type.typeName»MinCollector implements Consumer<«type.boxedName»> {
+				«type.javaName» min;
+				boolean nonEmpty;
+				private final «genericName» ord;
+
+				«type.typeName»MinCollector(final «genericName» ord) {
+					this.ord = ord;
+				}
+
+				@Override
+				public void accept(final «type.boxedName» value) {
+					if (this.nonEmpty) {
+						this.min = this.ord.min(this.min, value);
+					} else {
+						this.min = value;
+						this.nonEmpty = true;
+					}
+				}
+			}
+
+			final class «type.typeName»MaxCollector implements Consumer<«type.boxedName»> {
+				«type.javaName» max;
+				boolean nonEmpty;
+				private final «genericName» ord;
+
+				«type.typeName»MaxCollector(final «genericName» ord) {
+					this.ord = ord;
+				}
+
+				@Override
+				public void accept(final «type.boxedName» value) {
+					if (this.nonEmpty) {
+						this.max = this.ord.max(this.max, value);
+					} else {
+						this.max = value;
+						this.nonEmpty = true;
+					}
+				}
+			}
 		«ENDIF»
 	''' }
 }
