@@ -557,6 +557,38 @@ final class FGenerator implements InterfaceGenerator {
 				«ENDIF»
 			}
 
+			«IF to == Type.BOOLEAN»
+				static «paramGenericName» not(final «genericName» f) {
+					return f.negate();
+				}
+
+				static «paramGenericName» and(final «genericName» f1, final «genericName» f2) {
+					requireNonNull(f1);
+					requireNonNull(f2);
+					«IF from == Type.OBJECT»
+						return (final «from.genericName» value) -> {
+							requireNonNull(value);
+							return f1.apply(value) && f2.apply(value);
+						};
+					«ELSE»
+						return (final «from.genericName» value) -> f1.apply(value) && f2.apply(value);
+					«ENDIF»
+				}
+
+				static «paramGenericName» or(final «genericName» f1, final «genericName» f2) {
+					requireNonNull(f1);
+					requireNonNull(f2);
+					«IF from == Type.OBJECT»
+						return (final «from.genericName» value) -> {
+							requireNonNull(value);
+							return f1.apply(value) && f2.apply(value);
+						};
+					«ELSE»
+						return (final «from.genericName» value) -> f1.apply(value) || f2.apply(value);
+					«ENDIF»
+				}
+
+			«ENDIF»
 			«javadocSynonym(alwaysName)»
 			static «paramGenericName» of(final «toName» value) {
 				return «alwaysName»(value);

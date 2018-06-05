@@ -43,6 +43,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.COMMON».*;
+		import static «Constants.FUNCTION».«type.shortName("BooleanF")».*;
 
 		public interface «type.covariantName("ContainerView")» extends «type.containerGenericName» {
 
@@ -524,11 +525,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«toStr(Type.OBJECT, mappedContainerViewShortName, false)»
 		}
 
-		class «type.genericName("FilteredContainerView")» implements «genericName» {
-			final «genericName» view;
+		class «filteredContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> implements «genericName» {
+			final C view;
 			final «type.boolFName» predicate;
 
-			«filteredContainerViewShortName»(final «genericName» view, final «type.boolFName» predicate) {
+			«filteredContainerViewShortName»(final C view, final «type.boolFName» predicate) {
 				this.view = view;
 				this.predicate = predicate;
 			}
@@ -570,6 +571,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 						eff.apply(value);
 					}
 				});
+			}
+
+			@Override
+			public «genericName» filter(final «type.boolFName» p) {
+				return new «filteredContainerViewShortName»<>(this.view, and(this.predicate, p));
 			}
 
 			«toStr(type, filteredContainerViewShortName, false)»

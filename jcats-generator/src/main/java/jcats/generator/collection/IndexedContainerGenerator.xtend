@@ -126,6 +126,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				return intNone();
 			}
 
+			@Override
 			default «type.indexedContainerViewGenericName» view() {
 				return new «type.shortName("BaseIndexedContainerView")»<>(this);
 			}

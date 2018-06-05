@@ -38,6 +38,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.COMMON».*;
+		import static «Constants.FUNCTION».«type.shortName("BooleanF")».*;
 
 		public interface «type.covariantName("IndexedContainerView")» extends «type.containerViewGenericName», «type.indexedContainerGenericName» {
 
@@ -184,9 +185,9 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 		}
 
-		final class «type.genericName("FilteredIndexedContainerView")» extends «type.genericName("FilteredContainerView")» {
+		final class «filteredIndexedContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> extends «type.shortName("FilteredContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»C> {
 
-			«filteredIndexedContainerViewShortName»(final «genericName» view, final «type.boolFName» predicate) {
+			«filteredIndexedContainerViewShortName»(final C view, final «type.boolFName» predicate) {
 				super(view, predicate);
 			}
 
@@ -199,6 +200,11 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				«ELSE»
 					return new FilteredIterator<>(this.view.reverseIterator(), this.predicate::apply);
 				«ENDIF»
+			}
+
+			@Override
+			public «type.containerViewGenericName» filter(final «type.boolFName» p) {
+				return new «filteredIndexedContainerViewShortName»<>(this.view, and(this.predicate, p));
 			}
 		}
 
