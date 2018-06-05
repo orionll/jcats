@@ -301,7 +301,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			default void forEach(final Consumer<? super «type.genericBoxedName»> action) {
-				requireNonNull(action);
 				foreach(action::accept);
 			}
 
