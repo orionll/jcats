@@ -898,18 +898,26 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 
 			«ENDIF»
-			static «paramGenericName» sizedToArray(final Iterable<«type.genericBoxedName»> iterable, final int size) {
+			private static «paramGenericName» sizedToArray(final Iterable<«type.genericBoxedName»> iterable, final int size) {
 				if (size == 0) {
 					return empty«shortName»();
 				} else {
 					final «type.javaName»[] array = new «type.javaName»[size];
-					fillArray(array, 0, iterable);
+					«IF type == Type.OBJECT»
+						fillArray(array, 0, iterable);
+					«ELSE»
+						if (iterable instanceof Container<?>) {
+							((Container<«type.boxedName»>) iterable).foreachWithIndex((final int index, final «type.boxedName» value) -> array[index] = value);
+						} else {
+							fillArray(array, 0, iterable);
+						}
+					«ENDIF»
 					return new «diamondName»(array);
 				}
 			}
 
 			public static «paramGenericName» ofAll(final Iterable<«type.genericBoxedName»> iterable) {
-				if (iterable instanceof «type.containerShortName») {
+				if (iterable instanceof «type.containerWildcardName») {
 					return ((«type.containerGenericName») iterable).to«type.arrayShortName»();
 				} else if (iterable instanceof Sized && ((Sized) iterable).hasFixedSize()) {
 					return sizedToArray(iterable, ((Sized) iterable).size());
