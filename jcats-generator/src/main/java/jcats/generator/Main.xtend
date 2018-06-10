@@ -16,6 +16,7 @@ import jcats.generator.collection.IndexedContainerGenerator
 import jcats.generator.collection.IndexedContainerViewGenerator
 import jcats.generator.collection.KeyValueGenerator
 import jcats.generator.collection.PrimitiveStream2Generator
+import jcats.generator.collection.RangeGenerator
 import jcats.generator.collection.Seq0Generator
 import jcats.generator.collection.Seq1Generator
 import jcats.generator.collection.Seq2Generator
@@ -94,6 +95,7 @@ final class Main {
 			new SizedGenerator,
 			new OrderGenerator,
 			new OrderedGenerator,
+			new RangeGenerator,
 			new KeyValueGenerator,
 			new DictGenerator,
 			new UniqueGenerator,
