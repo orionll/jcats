@@ -266,7 +266,16 @@ final class ArrayGenerator implements ClassGenerator {
 				} else {
 					final «type.javaName»[] result = new «type.javaName»[this.array.length + suffixSize];
 					System.arraycopy(this.array, 0, result, 0, this.array.length);
-					fillArray(result, this.array.length, suffix);
+					«IF type == Type.OBJECT»
+						fillArray(result, this.array.length, suffix);
+					«ELSE»
+						if (suffix instanceof Container<?>) {
+							((Container<«type.boxedName»>) suffix).foreachWithIndex((final int index, final «type.boxedName» value) ->
+									result[this.array.length + index] = value);
+						} else {
+							fillArray(result, this.array.length, suffix);
+						}
+					«ENDIF»
 					return new «diamondName»(result);
 				}
 			}
@@ -276,7 +285,16 @@ final class ArrayGenerator implements ClassGenerator {
 					return this;
 				} else {
 					final «type.javaName»[] result = new «type.javaName»[prefixSize + this.array.length];
-					fillArray(result, 0, prefix);
+					«IF type == Type.OBJECT»
+						fillArray(result, 0, prefix);
+					«ELSE»
+						if (prefix instanceof Container<?>) {
+							((Container<«type.boxedName»>) prefix).foreachWithIndex((final int index, final «type.boxedName» value) ->
+									result[index] = value);
+						} else {
+							fillArray(result, 0, prefix);
+						}
+					«ENDIF»
 					System.arraycopy(this.array, 0, result, prefixSize, this.array.length);
 					return new «diamondName»(result);
 				}
