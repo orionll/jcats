@@ -6,6 +6,7 @@ final class CastsGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
+		import java.lang.ref.*;
 		import java.util.Comparator;
 		import java.util.Iterator;
 		import java.util.Optional;
@@ -70,6 +71,16 @@ final class CastsGenerator implements ClassGenerator {
 			«cast("ToIntFunction", "castToIntFunction", #["A"], #["A"], #[])»
 
 			«cast("ToLongFunction", "castToLongFunction", #["A"], #["A"], #[])»
+
+			«cast("Reference", "castReference", #["A"], #[], #["A"])»
+
+			«cast("WeakReference", "castWeakReference", #["A"], #[], #["A"])»
+
+			«cast("SoftReference", "castSoftReference", #["A"], #[], #["A"])»
+
+			«cast("PhantomReference", "castPhantomReference", #["A"], #[], #["A"])»
+
+			«cast("ReferenceQueue", "castReferenceQueue", #["A"], #[], #["A"])»
 		}
 	''' }
 }
