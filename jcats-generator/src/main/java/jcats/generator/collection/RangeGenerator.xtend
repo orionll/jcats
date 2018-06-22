@@ -136,18 +136,16 @@ final class RangeGenerator implements ClassGenerator {
 			@Override
 			public void foreachWithIndex(final IntIntEff2 eff) {
 				requireNonNull(eff);
-				int index = 0;
-				for (int i = this.low; i < this.high; i++, index++) {
-					if (index < 0) {
-						throw new ArithmeticException("Integer overflow");
+				if (hasFixedSize()) {
+					int index = 0;
+					for (int i = this.low; i < this.high; i++, index++) {
+						eff.apply(index, i);
 					}
-					eff.apply(index, i);
-				}
-				if (this.closed) {
-					if (index < 0) {
-						throw new ArithmeticException("Integer overflow");
+					if (this.closed) {
+						eff.apply(index, this.high);
 					}
-					eff.apply(index, this.high);
+				} else {
+					throw new ArithmeticException("Integer overflow");
 				}
 			}
 
@@ -176,6 +174,24 @@ final class RangeGenerator implements ClassGenerator {
 			@Override
 			public IntIndexedContainerView view() {
 				return new RangeView(this);
+			}
+
+			@Override
+			public IntStream2 stream() {
+				if (this.closed) {
+					return IntStream2.rangeClosed(this.low, this.high);
+				} else {
+					return IntStream2.range(this.low, this.high);
+				}
+			}
+
+			@Override
+			public IntStream2 parallelStream() {
+				if (this.closed) {
+					return IntStream2.rangeClosed(this.low, this.high).parallel();
+				} else {
+					return IntStream2.range(this.low, this.high).parallel();
+				}
 			}
 
 			«hashcode(Type.INT)»
