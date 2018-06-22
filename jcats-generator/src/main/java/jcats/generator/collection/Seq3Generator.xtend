@@ -912,6 +912,28 @@ final class Seq3Generator extends SeqGenerator {
 			}
 
 			@Override
+			«IF type == Type.OBJECT»
+				public void foreachWithIndex(final IntObjectEff2<A> eff) {
+			«ELSE»
+				public void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
+			«ENDIF»
+				int i = 0;
+				for (final «type.javaName» value : init) {
+					eff.apply(i++, «type.genericCast»value);
+				}
+				for (final «type.javaName»[][] node2 : node3) {
+					for (final «type.javaName»[] node1 : node2) {
+						for (final «type.javaName» value : node1) {
+							eff.apply(i++, «type.genericCast»value);
+						}
+					}
+				}
+				for (final «type.javaName» value : tail) {
+					eff.apply(i++, «type.genericCast»value);
+				}
+			}
+
+			@Override
 			public void foreachUntil(final «type.boolFName» eff) {
 				for (final «type.javaName» value : init) {
 					if (!eff.apply(«type.genericCast»value)) {

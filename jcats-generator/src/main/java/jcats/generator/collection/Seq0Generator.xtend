@@ -153,6 +153,15 @@ class Seq0Generator extends SeqGenerator {
 			}
 
 			@Override
+			«IF type == Type.OBJECT»
+				public void foreachWithIndex(final IntObjectEff2<A> eff) {
+			«ELSE»
+				public void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
+			«ENDIF»
+				requireNonNull(eff);
+			}
+
+			@Override
 			public void foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
 			}
