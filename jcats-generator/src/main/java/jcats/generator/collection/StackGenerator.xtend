@@ -306,12 +306,26 @@ final class StackGenerator implements ClassGenerator {
 					final «builderGenericName» builder = new «builderDiamondName»();
 					«genericName» stack = this;
 					int i = 0;
-					while (!stack.isEmpty() && i < n) {
+					while (stack.isNotEmpty() && i < n) {
 						builder.append(stack.head);
 						stack = stack.tail;
 						i++;
 					}
 					return builder.build();
+				}
+			}
+
+			public «genericName» skip(final int n) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				} else {
+					«genericName» stack = this;
+					int i = 0;
+					while (stack.isNotEmpty() && i < n) {
+						stack = stack.tail;
+						i++;
+					}
+					return stack;
 				}
 			}
 
