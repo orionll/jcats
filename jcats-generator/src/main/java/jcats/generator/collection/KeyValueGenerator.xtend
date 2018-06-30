@@ -83,6 +83,33 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				return false;
 			}
 
+			default void ifContainsKey(final K key, final Eff<A> eff) {
+				requireNonNull(eff);
+				final A value = getOrNull(key);
+				if (value != null) {
+					eff.apply(value);
+				}
+			}
+
+			default void ifDoesNotContainKey(final K key, final Eff0 eff) {
+				requireNonNull(eff);
+				final A value = getOrNull(key);
+				if (value == null) {
+					eff.apply();
+				}
+			}
+
+			default void ifContainsKeyOrElse(final K key, final Eff<A> ifContains, final Eff0 ifDoesNotContain) {
+				requireNonNull(ifContains);
+				requireNonNull(ifDoesNotContain);
+				final A value = getOrNull(key);
+				if (value == null) {
+					ifDoesNotContain.apply();
+				} else {
+					ifContains.apply(value);
+				}
+			}
+
 			default void foreach(final Eff2<K, A> eff) {
 				requireNonNull(eff);
 				forEach((final P<K, A> entry) -> eff.apply(entry.get1(), entry.get2()));
