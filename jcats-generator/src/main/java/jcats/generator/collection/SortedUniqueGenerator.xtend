@@ -242,6 +242,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				return isEmpty() ? «type.emptyIterator» : new «type.diamondName(baseName + "ReverseIterator")»(this);
+			}
+
+			@Override
 			public int spliteratorCharacteristics() {
 				return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE;
 			}
@@ -416,6 +421,41 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 				if (result.right != null) {
 					for («genericName» unique = result.right; unique != null; unique = unique.left) {
+						this.stack = this.stack.prepend(unique);
+					}
+				}
+
+				return result.entry;
+			}
+		}
+
+		final class «type.genericName(baseName + "ReverseIterator")» implements «type.iteratorGenericName» {
+			private final «genericName» root;
+			private Stack<«genericName»> stack;
+
+			«type.shortName(baseName + "ReverseIterator")»(final «genericName» root) {
+				this.root = root;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (this.stack == null || this.stack.isNotEmpty());
+			}
+
+			@Override
+			public «type.iteratorReturnType» «type.iteratorNext»() {
+				if (this.stack == null) {
+					this.stack = emptyStack();
+					for («genericName» unique = this.root; unique != null; unique = unique.right) {
+						this.stack = this.stack.prepend(unique);
+					}
+				}
+
+				final «genericName» result = this.stack.head();
+				this.stack = this.stack.tail;
+
+				if (result.left != null) {
+					for («genericName» unique = result.left; unique != null; unique = unique.right) {
 						this.stack = this.stack.prepend(unique);
 					}
 				}
