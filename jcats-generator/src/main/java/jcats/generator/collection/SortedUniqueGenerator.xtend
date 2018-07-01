@@ -40,6 +40,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		«ENDIF»
 		import java.util.Spliterator;
 		import java.util.Spliterators;
+		import java.util.stream.Collector;
 		import java.util.stream.«type.streamName»;
 
 		import «Constants.JCATS».*;
@@ -58,9 +59,9 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		public final class «type.covariantName(baseName)» implements «type.uniqueContainerGenericName», Serializable {
 
 			«IF type == Type.OBJECT»
-				private static final «wildcardName» EMPTY = new «diamondName»(null, null, null, Ord.<Integer>asc(), 0);
+				static final «wildcardName» EMPTY = new «diamondName»(null, null, null, Ord.<Integer>asc(), 0);
 			«ELSE»
-				private static final «shortName» EMPTY = new «shortName»(«type.asc»());
+				static final «shortName» EMPTY = new «shortName»(«type.asc»());
 			«ENDIF»
 
 			final «type.genericName» entry;
@@ -375,15 +376,40 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				«ENDIF»
 				return result;
 			}
-			«IF type == Type.OBJECT»
 
+			«IF type == Type.OBJECT»
 				public static «paramComparableGenericName» from«type.streamName»(final «type.streamGenericName» stream) {
 					return stream.reduce(emptySortedUnique(), SortedUnique::put, SortedUnique::merge);
 				}
 
-				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
 
+			public static «IF type == Type.OBJECT»<A extends Comparable<A>> «ENDIF»«type.sortedUniqueBuilderGenericName» builder() {
+				return new «type.diamondName("SortedUniqueBuilder")»();
+			}
+
+			public static «IF type == Type.OBJECT»<A> «ENDIF»«type.sortedUniqueBuilderGenericName» builderBy(final «type.ordGenericName» ord) {
+				return new «type.diamondName("SortedUniqueBuilder")»(ord);
+			}
+
+			public static «IF type == Type.OBJECT»<A extends Comparable<A>> «ENDIF»Collector<«type.genericBoxedName», ?, «genericName»> collector() {
+				«IF type == Type.OBJECT»
+					return Collector.<«type.genericBoxedName», «type.sortedUniqueBuilderGenericName», «genericName»> of(
+				«ELSE»
+					return Collector.of(
+				«ENDIF»
+						«shortName»::builder, «type.sortedUniqueBuilderShortName»::put, «type.sortedUniqueBuilderShortName»::merge, «type.sortedUniqueBuilderShortName»::build);
+			}
+
+			public static «IF type == Type.OBJECT»<A> «ENDIF»Collector<«type.genericBoxedName», ?, «genericName»> collectorBy(final «type.ordGenericName» ord) {
+				return Collector.of(
+						() -> builderBy(ord), «type.sortedUniqueBuilderShortName»::put, «type.sortedUniqueBuilderShortName»::merge, «type.sortedUniqueBuilderShortName»::build);
+			}
+
+			«IF type == Type.OBJECT»
+				«cast(#["A"], #[], #["A"])»
+
+			«ENDIF»
 			static final class InsertResult {
 				boolean heightIncreased;
 			}

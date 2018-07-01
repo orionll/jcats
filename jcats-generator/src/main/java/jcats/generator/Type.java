@@ -219,6 +219,14 @@ public enum Type {
 		return genericName("SortedUnique");
 	}
 
+	public String sortedUniqueBuilderShortName() {
+		return shortName("SortedUniqueBuilder");
+	}
+
+	public String sortedUniqueBuilderGenericName() {
+		return genericName("SortedUniqueBuilder");
+	}
+
 	public String effShortName() {
 		return shortName("Eff");
 	}

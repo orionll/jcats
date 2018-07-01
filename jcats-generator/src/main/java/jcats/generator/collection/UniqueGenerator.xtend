@@ -22,6 +22,7 @@ final class UniqueGenerator implements ClassGenerator {
 		import java.util.NoSuchElementException;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
+		import java.util.stream.Collector;
 		import java.util.stream.Stream;
 
 		import «Constants.JCATS».*;
@@ -324,6 +325,15 @@ final class UniqueGenerator implements ClassGenerator {
 
 			public static «paramGenericName» fromStream(final Stream<A> stream) {
 				return stream.reduce(empty«shortName»(), «shortName»::put, «shortName»::merge);
+			}
+
+			public static <A> UniqueBuilder<A> builder() {
+				return new UniqueBuilder<>();
+			}
+
+			public static <A> Collector<A, ?, Unique<A>> collector() {
+				return Collector.<A, UniqueBuilder<A>, Unique<A>> of(
+						Unique::builder, UniqueBuilder::put, UniqueBuilder::merge, UniqueBuilder::build);
 			}
 
 			«cast(#["A"], #[], #["A"])»

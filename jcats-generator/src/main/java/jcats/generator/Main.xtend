@@ -27,10 +27,12 @@ import jcats.generator.collection.Seq6Generator
 import jcats.generator.collection.SeqBuilderGenerator
 import jcats.generator.collection.SeqGenerator
 import jcats.generator.collection.SortedDictGenerator
+import jcats.generator.collection.SortedUniqueBuilderGenerator
 import jcats.generator.collection.SortedUniqueGenerator
 import jcats.generator.collection.StackBuilderGenerator
 import jcats.generator.collection.StackGenerator
 import jcats.generator.collection.Stream2Generator
+import jcats.generator.collection.UniqueBuilderGenerator
 import jcats.generator.collection.UniqueContainerGenerator
 import jcats.generator.collection.UniqueGenerator
 import jcats.generator.collection.VNGenerators
@@ -99,6 +101,7 @@ final class Main {
 			new KeyValueGenerator,
 			new DictGenerator,
 			new UniqueGenerator,
+			new UniqueBuilderGenerator,
 			new SortedDictGenerator,
 			new HashTableCommonGenerator,
 			new CommonGenerator,
@@ -140,6 +143,7 @@ final class Main {
 			Seq6Generator.generators,
 			SeqBuilderGenerator.generators,
 			SortedUniqueGenerator.generators,
+			SortedUniqueBuilderGenerator.generators,
 			PNGenerators.generators,
 			PGenerator.generators,
 			IndexedGenerator.generators,
