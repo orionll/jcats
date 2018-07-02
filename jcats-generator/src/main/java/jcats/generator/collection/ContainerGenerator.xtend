@@ -38,6 +38,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 		import java.util.function.Consumer;
 		import java.util.stream.«type.streamName»;
 		import java.util.stream.StreamSupport;
+		import java.io.Serializable;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -543,7 +544,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type.primitive»
-			class «type.genericName("ContainerAsContainer")»<C extends «shortName»> implements Container<«type.boxedName»> {
+			class «type.genericName("ContainerAsContainer")»<C extends «shortName»> implements Container<«type.boxedName»>, Serializable {
 				final C container;
 
 				«shortName»AsContainer(final C container) {
@@ -806,9 +807,9 @@ final class ContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			class CollectionAsContainer<C extends Collection<A>, A> implements Container<A> {
+			class CollectionAsContainer<C extends Collection<A>, A> implements Container<A>, Serializable {
 		«ELSE»
-			class «type.typeName»CollectionAs«type.typeName»Container<C extends Collection<«type.boxedName»>> implements «type.typeName»Container {
+			class «type.typeName»CollectionAs«type.typeName»Container<C extends Collection<«type.boxedName»>> implements «type.typeName»Container, Serializable {
 		«ENDIF»
 			final C collection;
 

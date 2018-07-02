@@ -34,6 +34,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
+		import java.io.Serializable;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -262,7 +263,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			}
 
 		«ENDIF»
-		final class «type.genericName("IndexedContainerAsList")» extends AbstractImmutableList<«type.genericBoxedName»> implements RandomAccess {
+		final class «type.genericName("IndexedContainerAsList")» extends AbstractImmutableList<«type.genericBoxedName»> implements RandomAccess, Serializable {
 			final «genericName» container;
 
 			«shortName»AsList(final «genericName» container) {

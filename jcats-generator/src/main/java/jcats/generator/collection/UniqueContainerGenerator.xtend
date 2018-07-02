@@ -30,6 +30,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.function.Consumer;
+		import java.io.Serializable;
 
 		import «Constants.JCATS».*;
 
@@ -96,7 +97,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			}
 
 		«ENDIF»
-		final class «type.genericName("UniqueContainerAsSet")» extends AbstractImmutableSet<«type.genericBoxedName»> {
+		final class «type.genericName("UniqueContainerAsSet")» extends AbstractImmutableSet<«type.genericBoxedName»> implements Serializable {
 			final «genericName» container;
 
 			«shortName»AsSet(final «genericName» container) {
