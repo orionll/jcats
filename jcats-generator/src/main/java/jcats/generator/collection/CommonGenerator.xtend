@@ -675,7 +675,7 @@ final class CommonGenerator implements ClassGenerator {
 			private A1 a1;
 			private Iterator<A2> iterator2;
 
-			public Product2Iterator(final Iterable<A1> iterable1, final Iterable<A2> iterable2, final F2<A1, A2, B> f) {
+			Product2Iterator(final Iterable<A1> iterable1, final Iterable<A2> iterable2, final F2<A1, A2, B> f) {
 				this.iterator1 = iterable1.iterator();
 				this.iterable2 = iterable2;
 				this.f = f;
@@ -712,7 +712,7 @@ final class CommonGenerator implements ClassGenerator {
 			private Iterator<A2> iterator2;
 			private Iterator<A3> iterator3;
 
-			public Product3Iterator(final Iterable<A1> iterable1, final Iterable<A2> iterable2, final Iterable<A3> iterable3, final F3<A1, A2, A3, B> f) {
+			Product3Iterator(final Iterable<A1> iterable1, final Iterable<A2> iterable2, final Iterable<A3> iterable3, final F3<A1, A2, A3, B> f) {
 				this.iterator1 = iterable1.iterator();
 				this.iterable2 = iterable2;
 				this.iterable3 = iterable3;

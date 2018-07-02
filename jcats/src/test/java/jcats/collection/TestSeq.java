@@ -58,7 +58,7 @@ public class TestSeq {
 	private static <A> void assertSeqsDeepEqual(final String msg, final Seq<A> expectedSeq, final Seq<A> seq) {
 		try {
 			if (expectedSeq instanceof Seq0<?>) {
-				assertTrue(emptySeq() == seq);
+				assertSame(emptySeq(), seq);
 			} else if (expectedSeq instanceof Seq1<?>) {
 				assertArrayEquals(msg, ((Seq1<?>) expectedSeq).node1, ((Seq1<?>) seq).node1);
 			} else if (expectedSeq instanceof Seq2<?>) {

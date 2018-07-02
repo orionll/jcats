@@ -62,13 +62,13 @@ public class TestSortedUnique {
 	public void putSame() {
 		final SortedUnique<Character> unique = createTestSortedUnique();
 		final SortedUnique<Character> newUnique = unique.put('H');
-		assertTrue(unique == newUnique);
+		assertSame(unique, newUnique);
 	}
 
 	@Test
 	public void removeFromEmpty() {
 		final SortedUnique<Character> unique = emptySortedUnique();
-		assertTrue(unique == unique.remove('A'));
+		assertSame(unique, unique.remove('A'));
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class TestSortedUnique {
 	public void removeAbsent() {
 		final SortedUnique<Character> unique = createTestSortedUnique();
 		final SortedUnique<Character> newUnique = unique.remove('Y');
-		assertTrue(unique == newUnique);
+		assertSame(unique, newUnique);
 	}
 
 	@Test

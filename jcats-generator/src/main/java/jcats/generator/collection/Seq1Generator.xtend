@@ -124,7 +124,9 @@ final class Seq1Generator extends SeqGenerator {
 
 			@Override
 			public «genericName» prepend(final «type.genericName» value) {
-				requireNonNull(value);
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
 				if (node1.length == 32) {
 					final «type.javaName»[] init = { value };
 					return new «diamondName(2)»(«shortName»2.EMPTY_NODE2, init, node1, 33);
@@ -138,7 +140,9 @@ final class Seq1Generator extends SeqGenerator {
 
 			@Override
 			public «genericName» append(final «type.genericName» value) {
-				requireNonNull(value);
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
 				if (node1.length == 32) {
 					final «type.javaName»[] tail = { value };
 					return new «diamondName(2)»(«shortName»2.EMPTY_NODE2, node1, tail, 33);

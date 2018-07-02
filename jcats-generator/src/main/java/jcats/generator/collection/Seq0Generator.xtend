@@ -100,7 +100,7 @@ class Seq0Generator extends SeqGenerator {
 
 			@Override
 			public «genericName» append(final «type.genericName» value) {
-				final «type.javaName»[] node1 = { requireNonNull(value) };
+				final «type.javaName»[] node1 = { «type.requireNonNull("value")» };
 				return new «diamondName(1)»(node1);
 			}
 

@@ -69,13 +69,13 @@ public class TestSortedDict {
 	public void putSame() {
 		final SortedDict<Character, String> dict = createTestDict();
 		final SortedDict<Character, String> newDict = dict.put('H', "hh");
-		assertTrue(dict == newDict);
+		assertSame(dict, newDict);
 	}
 
 	@Test
 	public void removeFromEmpty() {
 		final SortedDict<Character, Object> dict = emptySortedDict();
-		assertTrue(dict == dict.remove('A'));
+		assertSame(dict, dict.remove('A'));
 	}
 
 	@Test
@@ -115,7 +115,7 @@ public class TestSortedDict {
 	public void removeAbsent() {
 		final SortedDict<Character, String> dict = createTestDict();
 		final SortedDict<Character, String> newDict = dict.remove('Y');
-		assertTrue(dict == newDict);
+		assertSame(dict, newDict);
 	}
 
 	@Test

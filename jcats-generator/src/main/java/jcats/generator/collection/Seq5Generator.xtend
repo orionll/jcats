@@ -678,7 +678,9 @@ final class Seq5Generator extends SeqGenerator {
 
 			@Override
 			public «genericName» prepend(final «type.genericName» value) {
-				requireNonNull(value);
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
 				if (init.length == 32) {
 					final «type.javaName»[][][][] node4 = node5[0];
 					final «type.javaName»[][][] node3 = node4[0];
@@ -773,7 +775,9 @@ final class Seq5Generator extends SeqGenerator {
 
 			@Override
 			public «genericName» append(final «type.genericName» value) {
-				requireNonNull(value);
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
 				if (tail.length == 32) {
 					final «type.javaName»[][][][] node4 = node5[node5.length - 1];
 					final «type.javaName»[][][] node3 = node4[node4.length - 1];

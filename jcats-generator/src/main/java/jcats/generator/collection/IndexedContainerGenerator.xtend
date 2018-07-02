@@ -133,6 +133,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			}
 
 			«IF type.primitive»
+				@Override
 				default IndexedContainer<«type.boxedName»> asContainer() {
 					return new «shortName»AsIndexedContainer(this);
 				}

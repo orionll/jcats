@@ -64,13 +64,13 @@ public class TestIntSortedUnique {
 	public void putSame() {
 		final IntSortedUnique unique = createTestIntSortedUnique();
 		final IntSortedUnique newUnique = unique.put('H');
-		assertTrue(unique == newUnique);
+		assertSame(unique, newUnique);
 	}
 
 	@Test
 	public void removeFromEmpty() {
 		final IntSortedUnique unique = emptyIntSortedUnique();
-		assertTrue(unique == unique.remove('A'));
+		assertSame(unique, unique.remove('A'));
 	}
 
 	@Test
@@ -110,7 +110,7 @@ public class TestIntSortedUnique {
 	public void removeAbsent() {
 		final IntSortedUnique unique = createTestIntSortedUnique();
 		final IntSortedUnique newUnique = unique.remove('Y');
-		assertTrue(unique == newUnique);
+		assertSame(unique, newUnique);
 	}
 
 	@Test

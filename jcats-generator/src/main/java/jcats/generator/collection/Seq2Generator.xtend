@@ -295,7 +295,9 @@ class Seq2Generator extends SeqGenerator {
 
 			@Override
 			public «genericName» prepend(final «type.genericName» value) {
-				requireNonNull(value);
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
 				if (init.length == 32) {
 					if (node2.length == 30) {
 						final «type.javaName»[] newInit = { value };
@@ -321,7 +323,9 @@ class Seq2Generator extends SeqGenerator {
 
 			@Override
 			public «genericName» append(final «type.genericName» value) {
-				requireNonNull(value);
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
 				if (tail.length == 32) {
 					if (node2.length == 30) {
 						final «type.javaName»[] newTail = { value };
