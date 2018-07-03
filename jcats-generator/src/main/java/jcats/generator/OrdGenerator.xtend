@@ -219,13 +219,13 @@ final class OrdGenerator implements InterfaceGenerator {
 
 			default «genericName» reverse() {
 				«IF type == Type.OBJECT»
-					return (final «type.genericName» x, final «type.genericName» y) -> {
+					return («genericName» & Serializable) (final «type.genericName» x, final «type.genericName» y) -> {
 						requireNonNull(x);
 						requireNonNull(y);
 						return order(x, y).reverse();
 					};
 				«ELSE»
-					return (final «type.genericName» x, final «type.genericName» y) ->
+					return («genericName» & Serializable) (final «type.genericName» x, final «type.genericName» y) ->
 						order(x, y).reverse();
 				«ENDIF»
 			}
@@ -233,7 +233,7 @@ final class OrdGenerator implements InterfaceGenerator {
 			«IF type == Type.OBJECT»
 				default <B> Ord<B> contraMap(final F<B, A> f) {
 					requireNonNull(f);
-					return (final B b1, final B b2) -> {
+					return (Ord<B> & Serializable) (final B b1, final B b2) -> {
 						requireNonNull(b1);
 						requireNonNull(b2);
 						final A a1 = requireNonNull(f.apply(b1));
@@ -244,7 +244,7 @@ final class OrdGenerator implements InterfaceGenerator {
 			«ELSE»
 				default <A> Ord<A> contraMap(final «type.typeName»F<A> f) {
 					requireNonNull(f);
-					return (final A a1, final A a2) -> {
+					return (Ord<A> & Serializable) (final A a1, final A a2) -> {
 						requireNonNull(a1);
 						requireNonNull(a2);
 						final «type.javaName» value1 = f.apply(a1);
@@ -258,7 +258,7 @@ final class OrdGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT»
 					default «t.ordGenericName» contraMapFrom«t.typeName»(final «t.typeName»ObjectF<A> f) {
 						requireNonNull(f);
-						return (final «t.javaName» value1, final «t.javaName» value2) -> {
+						return («t.ordGenericName» & Serializable) (final «t.javaName» value1, final «t.javaName» value2) -> {
 							final A a1 = requireNonNull(f.apply(value1));
 							final A a2 = requireNonNull(f.apply(value2));
 							return requireNonNull(order(a1, a2));
@@ -267,7 +267,7 @@ final class OrdGenerator implements InterfaceGenerator {
 				«ELSE»
 					default «t.ordGenericName» contraMapFrom«t.typeName»(final «t.typeName»«type.typeName»F f) {
 						requireNonNull(f);
-						return (final «t.javaName» value1, final «t.javaName» value2) -> {
+						return («t.ordGenericName» & Serializable) (final «t.javaName» value1, final «t.javaName» value2) -> {
 							final «type.javaName» result1 = f.apply(value1);
 							final «type.javaName» result2 = f.apply(value2);
 							return requireNonNull(order(result1, result2));
@@ -278,7 +278,7 @@ final class OrdGenerator implements InterfaceGenerator {
 			«ENDFOR»
 			default «genericName» then(final «genericName» ord) {
 				requireNonNull(ord);
-				return (final «type.genericName» x, final «type.genericName» y) -> {
+				return («genericName» & Serializable) (final «type.genericName» x, final «type.genericName» y) -> {
 					«IF type == Type.OBJECT»
 						requireNonNull(x);
 						requireNonNull(y);
@@ -375,13 +375,13 @@ final class OrdGenerator implements InterfaceGenerator {
 
 			default Comparator<«type.genericBoxedName»> toComparator() {
 				«IF type == Type.OBJECT»
-					return (final «type.genericBoxedName» x, final «type.genericBoxedName» y) -> {
+					return (Comparator<«type.genericBoxedName»> & Serializable) (final «type.genericBoxedName» x, final «type.genericBoxedName» y) -> {
 						requireNonNull(x);
 						requireNonNull(y);
 						return order(x, y).toInt();
 					};
 				«ELSE»
-					return (final «type.genericBoxedName» x, final «type.genericBoxedName» y) ->
+					return (Comparator<«type.genericBoxedName»> & Serializable) (final «type.genericBoxedName» x, final «type.genericBoxedName» y) ->
 						order(x, y).toInt();
 				«ENDIF»
 			}
@@ -399,7 +399,7 @@ final class OrdGenerator implements InterfaceGenerator {
 			«IF type == Type.OBJECT»
 				static <A> Ord<A> fromF(final F2<A, A, Order> f2) {
 					requireNonNull(f2);
-					return (final «type.genericName» x, final «type.genericName» y) -> {
+					return («genericName» & Serializable) (final «type.genericName» x, final «type.genericName» y) -> {
 						requireNonNull(x);
 						requireNonNull(y);
 						return requireNonNull(f2.apply(x, y));
@@ -408,7 +408,7 @@ final class OrdGenerator implements InterfaceGenerator {
 			«ELSE»
 				static «genericName» fromF(final «type.typeName»«type.typeName»ObjectF2<Order> f2) {
 					requireNonNull(f2);
-					return (final «type.genericName» x, final «type.genericName» y) ->
+					return («genericName» & Serializable) (final «type.genericName» x, final «type.genericName» y) ->
 						requireNonNull(f2.apply(x, y));
 				}
 			«ENDIF»
@@ -419,7 +419,7 @@ final class OrdGenerator implements InterfaceGenerator {
 					if (comparator instanceof Ord<?>) {
 						return (Ord<A>) comparator;
 					} else {
-						return (final «type.genericName» x, final «type.genericName» y) -> {
+						return («genericName» & Serializable) (final «type.genericName» x, final «type.genericName» y) -> {
 							requireNonNull(x);
 							requireNonNull(y);
 							return Order.fromInt(comparator.compare(x, y));
@@ -432,7 +432,7 @@ final class OrdGenerator implements InterfaceGenerator {
 					if (comparator instanceof «shortName») {
 						return («genericName») comparator;
 					} else {
-						return (final «type.genericName» x, final «type.genericName» y) ->
+						return («genericName» & Serializable) (final «type.genericName» x, final «type.genericName» y) ->
 							Order.fromInt(comparator.compare(x, y));
 					}
 				}
@@ -684,14 +684,14 @@ final class OrdGenerator implements InterfaceGenerator {
 			«FOR natural : #[true, false]»
 				«FOR from : Type.values»
 					«IF from == Type.OBJECT»
-						final class ContraMapped«type.typeName»«kind(natural)»Ord<A> implements Ord<A> {
+						final class ContraMapped«type.typeName»«kind(natural)»Ord<A> implements Ord<A>, Serializable {
 							private final «type.typeName»F<A> f;
 
 							ContraMapped«type.typeName»«kind(natural)»Ord(final «type.typeName»F<A> f) {
 								this.f = f;
 							}
 					«ELSE»
-						final class ContraMapped«from.typeName»«type.typeName»«kind(natural)»Ord implements «from.typeName»Ord {
+						final class ContraMapped«from.typeName»«type.typeName»«kind(natural)»Ord implements «from.typeName»Ord, Serializable {
 							private final «from.typeName»«type.typeName»F f;
 
 							ContraMapped«from.typeName»«type.typeName»«kind(natural)»Ord(final «from.typeName»«type.typeName»F f) {
