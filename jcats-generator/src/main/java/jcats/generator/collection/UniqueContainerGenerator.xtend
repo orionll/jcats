@@ -39,6 +39,11 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 
 		public interface «type.covariantName("UniqueContainer")» extends «type.containerGenericName», Equatable<«genericName»> {
 
+			@Override
+			default «type.uniqueContainerViewGenericName» view() {
+				return new «type.shortName("BaseUniqueContainerView")»<>(this);
+			}
+
 			«IF type.primitive»
 				@Override
 				default UniqueContainer<«type.boxedName»> asContainer() {

@@ -291,6 +291,14 @@ public enum Type {
 		return wildcardName("UniqueContainer");
 	}
 
+	public String uniqueContainerViewGenericName() {
+		return genericName("UniqueContainerView");
+	}
+
+	public String uniqueContainerViewShortName() {
+		return shortName("UniqueContainerView");
+	}
+
 	public String iteratorShortName(final String baseName) {
 		return shortName(baseName + "Iterator");
 	}

@@ -34,6 +34,7 @@ import jcats.generator.collection.StackGenerator
 import jcats.generator.collection.Stream2Generator
 import jcats.generator.collection.UniqueBuilderGenerator
 import jcats.generator.collection.UniqueContainerGenerator
+import jcats.generator.collection.UniqueContainerViewGenerator
 import jcats.generator.collection.UniqueGenerator
 import jcats.generator.collection.VNGenerators
 import jcats.generator.function.Eff0Generator
@@ -129,6 +130,7 @@ final class Main {
 			IndexedContainerGenerator.generators,
 			IndexedContainerViewGenerator.generators,
 			UniqueContainerGenerator.generators,
+			UniqueContainerViewGenerator.generators,
 			ArrayGenerator.generators,
 			ArrayBuilderGenerator.generators,
 			StackGenerator.generators,
