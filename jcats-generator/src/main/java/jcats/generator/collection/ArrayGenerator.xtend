@@ -96,7 +96,7 @@ final class ArrayGenerator implements ClassGenerator {
 			public «type.genericName» head() throws NoSuchElementException {
 				try {
 					return get(0);
-				} catch (IndexOutOfBoundsException __) {
+				} catch (final IndexOutOfBoundsException __) {
 					throw new NoSuchElementException();
 				}
 			}
@@ -107,7 +107,7 @@ final class ArrayGenerator implements ClassGenerator {
 			public «type.genericName» last() throws NoSuchElementException {
 				try {
 					return get(this.array.length - 1);
-				} catch (IndexOutOfBoundsException __) {
+				} catch (final IndexOutOfBoundsException __) {
 					throw new NoSuchElementException();
 				}
 			}

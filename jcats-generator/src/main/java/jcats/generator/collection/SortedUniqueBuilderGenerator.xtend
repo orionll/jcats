@@ -42,7 +42,7 @@ final class SortedUniqueBuilderGenerator implements ClassGenerator {
 				this.unique = «IF type == Type.OBJECT»(«type.sortedUniqueGenericName») «ENDIF»«type.sortedUniqueShortName».EMPTY;
 			}
 
-			«shortName»(«type.sortedUniqueGenericName» unique) {
+			«shortName»(final «type.sortedUniqueGenericName» unique) {
 				this.unique = unique;
 			}
 
