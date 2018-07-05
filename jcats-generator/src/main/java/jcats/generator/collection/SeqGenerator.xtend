@@ -234,8 +234,6 @@ class SeqGenerator implements ClassGenerator {
 					} else {
 						return appendSized(«type.getIterator("suffix.iterator()")», suffixSize);
 					}
-				} else if (suffix instanceof Collection && ((Collection<?>) suffix).isEmpty()) {
-					return this;
 				} else {
 					final «seqBuilderName» builder = new «seqBuilderDiamondName»(this);
 					builder.appendAll(suffix);
