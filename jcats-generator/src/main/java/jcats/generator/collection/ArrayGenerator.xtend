@@ -722,7 +722,7 @@ final class ArrayGenerator implements ClassGenerator {
 				return Arrays.hashCode(this.array);
 			}
 
-			«equals(type, type.indexedContainerWildcardName, false)»
+			«indexedEquals(type)»
 
 			public boolean isStrictlyEqualTo(final «genericName» other) {
 				if (other == this) {

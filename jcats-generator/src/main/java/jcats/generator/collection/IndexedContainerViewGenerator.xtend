@@ -137,7 +137,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			«hashcode(type)»
 
-			«equals(type, type.indexedContainerWildcardName, false)»
+			«indexedEquals(type)»
 
 			@Override
 			public String toString() {
@@ -178,6 +178,10 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			public IndexedContainerView<«mapTargetType»> skip(final int n) {
 				return new «mappedIndexedContainerViewShortName»<>(this.view.skip(n), this.f);
 			}
+
+			«hashcode(Type.OBJECT)»
+
+			«indexedEquals(Type.OBJECT)»
 
 			@Override
 			public String toString() {
@@ -255,6 +259,10 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				}
 			}
 
+			«hashcode(type)»
+
+			«indexedEquals(type)»
+
 			«toStr(type, limitedIndexedContainerViewShortName, false)»
 		}
 
@@ -323,6 +331,10 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					return super.iterator();
 				}
 			}
+
+			«hashcode(type)»
+
+			«indexedEquals(type)»
 
 			«toStr(type, skippedIndexedContainerViewShortName, false)»
 		}

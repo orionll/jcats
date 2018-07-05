@@ -99,6 +99,8 @@ interface Generator {
 		}
 	'''}
 
+	def static indexedEquals(Type type) { equals(type, type.indexedContainerWildcardName, false) }
+
 	def static uniqueEquals(Type type) {'''
 		/**
 		 * «equalsDeprecatedJavaDoc»

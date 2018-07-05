@@ -292,7 +292,7 @@ final class VNGenerators {
 						return result;
 					}
 
-					«equals(type, type.indexedContainerWildcardName, false)»
+					«indexedEquals(type)»
 
 					public boolean isStrictlyEqualTo(final «genericName» other) {
 						if (other == this) {
