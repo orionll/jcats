@@ -227,6 +227,10 @@ public enum Type {
 		return genericName("SortedUniqueBuilder");
 	}
 
+	public String sortedUniqueBuilderDiamondName() {
+		return diamondName("SortedUniqueBuilder");
+	}
+
 	public String effShortName() {
 		return shortName("Eff");
 	}

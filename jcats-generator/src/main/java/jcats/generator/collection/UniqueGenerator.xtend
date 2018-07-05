@@ -243,11 +243,9 @@ final class UniqueGenerator implements ClassGenerator {
 				if (iterable instanceof «wildcardName») {
 					return merge((«genericName») iterable);
 				} else {
-					«genericName» result = this;
-					for (final A value : iterable) {
-						result = result.put(value);
-					}
-					return result;
+					final UniqueBuilder<A> builder = new UniqueBuilder<>(this);
+					builder.putAll(iterable);
+					return builder.build();
 				}
 			}
 
@@ -307,24 +305,22 @@ final class UniqueGenerator implements ClassGenerator {
 				if (iterable instanceof «wildcardName») {
 					return («genericName») iterable;
 				} else {
-					«genericName» unique = empty«shortName»();
-					for (final A value : iterable) {
-						unique = unique.put(value);
-					}
-					return unique;
+					final UniqueBuilder<A> builder = builder();
+					builder.putAll(iterable);
+					return builder.build();
 				}
 			}
 
 			public static «paramGenericName» fromIterator(final Iterator<A> iterator) {
-				«genericName» unique = empty«shortName»();
-				while (iterator.hasNext()) {
-					unique = unique.put(iterator.next());
-				}
-				return unique;
+				final UniqueBuilder<A> builder = builder();
+				builder.putIterator(iterator);
+				return builder.build();
 			}
 
 			public static «paramGenericName» fromStream(final Stream<A> stream) {
-				return stream.reduce(empty«shortName»(), «shortName»::put, «shortName»::merge);
+				final UniqueBuilder<A> builder = builder();
+				builder.putStream(stream);
+				return builder.build();
 			}
 
 			public static <A> UniqueBuilder<A> builder() {

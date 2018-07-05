@@ -10,6 +10,9 @@ final class UniqueBuilderGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
+		import java.util.Iterator;
+		import java.util.stream.Stream;
+
 		import «Constants.SIZED»;
 
 		import static «Constants.COLLECTION».Unique.emptyUnique;
@@ -22,8 +25,39 @@ final class UniqueBuilderGenerator implements ClassGenerator {
 				this.unique = emptyUnique();
 			}
 
+			UniqueBuilder(final Unique<A> unique) {
+				this.unique = unique;
+			}
+
 			public UniqueBuilder<A> put(final A value) {
 				this.unique = this.unique.put(value);
+				return this;
+			}
+
+			@SafeVarargs
+			public final UniqueBuilder<A> putValues(final A... values) {
+				for (final A value : values) {
+					put(value);
+				}
+				return this;
+			}
+
+			public UniqueBuilder<A> putAll(final Iterable<A> iterable) {
+				if (iterable instanceof Container<?>) {
+					((Container<A>) iterable).foreach(this::put);
+				} else {
+					iterable.forEach(this::put);
+				}
+				return this;
+			}
+
+			public UniqueBuilder<A> putIterator(final Iterator<A> iterator) {
+				iterator.forEachRemaining(this::put);
+				return this;
+			}
+
+			public UniqueBuilder<A> putStream(final Stream<A> stream) {
+				stream.forEach(this::put);
 				return this;
 			}
 

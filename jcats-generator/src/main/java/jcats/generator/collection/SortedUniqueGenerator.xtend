@@ -222,18 +222,9 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				if (iterable instanceof «wildcardName») {
 					return merge((«genericName») iterable);
 				} else {
-					«genericName» result = this;
-					«IF type.isJavaUnboxedType»
-						final «type.iteratorGenericName» iterator = «type.getIterator("iterable.iterator()")»;
-						while (iterator.hasNext()) {
-							result = result.put(iterator.«type.iteratorNext»());
-						}
-					«ELSE»
-						for (final «type.genericName» value : iterable) {
-							result = result.put(value);
-						}
-					«ENDIF»
-					return result;
+					final «type.sortedUniqueBuilderGenericName» builder = new «type.sortedUniqueBuilderDiamondName»(this);
+					builder.putAll(iterable);
+					return builder.build();
 				}
 			}
 
@@ -347,42 +338,26 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				if (iterable instanceof «wildcardName») {
 					return («genericName») iterable;
 				} else {
-					«genericName» result = empty«shortName»();
-					«IF type.isJavaUnboxedType»
-						final «type.iteratorGenericName» iterator = «type.getIterator("iterable.iterator()")»;
-						while (iterator.hasNext()) {
-							result = result.put(iterator.«type.iteratorNext»());
-						}
-					«ELSE»
-						for (final «type.genericName» value : iterable) {
-							result = result.put(value);
-						}
-					«ENDIF»
-					return result;
+					final «type.sortedUniqueBuilderGenericName» builder = builder();
+					builder.putAll(iterable);
+					return builder.build();
 				}
 			}
 
 			public static «paramComparableGenericName» fromIterator(final Iterator<«type.genericBoxedName»> iterator) {
-				«genericName» result = empty«shortName»();
-				«IF type.isJavaUnboxedType»
-					final «type.iteratorGenericName» primitiveIterator = «type.getIterator("iterator")»;
-					while (primitiveIterator.hasNext()) {
-						result = result.put(primitiveIterator.«type.iteratorNext»());
-					}
-				«ELSE»
-					while (iterator.hasNext()) {
-						result = result.put(iterator.next());
-					}
+				«IF type.javaUnboxedType»
+					requireNonNull(iterator);
 				«ENDIF»
-				return result;
+				final «type.sortedUniqueBuilderGenericName» builder = builder();
+				builder.putIterator(iterator);
+				return builder.build();
 			}
 
-			«IF type == Type.OBJECT»
-				public static «paramComparableGenericName» from«type.streamName»(final «type.streamGenericName» stream) {
-					return stream.reduce(emptySortedUnique(), SortedUnique::put, SortedUnique::merge);
-				}
-
-			«ENDIF»
+			public static «paramComparableGenericName» from«type.streamName»(final «type.streamGenericName» stream) {
+				final «type.sortedUniqueBuilderGenericName» builder = builder();
+				builder.put«type.streamName»(stream);
+				return builder.build();
+			}
 
 			public static «IF type == Type.OBJECT»<A extends Comparable<A>> «ENDIF»«type.sortedUniqueBuilderGenericName» builder() {
 				return new «type.diamondName("SortedUniqueBuilder")»();
