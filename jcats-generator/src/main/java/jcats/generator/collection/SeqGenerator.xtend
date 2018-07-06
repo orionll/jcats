@@ -76,7 +76,6 @@ class SeqGenerator implements ClassGenerator {
 
 
 		public abstract class «type.covariantName("Seq")» implements «type.indexedContainerGenericName», Serializable {
-			private static final «wildcardName» EMPTY = new «shortName»0();
 
 			static final «type.javaName»[][] EMPTY_NODE2 = new «type.javaName»[0][];
 
@@ -466,9 +465,9 @@ class SeqGenerator implements ClassGenerator {
 
 			public static «paramGenericName» empty«shortName»() {
 				«IF type == Type.OBJECT»
-					return («genericName») EMPTY;
+					return («genericName») «shortName»0.EMPTY;
 				«ELSE»
-					return EMPTY;
+					return «shortName»0.EMPTY;
 				«ENDIF»
 			}
 

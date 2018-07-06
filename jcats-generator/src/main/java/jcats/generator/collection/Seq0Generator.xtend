@@ -40,6 +40,9 @@ class Seq0Generator extends SeqGenerator {
 		import static «Constants.COMMON».*;
 
 		final class «genericName(0)» extends «genericName» {
+
+			static final «wildcardName» EMPTY = new «shortName»0();
+
 			@Override
 			public int size() {
 				return 0;
