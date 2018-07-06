@@ -959,9 +959,7 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			public static «paramGenericName» fromIterator(final Iterator<«type.genericBoxedName»> iterator) {
-				«IF type.javaUnboxedType»
-					requireNonNull(iterator);
-				«ENDIF»
+				requireNonNull(iterator);
 				final «arrayBuilderName» builder = builder();
 				builder.appendIterator(iterator);
 				return builder.build();

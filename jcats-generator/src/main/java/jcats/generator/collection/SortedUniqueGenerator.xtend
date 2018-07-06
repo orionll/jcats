@@ -345,9 +345,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			public static «paramComparableGenericName» fromIterator(final Iterator<«type.genericBoxedName»> iterator) {
-				«IF type.javaUnboxedType»
-					requireNonNull(iterator);
-				«ENDIF»
+				requireNonNull(iterator);
 				final «type.sortedUniqueBuilderGenericName» builder = builder();
 				builder.putIterator(iterator);
 				return builder.build();

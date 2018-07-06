@@ -207,6 +207,18 @@ interface Generator {
 		}
 	}
 
+	def static streamForEach(Type type, String method, boolean ordered) { '''
+		if (stream.isParallel()) {
+			stream.forEach«IF ordered»Ordered«ENDIF»((final «type.genericJavaUnboxedName» value) -> {
+				synchronized (this) {
+					«method»(value);
+				}
+			});
+		} else {
+			stream.forEach«IF ordered»Ordered«ENDIF»(this::«method»);
+		}
+	''' }
+
 	def cast(Iterable<String> typeParams, Iterable<String> contravariantTypeParams, Iterable<String> covariantTypeParams) {
 		cast(name, "cast", typeParams, contravariantTypeParams, covariantTypeParams)
 	}

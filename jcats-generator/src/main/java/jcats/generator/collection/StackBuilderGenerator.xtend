@@ -102,7 +102,7 @@ final class StackBuilderGenerator implements ClassGenerator {
 			}
 
 			public «genericName» append«type.streamName»(final «type.streamGenericName» stream) {
-				stream.forEachOrdered(this::append);
+				«streamForEach(type, "append", true)»
 				return this;
 			}
 

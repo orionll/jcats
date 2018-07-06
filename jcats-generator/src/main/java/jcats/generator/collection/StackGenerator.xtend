@@ -36,6 +36,7 @@ final class StackGenerator implements ClassGenerator {
 			import java.util.PrimitiveIterator;
 		«ENDIF»
 		import java.util.stream.Collector;
+		import java.util.stream.«type.streamName»;
 		import java.util.Spliterator;
 
 		import «Constants.JCATS».*;
@@ -408,6 +409,19 @@ final class StackGenerator implements ClassGenerator {
 				} else {
 					return new «builderGenericName»().appendAll(iterable).build();
 				}
+			}
+
+			public static «paramGenericName» fromIterator(final Iterator<«type.genericBoxedName»> iterator) {
+				requireNonNull(iterator);
+				final «type.stackBuilderGenericName» builder = builder();
+				builder.appendIterator(iterator);
+				return builder.build();
+			}
+
+			public static «paramGenericName» from«type.streamName»(final «type.streamGenericName» stream) {
+				final «type.stackBuilderGenericName» builder = builder();
+				builder.append«type.streamName»(stream);
+				return builder.build();
 			}
 
 			«IF type == Type.OBJECT»

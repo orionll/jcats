@@ -2,6 +2,7 @@ package jcats.generator.collection
 
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
+import jcats.generator.Type
 
 final class UniqueBuilderGenerator implements ClassGenerator {
 
@@ -57,7 +58,7 @@ final class UniqueBuilderGenerator implements ClassGenerator {
 			}
 
 			public UniqueBuilder<A> putStream(final Stream<A> stream) {
-				stream.forEach(this::put);
+				«streamForEach(Type.OBJECT, "put", false)»
 				return this;
 			}
 

@@ -858,9 +858,7 @@ class SeqGenerator implements ClassGenerator {
 			}
 
 			public static «paramGenericName» fromIterator(final Iterator<«type.genericBoxedName»> iterator) {
-				«IF type.javaUnboxedType»
-					requireNonNull(iterator);
-				«ENDIF»
+				requireNonNull(iterator);
 				final «seqBuilderName» builder = builder();
 				builder.appendIterator(iterator);
 				return builder.build();
