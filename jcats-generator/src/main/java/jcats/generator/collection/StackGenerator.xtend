@@ -190,6 +190,19 @@ final class StackGenerator implements ClassGenerator {
 			/**
 			 * O(size)
 			 */
+			public «genericName» reverse() {
+				«genericName» result = empty«shortName»();
+				«genericName» stack = this;
+				while (stack.isNotEmpty()) {
+					result = new «diamondName»(stack.head, result);
+					stack = stack.tail;
+				}
+				return result;
+			}
+
+			/**
+			 * O(size)
+			 */
 			«IF type == Type.OBJECT»
 				public <B> Stack<B> map(final F<A, B> f) {
 			«ELSE»
