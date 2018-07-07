@@ -311,6 +311,8 @@ final class UniqueGenerator implements ClassGenerator {
 				}
 			}
 
+			«fillUntil(Type.OBJECT, paramGenericName, "UniqueBuilder<A>", "put")»
+
 			public static «paramGenericName» fromIterator(final Iterator<A> iterator) {
 				final UniqueBuilder<A> builder = builder();
 				builder.putIterator(iterator);

@@ -881,7 +881,7 @@ final class ArrayGenerator implements ClassGenerator {
 
 			«fill(type, paramGenericName)»
 
-			«fillUntil(type, paramGenericName, arrayBuilderName)»
+			«fillUntil(type, paramGenericName, arrayBuilderName, "append")»
 
 			public static «paramGenericName» tabulate(final int size, final Int«type.typeName»F«IF type == Type.OBJECT»<A>«ENDIF» f) {
 				requireNonNull(f);

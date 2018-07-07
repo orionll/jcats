@@ -350,6 +350,8 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				}
 			}
 
+			«fillUntil(type, paramComparableGenericName, type.sortedUniqueBuilderGenericName, "put")»
+
 			public static «paramComparableGenericName» fromIterator(final Iterator<«type.genericBoxedName»> iterator) {
 				requireNonNull(iterator);
 				final «type.sortedUniqueBuilderGenericName» builder = builder();
