@@ -461,6 +461,14 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 			«ENDIF»
+			«IF type == Type.OBJECT»
+				default Unique<A> toUnique() {
+					final UniqueBuilder<A> builder = Unique.builder();
+					foreach(builder::put);
+					return builder.build();
+				}
+
+			«ENDIF»
 			default «type.javaName»[] «type.toArrayName»() {
 				if (hasFixedSize()) {
 					if (isEmpty()) {

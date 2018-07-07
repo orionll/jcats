@@ -249,6 +249,12 @@ final class UniqueGenerator implements ClassGenerator {
 				}
 			}
 
+			@Deprecated
+			@Override
+			public «genericName» toUnique() {
+				return this;
+			}
+
 			@Override
 			public Iterator<A> iterator() {
 				return isEmpty() ? Collections.emptyIterator() : new HashTableIterator<>(this.leafMap, this.treeMap, this.slots);
@@ -302,8 +308,8 @@ final class UniqueGenerator implements ClassGenerator {
 
 			public static «paramGenericName» ofAll(final Iterable<A> iterable) {
 				requireNonNull(iterable);
-				if (iterable instanceof «wildcardName») {
-					return («genericName») iterable;
+				if (iterable instanceof Container<?>) {
+					return ((Container<A>) iterable).toUnique();
 				} else {
 					final UniqueBuilder<A> builder = builder();
 					builder.putAll(iterable);
