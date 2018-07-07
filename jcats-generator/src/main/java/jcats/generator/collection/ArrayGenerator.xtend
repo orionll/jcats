@@ -735,88 +735,54 @@ final class ArrayGenerator implements ClassGenerator {
 			«toStr(type, false)»
 
 			«IF type == Type.OBJECT»
-				public <B, C> Array<C> zip(final Container<B> that, final F2<A, B, C> f) {
-					requireNonNull(f);
-					if (isEmpty()) {
-						return emptyArray();
-					} else if (that.hasFixedSize()) {
-						if (that.isEmpty()) {
-							return emptyArray();
-						} else {
-							final Object[] result = new Object[Math.min(this.array.length, that.size())];
-							final Iterator<B> iterator = that.iterator();
-							for (int i = 0; i < result.length; i++) {
-								result[i] = requireNonNull(f.apply((A) this.array[i], iterator.next()));
-							}
-							return new Array<>(result);
-						}
-					} else {
-						final ArrayBuilder<C> builder = builder();
-						final Iterator<B> iterator = that.iterator();
-						for (final Object value : this.array) {
-							if (iterator.hasNext()) {
-								builder.append(requireNonNull(f.apply((A) value, iterator.next())));
-							} else {
-								break;
-							}
-						}
-						return builder.build();
-					}
-				}
-
-				public <B> Array<B> zipWithIndex(final IntObjectObjectF2<A, B> f) {
-					if (isEmpty()) {
-						return emptyArray();
-					} else {
-						final Object[] result = new Object[this.array.length];
-						for (int i = 0; i < this.array.length; i++) {
-							result[i] = requireNonNull(f.apply(i, (A) this.array[i]));
-						}
-						return new Array<>(result);
-					}
-				}
+				public <B, C> Array<C> zip(final Iterable<B> that, final F2<A, B, C> f) {
 			«ELSE»
-				public <A, B> Array<B> zip(final Container<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
-					requireNonNull(f);
-					if (isEmpty()) {
-						return emptyArray();
-					} else if (that.hasFixedSize()) {
-						if (that.isEmpty()) {
-							return emptyArray();
-						} else {
-							final Object[] result = new Object[Math.min(this.array.length, that.size())];
-							final Iterator<A> iterator = that.iterator();
-							for (int i = 0; i < result.length; i++) {
-								result[i] = requireNonNull(f.apply(this.array[i], iterator.next()));
-							}
-							return new Array<>(result);
-						}
-					} else {
-						final ArrayBuilder<B> builder = Array.builder();
-						final Iterator<A> iterator = that.iterator();
-						for (final «type.javaName» value : this.array) {
-							if (iterator.hasNext()) {
-								builder.append(requireNonNull(f.apply(value, iterator.next())));
-							} else {
-								break;
-							}
-						}
-						return builder.build();
-					}
-				}
-
-				public <A> Array<A> zipWithIndex(final Int«type.typeName»ObjectF2<A> f) {
-					if (isEmpty()) {
+				public <A, B> Array<B> zip(final Iterable<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
+			«ENDIF»
+				requireNonNull(f);
+				if (isEmpty()) {
+					return emptyArray();
+				} else if (that instanceof Container<?> && ((Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»>) that).hasFixedSize()) {
+					final Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> cont = (Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»>) that;
+					if (cont.isEmpty()) {
 						return emptyArray();
 					} else {
-						final Object[] result = new Object[this.array.length];
-						for (int i = 0; i < this.array.length; i++) {
-							result[i] = requireNonNull(f.apply(i, this.array[i]));
+						final Object[] result = new Object[Math.min(this.array.length, cont.size())];
+						final Iterator<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> iterator = cont.iterator();
+						for (int i = 0; i < result.length; i++) {
+							result[i] = requireNonNull(f.apply(«IF type == Type.OBJECT»(A) «ENDIF»this.array[i], iterator.next()));
 						}
 						return new Array<>(result);
 					}
+				} else {
+					final ArrayBuilder<«IF type == Type.OBJECT»C«ELSE»B«ENDIF»> builder = Array.builder();
+					final Iterator<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> iterator = that.iterator();
+					for (final «type.javaName» value : this.array) {
+						if (iterator.hasNext()) {
+							builder.append(requireNonNull(f.apply(«IF type == Type.OBJECT»(A) «ENDIF»value, iterator.next())));
+						} else {
+							break;
+						}
+					}
+					return builder.build();
 				}
+			}
+
+			«IF type == Type.OBJECT»
+				public <B> Array<B> zipWithIndex(final IntObjectObjectF2<A, B> f) {
+			«ELSE»
+				public <A> Array<A> zipWithIndex(final Int«type.typeName»ObjectF2<A> f) {
 			«ENDIF»
+				if (isEmpty()) {
+					return emptyArray();
+				} else {
+					final Object[] result = new Object[this.array.length];
+					for (int i = 0; i < this.array.length; i++) {
+						result[i] = requireNonNull(f.apply(i, «IF type == Type.OBJECT»(A) «ENDIF»this.array[i]));
+					}
+					return new Array<>(result);
+				}
+			}
 
 			public static «paramGenericName» empty«shortName»() {
 				«IF type == Type.OBJECT»
