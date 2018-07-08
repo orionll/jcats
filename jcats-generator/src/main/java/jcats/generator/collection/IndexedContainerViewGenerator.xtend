@@ -58,10 +58,22 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				return new «mappedIndexedContainerViewShortName»<>(this, f);
 			}
 
+			«FOR toType : Type.primitives»
+				@Override
+				«IF type == Type.OBJECT»
+					default «toType.indexedContainerViewGenericName» mapTo«toType.typeName»(final «toType.typeName»F<A> f) {
+				«ELSE»
+					default «toType.indexedContainerViewGenericName» mapTo«toType.typeName»(final «type.typeName»«toType.typeName»F f) {
+				«ENDIF»
+					requireNonNull(f);
+					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this, f);
+				}
+
+			«ENDFOR»
 			@Override
 			default «type.containerViewGenericName» filter(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
-				return new «type.diamondName("FilteredIndexedContainerView")»(this, predicate);
+				return new «type.shortName("FilteredIndexedContainerView")»<>(this, predicate);
 			}
 
 			@Override
@@ -169,6 +181,13 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				return new «mappedIndexedContainerViewShortName»<>(this.view, this.f.map(g));
 			}
 
+			«FOR t : Type.primitives»
+				@Override
+				public «t.indexedContainerViewGenericName» mapTo«t.typeName»(final «t.typeName»F<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> g) {
+					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«t.typeName»IndexedContainerView<>(this.view, this.f.mapTo«t.typeName»(g));
+				}
+
+			«ENDFOR»
 			@Override
 			public IndexedContainerView<«mapTargetType»> limit(final int n) {
 				return new «mappedIndexedContainerViewShortName»<>(this.view.limit(n), this.f);
@@ -183,12 +202,58 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			«indexedEquals(Type.OBJECT)»
 
-			@Override
-			public String toString() {
-				return iterableToString(this, "«mappedIndexedContainerViewShortName»");
-			}
+			«toStr(Type.OBJECT, mappedIndexedContainerViewShortName, false)»
 		}
 
+		«FOR toType : Type.primitives»
+			«IF type == Type.OBJECT»
+				class MappedTo«toType.typeName»IndexedContainerView<A, C extends «genericName»> extends MappedTo«toType.typeName»ContainerView<A, C> implements «toType.indexedContainerViewGenericName» {
+			«ELSE»
+				class «type.typeName»MappedTo«toType.typeName»IndexedContainerView<C extends «genericName»> extends «type.typeName»MappedTo«toType.typeName»ContainerView<C> implements «toType.indexedContainerViewGenericName» {
+			«ENDIF»
+				«IF type == Type.OBJECT»
+					MappedTo«toType.typeName»IndexedContainerView(final C view, final «toType.typeName»F<A> f) {
+				«ELSE»
+					«type.typeName»MappedTo«toType.typeName»IndexedContainerView(final C view, final «type.typeName»«toType.typeName»F f) {
+				«ENDIF»
+					super(view, f);
+				}
+
+				@Override
+				public «toType.genericName» get(final int index) throws IndexOutOfBoundsException {
+					return this.f.apply(this.view.get(index));
+				}
+
+				@Override
+				public <B> IndexedContainerView<B> map(final «toType.typeName»ObjectF<B> g) {
+					return new «mappedIndexedContainerViewShortName»<>(this.view, this.f.map(g));
+				}
+
+				«FOR t : Type.primitives»
+					@Override
+					public «t.indexedContainerViewGenericName» mapTo«t.typeName»(final «toType.typeName»«t.typeName»F g) {
+						return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«t.typeName»IndexedContainerView<>(this.view, this.f.mapTo«t.typeName»(g));
+					}
+
+				«ENDFOR»
+				@Override
+				public «toType.indexedContainerViewGenericName» limit(final int n) {
+					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this.view.limit(n), this.f);
+				}
+
+				@Override
+				public «toType.indexedContainerViewGenericName» skip(final int n) {
+					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this.view.skip(n), this.f);
+				}
+
+				«hashcode(toType)»
+
+				«indexedEquals(toType)»
+
+				«toStr(toType, '''«IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView''', false)»
+			}
+
+		«ENDFOR»
 		final class «filteredIndexedContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> extends «type.shortName("FilteredContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»C> {
 
 			«filteredIndexedContainerViewShortName»(final C view, final «type.boolFName» predicate) {
