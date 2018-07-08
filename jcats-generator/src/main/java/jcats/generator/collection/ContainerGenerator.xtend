@@ -537,12 +537,22 @@ final class ContainerGenerator implements InterfaceGenerator {
 			«IF type == Type.OBJECT»
 				static <A> Container<A> asContainer(final Collection<A> collection) {
 					requireNonNull(collection);
-					return new CollectionAsContainer<>(collection);
+					return new CollectionAsContainer<>(collection, false);
+				}
+
+				static <A> Container<A> asFixedSizeContainer(final Collection<A> collection) {
+					requireNonNull(collection);
+					return new CollectionAsContainer<>(collection, true);
 				}
 			«ELSE»
 				static «type.containerGenericName» as«type.typeName»Container(final Collection<«type.boxedName»> collection) {
 					requireNonNull(collection);
-					return new «type.typeName»CollectionAs«type.typeName»Container<>(collection);
+					return new «type.typeName»CollectionAs«type.typeName»Container<>(collection, false);
+				}
+
+				static «type.containerGenericName» asFixedSize«type.typeName»Container(final Collection<«type.boxedName»> collection) {
+					requireNonNull(collection);
+					return new «type.typeName»CollectionAs«type.typeName»Container<>(collection, true);
 				}
 			«ENDIF»
 			«IF type == Type.OBJECT»
@@ -820,13 +830,15 @@ final class ContainerGenerator implements InterfaceGenerator {
 			class «type.typeName»CollectionAs«type.typeName»Container<C extends Collection<«type.boxedName»>> implements «type.typeName»Container, Serializable {
 		«ENDIF»
 			final C collection;
+			private final boolean fixedSize;
 
 			«IF type == Type.OBJECT»
-				CollectionAsContainer(final C collection) {
+				CollectionAsContainer(final C collection, final boolean fixedSize) {
 			«ELSE»
-				«type.typeName»CollectionAs«type.typeName»Container(final C collection) {
+				«type.typeName»CollectionAs«type.typeName»Container(final C collection, final boolean fixedSize) {
 			«ENDIF»
 				this.collection = collection;
+				this.fixedSize = fixedSize;
 			}
 
 			@Override
@@ -846,7 +858,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			public boolean hasFixedSize() {
-				return false;
+				return this.fixedSize;
 			}
 
 			@Override

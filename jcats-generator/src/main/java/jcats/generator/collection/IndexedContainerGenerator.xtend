@@ -154,12 +154,22 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			«IF type == Type.OBJECT»
 				static <A> IndexedContainer<A> asIndexedContainer(final List<A> list) {
 					requireNonNull(list);
-					return new ListAsIndexedContainer<>(list);
+					return new ListAsIndexedContainer<>(list, false);
+				}
+
+				static <A> IndexedContainer<A> asFixedSizeIndexedContainer(final List<A> list) {
+					requireNonNull(list);
+					return new ListAsIndexedContainer<>(list, true);
 				}
 			«ELSE»
 				static «type.indexedContainerGenericName» as«type.typeName»IndexedContainer(final List<«type.boxedName»> list) {
 					requireNonNull(list);
-					return new «type.typeName»ListAs«type.typeName»IndexedContainer(list);
+					return new «type.typeName»ListAs«type.typeName»IndexedContainer(list, false);
+				}
+
+				static «type.indexedContainerGenericName» asFixedSize«type.typeName»IndexedContainer(final List<«type.boxedName»> list) {
+					requireNonNull(list);
+					return new «type.typeName»ListAs«type.typeName»IndexedContainer(list, true);
 				}
 			«ENDIF»
 			«IF type == Type.OBJECT»
@@ -316,11 +326,11 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		«ENDIF»
 
 			«IF type == Type.OBJECT»
-				ListAsIndexedContainer(final List<A> list) {
+				ListAsIndexedContainer(final List<A> list, final boolean fixedSize) {
 			«ELSE»
-				«type.typeName»ListAs«type.typeName»IndexedContainer(final List<«type.boxedName»> list) {
+				«type.typeName»ListAs«type.typeName»IndexedContainer(final List<«type.boxedName»> list, final boolean fixedSize) {
 			«ENDIF»
-				super(list);
+				super(list, fixedSize);
 			}
 
 			@Override

@@ -71,12 +71,22 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			«IF type == Type.OBJECT»
 				static <A> UniqueContainer<A> asUniqueContainer(final Set<A> set) {
 					requireNonNull(set);
-					return new SetAsUniqueContainer<>(set);
+					return new SetAsUniqueContainer<>(set, false);
+				}
+
+				static <A> UniqueContainer<A> asFixedSizeUniqueContainer(final Set<A> set) {
+					requireNonNull(set);
+					return new SetAsUniqueContainer<>(set, true);
 				}
 			«ELSE»
 				static «type.uniqueContainerGenericName» as«type.typeName»UniqueContainer(final Set<«type.boxedName»> set) {
 					requireNonNull(set);
-					return new «type.typeName»SetAs«type.typeName»UniqueContainer(set);
+					return new «type.typeName»SetAs«type.typeName»UniqueContainer(set, false);
+				}
+
+				static «type.uniqueContainerGenericName» asFixedSize«type.typeName»UniqueContainer(final Set<«type.boxedName»> set) {
+					requireNonNull(set);
+					return new «type.typeName»SetAs«type.typeName»UniqueContainer(set, true);
 				}
 			«ENDIF»
 			«IF type == Type.OBJECT»
@@ -167,11 +177,11 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 		«ENDIF»
 			
 			«IF type == Type.OBJECT»
-				SetAsUniqueContainer(final Set<A> set) {
+				SetAsUniqueContainer(final Set<A> set, final boolean fixedSize) {
 			«ELSE»
-				«type.typeName»SetAs«type.typeName»UniqueContainer(final Set<«type.boxedName»> set) {
+				«type.typeName»SetAs«type.typeName»UniqueContainer(final Set<«type.boxedName»> set, final boolean fixedSize) {
 			«ENDIF»
-				super(set);
+				super(set, fixedSize);
 			}
 
 			@Override
