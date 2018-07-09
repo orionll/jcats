@@ -10,6 +10,7 @@ import jcats.generator.collection.ArrayBuilderGenerator
 import jcats.generator.collection.ArrayGenerator
 import jcats.generator.collection.ContainerGenerator
 import jcats.generator.collection.ContainerViewGenerator
+import jcats.generator.collection.DictBuilderGenerator
 import jcats.generator.collection.DictGenerator
 import jcats.generator.collection.HashTableCommonGenerator
 import jcats.generator.collection.IndexedContainerGenerator
@@ -26,6 +27,7 @@ import jcats.generator.collection.Seq5Generator
 import jcats.generator.collection.Seq6Generator
 import jcats.generator.collection.SeqBuilderGenerator
 import jcats.generator.collection.SeqGenerator
+import jcats.generator.collection.SortedDictBuilderGenerator
 import jcats.generator.collection.SortedDictGenerator
 import jcats.generator.collection.SortedUniqueBuilderGenerator
 import jcats.generator.collection.SortedUniqueGenerator
@@ -101,9 +103,11 @@ final class Main {
 			new RangeGenerator,
 			new KeyValueGenerator,
 			new DictGenerator,
+			new DictBuilderGenerator,
 			new UniqueGenerator,
 			new UniqueBuilderGenerator,
 			new SortedDictGenerator,
+			new SortedDictBuilderGenerator,
 			new HashTableCommonGenerator,
 			new CommonGenerator,
 			new CastsGenerator,

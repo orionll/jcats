@@ -33,6 +33,7 @@ final class SortedUniqueBuilderGenerator implements ClassGenerator {
 		import «Constants.JCATS».«type.ordShortName»;
 
 		import static «Constants.COLLECTION».«type.sortedUniqueShortName».empty«type.sortedUniqueShortName»By;
+		import static «Constants.COMMON».*;
 
 		public final class «genericName» implements Sized {
 
@@ -96,7 +97,7 @@ final class SortedUniqueBuilderGenerator implements ClassGenerator {
 				return this;
 			}
 
-			public «genericName» merge(final «genericName» other) {
+			«genericName» merge(final «genericName» other) {
 				this.unique = this.unique.merge(other.unique);
 				return this;
 			}
@@ -114,6 +115,8 @@ final class SortedUniqueBuilderGenerator implements ClassGenerator {
 			public «type.sortedUniqueGenericName» build() {
 				return this.unique;
 			}
+
+			«toStr(type, shortName, false, "this.unique")»
 		}
 	''' }
 }

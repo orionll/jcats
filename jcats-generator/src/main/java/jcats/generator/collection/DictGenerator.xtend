@@ -323,6 +323,10 @@ class DictGenerator implements ClassGenerator {
 				return dict;
 			}
 
+			public static <K, A> DictBuilder<K, A> builder() {
+				return new DictBuilder<>();
+			}
+
 			«cast(#["K", "A"], #[], #["A"])»
 		}
 	''' }

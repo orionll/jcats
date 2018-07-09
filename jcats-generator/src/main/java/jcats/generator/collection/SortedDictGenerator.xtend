@@ -380,6 +380,10 @@ final class SortedDictGenerator implements ClassGenerator {
 				return dict;
 			}
 
+			public static <K extends Comparable<K>, A> SortedDictBuilder<K, A> builder() {
+				return new SortedDictBuilder<>();
+			}
+
 			«cast(#["K", "A"], #[], #["A"])»
 
 			static final class InsertResult {

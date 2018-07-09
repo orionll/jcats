@@ -17,6 +17,7 @@ final class UniqueBuilderGenerator implements ClassGenerator {
 		import «Constants.SIZED»;
 
 		import static «Constants.COLLECTION».Unique.emptyUnique;
+		import static «Constants.COMMON».*;
 
 		public final class UniqueBuilder<A> implements Sized {
 
@@ -62,7 +63,7 @@ final class UniqueBuilderGenerator implements ClassGenerator {
 				return this;
 			}
 
-			public UniqueBuilder<A> merge(final UniqueBuilder<A> other) {
+			UniqueBuilder<A> merge(final UniqueBuilder<A> other) {
 				this.unique = this.unique.merge(other.unique);
 				return this;
 			}
@@ -80,6 +81,8 @@ final class UniqueBuilderGenerator implements ClassGenerator {
 			public Unique<A> build() {
 				return this.unique;
 			}
+
+			«toStr(Type.OBJECT, "UniqueBuilder", false, "this.unique")»
 		}
 	''' }
 }

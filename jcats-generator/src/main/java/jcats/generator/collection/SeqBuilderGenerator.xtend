@@ -378,14 +378,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 				}
 			}
 
-			@Override
-			public String toString() {
-				«IF type.javaUnboxedType»
-					return «type.containerShortName.firstToLowerCase»ToString(build(), "«shortName»");
-				«ELSE»
-					return iterableToString(build(), "«shortName»");
-				«ENDIF»
-			}
+			«toStr(type, shortName, false, "build()")»
 		}
 	''' }
 }
