@@ -59,7 +59,7 @@ final class UniqueBuilderGenerator implements ClassGenerator {
 			}
 
 			public UniqueBuilder<A> putStream(final Stream<A> stream) {
-				«streamForEach(Type.OBJECT, "put", false)»
+				«streamForEach("A", "put", false)»
 				return this;
 			}
 

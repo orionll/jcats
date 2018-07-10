@@ -11,9 +11,13 @@ final class SortedDictBuilderGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		import «Constants.SIZED»;
+		import java.util.Iterator;
+		import java.util.Map;
+		import java.util.stream.Stream;
 
-		import static «Constants.COLLECTION».SortedDict.emptySortedDict;
+		import «Constants.JCATS».*;
+
+		import static «Constants.COLLECTION».SortedDict.*;
 		import static «Constants.COMMON».*;
 
 		public final class SortedDictBuilder<K, A> implements Sized {
@@ -28,8 +32,48 @@ final class SortedDictBuilderGenerator implements ClassGenerator {
 				this.dict = dict;
 			}
 
+			SortedDictBuilder(final Ord<K> ord) {
+				this.dict = emptySortedDictBy(ord);
+			}
+
 			public SortedDictBuilder<K, A> put(final K key, final A value) {
 				this.dict = this.dict.put(key, value);
+				return this;
+			}
+
+			public SortedDictBuilder<K, A> putEntry(final  P<K, A> entry) {
+				return put(entry.get1(), entry.get2());
+			}
+
+			@SafeVarargs
+			public final SortedDictBuilder<K, A> putEntries(final P<K, A>... entries) {
+				for (final P<K, A> entry : entries) {
+					putEntry(entry);
+				}
+				return this;
+			}
+
+			public SortedDictBuilder<K, A> putAll(final Iterable<P<K, A>> entries) {
+				if (entries instanceof Container<?>) {
+					((Container<P<K, A>>) entries).foreach(this::putEntry);
+				} else {
+					entries.forEach(this::putEntry);
+				}
+				return this;
+			}
+
+			public SortedDictBuilder<K, A> putIterator(final Iterator<P<K, A>> entries) {
+				entries.forEachRemaining(this::putEntry);
+				return this;
+			}
+
+			public SortedDictBuilder<K, A> putStream(final Stream<P<K, A>> stream) {
+				«streamForEach("P<K, A>", "putEntry", false)»
+				return this;
+			}
+
+			public SortedDictBuilder<K, A> putMap(final Map<K, A> map) {
+				map.forEach(this::put);
 				return this;
 			}
 

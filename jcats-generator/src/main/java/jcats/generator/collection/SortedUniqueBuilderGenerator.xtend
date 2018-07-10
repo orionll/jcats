@@ -93,7 +93,7 @@ final class SortedUniqueBuilderGenerator implements ClassGenerator {
 			}
 
 			public «genericName» put«type.streamName»(final «type.streamGenericName» stream) {
-				«streamForEach(type, "put", false)»
+				«streamForEach(type.genericJavaUnboxedName, "put", false)»
 				return this;
 			}
 

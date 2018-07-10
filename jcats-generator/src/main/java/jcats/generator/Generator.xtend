@@ -209,9 +209,9 @@ interface Generator {
 		}
 	}
 
-	def static streamForEach(Type type, String method, boolean ordered) { '''
+	def static streamForEach(String elementType, String method, boolean ordered) { '''
 		if (stream.isParallel()) {
-			stream.forEach«IF ordered»Ordered«ENDIF»((final «type.genericJavaUnboxedName» value) -> {
+			stream.forEach«IF ordered»Ordered«ENDIF»((final «elementType» value) -> {
 				synchronized (this) {
 					«method»(value);
 				}

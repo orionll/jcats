@@ -205,7 +205,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			}
 
 			public «genericName» append«type.streamName»(final «type.streamGenericName» stream) {
-				«streamForEach(type, "append", true)»
+				«streamForEach(type.genericJavaUnboxedName, "append", true)»
 				return this;
 			}
 

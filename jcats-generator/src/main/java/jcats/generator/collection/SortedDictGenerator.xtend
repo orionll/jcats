@@ -27,6 +27,7 @@ final class SortedDictGenerator implements ClassGenerator {
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.function.Consumer;
+		import java.util.stream.Stream;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -334,54 +335,53 @@ final class SortedDictGenerator implements ClassGenerator {
 			«ENDFOR»
 			@SafeVarargs
 			public static <K extends Comparable<K>, A> SortedDict<K, A> ofEntries(final P<K, A>... entries) {
-				SortedDict<K, A> dict = emptySortedDict();
-				for (final P<K, A> entry : entries) {
-					dict = dict.put(entry.get1(), entry.get2());
-				}
-				return dict;
+				final SortedDictBuilder<K, A> builder = builder();
+				builder.putEntries(entries);
+				return builder.build();
 			}
 
 			public static <K extends Comparable<K>, A> SortedDict<K, A> ofAll(final Iterable<P<K, A>> entries) {
-				SortedDict<K, A> dict = emptySortedDict();
-				for (final P<K, A> entry : entries) {
-					dict = dict.put(entry.get1(), entry.get2());
-				}
-				return dict;
+				final SortedDictBuilder<K, A> builder = builder();
+				builder.putAll(entries);
+				return builder.build();
 			}
 
 			public static <K extends Comparable<K>, A> SortedDict<K, A> fromIterator(final Iterator<P<K, A>> entries) {
-				SortedDict<K, A> dict = emptySortedDict();
-				while (entries.hasNext()) {
-					final P<K, A> entry = entries.next();
-					dict = dict.put(entry.get1(), entry.get2());
-				}
-				return dict;
+				final SortedDictBuilder<K, A> builder = builder();
+				builder.putIterator(entries);
+				return builder.build();
+			}
+
+			public static <K extends Comparable<K>, A> SortedDict<K, A> fromStream(final Stream<P<K, A>> entries) {
+				final SortedDictBuilder<K, A> builder = builder();
+				builder.putStream(entries);
+				return builder.build();
 			}
 
 			public static <K extends Comparable<K>, A> SortedDict<K, A> fromMap(final Map<K, A> map) {
-				SortedDict<K, A> dict = emptySortedDict();
-				for (final Entry<K, A> entry : map.entrySet()) {
-					dict = dict.put(entry.getKey(), entry.getValue());
-				}
-				return dict;
+				final SortedDictBuilder<K, A> builder = builder();
+				builder.putMap(map);
+				return builder.build();
 			}
 
 			public static <K, A> SortedDict<K, A> fromSortedMap(final SortedMap<K, A> map) {
 				final Comparator<? super K> comparator = map.comparator();
-				SortedDict<K, A> dict;
+				final SortedDictBuilder<K, A> builder;
 				if (comparator == null) {
-					dict = (SortedDict<K, A>) emptySortedDict();
+					builder = (SortedDictBuilder<K, A>) builder();
 				} else {
-					dict = emptySortedDictBy((Ord<K>) Ord.fromComparator(comparator));
+					builder = builderBy(Ord.cast(Ord.fromComparator(comparator)));
 				}
-				for (final Entry<K, A> entry : map.entrySet()) {
-					dict = dict.put(entry.getKey(), entry.getValue());
-				}
-				return dict;
+				builder.putMap(map);
+				return builder.build();
 			}
 
 			public static <K extends Comparable<K>, A> SortedDictBuilder<K, A> builder() {
 				return new SortedDictBuilder<>();
+			}
+
+			public static <K, A> SortedDictBuilder<K, A> builderBy(final Ord<K> ord) {
+				return new SortedDictBuilder<>(ord);
 			}
 
 			«cast(#["K", "A"], #[], #["A"])»

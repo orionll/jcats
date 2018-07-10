@@ -24,6 +24,7 @@ class DictGenerator implements ClassGenerator {
 		import java.util.Map.Entry;
 		import java.util.NoSuchElementException;
 		import java.util.function.Consumer;
+		import java.util.stream.Stream;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -291,36 +292,33 @@ class DictGenerator implements ClassGenerator {
 			«ENDFOR»
 			@SafeVarargs
 			public static «paramGenericName» ofEntries(final P<K, A>... entries) {
-				«genericName» dict = empty«shortName»();
-				for (final P<K, A> entry : entries) {
-					dict = dict.put(entry.get1(), entry.get2());
-				}
-				return dict;
+				final DictBuilder<K, A> builder = builder();
+				builder.putEntries(entries);
+				return builder.build();
 			}
 
 			public static «paramGenericName» ofAll(final Iterable<P<K, A>> entries) {
-				«genericName» dict = empty«shortName»();
-				for (final P<K, A> entry : entries) {
-					dict = dict.put(entry.get1(), entry.get2());
-				}
-				return dict;
+				final DictBuilder<K, A> builder = builder();
+				builder.putAll(entries);
+				return builder.build();
 			}
 
 			public static «paramGenericName» fromIterator(final Iterator<P<K, A>> entries) {
-				«genericName» dict = empty«shortName»();
-				while (entries.hasNext()) {
-					final P<K, A> entry = entries.next();
-					dict = dict.put(entry.get1(), entry.get2());
-				}
-				return dict;
+				final DictBuilder<K, A> builder = builder();
+				builder.putIterator(entries);
+				return builder.build();
+			}
+
+			public static «paramGenericName» fromStream(final Stream<P<K, A>> entries) {
+				final DictBuilder<K, A> builder = builder();
+				builder.putStream(entries);
+				return builder.build();
 			}
 
 			public static «paramGenericName» fromMap(final Map<K, A> map) {
-				«genericName» dict = empty«shortName»();
-				for (final Entry<K, A> entry : map.entrySet()) {
-					dict = dict.put(entry.getKey(), entry.getValue());
-				}
-				return dict;
+				final DictBuilder<K, A> builder = builder();
+				builder.putMap(map);
+				return builder.build();
 			}
 
 			public static <K, A> DictBuilder<K, A> builder() {
