@@ -418,6 +418,10 @@ final class OrdGenerator implements InterfaceGenerator {
 					requireNonNull(comparator);
 					if (comparator instanceof Ord<?>) {
 						return (Ord<A>) comparator;
+					} else if (comparator == Comparator.naturalOrder()) {
+						return (Ord<A>) asc();
+					} else if (comparator == Comparator.reverseOrder()) {
+						return (Ord<A>) desc();
 					} else {
 						return («genericName» & Serializable) (final «type.genericName» x, final «type.genericName» y) -> {
 							requireNonNull(x);
