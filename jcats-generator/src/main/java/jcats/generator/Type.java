@@ -40,6 +40,10 @@ public enum Type {
 		return javaUnboxedTypes().contains(this);
 	}
 
+	public boolean isNumber() {
+		return (this == INT || this == LONG || this == DOUBLE);
+	}
+
 	public boolean isIntegral() {
 		return (this == INT || this == LONG);
 	}

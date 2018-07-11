@@ -20,6 +20,120 @@ final class ContainerGenerator implements InterfaceGenerator {
 	def shortName() { if (type == Type.OBJECT) "Container" else type.typeName + "Container" }
 	def genericName() { if (type == Type.OBJECT) shortName + "<A>" else shortName }
 
+	def maxOrMinBy(boolean max) {
+		val what = if (max) "max" else "min"
+		'''
+		«IF type == Type.OBJECT»
+			default <B extends Comparable<B>> «type.optionGenericName» «what»By(final F<A, B> f) {
+				requireNonNull(f);
+				A «what» = null;
+				B prev = null;
+				for (final A value : this) {
+					if («what» == null) {
+						«what» = value;
+						prev = requireNonNull(f.apply(value));
+					} else {
+						final B next = f.apply(value);
+						if (next.compareTo(prev) «IF max»>«ELSE»<«ENDIF» 0) {
+							«what» = value;
+						}
+						prev = next;
+					}
+				}
+				return Option.fromNullable(«what»);
+			}
+		«ELSE»
+			default <A extends Comparable<A>> «type.optionGenericName» «what»By(final «type.typeName»ObjectF<A> f) {
+				requireNonNull(f);
+				«type.javaName» «what» = «type.defaultValue»;
+				boolean empty = true;
+				A prev = null;
+				«IF type.javaUnboxedType»
+					final «type.iteratorGenericName» iterator = iterator();
+					while (iterator.hasNext()) {
+						final «type.javaName» value = iterator.«type.iteratorNext»();
+				«ELSE»
+					for (final «type.javaName» value : this) {
+				«ENDIF»
+					if (empty) {
+						«what» = value;
+						prev = requireNonNull(f.apply(value));
+						empty = false;
+					} else {
+						final A next = f.apply(value);
+						if (next.compareTo(prev) «IF max»>«ELSE»<«ENDIF» 0) {
+							«what» = value;
+						}
+						prev = next;
+					}
+				}
+				return empty ? «type.noneName»() : «type.someName»(«what»);
+			}
+		«ENDIF»
+		'''
+	}
+
+	def maxOrMinByPrimitive(Type to, boolean max) {
+		val what = if (max) "max" else "min"
+		'''
+		«IF type == Type.OBJECT»
+			default «type.optionGenericName» «what»By«to.typeName»(final «to.typeName»F<A> f) {
+				requireNonNull(f);
+				A «what» = null;
+				«to.javaName» prev = «to.defaultValue»;
+				for (final A value : this) {
+					if («what» == null) {
+						«what» = value;
+						prev = f.apply(value);
+					} else {
+						final «to.javaName» next = f.apply(value);
+						«IF to.number»
+							if (next «IF max»>«ELSE»<«ENDIF» prev) {
+						«ELSE»
+							if («to.genericBoxedName».compare(next, prev) «IF max»>«ELSE»<«ENDIF» 0) {
+						«ENDIF»
+							«what» = value;
+						}
+						prev = next;
+					}
+				}
+				return Option.fromNullable(«what»);
+			}
+		«ELSE»
+			default «type.optionGenericName» «what»By«to.typeName»(final «type.typeName»«to.typeName»F f) {
+				requireNonNull(f);
+				«type.javaName» «what» = «type.defaultValue»;
+				boolean empty = true;
+				«to.javaName» prev = «to.defaultValue»;
+				«IF type.javaUnboxedType»
+					final «type.iteratorGenericName» iterator = iterator();
+					while (iterator.hasNext()) {
+						final «type.javaName» value = iterator.«type.iteratorNext»();
+				«ELSE»
+					for (final «type.javaName» value : this) {
+				«ENDIF»
+					if (empty) {
+						«what» = value;
+						prev = f.apply(value);
+						empty = false;
+					} else {
+						final «to.javaName» next = f.apply(value);
+						«IF to.number»
+							if (next «IF max»>«ELSE»<«ENDIF» prev) {
+						«ELSE»
+							if («to.genericBoxedName».compare(next, prev) «IF max»>«ELSE»<«ENDIF» 0) {
+						«ENDIF»
+							«what» = value;
+						}
+						prev = next;
+					}
+				}
+				return empty ? «type.noneName»() : «type.someName»(«what»);
+			}
+		«ENDIF»
+		'''
+	}
+
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
@@ -362,47 +476,16 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
-			«IF type == Type.OBJECT»
-				default <B extends Comparable<B>> «type.optionGenericName» maxBy(final F<A, B> f) {
-					return max(by(f));
-			«ELSE»
-				default <A extends Comparable<A>> «type.optionGenericName» maxBy(final «type.typeName»ObjectF<A> f) {
-					return maxByOrd(by(f));
-			«ENDIF»
-			}
+			«maxOrMinBy(true)»
 
 			«FOR to : Type.primitives»
-				«IF type == Type.OBJECT»
-					default «type.optionGenericName» maxBy«to.typeName»(final «to.typeName»F<A> f) {
-						return max(by«to.typeName»(f));
-				«ELSE»
-					default «type.optionGenericName» maxBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
-						return maxByOrd(by«to.typeName»(f));
-				«ENDIF»
-				}
+				«maxOrMinByPrimitive(to, true)»
 
 			«ENDFOR»
-			«IF type == Type.OBJECT»
-				default <B extends Comparable<B>> «type.optionGenericName» minBy(final F<A, B> f) {
-					return min(by(f));
-			«ELSE»
-				default <A extends Comparable<A>> «type.optionGenericName» minBy(final «type.typeName»ObjectF<A> f) {
-					return minByOrd(by(f));
-			«ENDIF»
-			}
-			
+			«maxOrMinBy(false)»
+
 			«FOR to : Type.primitives»
-				«IF type == Type.OBJECT»
-					default «type.optionGenericName» minBy«to.typeName»(final «to.typeName»F<A> f) {
-				«ELSE»
-					default «type.optionGenericName» minBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
-				«ENDIF»
-					«IF type == Type.OBJECT»
-						return min(by«to.typeName»(f));
-					«ELSE»
-						return minByOrd(by«to.typeName»(f));
-					«ENDIF»
-				}
+				«maxOrMinByPrimitive(to, false)»
 
 			«ENDFOR»
 			default int spliteratorCharacteristics() {
