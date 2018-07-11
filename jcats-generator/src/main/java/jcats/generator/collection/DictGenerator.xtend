@@ -64,6 +64,31 @@ class DictGenerator implements ClassGenerator {
 				return update(key, key.hashCode(), value, 0);
 			}
 
+			public «genericName» update(final K key, final F<A, A> f) {
+				requireNonNull(f);
+				final int keyHash = key.hashCode();
+				final A value = get(key, keyHash, 0);
+				if (value == null) {
+					return this;
+				} else {
+					final A newValue = requireNonNull(f.apply(value));
+					return update(key, keyHash, newValue, 0);
+				}
+			}
+
+			public «genericName» updateOrPut(final K key, final A defaultValue, final F<A, A> f) {
+				requireNonNull(defaultValue);
+				requireNonNull(f);
+				final int keyHash = key.hashCode();
+				final A value = get(key, keyHash, 0);
+				if (value == null) {
+					return update(key, keyHash, defaultValue, 0);
+				} else {
+					final A newValue = requireNonNull(f.apply(value));
+					return update(key, keyHash, newValue, 0);
+				}
+			}
+
 			public «genericName» remove(final K key) {
 				return remove(key, key.hashCode(), 0);
 			}

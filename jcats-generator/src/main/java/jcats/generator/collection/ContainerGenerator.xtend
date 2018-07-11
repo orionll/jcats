@@ -49,6 +49,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			import static «Constants.JCATS».«type.optionShortName».*;
 		«ENDIF»
 		import static «Constants.COLLECTION».Common.*;
+		import static «Constants.SEQ».*;
 		import static «Constants.JCATS».«type.ordShortName».*;
 		«IF type.primitive»
 			import static «Constants.ARRAY».*;
@@ -465,6 +466,13 @@ final class ContainerGenerator implements InterfaceGenerator {
 				default Unique<A> toUnique() {
 					final UniqueBuilder<A> builder = Unique.builder();
 					foreach(builder::put);
+					return builder.build();
+				}
+
+				default <K> Dict<K, Seq<A>> groupBy(final F<A, K> f) {
+					final DictBuilder<K, Seq<A>> builder = Dict.builder();
+					foreach((final A value) ->
+						builder.updateOrPut(f.apply(value), singleSeq(value), (final Seq<A> seq) -> seq.append(value)));
 					return builder.build();
 				}
 

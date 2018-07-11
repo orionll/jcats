@@ -16,6 +16,7 @@ final class DictBuilderGenerator implements ClassGenerator {
 		import java.util.stream.Stream;
 
 		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
 		import static «Constants.COLLECTION».Dict.emptyDict;
 		import static «Constants.COMMON».*;
@@ -34,6 +35,11 @@ final class DictBuilderGenerator implements ClassGenerator {
 
 			public DictBuilder<K, A> put(final K key, final A value) {
 				this.dict = this.dict.put(key, value);
+				return this;
+			}
+
+			DictBuilder<K, A> updateOrPut(final K key, final A defaultValue, final F<A, A> f) {
+				this.dict = this.dict.updateOrPut(key, defaultValue, f);
 				return this;
 			}
 
