@@ -94,6 +94,7 @@ final class Main {
 
 	private def static List<Generator> allGenerators() {
 		#[#[
+			new ControlGenerator,
 			new FsGenerator,
 			new Eff0Generator,
 			new EquatableGenerator,
