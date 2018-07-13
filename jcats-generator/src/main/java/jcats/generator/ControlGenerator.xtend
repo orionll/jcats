@@ -66,10 +66,30 @@ final class ControlGenerator implements ClassGenerator {
 				}
 			}
 
+			public static <A> void doIfNonNullOrElse(final A value, final Eff<A> ifNonNull, final Eff0 ifNull) {
+				requireNonNull(ifNonNull);
+				requireNonNull(ifNull);
+				if (value != null) {
+					ifNonNull.apply(value);
+				} else {
+					ifNull.apply();
+				}
+			}
+
 			public static <A> void doWhenNonNull(final A value, final Eff0 eff) {
 				requireNonNull(eff);
 				if (value != null) {
 					eff.apply();
+				}
+			}
+
+			public static <A> void doWhenNonNullOrElse(final A value, final Eff0 ifNonNull, final Eff0 ifNull) {
+				requireNonNull(ifNonNull);
+				requireNonNull(ifNull);
+				if (value != null) {
+					ifNonNull.apply();
+				} else {
+					ifNull.apply();
 				}
 			}
 
