@@ -170,6 +170,13 @@ final class F0Generator implements InterfaceGenerator {
 				return new Lazy«type.diamondName("F0")»(f);
 			}
 
+			static <«IF type == Type.OBJECT»A, «ENDIF»X extends RuntimeException> «genericName» fail(final F0<X> f) {
+				requireNonNull(f);
+				return () -> {
+					throw f.apply();
+				};
+			}
+
 			«IF type == Type.OBJECT»
 				«join»
 			«ELSE»
