@@ -40,13 +40,17 @@ import jcats.generator.collection.UniqueContainerViewGenerator
 import jcats.generator.collection.UniqueGenerator
 import jcats.generator.collection.VNGenerators
 import jcats.generator.function.Eff0Generator
+import jcats.generator.function.Eff0XGenerator
 import jcats.generator.function.Eff2Generator
 import jcats.generator.function.EffGenerator
 import jcats.generator.function.EffNGenerators
+import jcats.generator.function.EffXGenerator
 import jcats.generator.function.F0Generator
+import jcats.generator.function.F0XGenerator
 import jcats.generator.function.F2Generator
 import jcats.generator.function.FGenerator
 import jcats.generator.function.FNGenerators
+import jcats.generator.function.FXGenerator
 import jcats.generator.function.FsGenerator
 
 import static extension java.nio.file.Files.*
@@ -96,7 +100,11 @@ final class Main {
 		#[#[
 			new ControlGenerator,
 			new FsGenerator,
+			new FXGenerator,
+			new F0XGenerator,
+			new EffXGenerator,
 			new Eff0Generator,
+			new Eff0XGenerator,
 			new EquatableGenerator,
 			new SizedGenerator,
 			new OrderGenerator,

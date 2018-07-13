@@ -136,6 +136,12 @@ final class F0Generator implements InterfaceGenerator {
 				«ENDIF»
 
 			«ENDFOR»
+			«IF type == Type.OBJECT»
+				default <X extends Throwable> F0X<A, X> toF0X() {
+					return this::apply;
+				}
+
+			«ENDIF»
 			default Eff0 toEff0() {
 				return this::apply;
 			}

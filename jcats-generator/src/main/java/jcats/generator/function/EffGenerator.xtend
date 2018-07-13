@@ -82,6 +82,12 @@ final class EffGenerator implements InterfaceGenerator {
 				return () -> apply(value);
 			}
 
+			«IF type == Type.OBJECT»
+				default <X extends Throwable> EffX<A, X> toEffX() {
+					return (final A a) -> apply(requireNonNull(a));
+				}
+
+			«ENDIF»
 			«IF type != Type.OBJECT»
 				default Eff<«type.boxedName»> toEff() {
 					return this::apply;
@@ -124,6 +130,12 @@ final class EffGenerator implements InterfaceGenerator {
 				}
 
 			«ENDFOR»
+			static <«IF type == Type.OBJECT»A, «ENDIF»X extends RuntimeException> «genericName» fail(final F0<X> f) {
+				return (final «type.genericName» value) -> {
+					throw f.apply();
+				};
+			}
+
 			static «paramGenericName» doNothing() {
 				return Objects::requireNonNull;
 			}

@@ -29,12 +29,23 @@ final class Eff0Generator implements InterfaceGenerator {
 				}
 
 			«ENDFOR»
+			default <X extends Throwable> Eff0X<X> toEff0X() {
+				return this::apply;
+			}
+
 			static Eff0 eff0(final Eff0 eff) {
 				return requireNonNull(eff);
 			}
 
 			static Eff0 doNothing() {
 				return () -> {};
+			}
+
+			static <X extends RuntimeException> Eff0 fail(final F0<X> f) {
+				requireNonNull(f);
+				return () -> {
+					throw f.apply();
+				};
 			}
 		}
 	''' }

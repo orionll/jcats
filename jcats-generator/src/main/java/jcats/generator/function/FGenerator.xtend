@@ -379,6 +379,12 @@ final class FGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
+			«IF from == Type.OBJECT && to == Type.OBJECT»
+				default <X extends Throwable> FX<A, B, X> toFX() {
+					return (final A a) -> apply(requireNonNull(a));
+				}
+
+			«ENDIF»
 			«IF from != Type.OBJECT && to == Type.OBJECT»
 				default F<«from.boxedName», A> toF() {
 					return (final «from.boxedName» value) -> {
@@ -596,6 +602,12 @@ final class FGenerator implements InterfaceGenerator {
 
 			static «paramGenericName» «shortName.firstToLowerCase»(final «genericName» f) {
 				return requireNonNull(f);
+			}
+
+			static <«IF from == Type.OBJECT && to == Type.OBJECT»A, B, «ELSEIF from == Type.OBJECT || to == Type.OBJECT»A, «ENDIF»X extends RuntimeException> «genericName» fail(final F0<X> f) {
+				return (final «from.genericName» value) -> {
+					throw f.apply();
+				};
 			}
 
 			«IF from == Type.OBJECT && to == Type.OBJECT»

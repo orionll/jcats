@@ -17,6 +17,7 @@ final class FsGenerator implements ClassGenerator {
 			«FOR type : Type.primitives»
 				static final «type.typeName»«type.typeName»F «type.typeName.toUpperCase»_ID = (final «type.javaName» value) -> value;
 			«ENDFOR»
+			static final FX IDX = Objects::requireNonNull;
 		}
 	''' }
 }
