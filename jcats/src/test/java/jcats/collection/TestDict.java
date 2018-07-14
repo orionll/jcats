@@ -52,7 +52,7 @@ public class TestDict {
 	@Test
 	public void singleElementSize() {
 		assertEquals(1, dict("a", 1).size());
-		assertEquals(1, dict2("a", 1, "a", 1).size());
+		assertEquals(1, dict("a", 1, "a", 1).size());
 	}
 
 	@Test
@@ -87,19 +87,19 @@ public class TestDict {
 
 	@Test
 	public void hashCodeClashContains() {
-		assertTrue(dict2("Aa", 1, "BB", 2).containsKey("BB"));
-		assertFalse(dict2("Aa", 1, "BB", 2).containsKey("XX"));
+		assertTrue(dict("Aa", 1, "BB", 2).containsKey("BB"));
+		assertFalse(dict("Aa", 1, "BB", 2).containsKey("XX"));
 	}
 
 	@Test
 	public void hashCodeClashGet() {
-		final Dict<String, Integer> dict1 = dict2("Aa", 1, "BB", 2);
+		final Dict<String, Integer> dict1 = dict("Aa", 1, "BB", 2);
 		assertEquals(some(1), dict1.get("Aa"));
 		assertEquals(some(2), dict1.get("BB"));
 		assertEquals(none(), dict1.get("XX"));
 		assertEquals(2, dict1.size());
 
-		final Dict<String, Integer> dict2 = dict5("a", 1, "b", 2, "c", 3, "Aa", 4, "BB", 5);
+		final Dict<String, Integer> dict2 = dict("a", 1, "b", 2, "c", 3, "Aa", 4, "BB", 5);
 		assertEquals(some(1), dict2.get("a"));
 		assertEquals(some(2), dict2.get("b"));
 		assertEquals(some(3), dict2.get("c"));
@@ -108,12 +108,12 @@ public class TestDict {
 		assertEquals(none(), dict2.get("XX"));
 		assertEquals(5, dict2.size());
 
-		final Dict<String, Integer> dict3 = dict4("Aa", 1, "BB", 2, "BB", 2, "Aa", 3);
+		final Dict<String, Integer> dict3 = dict("Aa", 1, "BB", 2, "BB", 2, "Aa", 3);
 		assertEquals(some(3), dict3.get("Aa"));
 		assertEquals(some(2), dict3.get("BB"));
 		assertEquals(2, dict3.size());
 
-		final Dict<String, Integer> dict4 = dict4("AaAa", 1, "BBBB", 2, "AaBB", 3, "AaAa", 4);
+		final Dict<String, Integer> dict4 = dict("AaAa", 1, "BBBB", 2, "AaBB", 3, "AaAa", 4);
 		assertEquals(some(4), dict4.get("AaAa"));
 		assertEquals(some(2), dict4.get("BBBB"));
 		assertEquals(some(3), dict4.get("AaBB"));
@@ -122,7 +122,7 @@ public class TestDict {
 
 	@Test
 	public void hashCodeClashRemove() {
-		final Dict<String, Integer> dict = dict2("Aa", 1, "BB", 2).remove("Aa");
+		final Dict<String, Integer> dict = dict("Aa", 1, "BB", 2).remove("Aa");
 		assertFalse(dict.containsKey("Aa"));
 		assertEquals(some(2), dict.get("BB"));
 		assertEquals(1, dict.size());
@@ -155,7 +155,7 @@ public class TestDict {
 
 	@Test
 	public void sameTree() {
-		final Dict<String, Integer> dict = dict3("!", 1, "a", 2, "A", 3);
+		final Dict<String, Integer> dict = dict("!", 1, "a", 2, "A", 3);
 		assertEquals(some(1), dict.get("!"));
 		assertEquals(some(2), dict.get("a"));
 		assertEquals(some(3), dict.get("A"));
@@ -195,11 +195,11 @@ public class TestDict {
 
 	@Test
 	public void equals() {
-		final Dict<String, Integer> dict1 = dict3("a", 1, "b", 2, "c", 3);
-		final Dict<String, Integer> dict2 = dict3("a", 1, "b", 2, "c", 3);
-		final Dict<String, Integer> dict3 = dict3("a", 1, "b", 2, "c", 4);
-		final Dict<String, Integer> dict4 = dict2("a", 1, "b", 2);
-		final Dict<String, Integer> dict5 = dict3("a", 1, "b", 2, "d", 3);
+		final Dict<String, Integer> dict1 = dict("a", 1, "b", 2, "c", 3);
+		final Dict<String, Integer> dict2 = dict("a", 1, "b", 2, "c", 3);
+		final Dict<String, Integer> dict3 = dict("a", 1, "b", 2, "c", 4);
+		final Dict<String, Integer> dict4 = dict("a", 1, "b", 2);
+		final Dict<String, Integer> dict5 = dict("a", 1, "b", 2, "d", 3);
 		assertEquals(dict1, dict1);
 		assertEquals(dict1, dict2);
 		assertNotEquals(dict1, dict3);
@@ -209,14 +209,14 @@ public class TestDict {
 
 	@Test
 	public void hashcode() {
-		final Dict<String, Integer> dict1 = dict5("a", 1, "b", 2, "c", 3, "Aa", 4, "BB", 5);
-		final Dict<String, Integer> dict2 = dict5("BB", 5, "b", 2, "c", 3, "Aa", 4, "a", 1);
+		final Dict<String, Integer> dict1 = dict("a", 1, "b", 2, "c", 3, "Aa", 4, "BB", 5);
+		final Dict<String, Integer> dict2 = dict("BB", 5, "b", 2, "c", 3, "Aa", 4, "a", 1);
 		assertEquals(dict1.hashCode(), dict2.hashCode());
 	}
 
 	@Test
 	public void traverse() {
-		final Dict<String, Integer> dict = dict5("a", 1, "b", 2, "c", 3, "Aa", 4, "BB", 5);
+		final Dict<String, Integer> dict = dict("a", 1, "b", 2, "c", 3, "Aa", 4, "BB", 5);
 		final Set<String> keys = Sets.newHashSet();
 		final Set<Integer> values = Sets.newHashSet();
 		dict.foreach((key, value) -> {

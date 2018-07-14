@@ -309,7 +309,7 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			«FOR i : 2 .. Constants.DICT_FACTORY_METHODS_COUNT»
-				public static <K extends Comparable<K>, A> SortedDict<K, A> sortedDict«i»(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
+				public static <K extends Comparable<K>, A> SortedDict<K, A> sortedDict(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
 					return SortedDict.<K, A> emptySortedDict()
 						«FOR j : 1 .. i»
 							.put(key«j», value«j»)«IF j == i»;«ENDIF»
@@ -328,8 +328,9 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			«FOR i : 2 .. Constants.DICT_FACTORY_METHODS_COUNT»
+				«javadocSynonym("sortedDict")»
 				public static <K extends Comparable<K>, A> SortedDict<K, A> of(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
-					return sortedDict«i»(«(1..i).map["key" + it + ", value" + it].join(", ")»);
+					return sortedDict(«(1..i).map["key" + it + ", value" + it].join(", ")»);
 				}
 
 			«ENDFOR»

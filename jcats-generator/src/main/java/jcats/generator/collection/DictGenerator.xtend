@@ -290,7 +290,7 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			«FOR i : 2 .. Constants.DICT_FACTORY_METHODS_COUNT»
-				public static «paramGenericName» dict«i»(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
+				public static «paramGenericName» dict(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
 					return «shortName».<K, A> empty«shortName»()
 						«FOR j : 1 .. i»
 							.put(key«j», value«j»)«IF j == i»;«ENDIF»
@@ -309,9 +309,9 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			«FOR i : 2 .. Constants.DICT_FACTORY_METHODS_COUNT»
-				«javadocSynonym("dict" + i)»
+				«javadocSynonym("dict")»
 				public static «paramGenericName» of(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
-					return dict«i»(«(1..i).map["key" + it + ", value" + it].join(", ")»);
+					return dict(«(1..i).map["key" + it + ", value" + it].join(", ")»);
 				}
 
 			«ENDFOR»
