@@ -99,6 +99,7 @@ final class Main {
 	private def static List<Generator> allGenerators() {
 		#[#[
 			new ControlGenerator,
+			new MatcherGenerator,
 			new FsGenerator,
 			new FXGenerator,
 			new F0XGenerator,
