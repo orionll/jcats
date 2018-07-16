@@ -6,10 +6,7 @@ final class ControlGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
-		import jcats.function.Eff;
-		import jcats.function.Eff0;
-		import jcats.function.F;
-		import jcats.function.F0;
+		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
 
@@ -27,12 +24,27 @@ final class ControlGenerator implements ClassGenerator {
 				return (value == null) ? requireNonNull(defaultValue.apply()) : value;
 			}
 
+			public static <A, X extends Throwable> A nonNullOrElseX(final A value, final F0X<A, X> defaultValue) throws X {
+				requireNonNull(defaultValue);
+				return (value == null) ? requireNonNull(defaultValue.apply()) : value;
+			}
+
 			public static <A, B> B ifNonNull(final A value, final F<A, B> f) {
 				requireNonNull(f);
 				return (value == null) ? null : f.apply(value);
 			}
 
+			public static <A, B, X extends Throwable> B ifNonNullX(final A value, final FX<A, B, X> f) throws X {
+				requireNonNull(f);
+				return (value == null) ? null : f.apply(value);
+			}
+
 			public static <A, B> B ifNonNullOr(final A value, final F<A, B> f, final B defaultValue) {
+				requireNonNull(f);
+				return (value == null) ? defaultValue : f.apply(value);
+			}
+
+			public static <A, B, X extends Throwable> B ifNonNullOrX(final A value, final FX<A, B, X> f, final B defaultValue) throws X {
 				requireNonNull(f);
 				return (value == null) ? defaultValue : f.apply(value);
 			}
@@ -43,12 +55,28 @@ final class ControlGenerator implements ClassGenerator {
 				return (value == null) ? defaultValue.apply() : f.apply(value);
 			}
 
+			public static <A, B, X extends Throwable> B ifNonNullOrElseX(final A value, final FX<A, B, X> f, final F0X<B, X> defaultValue) throws X {
+				requireNonNull(f);
+				requireNonNull(defaultValue);
+				return (value == null) ? defaultValue.apply() : f.apply(value);
+			}
+
 			public static <A, B> B whenNonNull(final A value, final F0<B> f) {
 				requireNonNull(f);
 				return (value == null) ? null : f.apply();
 			}
 
+			public static <A, B, X extends Throwable> B whenNonNullX(final A value, final F0X<B, X> f) throws X {
+				requireNonNull(f);
+				return (value == null) ? null : f.apply();
+			}
+
 			public static <A, B> B whenNonNullOr(final A value, final F0<B> f, final B defaultValue) {
+				requireNonNull(f);
+				return (value == null) ? defaultValue : f.apply();
+			}
+
+			public static <A, B, X extends Throwable> B whenNonNullOrX(final A value, final F0X<B, X> f, final B defaultValue) throws X {
 				requireNonNull(f);
 				return (value == null) ? defaultValue : f.apply();
 			}
@@ -59,7 +87,20 @@ final class ControlGenerator implements ClassGenerator {
 				return (value == null) ? defaultValue.apply() : f.apply();
 			}
 
+			public static <A, B, X extends Throwable> B whenNonNullOrElseX(final A value, final F0X<B, X> f, final F0X<B, X> defaultValue) throws X {
+				requireNonNull(f);
+				requireNonNull(defaultValue);
+				return (value == null) ? defaultValue.apply() : f.apply();
+			}
+
 			public static <A> void doIfNonNull(final A value, final Eff<A> eff) {
+				requireNonNull(eff);
+				if (value != null) {
+					eff.apply(value);
+				}
+			}
+
+			public static <A, X extends Throwable> void doIfNonNullX(final A value, final EffX<A, X> eff) throws X {
 				requireNonNull(eff);
 				if (value != null) {
 					eff.apply(value);
@@ -76,7 +117,24 @@ final class ControlGenerator implements ClassGenerator {
 				}
 			}
 
+			public static <A, X extends Throwable> void doIfNonNullOrElseX(final A value, final EffX<A, X> ifNonNull, final Eff0X<X> ifNull) throws X {
+				requireNonNull(ifNonNull);
+				requireNonNull(ifNull);
+				if (value != null) {
+					ifNonNull.apply(value);
+				} else {
+					ifNull.apply();
+				}
+			}
+
 			public static <A> void doWhenNonNull(final A value, final Eff0 eff) {
+				requireNonNull(eff);
+				if (value != null) {
+					eff.apply();
+				}
+			}
+
+			public static <A, X extends Throwable> void doWhenNonNullX(final A value, final Eff0X<X> eff) throws X {
 				requireNonNull(eff);
 				if (value != null) {
 					eff.apply();
@@ -93,7 +151,24 @@ final class ControlGenerator implements ClassGenerator {
 				}
 			}
 
+			public static <A, X extends Throwable> void doWhenNonNullOrElseX(final A value, final Eff0X<X> ifNonNull, final Eff0X<X> ifNull) throws X {
+				requireNonNull(ifNonNull);
+				requireNonNull(ifNull);
+				if (value != null) {
+					ifNonNull.apply();
+				} else {
+					ifNull.apply();
+				}
+			}
+
 			public static <A> void doIfNull(final A value, final Eff0 eff) {
+				requireNonNull(eff);
+				if (value == null) {
+					eff.apply();
+				}
+			}
+
+			public static <A, X extends Throwable> void doIfNullX(final A value, final Eff0X<X> eff) throws X {
 				requireNonNull(eff);
 				if (value == null) {
 					eff.apply();
@@ -131,6 +206,29 @@ final class ControlGenerator implements ClassGenerator {
 						«ENDFOR»
 						} else {
 							return requireNonNull(defaultValue.apply());
+						}
+					}
+				«ENDFOR»
+				«FOR i : 1 .. Constants.MATCHER_METHODS_COUNT»
+
+					public void doMatch(
+							«FOR j : 1 .. i»
+								final A case«j», final Eff0 eff«j»,
+							«ENDFOR»
+							final Eff0 defaultEff) {
+						«FOR j : 1 .. i»
+							requireNonNull(case«j»);
+							requireNonNull(eff«j»);
+						«ENDFOR»
+						requireNonNull(defaultEff);
+						if (this.value.equals(case1)) {
+							eff1.apply();
+						«FOR j : 1 ..< i»
+							} else if (this.value.equals(case«j+1»)) {
+								eff«j+1».apply();
+						«ENDFOR»
+						} else {
+							defaultEff.apply();
 						}
 					}
 				«ENDFOR»
