@@ -14,6 +14,7 @@ final class Constants {
 	val public static MAX_ARITY = 5
 	val public static MAX_PRODUCT_ARITY = 3
 	val public static DICT_FACTORY_METHODS_COUNT = 11
+	val public static MATCHER_METHODS_COUNT = 9
 	val public static EFFECT = "jcats.function.Effect"
 	val public static F = "jcats.function.F"
 	val public static F0 = "jcats.function.F0"
