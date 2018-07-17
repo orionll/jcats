@@ -74,7 +74,7 @@ final class FXGenerator implements InterfaceGenerator {
 				return (FX<A, A, X>) Fs.IDX;
 			}
 
-			static <A, B, C, X extends Throwable> FX<A, C, X> andThen(final FX<A, B, X> f, final FX<B, C, X> g) {
+			static <A, B, C, X extends Throwable> FX<A, C, X> andThenX(final FX<A, B, X> f, final FX<B, C, X> g) {
 				requireNonNull(f);
 				requireNonNull(g);
 				return (final A a) -> {
@@ -84,7 +84,7 @@ final class FXGenerator implements InterfaceGenerator {
 				};
 			}
 
-			static <A, B, C, X extends Throwable> FX<A, C, X> compose(final FX<B, C, X> f, final FX<A, B, X> g) {
+			static <A, B, C, X extends Throwable> FX<A, C, X> composeX(final FX<B, C, X> f, final FX<A, B, X> g) {
 				requireNonNull(f);
 				requireNonNull(g);
 				return (final A a) -> {
@@ -94,7 +94,7 @@ final class FXGenerator implements InterfaceGenerator {
 				};
 			}
 
-			static <A, B, X extends Throwable> FX<A, B, X> always(final B value) {
+			static <A, B, X extends Throwable> FX<A, B, X> alwaysX(final B value) {
 				requireNonNull(value);
 				return (final A a) -> {
 					requireNonNull(a);
@@ -103,17 +103,17 @@ final class FXGenerator implements InterfaceGenerator {
 			}
 
 			/**
-			 * Alias for {@link #always}
+			 * Alias for {@link #alwaysX}
 			 */
 			static <A, B, X extends Throwable> FX<A, B, X> of(final B value) {
-				return always(value);
+				return alwaysX(value);
 			}
 
 			static <A, B, X extends Throwable> FX<A, B, X> fX(final FX<A, B, X> f) {
 				return requireNonNull(f);
 			}
 
-			static <A, B, X extends Throwable> FX<A, B, X> fail(final F0<X> f) {
+			static <A, B, X extends Throwable> FX<A, B, X> failX(final F0<X> f) {
 				return (final A value) -> {
 					throw f.apply();
 				};

@@ -42,7 +42,7 @@ final class EffXGenerator implements InterfaceGenerator {
 				return requireNonNull(eff);
 			}
 
-			static <A, B, X extends Throwable> EffX<A, X> compose(final EffX<B, X> eff, final FX<A, B, X> f) {
+			static <A, B, X extends Throwable> EffX<A, X> composeX(final EffX<B, X> eff, final FX<A, B, X> f) {
 				requireNonNull(eff);
 				requireNonNull(f);
 				return (final A a) -> {
@@ -52,13 +52,13 @@ final class EffXGenerator implements InterfaceGenerator {
 				};
 			}
 
-			static <A, X extends Throwable> EffX<A, X> fail(final F0<X> f) {
+			static <A, X extends Throwable> EffX<A, X> failX(final F0<X> f) {
 				return (final A value) -> {
 					throw f.apply();
 				};
 			}
 
-			static <A, X extends Throwable> EffX<A, X> doNothing() {
+			static <A, X extends Throwable> EffX<A, X> doNothingX() {
 				return Objects::requireNonNull;
 			}
 

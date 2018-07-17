@@ -65,11 +65,11 @@ final class F0XGenerator implements InterfaceGenerator {
 				return requireNonNull(f);
 			}
 
-			static <A, X extends Throwable> F0X<A, X> lazy(final F0X<A, X> f) {
+			static <A, X extends Throwable> F0X<A, X> lazyX(final F0X<A, X> f) {
 				return new LazyF0X<>(f);
 			}
 
-			static <A, X extends Throwable> F0X<A, X> fail(final F0<X> f) {
+			static <A, X extends Throwable> F0X<A, X> failX(final F0<X> f) {
 				requireNonNull(f);
 				return () -> {
 					throw f.apply();

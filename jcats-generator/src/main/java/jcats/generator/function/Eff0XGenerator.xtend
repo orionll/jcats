@@ -29,11 +29,11 @@ final class Eff0XGenerator implements InterfaceGenerator {
 				return requireNonNull(eff);
 			}
 
-			static <X extends Throwable> Eff0X<X> doNothing() {
+			static <X extends Throwable> Eff0X<X> doNothingX() {
 				return () -> {};
 			}
 
-			static <X extends Throwable> Eff0X<X> fail(final F0<X> f) {
+			static <X extends Throwable> Eff0X<X> failX(final F0<X> f) {
 				requireNonNull(f);
 				return () -> {
 					throw f.apply();
