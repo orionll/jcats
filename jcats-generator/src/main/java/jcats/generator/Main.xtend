@@ -98,6 +98,7 @@ final class Main {
 
 	private def static List<Generator> allGenerators() {
 		#[#[
+			new UnitGenerator,
 			new ControlGenerator,
 			new MatcherGenerator,
 			new FsGenerator,
