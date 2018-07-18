@@ -121,7 +121,7 @@ final class Main {
 			new SortedDictBuilderGenerator,
 			new HashTableCommonGenerator,
 			new CommonGenerator,
-			new CastsGenerator,
+			new CastGenerator,
 			new String1Generator,
 			new Stream2Generator,
 			varianceAnnotationGenerator(true),

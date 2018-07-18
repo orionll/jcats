@@ -1,7 +1,7 @@
 package jcats.generator
 
-final class CastsGenerator implements ClassGenerator {
-	override className() { "jcats.Casts" }
+final class CastGenerator implements ClassGenerator {
+	override className() { "jcats.Cast" }
 
 	override sourceCode() { '''
 		package «Constants.JCATS»;
@@ -17,8 +17,9 @@ final class CastsGenerator implements ClassGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		
-		public final class Casts {
-			private Casts() {}
+		public final class Cast {
+
+			private Cast() {}
 
 			«cast("Iterable", "castIterable", #["A"], #[], #["A"])»
 
