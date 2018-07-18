@@ -12,6 +12,8 @@ final class UnitGenerator implements ClassGenerator {
 
 			private static final Unit UNIT = new Unit();
 
+			private Unit() {}
+
 			public static Unit unit() {
 				return UNIT;
 			}
