@@ -115,7 +115,6 @@ class PGenerator implements ClassGenerator {
 		import java.util.Map.Entry;
 		import java.util.AbstractMap.SimpleImmutableEntry;
 
-		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
