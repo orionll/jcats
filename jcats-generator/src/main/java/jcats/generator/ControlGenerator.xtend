@@ -174,7 +174,26 @@ final class ControlGenerator implements ClassGenerator {
 					eff.apply();
 				}
 			}
-		}
 
+			public static <A> A unchecked(final F0X<A, Throwable> f) {
+				try {
+					return f.apply();
+				} catch (final RuntimeException | Error t) {
+					throw t;
+				} catch (final Throwable t) {
+					throw new RuntimeException(t);
+				}
+			}
+
+			public static void doUnchecked(final Eff0X<Throwable> f) {
+				try {
+					f.apply();
+				} catch (final RuntimeException | Error t) {
+					throw t;
+				} catch (final Throwable t) {
+					throw new RuntimeException(t);
+				}
+			}
+		}
 	''' }
 }
