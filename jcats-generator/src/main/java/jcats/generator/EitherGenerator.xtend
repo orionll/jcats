@@ -534,10 +534,24 @@ final class EitherGenerator implements ClassGenerator {
 				«ENDIF»
 			}
 
-			«javadocSynonym("«rightName»")»
+			«javadocSynonym(rightName)»
 			public static «paramGenericName» of(final «rightType.genericName» right) {
 				return «rightName»(right);
 			}
+			«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
+
+				public static <X extends Throwable, A> «genericName» run(final F0X<A, X> f, final Class<X> throwableClass) {
+					try {
+						return right(f.apply());
+					} catch (final Throwable t) {
+						if (throwableClass.isInstance(t)) {
+							return left((X) t);
+						} else {
+							throw Control.<RuntimeException> sneakyThrow(t); // Safe here
+						}
+					}
+				}
+			«ENDIF»
 			«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
 
 				«joinMultiple(#["X"], "A")»

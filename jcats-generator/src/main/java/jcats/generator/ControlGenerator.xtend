@@ -194,6 +194,10 @@ final class ControlGenerator implements ClassGenerator {
 					throw new RuntimeException(t);
 				}
 			}
+
+			static <X extends Throwable> X sneakyThrow(final Throwable t) throws X {
+				throw (X) t;
+			}
 		}
 	''' }
 }
