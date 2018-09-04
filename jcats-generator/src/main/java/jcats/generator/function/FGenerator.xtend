@@ -593,6 +593,16 @@ final class FGenerator implements InterfaceGenerator {
 						return (final «from.genericName» value) -> f1.apply(value) || f2.apply(value);
 					«ENDIF»
 				}
+				«IF from == Type.OBJECT»
+
+					static «paramGenericName» isNull() {
+						return (final A value) -> (value == null);
+					}
+
+					static «paramGenericName» isNotNull() {
+						return (final A value) -> (value != null);
+					}
+				«ENDIF»
 
 			«ENDIF»
 			«javadocSynonym(alwaysName)»
