@@ -263,6 +263,18 @@ final class CommonGenerator implements ClassGenerator {
 						throw new NoSuchElementException();
 					}
 				}
+
+				@Override
+				«IF type.javaUnboxedType»
+					public void forEachRemaining(final «type.typeName»Consumer action) {
+				«ELSE»
+					public void forEachRemaining(final Consumer<? super «type.genericBoxedName»> action) {
+				«ENDIF»
+					requireNonNull(action);
+					while (this.i < this.array.length) {
+						action.accept(«type.genericCast»this.array[this.i++]);
+					}
+				}
 			}
 
 		«ENDFOR»
@@ -290,6 +302,18 @@ final class CommonGenerator implements ClassGenerator {
 						return next;
 					} catch (final IndexOutOfBoundsException __) {
 						throw new NoSuchElementException();
+					}
+				}
+
+				@Override
+				«IF type.javaUnboxedType»
+					public void forEachRemaining(final «type.typeName»Consumer action) {
+				«ELSE»
+					public void forEachRemaining(final Consumer<? super «type.genericBoxedName»> action) {
+				«ENDIF»
+					requireNonNull(action);
+					while (this.i >= 0) {
+						action.accept(«type.genericCast»this.array[this.i--]);
 					}
 				}
 			}
