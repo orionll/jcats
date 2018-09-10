@@ -195,6 +195,42 @@ final class ControlGenerator implements ClassGenerator {
 				}
 			}
 
+			public static <A> A tryClose(final F0<A> f, final Eff0 close) {
+				// Cannot use method reference because of Java 8 compiler bug
+				try (final CloseableX<RuntimeException> __ = new CloseableX<RuntimeException>() {
+					@Override
+					public void close() {
+						close.apply();
+					}
+				}) {
+					return f.apply();
+				}
+			}
+
+			public static void doTryClose(final Eff0 eff, final Eff0 close) {
+				// Cannot use method reference because of Java 8 compiler bug
+				try (final CloseableX<RuntimeException> __ = new CloseableX<RuntimeException>() {
+					@Override
+					public void close() {
+						close.apply();
+					}
+				}) {
+					eff.apply();
+				}
+			}
+
+			public static <A, X extends Exception> A tryCloseX(final F0X<A, X> f, final Eff0X<X> close) throws X {
+				try (final CloseableX<X> __ = close::apply) {
+					return f.apply();
+				}
+			}
+
+			public static <X extends Exception> void doTryCloseX(final Eff0X<X> eff, final Eff0X<X> close) throws X {
+				try (final CloseableX<X> __ = close::apply) {
+					eff.apply();
+				}
+			}
+
 			static <X extends Throwable> X sneakyThrow(final Throwable t) throws X {
 				throw (X) t;
 			}

@@ -111,6 +111,7 @@ final class Main {
 			new SizedGenerator,
 			new OrderGenerator,
 			new OrderedGenerator,
+			new CloseableXGenerator,
 			new RangeGenerator,
 			new KeyValueGenerator,
 			new DictGenerator,
