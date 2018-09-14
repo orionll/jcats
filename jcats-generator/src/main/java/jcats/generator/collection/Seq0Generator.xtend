@@ -49,16 +49,6 @@ class Seq0Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «type.genericName» head() {
-				throw new NoSuchElementException();
-			}
-
-			@Override
-			public «type.genericName» last() {
-				throw new NoSuchElementException();
-			}
-
-			@Override
 			public «genericName» init() {
 				throw new NoSuchElementException();
 			}

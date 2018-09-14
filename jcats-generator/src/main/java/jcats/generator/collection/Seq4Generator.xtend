@@ -113,16 +113,6 @@ final class Seq4Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «type.genericName» head() {
-				return «type.genericCast»init[0];
-			}
-
-			@Override
-			public «type.genericName» last() {
-				return «type.genericCast»tail[tail.length - 1];
-			}
-
-			@Override
 			public «genericName» init() {
 				if (tail.length == 1) {
 					final «type.javaName»[][][] lastNode3 = node4[node4.length - 1];

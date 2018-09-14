@@ -147,6 +147,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			import java.util.PrimitiveIterator;
 		«ENDIF»
 		import java.util.NavigableSet;
+		import java.util.NoSuchElementException;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.function.Consumer;
@@ -170,6 +171,19 @@ final class ContainerGenerator implements InterfaceGenerator {
 		«ENDIF»
 
 		public interface «type.covariantName("Container")» extends Iterable<«type.genericBoxedName»>, Sized {
+
+			default «type.genericName» head() throws NoSuchElementException {
+				return iterator().«type.iteratorNext»();
+			}
+
+			default «type.optionGenericName» headOption() {
+				final «type.iteratorGenericName» iterator = iterator();
+				if (iterator.hasNext()) {
+					return «type.someName»(iterator.«type.iteratorNext»());
+				} else {
+					return «type.noneName»();
+				}
+			}
 
 			default boolean contains(final «type.genericName» value) {
 				«IF type == Type.OBJECT»

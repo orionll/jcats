@@ -47,16 +47,6 @@ final class Seq1Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «type.genericName» head() {
-				return «type.genericCast»node1[0];
-			}
-
-			@Override
-			public «type.genericName» last() {
-				return «type.genericCast»node1[node1.length - 1];
-			}
-
-			@Override
 			public «genericName» init() {
 				if (node1.length == 1) {
 					return empty«shortName»();

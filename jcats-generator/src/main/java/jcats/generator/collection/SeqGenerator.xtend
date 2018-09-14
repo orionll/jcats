@@ -91,16 +91,6 @@ class SeqGenerator implements ClassGenerator {
 			/**
 			 * O(1)
 			 */
-			public abstract «type.genericName» head() throws NoSuchElementException;
-
-			/**
-			 * O(1)
-			 */
-			public abstract «type.genericName» last() throws NoSuchElementException;
-
-			/**
-			 * O(1)
-			 */
 			public abstract «genericName» init() throws NoSuchElementException;
 
 			/**

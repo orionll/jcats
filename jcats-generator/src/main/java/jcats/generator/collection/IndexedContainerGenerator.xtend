@@ -77,6 +77,61 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
+			@Override
+			default «type.genericName» head() throws NoSuchElementException {
+				if (hasFixedSize()) {
+					if (isEmpty()) {
+						throw new NoSuchElementException();
+					} else {
+						return get(0);
+					}
+				} else {
+					return «type.containerShortName».super.head();
+				}
+			}
+
+			@Override
+			default «type.optionGenericName» headOption() {
+				if (hasFixedSize()) {
+					if (isEmpty()) {
+						return «type.noneName»();
+					} else {
+						return «type.someName»(get(0));
+					}
+				} else {
+					return «type.containerShortName».super.headOption();
+				}
+			}
+
+			default «type.genericName» last() throws NoSuchElementException {
+				if (hasFixedSize()) {
+					if (isEmpty()) {
+						throw new NoSuchElementException();
+					} else {
+						return get(size() - 1);
+					}
+				} else {
+					return reverseIterator().«type.iteratorNext»();
+				}
+			}
+
+			default «type.optionGenericName» lastOption() {
+				if (hasFixedSize()) {
+					if (isEmpty()) {
+						return «type.noneName»();
+					} else {
+						return «type.someName»(get(size() - 1));
+					}
+				} else {
+					final «type.iteratorGenericName» iterator = reverseIterator();
+					if (iterator.hasNext()) {
+						return «type.someName»(iterator.«type.iteratorNext»());
+					} else {
+						return «type.noneName»();
+					}
+				}
+			}
+
 			default IntOption indexOf(final «type.genericName» value) {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);

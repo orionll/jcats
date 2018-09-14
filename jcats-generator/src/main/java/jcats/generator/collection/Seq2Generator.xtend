@@ -76,16 +76,6 @@ class Seq2Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «type.genericName» head() {
-				return «type.genericCast»init[0];
-			}
-
-			@Override
-			public «type.genericName» last() {
-				return «type.genericCast»tail[tail.length - 1];
-			}
-
-			@Override
 			public «genericName» init() {
 				if (tail.length == 1) {
 					if (node2.length == 0) {

@@ -93,28 +93,6 @@ final class ArrayGenerator implements ClassGenerator {
 			/**
 			 * O(1)
 			 */
-			public «type.genericName» head() throws NoSuchElementException {
-				try {
-					return get(0);
-				} catch (final IndexOutOfBoundsException __) {
-					throw new NoSuchElementException();
-				}
-			}
-
-			/**
-			 * O(1)
-			 */
-			public «type.genericName» last() throws NoSuchElementException {
-				try {
-					return get(this.array.length - 1);
-				} catch (final IndexOutOfBoundsException __) {
-					throw new NoSuchElementException();
-				}
-			}
-
-			/**
-			 * O(1)
-			 */
 			@Override
 			public «type.genericName» get(final int index) throws IndexOutOfBoundsException {
 				try {
