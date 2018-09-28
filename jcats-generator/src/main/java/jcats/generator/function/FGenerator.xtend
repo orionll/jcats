@@ -587,20 +587,34 @@ final class FGenerator implements InterfaceGenerator {
 					«IF from == Type.OBJECT»
 						return (final «from.genericName» value) -> {
 							requireNonNull(value);
-							return f1.apply(value) && f2.apply(value);
+							return f1.apply(value) || f2.apply(value);
 						};
 					«ELSE»
 						return (final «from.genericName» value) -> f1.apply(value) || f2.apply(value);
 					«ENDIF»
 				}
-				«IF from == Type.OBJECT»
 
+				«IF from == Type.OBJECT»
 					static «paramGenericName» isNull() {
 						return (final A value) -> (value == null);
 					}
 
 					static «paramGenericName» isNotNull() {
 						return (final A value) -> (value != null);
+					}
+
+					static <A, B extends A> BooleanF<A> isEqualTo(final B other) {
+						requireNonNull(other);
+						return (final A value) -> value.equals(other);
+					}
+
+					static <A, B extends A> BooleanF<A> isInstanceOf(final Class<B> clazz) {
+						requireNonNull(clazz);
+						return (final A value) -> clazz.isInstance(requireNonNull(value));
+					}
+				«ELSE»
+					static «paramGenericName» isEqualTo«from.typeName»(final «from.javaName» other) {
+						return (final «from.javaName» value) -> value == other;
 					}
 				«ENDIF»
 
