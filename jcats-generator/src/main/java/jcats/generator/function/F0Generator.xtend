@@ -192,14 +192,10 @@ final class F0Generator implements InterfaceGenerator {
 				};
 			}
 
-			«IF type == Type.OBJECT»
-				«join»
-			«ELSE»
-				static «shortName» join(final F0<«shortName»> f) {
-					requireNonNull(f);
-					return () -> f.apply().apply();
-				}
-			«ENDIF»
+			static «paramGenericName» join(final F0<«genericName»> f) {
+				requireNonNull(f);
+				return () -> «type.requireNonNull("f.apply().apply()")»;
+			}
 
 			«IF type == Type.OBJECT»
 				static <A> F0<A> fromSupplier(final Supplier<A> s) {
