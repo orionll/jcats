@@ -53,8 +53,19 @@ final class EffXGenerator implements InterfaceGenerator {
 			}
 
 			static <A, X extends Throwable> EffX<A, X> failX(final F0<X> f) {
+				requireNonNull(f);
 				return (final A value) -> {
+					requireNonNull(value);
 					throw f.apply();
+				};
+			}
+
+			static <A, C, X extends Throwable> EffX<A, X> failWithArgX(final F<C, X> f, final C arg) {
+				requireNonNull(f);
+				requireNonNull(arg);
+				return (final A value) -> {
+					requireNonNull(value);
+					throw f.apply(arg);
 				};
 			}
 

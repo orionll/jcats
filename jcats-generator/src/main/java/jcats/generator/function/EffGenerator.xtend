@@ -131,8 +131,23 @@ final class EffGenerator implements InterfaceGenerator {
 
 			«ENDFOR»
 			static <«IF type == Type.OBJECT»A, «ENDIF»X extends RuntimeException> «genericName» fail(final F0<X> f) {
+				requireNonNull(f);
 				return (final «type.genericName» value) -> {
+					«IF type == Type.OBJECT»
+						requireNonNull(value);
+					«ENDIF»
 					throw f.apply();
+				};
+			}
+
+			static <«IF type == Type.OBJECT»A, «ENDIF»C, X extends RuntimeException> «genericName» failWithArg(final F<C, X> f, final C arg) {
+				requireNonNull(f);
+				requireNonNull(arg);
+				return (final «type.genericName» value) -> {
+					«IF type == Type.OBJECT»
+						requireNonNull(value);
+					«ENDIF»
+					throw f.apply(arg);
 				};
 			}
 

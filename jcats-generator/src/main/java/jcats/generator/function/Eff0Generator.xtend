@@ -47,6 +47,14 @@ final class Eff0Generator implements InterfaceGenerator {
 					throw f.apply();
 				};
 			}
+
+			static <C, X extends RuntimeException> Eff0 failWithArg(final F<C, X> f, final C arg) {
+				requireNonNull(f);
+				requireNonNull(arg);
+				return () -> {
+					throw f.apply(arg);
+				};
+			}
 		}
 	''' }
 }

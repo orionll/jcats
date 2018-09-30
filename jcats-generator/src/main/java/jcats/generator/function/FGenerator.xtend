@@ -629,8 +629,23 @@ final class FGenerator implements InterfaceGenerator {
 			}
 
 			static <«IF from == Type.OBJECT && to == Type.OBJECT»A, B, «ELSEIF from == Type.OBJECT || to == Type.OBJECT»A, «ENDIF»X extends RuntimeException> «genericName» fail(final F0<X> f) {
+				requireNonNull(f);
 				return (final «from.genericName» value) -> {
+					«IF from == Type.OBJECT»
+						requireNonNull(value);
+					«ENDIF»
 					throw f.apply();
+				};
+			}
+
+			static <«IF from == Type.OBJECT && to == Type.OBJECT»A, B, «ELSEIF from == Type.OBJECT || to == Type.OBJECT»A, «ENDIF»C, X extends RuntimeException> «genericName» failWithArg(final F<C, X> f, final C arg) {
+				requireNonNull(f);
+				requireNonNull(arg);
+				return (final «from.genericName» value) -> {
+					«IF from == Type.OBJECT»
+						requireNonNull(value);
+					«ENDIF»
+					throw f.apply(arg);
 				};
 			}
 

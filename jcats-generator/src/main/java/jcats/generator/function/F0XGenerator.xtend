@@ -80,6 +80,14 @@ final class F0XGenerator implements InterfaceGenerator {
 				};
 			}
 
+			static <A, C, X extends Throwable> F0X<A, X> failWithArgX(final F<C, X> f, final C arg) {
+				requireNonNull(f);
+				requireNonNull(arg);
+				return () -> {
+					throw f.apply(arg);
+				};
+			}
+
 			static <A, X extends Throwable> F0X<A, X> join(final F0X<F0X<A, X>, X> f0X) {
 				return f0X.flatMap(id());
 			}
