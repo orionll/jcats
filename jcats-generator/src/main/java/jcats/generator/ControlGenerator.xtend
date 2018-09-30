@@ -175,6 +175,10 @@ final class ControlGenerator implements ClassGenerator {
 				}
 			}
 
+			public static <A, X extends RuntimeException> A fail(final F0<X> f) {
+				throw f.apply();
+			}
+
 			public static <A> A unchecked(final F0X<A, Throwable> f) {
 				try {
 					return f.apply();
