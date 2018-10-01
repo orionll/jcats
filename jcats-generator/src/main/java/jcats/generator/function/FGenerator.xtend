@@ -603,9 +603,14 @@ final class FGenerator implements InterfaceGenerator {
 						return (final A value) -> (value != null);
 					}
 
-					static <A, B extends A> BooleanF<A> isEqualTo(final B other) {
+					static <A> BooleanF<A> isEqualTo(final A other) {
 						requireNonNull(other);
 						return (final A value) -> value.equals(other);
+					}
+
+					static <A> BooleanF<A> isNotEqualTo(final A other) {
+						requireNonNull(other);
+						return (final A value) -> !value.equals(other);
 					}
 
 					static <A, B extends A> BooleanF<A> isInstanceOf(final Class<B> clazz) {
@@ -615,6 +620,10 @@ final class FGenerator implements InterfaceGenerator {
 				«ELSE»
 					static «paramGenericName» isEqualTo«from.typeName»(final «from.javaName» other) {
 						return (final «from.javaName» value) -> value == other;
+					}
+
+					static «paramGenericName» isNotEqualTo«from.typeName»(final «from.javaName» other) {
+						return (final «from.javaName» value) -> value != other;
 					}
 				«ENDIF»
 
