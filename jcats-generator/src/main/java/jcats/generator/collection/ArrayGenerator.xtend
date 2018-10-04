@@ -402,7 +402,7 @@ final class ArrayGenerator implements ClassGenerator {
 			«IF type == Type.OBJECT»
 				public <B> Array<B> flatMap(final F<A, Iterable<B>> f) {
 			«ELSE»
-				public <A> Array<A> flatMap(final «type.typeName»ObjectF<Array<A>> f) {
+				public <A> Array<A> flatMap(final «type.typeName»ObjectF<Iterable<A>> f) {
 			«ENDIF»
 				requireNonNull(f);
 				if (isEmpty()) {
