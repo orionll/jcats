@@ -95,6 +95,28 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				}
 
 			«ENDFOR»
+			«IF type == Type.OBJECT»
+				default <B> ContainerView<B> flatMap(final F<A, Iterable<B>> f) {
+					requireNonNull(f);
+					return new FlatMappedContainerView<>(this, f);
+				}
+			«ELSE»
+				default <A> ContainerView<A> flatMap(final «type.typeName»ObjectF<Iterable<A>> f) {
+					requireNonNull(f);
+					return new «type.typeName»FlatMappedContainerView<>(this, f);
+				}
+			«ENDIF»
+			«FOR toType : Type.primitives»
+				«IF type == Type.OBJECT»
+					default «toType.containerViewGenericName» flatMapTo«toType.typeName»(final F<A, Iterable<«toType.genericBoxedName»>> f) {
+				«ELSE»
+					default «toType.containerViewGenericName» flatMapTo«toType.typeName»(final «type.typeName»ObjectF<Iterable<«toType.genericBoxedName»>> f) {
+				«ENDIF»
+					requireNonNull(f);
+					return new «IF type.primitive»«type.typeName»«ENDIF»FlatMappedTo«toType.typeName»ContainerView<>(this, f);
+				}
+
+			«ENDFOR»
 			default «genericName» filter(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
 				return new «type.shortName("FilteredContainerView")»<>(this, predicate);
@@ -638,6 +660,120 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				}
 
 				«toStr(toType, '''«IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»ContainerView''', false)»
+			}
+
+		«ENDFOR»
+		«IF type == Type.OBJECT»
+			final class FlatMappedContainerView<A, B, C extends ContainerView<A>> implements ContainerView<B> {
+				final C view;
+				final F<A, Iterable<B>> f;
+
+				FlatMappedContainerView(final C view, final F<A, Iterable<B>> f) {
+		«ELSE»
+			final class «type.typeName»FlatMappedContainerView<A, C extends «genericName»> implements ContainerView<A> {
+				final C view;
+				final «type.typeName»ObjectF<Iterable<A>> f;
+
+				«type.typeName»FlatMappedContainerView(final C view, final «type.typeName»ObjectF<Iterable<A>> f) {
+		«ENDIF»
+				this.view = view;
+				this.f = f;
+			}
+
+			@Override
+			public boolean hasFixedSize() {
+				return false;
+			}
+
+			@Override
+			public Iterator<«mapTargetType»> iterator() {
+				return new FlatMapped«IF type != Type.OBJECT»«type.typeName»Object«ENDIF»Iterator<>(this.view.iterator(), this.f);
+			}
+
+			@Override
+			public Iterator<«mapTargetType»> reverseIterator() {
+				return new FlatMapped«IF type != Type.OBJECT»«type.typeName»Object«ENDIF»ReverseIterator<>(this.view.reverseIterator(), this.f);
+			}
+
+			@Override
+			public void foreach(final Eff<«mapTargetType»> eff) {
+				requireNonNull(eff);
+				this.view.foreach((final «type.genericName» value) -> {
+					«IF type == Type.OBJECT»
+						requireNonNull(value);
+					«ENDIF»
+					final Iterable<«mapTargetType»> result = requireNonNull(this.f.apply(value));
+					if (result instanceof Container<?>) {
+						((Container<«mapTargetType»>) result).foreach(eff);
+					} else {
+						result.forEach(eff.toConsumer());
+					}
+				});
+			}
+
+			«toStr(Type.OBJECT, type.shortName("FlatMappedContainerView"), false)»
+		}
+
+		«FOR toType : Type.primitives»
+			«IF type == Type.OBJECT»
+				final class FlatMappedTo«toType.typeName»ContainerView<A, C extends «genericName»> implements «toType.containerViewGenericName» {
+					final C view;
+					final F<A, Iterable<«toType.genericBoxedName»>> f;
+
+					FlatMappedTo«toType.typeName»ContainerView(final C view, final F<A, Iterable<«toType.genericBoxedName»>> f) {
+			«ELSE»
+				final class «type.typeName»FlatMappedTo«toType.typeName»ContainerView<C extends «genericName»> implements «toType.containerViewGenericName» {
+					final C view;
+					final «type.typeName»ObjectF<Iterable<«toType.genericBoxedName»>> f;
+
+					«type.typeName»FlatMappedTo«toType.typeName»ContainerView(final C view, final «type.typeName»ObjectF<Iterable<«toType.genericBoxedName»>> f) {
+			«ENDIF»
+					this.view = view;
+					this.f = f;
+				}
+
+				@Override
+				public boolean hasFixedSize() {
+					return false;
+				}
+
+				@Override
+				public «toType.iteratorGenericName» iterator() {
+					«IF type == Type.OBJECT»
+						return new FlatMappedObject«toType.typeName»Iterator<>(this.view.iterator(), this.f);
+					«ELSE»
+						return new FlatMapped«type.typeName»«toType.typeName»Iterator(this.view.iterator(), this.f);
+					«ENDIF»
+				}
+
+				@Override
+				public «toType.iteratorGenericName» reverseIterator() {
+					«IF type == Type.OBJECT»
+						return new FlatMappedObject«toType.typeName»ReverseIterator<>(this.view.reverseIterator(), this.f);
+					«ELSE»
+						return new FlatMapped«type.typeName»«toType.typeName»ReverseIterator(this.view.reverseIterator(), this.f);
+					«ENDIF»
+				}
+
+				@Override
+				public void foreach(final «toType.typeName»Eff eff) {
+					requireNonNull(eff);
+					this.view.foreach((final «type.genericName» value) -> {
+						«IF type == Type.OBJECT»
+							requireNonNull(value);
+						«ENDIF»
+						final Iterable<«toType.genericBoxedName»> result = requireNonNull(this.f.apply(value));
+						if (result instanceof «toType.containerWildcardName») {
+							((«toType.containerGenericName») result).foreach(eff);
+						} else if (result instanceof Container<?>) {
+							((Container<«toType.genericBoxedName»>) result).foreach(eff.toEff());
+						} else {
+							result.forEach(eff::apply);
+						}
+					});
+				}
+
+				«toStr(toType, '''«IF type.primitive»«type.typeName»«ENDIF»FlatMappedTo«toType.typeName»ContainerView''', false)»
 			}
 
 		«ENDFOR»

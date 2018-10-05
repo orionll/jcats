@@ -405,6 +405,183 @@ final class CommonGenerator implements ClassGenerator {
 				«ENDIF»
 			«ENDFOR»
 		«ENDFOR»
+
+		final class FlatMappedIterator<A, B> implements Iterator<B> {
+			private final Iterator<A> iterator;
+			private final F<A, Iterable<B>> f;
+			private Iterator<B> targetIterator;
+
+			FlatMappedIterator(final Iterator<A> iterator, final F<A, Iterable<B>> f) {
+				this.iterator = iterator;
+				this.f = f;
+			}
+
+			@Override
+			public boolean hasNext() {
+				if (this.targetIterator != null && this.targetIterator.hasNext()) {
+					return true;
+				} else if (this.iterator.hasNext()) {
+					final A next = requireNonNull(this.iterator.next());
+					final Iterable<B> targetIterable = this.f.apply(next);
+					this.targetIterator = targetIterable.iterator();
+					return this.targetIterator.hasNext();
+				} else {
+					return false;
+				}
+			}
+
+			@Override
+			public B next() {
+				if (hasNext()) {
+					return requireNonNull(this.targetIterator.next());
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+		}
+
+		«FOR fromType : Type.values»
+			«FOR toType : Type.values»
+				«IF fromType != Type.OBJECT || toType != Type.OBJECT»
+					final class FlatMapped«fromType.typeName»«toType.typeName»Iterator«IF fromType == Type.OBJECT || toType == Type.OBJECT»<A>«ENDIF» implements «toType.iteratorGenericName» {
+						private final «fromType.iteratorGenericName» iterator;
+						private final «IF fromType != Type.OBJECT»«fromType.typeName»Object«ENDIF»F<«IF fromType == Type.OBJECT»A, «ENDIF»Iterable<«toType.genericBoxedName»>> f;
+						private «toType.iteratorGenericName» targetIterator;
+
+						FlatMapped«fromType.typeName»«toType.typeName»Iterator(final «fromType.iteratorGenericName» iterator, final «IF fromType != Type.OBJECT»«fromType.typeName»Object«ENDIF»F<«IF fromType == Type.OBJECT»A, «ENDIF»Iterable<«toType.genericBoxedName»>> f) {
+							this.iterator = iterator;
+							this.f = f;
+						}
+
+						@Override
+						public boolean hasNext() {
+							if (this.targetIterator != null && this.targetIterator.hasNext()) {
+								return true;
+							} else if (this.iterator.hasNext()) {
+								«IF fromType == Type.OBJECT»
+									final «fromType.genericName» next = requireNonNull(this.iterator.«fromType.iteratorNext»());
+								«ELSE»
+									final «fromType.genericName» next = this.iterator.«fromType.iteratorNext»();
+								«ENDIF»
+								final Iterable<«toType.genericBoxedName»> targetIterable = this.f.apply(next);
+								«IF toType.javaUnboxedType»
+									this.targetIterator = «toType.typeName»Iterator.getIterator(targetIterable.iterator());
+								«ELSE»
+									this.targetIterator = targetIterable.iterator();
+								«ENDIF»
+								return this.targetIterator.hasNext();
+							} else {
+								return false;
+							}
+						}
+
+						@Override
+						public «toType.iteratorReturnType» «toType.iteratorNext»() {
+							if (hasNext()) {
+								return «toType.requireNonNull('''this.targetIterator.«toType.iteratorNext»()''')»;
+							} else {
+								throw new NoSuchElementException();
+							}
+						}
+					}
+
+				«ENDIF»
+			«ENDFOR»
+		«ENDFOR»
+		final class FlatMappedReverseIterator<A, B> implements Iterator<B> {
+			private final Iterator<A> reverseIterator;
+			private final F<A, Iterable<B>> f;
+			private Iterator<B> targetIterator;
+
+			FlatMappedReverseIterator(final Iterator<A> reverseIterator, final F<A, Iterable<B>> f) {
+				this.reverseIterator = reverseIterator;
+				this.f = f;
+			}
+
+			@Override
+			public boolean hasNext() {
+				if (this.targetIterator != null && this.targetIterator.hasNext()) {
+					return true;
+				} else if (this.reverseIterator.hasNext()) {
+					final A next = requireNonNull(this.reverseIterator.next());
+					final Iterable<B> targetIterable = this.f.apply(next);
+					if (targetIterable instanceof Container<?>) {
+						this.targetIterator = ((Container<B>) targetIterable).reverseIterator();
+					} else {
+						this.targetIterator = Array.ofAll(targetIterable).reverseIterator();
+					}
+					return this.targetIterator.hasNext();
+				} else {
+					return false;
+				}
+			}
+
+			@Override
+			public B next() {
+				if (hasNext()) {
+					return requireNonNull(this.targetIterator.next());
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+		}
+
+		«FOR fromType : Type.values»
+			«FOR toType : Type.values»
+				«IF fromType != Type.OBJECT || toType != Type.OBJECT»
+					final class FlatMapped«fromType.typeName»«toType.typeName»ReverseIterator«IF fromType == Type.OBJECT || toType == Type.OBJECT»<A>«ENDIF» implements «toType.iteratorGenericName» {
+						private final «fromType.iteratorGenericName» reverseIterator;
+						private final «IF fromType != Type.OBJECT»«fromType.typeName»Object«ENDIF»F<«IF fromType == Type.OBJECT»A, «ENDIF»Iterable<«toType.genericBoxedName»>> f;
+						private «toType.iteratorGenericName» targetIterator;
+
+						FlatMapped«fromType.typeName»«toType.typeName»ReverseIterator(final «fromType.iteratorGenericName» reverseIterator, final «IF fromType != Type.OBJECT»«fromType.typeName»Object«ENDIF»F<«IF fromType == Type.OBJECT»A, «ENDIF»Iterable<«toType.genericBoxedName»>> f) {
+							this.reverseIterator = reverseIterator;
+							this.f = f;
+						}
+
+						@Override
+						public boolean hasNext() {
+							if (this.targetIterator != null && this.targetIterator.hasNext()) {
+								return true;
+							} else if (this.reverseIterator.hasNext()) {
+								«IF fromType == Type.OBJECT»
+									final «fromType.genericName» next = requireNonNull(this.reverseIterator.«fromType.iteratorNext»());
+								«ELSE»
+									final «fromType.genericName» next = this.reverseIterator.«fromType.iteratorNext»();
+								«ENDIF»
+								final Iterable<«toType.genericBoxedName»> targetIterable = this.f.apply(next);
+								if (targetIterable instanceof «toType.containerWildcardName») {
+									this.targetIterator = ((«toType.containerGenericName») targetIterable).reverseIterator();
+								«IF toType != Type.OBJECT»
+									} else if (targetIterable instanceof Container<?>) {
+										«IF toType.javaUnboxedType»
+											this.targetIterator = «toType.typeName»Iterator.getIterator(((Container<«toType.genericBoxedName»>) targetIterable).reverseIterator());
+										«ELSE»
+											this.targetIterator = ((Container<«toType.genericBoxedName»>) targetIterable).reverseIterator();
+										«ENDIF»
+								«ENDIF»
+								} else {
+									this.targetIterator = «toType.arrayShortName».ofAll(targetIterable).reverseIterator();
+								}
+								return this.targetIterator.hasNext();
+							} else {
+								return false;
+							}
+						}
+
+						@Override
+						public «toType.iteratorReturnType» «toType.iteratorNext»() {
+							if (hasNext()) {
+								return «toType.requireNonNull('''this.targetIterator.«toType.iteratorNext»()''')»;
+							} else {
+								throw new NoSuchElementException();
+							}
+						}
+					}
+
+				«ENDIF»
+			«ENDFOR»
+		«ENDFOR»
 		«FOR type : Iterables.concat(#[Type.OBJECT], Type.javaUnboxedTypes)»
 			final class «type.genericName("FilteredIterator")» implements «type.iteratorGenericName» {
 				private final «type.iteratorGenericName» iterator;
@@ -487,24 +664,24 @@ final class CommonGenerator implements ClassGenerator {
 			final class «type.genericName("SkippedIterator")» implements «type.iteratorGenericName» {
 				private final «type.iteratorGenericName» iterator;
 				private int skip;
-			
+
 				«type.shortName("SkippedIterator")»(final «type.iteratorGenericName» iterator, final int skip) {
 					this.iterator = iterator;
 					this.skip = skip;
 				}
-			
+
 				@Override
 				public boolean hasNext() {
 					advance();
 					return this.iterator.hasNext();
 				}
-			
+
 				@Override
 				public «type.iteratorReturnType» «type.iteratorNext»() {
 					advance();
 					return this.iterator.«type.iteratorNext»();
 				}
-			
+
 				private void advance() {
 					while (this.skip > 0 && this.iterator.hasNext()) {
 						this.skip--;
