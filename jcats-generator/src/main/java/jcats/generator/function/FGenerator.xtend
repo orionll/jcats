@@ -617,6 +617,11 @@ final class FGenerator implements InterfaceGenerator {
 						requireNonNull(clazz);
 						return (final A value) -> clazz.isInstance(requireNonNull(value));
 					}
+
+					static <A> BooleanF<A> referenceEquals(final A other) {
+						requireNonNull(other);
+						return (final A value) -> (requireNonNull(value) == other);
+					}
 				«ELSE»
 					static «paramGenericName» isEqualTo«from.typeName»(final «from.javaName» other) {
 						return (final «from.javaName» value) -> value == other;
