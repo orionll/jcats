@@ -143,11 +143,13 @@ final class ContainerGenerator implements InterfaceGenerator {
 		import java.util.HashSet;
 		import java.util.Iterator;
 		import java.util.LinkedHashSet;
+		import java.util.List;
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
 		import java.util.NavigableSet;
 		import java.util.NoSuchElementException;
+		import java.util.RandomAccess;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
 		import java.util.function.Consumer;
@@ -1008,7 +1010,22 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.iteratorGenericName» reverseIterator() {
-				if (this.collection instanceof NavigableSet) {
+				if (this.collection instanceof List<?> && this.collection instanceof RandomAccess) {
+					final int size = this.collection.size();
+					if (size == 0) {
+						«IF type.javaUnboxedType»
+							return «type.noneName»().iterator();
+						«ELSE»
+							return Collections.emptyIterator();
+						«ENDIF»
+					} else {
+						«IF type.javaUnboxedType»
+							return new «type.typeName»ListReverseIterator((List<«type.genericBoxedName»>) this.collection, size);
+						«ELSE»
+							return new ListReverseIterator<>((List<«type.genericBoxedName»>) this.collection, size);
+						«ENDIF»
+					}
+				} else if (this.collection instanceof NavigableSet) {
 					«IF type.javaUnboxedType»
 						return «type.typeName»Iterator.getIterator(((NavigableSet<«type.boxedName»>) this.collection).descendingIterator());
 					«ELSE»

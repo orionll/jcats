@@ -406,28 +406,6 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.iteratorGenericName» reverseIterator() {
-				if (this.collection instanceof RandomAccess) {
-					final int size = this.collection.size();
-					if (size == 0) {
-						«IF type.javaUnboxedType»
-							return «type.noneName»().iterator();
-						«ELSE»
-							return Collections.emptyIterator();
-						«ENDIF»
-					} else {
-						«IF type.javaUnboxedType»
-							return new «type.typeName»ListReverseIterator(this.collection, size);
-						«ELSE»
-							return new ListReverseIterator<>(this.collection, size);
-						«ENDIF»
-					}
-				} else {
-					return to«type.arrayShortName»().reverseIterator();
-				}
-			}
-
-			@Override
 			public List<«type.genericBoxedName»> asCollection() {
 				return Collections.unmodifiableList(this.collection);
 			}
