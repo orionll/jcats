@@ -865,7 +865,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public boolean hasFixedSize() {
-				return this.view.hasFixedSize();
+				return (this.limit == 0) || this.view.hasFixedSize();
 			}
 
 			@Override
@@ -911,9 +911,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public boolean isEmpty() {
-				if (this.view.isEmpty()) {
-					return true;
-				} else if (this.view.hasFixedSize()) {
+				if (this.view.hasFixedSize()) {
 					return (this.skip >= this.view.size());
 				} else {
 					return «shortName».super.isEmpty();
@@ -922,9 +920,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public boolean isNotEmpty() {
-				if (this.view.isEmpty()) {
-					return false;
-				} else if (this.view.hasFixedSize()) {
+				if (this.view.hasFixedSize()) {
 					return (this.skip < this.view.size());
 				} else {
 					return «shortName».super.isNotEmpty();
