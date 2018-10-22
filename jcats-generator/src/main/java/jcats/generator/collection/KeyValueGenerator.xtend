@@ -160,7 +160,11 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			boolean equals(final Object other);
 
 			static <K, A> KeyValue<K, A> asKeyValue(final Map<K, A> map) {
-				return new MapAsKeyValue<>(map);
+				return new MapAsKeyValue<>(map, false);
+			}
+
+			static <K, A> KeyValue<K, A> asFixedSizeKeyValue(final Map<K, A> map) {
+				return new MapAsKeyValue<>(map, true);
 			}
 
 			«cast(#["K", "A"], #[], #["A"])»
@@ -423,9 +427,11 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 		final class MapAsKeyValue<K, A> implements KeyValue<K, A> {
 			private final Map<K, A> map;
+			private final boolean fixedSize;
 
-			MapAsKeyValue(final Map<K, A> map) {
+			MapAsKeyValue(final Map<K, A> map, final boolean fixedSize) {
 				this.map = map;
+				this.fixedSize = fixedSize;
 			}
 
 			@Override
@@ -466,7 +472,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			public boolean hasFixedSize() {
-				return false;
+				return this.fixedSize;
 			}
 
 			@Override
