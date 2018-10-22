@@ -44,7 +44,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 		import static «Constants.COMMON».*;
 
 
-		public final class «genericName» {
+		public final class «genericName» implements Sized {
 			«IF type == Type.OBJECT»
 				static final int MIN_CAPACITY = 16;
 
@@ -209,10 +209,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				return this;
 			}
 
-			public boolean isEmpty() {
-				return (this.size == 0);
-			}
-
+			@Override
 			public int size() {
 				return this.size;
 			}
