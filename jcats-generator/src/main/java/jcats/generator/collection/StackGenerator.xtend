@@ -100,6 +100,11 @@ final class StackGenerator implements ClassGenerator {
 				return (this != EMPTY);
 			}
 
+			@Override
+			public boolean hasFixedSize() {
+				return false;
+			}
+
 			/**
 			 * O(1)
 			 */
