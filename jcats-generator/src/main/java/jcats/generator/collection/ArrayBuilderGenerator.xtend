@@ -214,6 +214,11 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				return this.size;
 			}
 
+			@Override
+			public boolean hasFixedSize() {
+				return false;
+			}
+
 			«type.javaName»[] buildArray() {
 				if (this.size == 0) {
 					return EMPTY_«type.typeName.toUpperCase»_ARRAY;
