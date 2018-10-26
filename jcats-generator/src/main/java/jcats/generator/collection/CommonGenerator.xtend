@@ -629,6 +629,30 @@ final class CommonGenerator implements ClassGenerator {
 						}
 					}
 				}
+
+				@Override
+				«IF type == Type.OBJECT»
+					public void forEachRemaining(final Consumer<? super A> action) {
+				«ELSE»
+					public void forEachRemaining(final «type.typeName»Consumer action) {
+				«ENDIF»
+					if (this.valueReady) {
+						this.valueReady = false;
+						«IF type.primitive»
+							action.accept(this.next);
+						«ELSE»
+							final «type.iteratorReturnType» value = this.next;
+							this.next = null;
+							action.accept(value);
+						«ENDIF»
+					}
+					while (this.iterator.hasNext()) {
+						final «type.iteratorReturnType» value = «type.requireNonNull('''this.iterator.«type.iteratorNext»()''')»;
+						if (this.predicate.apply(value)) {
+							action.accept(value);
+						}
+					}
+				}
 			}
 
 		«ENDFOR»
