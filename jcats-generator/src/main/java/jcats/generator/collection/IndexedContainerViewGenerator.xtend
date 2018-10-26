@@ -275,6 +275,8 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			public «type.containerViewGenericName» filter(final «type.boolFName» p) {
 				return new «filteredIndexedContainerViewShortName»<>(this.view, and(this.predicate, p));
 			}
+
+			«toStr(type, filteredIndexedContainerViewShortName, false)»
 		}
 
 		«IF type == Type.OBJECT»
