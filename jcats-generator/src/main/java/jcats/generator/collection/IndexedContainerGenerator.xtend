@@ -78,6 +78,51 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			default void foreach(final «type.effGenericName» eff) {
+				requireNonNull(eff);
+				if (hasFixedSize()) {
+					final int size = size();
+					for (int i = 0; i < size; i++) {
+						eff.apply(get(i));
+					}
+				} else {
+					«type.containerShortName».super.foreach(eff);
+				}
+			}
+
+			@Override
+			«IF type == Type.OBJECT»
+				default void foreachWithIndex(final IntObjectEff2<A> eff) {
+			«ELSE»
+				default void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
+			«ENDIF»
+				requireNonNull(eff);
+				if (hasFixedSize()) {
+					final int size = size();
+					for (int i = 0; i < size; i++) {
+						eff.apply(i, get(i));
+					}
+				} else {
+					«type.containerShortName».super.foreachWithIndex(eff);
+				}
+			}
+
+			@Override
+			default void foreachUntil(final «type.boolFName» eff) {
+				requireNonNull(eff);
+				if (hasFixedSize()) {
+					final int size = size();
+					for (int i = 0; i < size; i++) {
+						if (!eff.apply(get(i))) {
+							return;
+						}
+					}
+				} else {
+					«type.containerShortName».super.foreachUntil(eff);
+				}
+			}
+
+			@Override
 			default «type.genericName» head() throws NoSuchElementException {
 				if (hasFixedSize()) {
 					if (isEmpty()) {
