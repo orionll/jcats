@@ -376,6 +376,15 @@ final class CommonGenerator implements ClassGenerator {
 				final A next = requireNonNull(this.iterator.next());
 				return requireNonNull(this.f.apply(next));
 			}
+
+			@Override
+			public void forEachRemaining(final Consumer<? super B> action) {
+				requireNonNull(action);
+				this.iterator.forEachRemaining((final A value) -> {
+					final B mapped = requireNonNull(this.f.apply(value));
+					action.accept(mapped);
+				});
+			}
 		}
 
 		«FOR fromType : Type.values»
@@ -399,6 +408,19 @@ final class CommonGenerator implements ClassGenerator {
 						public «toType.genericJavaUnboxedName» «toType.iteratorNext»() {
 							final «fromType.iteratorReturnType» value = «fromType.requireNonNull('''this.iterator.«fromType.iteratorNext»()''')»;
 							return «toType.requireNonNull("this.f.apply(value)")»;
+						}
+
+						@Override
+						«IF toType.javaUnboxedType»
+							public void forEachRemaining(final «toType.typeName»Consumer action) {
+						«ELSE»
+							public void forEachRemaining(final Consumer<? super «toType.genericBoxedName»> action) {
+						«ENDIF»
+							requireNonNull(action);
+							this.iterator.forEachRemaining((final «fromType.genericJavaUnboxedName» value) -> {
+								final «toType.genericName» mapped = «toType.requireNonNull("this.f.apply(value)")»;
+								action.accept(mapped);
+							});
 						}
 					}
 
