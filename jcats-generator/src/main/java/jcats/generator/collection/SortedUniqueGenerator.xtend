@@ -250,20 +250,44 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public void foreach(final «type.effGenericName» action) {
+			public void foreach(final «type.effGenericName» eff) {
 				if (isNotEmpty()) {
-					traverse(action);
+					traverse(eff);
 				}
 			}
 
-			private void traverse(final «type.effGenericName» action) {
+			@Override
+			public void foreachUntil(final «type.boolFName» eff) {
+				if (isNotEmpty()) {
+					traverseUntil(eff);
+				}
+			}
+
+			private void traverse(final «type.effGenericName» eff) {
 				if (this.left != null) {
-					this.left.traverse(action);
+					this.left.traverse(eff);
 				}
-				action.apply(this.entry);
+				eff.apply(this.entry);
 				if (this.right != null) {
-					this.right.traverse(action);
+					this.right.traverse(eff);
 				}
+			}
+
+			private boolean traverseUntil(final «type.boolFName» action) {
+				if (this.left != null) {
+					if (!this.left.traverseUntil(action)) {
+						return false;
+					}
+				}
+				if (!action.apply(this.entry)) {
+					return false;
+				}
+				if (this.right != null) {
+					if (!this.right.traverseUntil(action)) {
+						return false;
+					}
+				}
+				return true;
 			}
 
 			@Override

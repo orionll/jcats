@@ -360,6 +360,17 @@ final class StackGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public void foreachUntil(final «type.boolFName» eff) {
+				«genericName» stack = this;
+				while (stack.isNotEmpty()) {
+					if (!eff.apply(stack.head)) {
+						return;
+					}
+					stack = stack.tail;
+				}
+			}
+
+			@Override
 			public «type.iteratorGenericName» iterator() {
 				«IF type.javaUnboxedType»
 					return isEmpty() ? «type.noneName»().iterator() : new «type.typeName»StackIterator(this);
