@@ -537,6 +537,30 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public void foreachUntil(final BooleanF<«mapTargetType»> eff) {
+				requireNonNull(eff);
+				this.view.foreachUntil((final «type.genericName» value) -> {
+					«IF type == Type.OBJECT»
+						requireNonNull(value);
+					«ENDIF»
+					final «mapTargetType» result = requireNonNull(this.f.apply(value));
+					return eff.apply(result);
+				});
+			}
+
+			@Override
+			public void foreachWithIndex(final IntObjectEff2<«mapTargetType»> eff) {
+				requireNonNull(eff);
+				this.view.foreachWithIndex((final int index, final «type.genericName» value) -> {
+					«IF type == Type.OBJECT»
+						requireNonNull(value);
+					«ENDIF»
+					final «mapTargetType» result = requireNonNull(this.f.apply(value));
+					eff.apply(index, result);
+				});
+			}
+
+			@Override
 			«IF type == Type.OBJECT»
 				public <D> ContainerView<D> map(final F<B, D> g) {
 			«ELSE»
@@ -634,6 +658,30 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 						«ENDIF»
 						final «toType.genericName» result = this.f.apply(value);
 						eff.apply(result);
+					});
+				}
+
+				@Override
+				public void foreachUntil(final «toType.typeName»BooleanF eff) {
+					requireNonNull(eff);
+					this.view.foreachUntil((final «type.genericName» value) -> {
+						«IF type == Type.OBJECT»
+							requireNonNull(value);
+						«ENDIF»
+						final «toType.genericName» result = this.f.apply(value);
+						return eff.apply(result);
+					});
+				}
+
+				@Override
+				public void foreachWithIndex(final Int«toType.typeName»Eff2 eff) {
+					requireNonNull(eff);
+					this.view.foreachWithIndex((final int index, final «type.genericName» value) -> {
+						«IF type == Type.OBJECT»
+							requireNonNull(value);
+						«ENDIF»
+						final «toType.genericName» result = this.f.apply(value);
+						eff.apply(index, result);
 					});
 				}
 
