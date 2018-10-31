@@ -326,6 +326,39 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				}
 			}
 
+			@Override
+			«IF type == Type.OBJECT»
+				public void foreachWithIndex(final IntObjectEff2<A> eff) {
+			«ELSE»
+				public void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
+			«ENDIF»
+				requireNonNull(eff);
+				if (this.view.hasFixedSize()) {
+					final int size = Math.min(this.limit, this.view.size());
+					for (int i = 0; i < size; i++) {
+						eff.apply(i, this.view.get(i));
+					}
+				} else {
+					super.foreachWithIndex(eff);
+				}
+			}
+
+			@Override
+			public boolean foreachUntil(final «type.boolFName» eff) {
+				requireNonNull(eff);
+				if (this.view.hasFixedSize()) {
+					final int size = Math.min(this.limit, this.view.size());
+					for (int i = 0; i < size; i++) {
+						if (!eff.apply(this.view.get(i))) {
+							return false;
+						}
+					}
+					return true;
+				} else {
+					return super.foreachUntil(eff);
+				}
+			}
+
 			«hashcode(type)»
 
 			«indexedEquals(type)»
@@ -387,6 +420,39 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					}
 				} else {
 					super.foreach(eff);
+				}
+			}
+
+			@Override
+			«IF type == Type.OBJECT»
+				public void foreachWithIndex(final IntObjectEff2<A> eff) {
+			«ELSE»
+				public void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
+			«ENDIF»
+				requireNonNull(eff);
+				if (this.view.hasFixedSize()) {
+					final int size = this.view.size();
+					for (int i = this.skip; i < size; i++) {
+						eff.apply(i - this.skip, this.view.get(i));
+					}
+				} else {
+					super.foreachWithIndex(eff);
+				}
+			}
+
+			@Override
+			public boolean foreachUntil(final «type.boolFName» eff) {
+				requireNonNull(eff);
+				if (this.view.hasFixedSize()) {
+					final int size = this.view.size();
+					for (int i = this.skip; i < size; i++) {
+						if (!eff.apply(this.view.get(i))) {
+							return false;
+						}
+					}
+					return true;
+				} else {
+					return super.foreachUntil(eff);
 				}
 			}
 

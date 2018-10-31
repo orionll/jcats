@@ -150,6 +150,22 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public boolean foreachUntil(final IntBooleanF eff) {
+				requireNonNull(eff);
+				for (int i = this.low; i < this.high; i++) {
+					if (!eff.apply(i)) {
+						return false;
+					}
+				}
+				if (this.closed) {
+					if (!eff.apply(this.high)) {
+						return false;
+					}
+				}
+				return true;
+			}
+
+			@Override
 			public PrimitiveIterator.OfInt iterator() {
 				if (isEmpty()) {
 					return intNone().iterator();
