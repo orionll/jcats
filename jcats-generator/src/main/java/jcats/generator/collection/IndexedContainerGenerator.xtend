@@ -108,17 +108,18 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			default void foreachUntil(final «type.boolFName» eff) {
+			default boolean foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
 				if (hasFixedSize()) {
 					final int size = size();
 					for (int i = 0; i < size; i++) {
 						if (!eff.apply(get(i))) {
-							return;
+							return false;
 						}
 					}
+					return true;
 				} else {
-					«type.containerShortName».super.foreachUntil(eff);
+					return «type.containerShortName».super.foreachUntil(eff);
 				}
 			}
 

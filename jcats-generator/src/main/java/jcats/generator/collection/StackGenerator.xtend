@@ -360,14 +360,15 @@ final class StackGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public void foreachUntil(final «type.boolFName» eff) {
+			public boolean foreachUntil(final «type.boolFName» eff) {
 				«genericName» stack = this;
 				while (stack.isNotEmpty()) {
 					if (!eff.apply(stack.head)) {
-						return;
+						return false;
 					}
 					stack = stack.tail;
 				}
+				return true;
 			}
 
 			@Override

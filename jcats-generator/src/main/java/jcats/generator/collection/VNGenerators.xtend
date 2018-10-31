@@ -270,13 +270,13 @@ final class VNGenerators {
 					}
 
 					@Override
-					public void foreachUntil(final «type.boolFName» eff) {
+					public boolean foreachUntil(final «type.boolFName» eff) {
 						«FOR index : 1 .. arity-1»
 							if (!eff.apply(this.a«index»)) {
-								return;
+								return false;
 							}
 						«ENDFOR»
-						eff.apply(this.a«arity»);
+						return eff.apply(this.a«arity»);
 					}
 
 					@Override

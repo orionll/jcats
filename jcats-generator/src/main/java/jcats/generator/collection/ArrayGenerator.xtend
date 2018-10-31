@@ -533,13 +533,14 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public void foreachUntil(final «type.boolFName» eff) {
+			public boolean foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
 				for (final «type.javaName» value : this.array) {
 					if (!eff.apply(«type.genericCast»value)) {
-						return;
+						return false;
 					}
 				}
+				return true;
 			}
 
 			@Override

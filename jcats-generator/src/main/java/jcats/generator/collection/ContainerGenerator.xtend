@@ -404,22 +404,23 @@ final class ContainerGenerator implements InterfaceGenerator {
 				});
 			}
 
-			default void foreachUntil(final «type.boolFName» eff) {
+			default boolean foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
 				«IF type.javaUnboxedType»
 					final «type.iteratorGenericName» iterator = iterator();
 					while (iterator.hasNext()) {
 						if (!eff.apply(iterator.«type.iteratorNext»())) {
-							return;
+							return false;
 						}
 					}
 				«ELSE»
 					for (final «type.genericName» value : this) {
 						if (!eff.apply(value)) {
-							return;
+							return false;
 						}
 					}
 				«ENDIF»
+				return true;
 			}
 
 			@Override
@@ -771,8 +772,8 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public void foreachUntil(final BooleanF<«type.boxedName»> eff) {
-					this.container.foreachUntil(eff::apply);
+				public boolean foreachUntil(final BooleanF<«type.boxedName»> eff) {
+					return this.container.foreachUntil(eff::apply);
 				}
 
 				@Override

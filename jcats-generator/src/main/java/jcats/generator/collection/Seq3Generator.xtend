@@ -928,26 +928,27 @@ final class Seq3Generator extends SeqGenerator {
 			}
 
 			@Override
-			public void foreachUntil(final «type.boolFName» eff) {
+			public boolean foreachUntil(final «type.boolFName» eff) {
 				for (final «type.javaName» value : init) {
 					if (!eff.apply(«type.genericCast»value)) {
-						return;
+						return false;
 					}
 				}
 				for (final «type.javaName»[][] node2 : node3) {
 					for (final «type.javaName»[] node1 : node2) {
 						for (final «type.javaName» value : node1) {
 							if (!eff.apply(«type.genericCast»value)) {
-								return;
+								return false;
 							}
 						}
 					}
 				}
 				for (final «type.javaName» value : tail) {
 					if (!eff.apply(«type.genericCast»value)) {
-						return;
+						return false;
 					}
 				}
+				return true;
 			}
 		}
 

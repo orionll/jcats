@@ -257,9 +257,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public void foreachUntil(final «type.boolFName» eff) {
+			public boolean foreachUntil(final «type.boolFName» eff) {
 				if (isNotEmpty()) {
-					traverseUntil(eff);
+					return traverseUntil(eff);
+				} else {
+					return true;
 				}
 			}
 

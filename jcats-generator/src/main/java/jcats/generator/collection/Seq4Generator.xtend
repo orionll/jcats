@@ -1077,10 +1077,10 @@ final class Seq4Generator extends SeqGenerator {
 			}
 
 			@Override
-			public void foreachUntil(final «type.boolFName» eff) {
+			public boolean foreachUntil(final «type.boolFName» eff) {
 				for (final «type.javaName» value : init) {
 					if (!eff.apply(«type.genericCast»value)) {
-						return;
+						return false;
 					}
 				}
 				for (final «type.javaName»[][][] node3 : node4) {
@@ -1088,7 +1088,7 @@ final class Seq4Generator extends SeqGenerator {
 						for (final «type.javaName»[] node1 : node2) {
 							for (final «type.javaName» value : node1) {
 								if (!eff.apply(«type.genericCast»value)) {
-									return;
+									return false;
 								}
 							}
 						}
@@ -1096,9 +1096,10 @@ final class Seq4Generator extends SeqGenerator {
 				}
 				for (final «type.javaName» value : tail) {
 					if (!eff.apply(«type.genericCast»value)) {
-						return;
+						return false;
 					}
 				}
+				return true;
 			}
 		}
 
