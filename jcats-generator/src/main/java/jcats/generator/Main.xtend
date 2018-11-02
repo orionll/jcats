@@ -125,6 +125,7 @@ final class Main {
 			new CastGenerator,
 			new String1Generator,
 			new Stream2Generator,
+			new SizeOverflowExceptionGenerator,
 			varianceAnnotationGenerator(true),
 			varianceAnnotationGenerator(false),
 			new jcats.generator.collection.CommonGenerator
