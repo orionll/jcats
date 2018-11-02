@@ -195,12 +195,12 @@ final class Stream2Generator implements ClassGenerator {
 				return this.stream.count();
 			}
 
-			public int size() throws ArithmeticException {
+			public int size() throws SizeOverflowException {
 				final long count = this.stream.count();
 				if (count == (int) count) {
 					return (int) count;
 				} else {
-					throw new ArithmeticException("Integer overflow");
+					throw new SizeOverflowException();
 				}
 			}
 

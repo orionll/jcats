@@ -8,7 +8,7 @@ final class SizedGenerator implements InterfaceGenerator {
 
 		public interface Sized {
 
-			int size() throws ArithmeticException;
+			int size() throws SizeOverflowException;
 
 			default boolean hasFixedSize() {
 				return true;

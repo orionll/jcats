@@ -478,7 +478,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 						return false;
 					}
 					if (++this.index < 0) {
-						throw new ArithmeticException("Integer overflow");
+						throw new SizeOverflowException();
 					}
 					return true;
 				}
@@ -500,7 +500,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 						return false;
 					}
 					if (++this.index < 0) {
-						throw new ArithmeticException("Integer overflow");
+						throw new SizeOverflowException();
 					}
 					return true;
 				}

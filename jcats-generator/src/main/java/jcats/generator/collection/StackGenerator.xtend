@@ -72,13 +72,13 @@ final class StackGenerator implements ClassGenerator {
 			 * O(size)
 			 */
 			@Override
-			public int size() throws ArithmeticException {
+			public int size() throws SizeOverflowException {
 				int len = 0;
 				«genericName» stack = this;
 				while (stack.isNotEmpty()) {
 					stack = stack.tail;
 					if (++len < 0) {
-						throw new ArithmeticException("Integer overflow");
+						throw new SizeOverflowException();
 					}
 				}
 				return len;

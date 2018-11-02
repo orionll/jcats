@@ -64,11 +64,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			default int size() throws ArithmeticException {
+			default int size() throws SizeOverflowException {
 				return foldLeftToInt(0, (final int size, final «type.genericName» __) -> {
 					final int newSize = size + 1;
 					if (newSize < 0) {
-						throw new ArithmeticException("Integer overflow");
+						throw new SizeOverflowException();
 					} else {
 						return newSize;
 					}

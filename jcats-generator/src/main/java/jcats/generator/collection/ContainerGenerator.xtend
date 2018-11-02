@@ -398,7 +398,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 				final int[] i = {0};
 				foreach((final «type.genericName» value) -> {
 					if (i[0] < 0) {
-						throw new ArithmeticException("Integer overflow");
+						throw new SizeOverflowException();
 					}
 					eff.apply(i[0]++, value);
 				});

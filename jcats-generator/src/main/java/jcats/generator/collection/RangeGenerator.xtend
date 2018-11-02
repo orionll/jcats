@@ -21,6 +21,7 @@ final class RangeGenerator implements ClassGenerator {
 		import java.util.NoSuchElementException;
 		import java.util.PrimitiveIterator;
 
+		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
@@ -42,12 +43,12 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public int size() throws ArithmeticException {
+			public int size() throws SizeOverflowException {
 				final long size = (long) this.high - this.low + (this.closed ? 1 : 0);
 				if (size == (int) size) {
 					return (int) size;
 				} else {
-					throw new ArithmeticException("Integer overflow");
+					throw new SizeOverflowException();
 				}
 			}
 
@@ -145,7 +146,7 @@ final class RangeGenerator implements ClassGenerator {
 						eff.apply(index, this.high);
 					}
 				} else {
-					throw new ArithmeticException("Integer overflow");
+					throw new SizeOverflowException();
 				}
 			}
 
