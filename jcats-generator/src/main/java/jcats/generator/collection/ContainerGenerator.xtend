@@ -179,11 +179,19 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			default «type.optionGenericName» headOption() {
-				final «type.iteratorGenericName» iterator = iterator();
-				if (iterator.hasNext()) {
-					return «type.someName»(iterator.«type.iteratorNext»());
+				if (hasFixedSize()) {
+					if (isEmpty()) {
+						return «type.noneName»();
+					} else {
+						return «type.someName»(head());
+					}
 				} else {
-					return «type.noneName»();
+					final «type.iteratorGenericName» iterator = iterator();
+					if (iterator.hasNext()) {
+						return «type.someName»(iterator.«type.iteratorNext»());
+					} else {
+						return «type.noneName»();
+					}
 				}
 			}
 

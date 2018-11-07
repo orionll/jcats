@@ -125,27 +125,10 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			default «type.genericName» head() throws NoSuchElementException {
-				if (hasFixedSize()) {
-					if (isEmpty()) {
-						throw new NoSuchElementException();
-					} else {
-						return get(0);
-					}
-				} else {
-					return «type.containerShortName».super.head();
-				}
-			}
-
-			@Override
-			default «type.optionGenericName» headOption() {
-				if (hasFixedSize()) {
-					if (isEmpty()) {
-						return «type.noneName»();
-					} else {
-						return «type.someName»(get(0));
-					}
-				} else {
-					return «type.containerShortName».super.headOption();
+				try {
+					return get(0);
+				} catch (final IndexOutOfBoundsException __) {
+					throw new NoSuchElementException();
 				}
 			}
 

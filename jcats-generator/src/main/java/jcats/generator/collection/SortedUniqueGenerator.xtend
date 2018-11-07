@@ -35,6 +35,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			import java.util.Collections;
 		«ENDIF»
 		import java.util.Iterator;
+		import java.util.NoSuchElementException;
 		«IF type.primitive»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
@@ -225,6 +226,19 @@ final class SortedUniqueGenerator implements ClassGenerator {
 					final «type.sortedUniqueBuilderGenericName» builder = new «type.sortedUniqueBuilderDiamondName»(this);
 					builder.putAll(iterable);
 					return builder.build();
+				}
+			}
+
+			@Override
+			public «type.genericName» head() throws NoSuchElementException {
+				if (isEmpty()) {
+					throw new NoSuchElementException();
+				} else {
+					«genericName» unique = this;
+					while (unique.left != null) {
+						unique = unique.left;
+					}
+					return unique.entry;
 				}
 			}
 
