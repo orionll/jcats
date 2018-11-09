@@ -183,6 +183,16 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public «mapTargetType» last() {
+				return requireNonNull(this.f.apply(this.view.last()));
+			}
+
+			@Override
+			public Option<«mapTargetType»> lastOption() {
+				return this.view.lastOption().map(this.f);
+			}
+
+			@Override
 			«IF type == Type.OBJECT»
 				public <D> IndexedContainerView<D> map(final F<B, D> g) {
 			«ELSE»
@@ -232,6 +242,16 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				@Override
 				public «toType.genericName» get(final int index) throws IndexOutOfBoundsException {
 					return this.f.apply(this.view.get(index));
+				}
+
+				@Override
+				public «toType.genericName» last() {
+					return this.f.apply(this.view.last());
+				}
+
+				@Override
+				public «toType.optionGenericName» lastOption() {
+					return this.view.lastOption().mapTo«toType.typeName»(this.f);
 				}
 
 				@Override
