@@ -706,6 +706,16 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
+				public «type.boxedName» head() throws NoSuchElementException {
+					return this.container.head();
+				}
+
+				@Override
+				public Option<«type.boxedName»> headOption() {
+					return this.container.headOption().toOption();
+				}
+
+				@Override
 				public boolean contains(final «type.boxedName» value) {
 					return this.container.contains(value);
 				}

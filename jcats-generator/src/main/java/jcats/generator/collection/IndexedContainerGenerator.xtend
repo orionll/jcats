@@ -328,6 +328,16 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
+				public «type.boxedName» last() throws NoSuchElementException {
+					return this.container.last();
+				}
+
+				@Override
+				public Option<«type.boxedName»> lastOption() {
+					return this.container.lastOption().toOption();
+				}
+
+				@Override
 				public IntOption indexOf(final «type.boxedName» value) {
 					return this.container.indexOf(value);
 				}
