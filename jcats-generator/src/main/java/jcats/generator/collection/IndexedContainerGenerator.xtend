@@ -218,7 +218,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 			«IF type.primitive»
 				@Override
-				default IndexedContainer<«type.boxedName»> asContainer() {
+				default IndexedContainerView<«type.boxedName»> asContainer() {
 					return new «shortName»AsIndexedContainer(this);
 				}
 
@@ -316,7 +316,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type.primitive»
-			final class «shortName»AsIndexedContainer extends «type.typeName»ContainerAsContainer<«shortName»> implements IndexedContainer<«type.boxedName»> {
+			final class «shortName»AsIndexedContainer extends «type.typeName»ContainerAsContainer<«shortName»> implements IndexedContainerView<«type.boxedName»> {
 
 				«shortName»AsIndexedContainer(final «shortName» container) {
 					super(container);

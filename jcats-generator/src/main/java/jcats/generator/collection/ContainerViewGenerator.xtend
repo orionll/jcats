@@ -435,7 +435,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«ENDIF»
 			«IF type.primitive»
 				@Override
-				public Container<«type.boxedName»> asContainer() {
+				public ContainerView<«type.boxedName»> asContainer() {
 					return this.container.asContainer();
 				}
 
