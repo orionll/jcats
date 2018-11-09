@@ -162,7 +162,11 @@ final class MaybeGenerator implements InterfaceGenerator {
 			}
 
 			default «type.optionGenericName» to«type.optionShortName»() {
-				return isEmpty() ? «type.noneName»() : «type.someName»(get());
+				«IF type == Type.OBJECT»
+					return Option.fromNullable(getOrNull());
+				«ELSE»
+					return isEmpty() ? «type.noneName»() : «type.someName»(get());
+				«ENDIF»
 			}
 
 			«IF type.javaUnboxedType»
