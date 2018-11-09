@@ -38,8 +38,9 @@ final class MaybeGenerator implements InterfaceGenerator {
 		import «Constants.COLLECTION».*;
 		import «Constants.FUNCTION».*;
 
+		import static «Constants.OPTION».*;
 		«IF type.primitive»
-			import static «Constants.OPTION».*;
+			import static «Constants.JCATS».«type.optionShortName».*;
 		«ENDIF»
 		«IF type.javaUnboxedType»
 			import static «Constants.JCATS».Empty«type.typeName»Iterator.empty«type.typeName»Iterator;
@@ -160,6 +161,10 @@ final class MaybeGenerator implements InterfaceGenerator {
 				«ENDIF»
 			}
 
+			default «type.optionGenericName» to«type.optionShortName»() {
+				return isEmpty() ? «type.noneName»() : «type.someName»(get());
+			}
+
 			«IF type.javaUnboxedType»
 				default Optional«type.typeName» toOptional«type.typeName»() {
 					return isEmpty() ? Optional«type.typeName».empty() : Optional«type.typeName».of(get());
@@ -259,6 +264,16 @@ final class MaybeGenerator implements InterfaceGenerator {
 			@Override
 			public boolean hasFixedSize() {
 				return this.maybe.hasFixedSize();
+			}
+
+			@Override
+			public «type.genericName» head() {
+				return this.maybe.get();
+			}
+
+			@Override
+			public «type.optionGenericName» headOption() {
+				return this.maybe.to«type.optionShortName»();
 			}
 
 			@Override

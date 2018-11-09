@@ -262,6 +262,12 @@ final class OptionGenerator implements ClassGenerator {
 				}
 			}
 
+			@Deprecated
+			@Override
+			public «type.optionGenericName» to«type.optionShortName»() {
+				return this;
+			}
+
 			@Override
 			public int hashCode() {
 				«IF type == Type.OBJECT»

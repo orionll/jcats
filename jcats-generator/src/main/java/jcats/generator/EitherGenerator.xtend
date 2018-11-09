@@ -105,7 +105,6 @@ final class EitherGenerator implements ClassGenerator {
 		«IF rightType == Type.OBJECT»
 			import static «Constants.F».id;
 		«ENDIF»
-		import static «Constants.JCATS».«rightType.optionShortName».*;
 		«IF leftType != Type.OBJECT || rightType != Type.OBJECT»
 			import static «Constants.EITHER».*;
 		«ENDIF»
@@ -463,10 +462,6 @@ final class EitherGenerator implements ClassGenerator {
 					return new «rightType.typeName»«leftType.typeName»Either(this.right, this.left, !this.isLeft);
 				}
 			«ENDIF»
-
-			public «rightType.optionGenericName» to«rightType.optionShortName»() {
-				return isRight() ? «rightType.someName»(this.right) : «rightType.noneName»();
-			}
 
 			«IF leftType != Type.OBJECT || rightType != Type.OBJECT»
 				public Either<«leftTypeGenericBoxedName», «rightType.genericBoxedName»> toEither() {
