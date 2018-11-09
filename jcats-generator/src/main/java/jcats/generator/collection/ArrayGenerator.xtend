@@ -847,20 +847,6 @@ final class ArrayGenerator implements ClassGenerator {
 
 			«iterate(type, paramGenericName, arrayBuilderName)»
 
-			«IF type == Type.OBJECT»
-				public static Array<Character> stringToCharArray(final String str) {
-					if (str.isEmpty()) {
-						return emptyArray();
-					} else {
-						final Object[] array = new Object[str.length()];
-						for (int i = 0; i < str.length(); i++) {
-							array[i] = str.charAt(i);
-						}
-						return new Array<>(array);
-					}
-				}
-
-			«ENDIF»
 			private static «paramGenericName» sizedToArray(final Iterable<«type.genericBoxedName»> iterable, final int size) {
 				if (size == 0) {
 					return empty«shortName»();
