@@ -328,7 +328,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public «type.boxedName» last() throws NoSuchElementException {
+				public «type.boxedName» last() {
 					return this.container.last();
 				}
 

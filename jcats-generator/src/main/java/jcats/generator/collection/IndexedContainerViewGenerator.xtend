@@ -116,6 +116,16 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public «type.genericName» last() {
+				return this.container.head();
+			}
+
+			@Override
+			public «type.optionGenericName» lastOption() {
+				return this.container.lastOption();
+			}
+
+			@Override
 			public IntOption indexOf(final «type.genericName» value) {
 				return this.container.indexOf(value);
 			}

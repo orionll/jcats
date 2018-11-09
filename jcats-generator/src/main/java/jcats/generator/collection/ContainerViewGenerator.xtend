@@ -179,6 +179,16 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public «type.genericName» head() {
+				return this.container.head();
+			}
+
+			@Override
+			public «type.optionGenericName» headOption() {
+				return this.container.headOption();
+			}
+
+			@Override
 			public boolean contains(final «type.genericName» value) {
 				return this.container.contains(value);
 			}

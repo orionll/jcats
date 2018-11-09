@@ -706,7 +706,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public «type.boxedName» head() throws NoSuchElementException {
+				public «type.boxedName» head() {
 					return this.container.head();
 				}
 
