@@ -85,6 +85,46 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public int head() throws NoSuchElementException {
+				if (isEmpty()) {
+					throw new NoSuchElementException();
+				} else {
+					return this.low;
+				}
+			}
+
+			@Override
+			public IntOption headOption() {
+				if (isEmpty()) {
+					return intNone();
+				} else {
+					return intSome(this.low);
+				}
+			}
+
+			@Override
+			public int last() throws NoSuchElementException {
+				if (isEmpty()) {
+					throw new NoSuchElementException();
+				} else if (this.closed) {
+					return this.high;
+				} else {
+					return this.high - 1;
+				}
+			}
+
+			@Override
+			public IntOption lastOption() {
+				if (isEmpty()) {
+					return intNone();
+				} else if (this.closed) {
+					return intSome(this.high);
+				} else {
+					return intSome(this.high - 1);
+				}
+			}
+
+			@Override
 			public boolean contains(final int value) {
 				return (value >= this.low) && (this.closed ? value <= this.high : value < this.high);
 			}
