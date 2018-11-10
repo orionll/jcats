@@ -34,6 +34,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 		import java.util.Iterator;
 		import java.util.HashSet;
 		import java.util.LinkedHashSet;
+		import java.util.NoSuchElementException;
 		import java.util.PrimitiveIterator;
 		import java.util.Spliterator;
 		import java.util.function.Consumer;
@@ -44,6 +45,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.COMMON».*;
 		import static «Constants.FUNCTION».«type.shortName("BooleanF")».*;
+		import static «Constants.JCATS».«type.optionShortName».*;
 
 		public interface «type.covariantName("ContainerView")» extends «type.containerGenericName» {
 
@@ -1002,6 +1004,24 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public boolean hasFixedSize() {
 				return (this.limit == 0) || this.view.hasFixedSize();
+			}
+
+			@Override
+			public «type.genericName» head() {
+				if (this.limit == 0) {
+					throw new NoSuchElementException();
+				} else {
+					return this.view.head();
+				}
+			}
+
+			@Override
+			public «type.optionGenericName» headOption() {
+				if (this.limit == 0) {
+					return «type.noneName»();
+				} else {
+					return this.view.headOption();
+				}
 			}
 
 			@Override
