@@ -181,20 +181,6 @@ final class VNGenerators {
 						return new «diamondName»(«(arity .. 1).map["this.a" + it].join(", ")»);
 					}
 
-					@Override
-					public boolean contains(final «type.genericName» value) {
-						«FOR i : 1 .. arity»
-							«IF type == Type.OBJECT»
-								if (value.equals(this.a«i»)) {
-							«ELSE»
-								if (value == this.a«i») {
-							«ENDIF»
-								return true;
-							}
-						«ENDFOR»
-						return false;
-					}
-
 					«IF arity == 2»
 						«IF type == Type.OBJECT»
 							public P<A, A> toP() {

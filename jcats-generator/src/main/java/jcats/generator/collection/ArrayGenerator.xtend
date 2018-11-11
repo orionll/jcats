@@ -496,23 +496,6 @@ final class ArrayGenerator implements ClassGenerator {
 			«takeWhile(false, type)»
 
 			@Override
-			public boolean contains(final «type.genericName» value) {
-				«IF type == Type.OBJECT»
-					requireNonNull(value);
-				«ENDIF»
-				for (final «type.javaName» a : this.array) {
-					«IF type == Type.OBJECT»
-						if (a.equals(value)) {
-					«ELSE»
-						if (a == value) {
-					«ENDIF»
-						return true;
-					}
-				}
-				return false;
-			}
-
-			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
 				for (final «type.javaName» value : this.array) {
