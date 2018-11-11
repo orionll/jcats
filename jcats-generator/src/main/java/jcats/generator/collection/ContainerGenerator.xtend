@@ -199,25 +199,11 @@ final class ContainerGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				«IF type.javaUnboxedType»
-					final «type.iteratorGenericName» iterator = iterator();
-					while (iterator.hasNext()) {
-						if (iterator.«type.iteratorNext»() == value) {
-							return true;
-						}
-					}
+				«IF type == Type.OBJECT»
+					return !foreachUntil((final A a) -> !a.equals(value));
 				«ELSE»
-					for (final «type.genericName» a : this) {
-						«IF type == Type.OBJECT»
-							if (a.equals(value)) {
-						«ELSE»
-							if (a == value) {
-						«ENDIF»
-							return true;
-						}
-					}
+					return !foreachUntil((final «type.genericName» a) -> a != value);
 				«ENDIF»
-				return false;
 			}
 
 			default «type.optionGenericName» firstMatch(final «type.boolFName» predicate) {
@@ -254,29 +240,15 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			default boolean anyMatch(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
-				«IF type.javaUnboxedType»
-					final «type.iteratorGenericName» iterator = iterator();
-					while (iterator.hasNext()) {
-						if (predicate.apply(iterator.«type.iteratorNext»())) {
-							return true;
-						}
-					}
-				«ELSE»
-					for (final «type.genericName» value : this) {
-						if (predicate.apply(value)) {
-							return true;
-						}
-					}
-				«ENDIF»
-				return false;
+				return !foreachUntil((final «type.genericName» a) -> !predicate.apply(a));
 			}
 
 			default boolean allMatch(final «type.boolFName» predicate) {
-				return !anyMatch(predicate.negate());
+				return foreachUntil(predicate);
 			}
 
 			default boolean noneMatch(final «type.boolFName» predicate) {
-				return !anyMatch(predicate);
+				return foreachUntil((final «type.genericName» a) -> !predicate.apply(a));
 			}
 
 			«IF type.primitive»
