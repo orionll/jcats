@@ -291,6 +291,11 @@ final class MaybeGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public boolean contains(final «type.genericName» value) {
+				return this.maybe.contains(value);
+			}
+
+			@Override
 			public «type.iteratorGenericName» iterator() {
 				return this.maybe.iterator();
 			}
