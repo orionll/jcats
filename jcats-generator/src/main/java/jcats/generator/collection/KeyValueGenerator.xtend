@@ -131,6 +131,10 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				return new KeyValueAsMap<>(this);
 			}
 
+			default Iterator<P<K, A>> reverseIterator() {
+				return asUniqueContainer().toArray().reverseIterator();
+			}
+
 			default int spliteratorCharacteristics() {
 				return Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE;
 			}
@@ -218,6 +222,11 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public Iterator<A> reverseIterator() {
+				return new MappedIterator<>(this.keyValue.reverseIterator(), P::get2);
+			}
+
+			@Override
 			public int spliteratorCharacteristics() {
 				return Spliterator.NONNULL | Spliterator.IMMUTABLE;
 			}
@@ -273,6 +282,11 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public Iterator<K> iterator() {
 				return new MappedIterator<>(this.keyValue.iterator(), P::get1);
+			}
+
+			@Override
+			public Iterator<K> reverseIterator() {
+				return new MappedIterator<>(this.keyValue.reverseIterator(), P::get1);
 			}
 
 			@Override
@@ -336,6 +350,11 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public Iterator<P<K, A>> iterator() {
 				return this.keyValue.iterator();
+			}
+
+			@Override
+			public Iterator<P<K, A>> reverseIterator() {
+				return this.keyValue.reverseIterator();
 			}
 
 			@Override

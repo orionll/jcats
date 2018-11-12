@@ -155,6 +155,11 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public Iterator<P<K, A>> reverseIterator() {
+				return (this.entry == null) ? Collections.emptyIterator() : new SortedDictReverseIterator<>(this);
+			}
+
+			@Override
 			public int spliteratorCharacteristics() {
 				return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE;
 			}
@@ -424,6 +429,41 @@ final class SortedDictGenerator implements ClassGenerator {
 
 				if (result.right != null) {
 					for (SortedDict<K, A> dict = result.right; dict != null; dict = dict.left) {
+						this.stack = this.stack.prepend(dict);
+					}
+				}
+
+				return result.entry;
+			}
+		}
+
+		final class SortedDictReverseIterator<K, A> implements Iterator<P<K, A>> {
+			private final SortedDict<K, A> root;
+			private Stack<SortedDict<K, A>> stack;
+
+			SortedDictReverseIterator(final SortedDict<K, A> root) {
+				this.root = root;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (this.stack == null || this.stack.isNotEmpty());
+			}
+
+			@Override
+			public P<K, A> next() {
+				if (this.stack == null) {
+					this.stack = emptyStack();
+					for (SortedDict<K, A> dict = this.root; dict != null; dict = dict.right) {
+						this.stack = this.stack.prepend(dict);
+					}
+				}
+
+				final SortedDict<K, A> result = this.stack.head();
+				this.stack = this.stack.tail;
+
+				if (result.left != null) {
+					for (SortedDict<K, A> dict = result.left; dict != null; dict = dict.right) {
 						this.stack = this.stack.prepend(dict);
 					}
 				}

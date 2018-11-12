@@ -267,6 +267,15 @@ class DictGenerator implements ClassGenerator {
 				return isEmpty() ? Collections.emptyIterator() : new HashTableIterator<>(this.leafMap, this.treeMap, this.slots);
 			}
 
+			/**
+			 * @deprecated «shortName» has no specified order, so this method makes no sense.
+			 */
+			@Deprecated
+			@Override
+			public Iterator<P<K, A>> reverseIterator() {
+				return KeyValue.super.reverseIterator();
+			}
+
 			@Override
 			public void forEach(final Consumer<? super P<K, A>> action) {
 				«HashTableCommonGenerator.forEach("forEach", "action", "accept", "P", "P<K, A>")»
