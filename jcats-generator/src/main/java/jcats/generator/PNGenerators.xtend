@@ -18,7 +18,7 @@ final class PNGenerators {
 
 	private def static Generator generator(int arity) {
 		new ClassGenerator {
-			private val shortName = shortName(arity)
+			val shortName = shortName(arity)
 
 			override className() { fullName(arity) }
 

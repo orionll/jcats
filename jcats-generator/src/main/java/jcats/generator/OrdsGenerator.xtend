@@ -9,7 +9,7 @@ final class OrdsGenerator implements ClassGenerator {
 		
 	override className() { Constants.JCATS + "." + type.shortName("Ords") }
 
-	def public static List<Generator> generators() {
+	def static List<Generator> generators() {
 		Type.values.toList.map[new OrdsGenerator(it) as Generator]
 	}
 
