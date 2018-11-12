@@ -301,6 +301,11 @@ final class MaybeGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				return this.maybe.iterator();
+			}
+
+			@Override
 			public «type.spliteratorGenericName» spliterator() {
 				return this.maybe.spliterator();
 			}

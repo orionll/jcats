@@ -140,6 +140,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 		import java.util.ArrayList;
 		import java.util.Collection;
 		import java.util.Collections;
+		import java.util.Deque;
 		import java.util.HashSet;
 		import java.util.Iterator;
 		import java.util.LinkedHashSet;
@@ -772,17 +773,17 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public «type.iteratorGenericName» iterator() {
+				public Iterator<«type.genericBoxedName»> iterator() {
 					return this.container.iterator();
 				}
 
 				@Override
-				public «type.spliteratorGenericName» spliterator() {
+				public Spliterator<«type.genericBoxedName»> spliterator() {
 					return this.container.spliterator();
 				}
 
 				@Override
-				public «type.iteratorGenericName» reverseIterator() {
+				public Iterator<«type.genericBoxedName»> reverseIterator() {
 					return this.container.reverseIterator();
 				}
 
@@ -1016,7 +1017,13 @@ final class ContainerGenerator implements InterfaceGenerator {
 							return new ListReverseIterator<>((List<«type.genericBoxedName»>) this.collection, size);
 						«ENDIF»
 					}
-				} else if (this.collection instanceof NavigableSet) {
+				} else if (this.collection instanceof Deque<?>) {
+					«IF type.javaUnboxedType»
+						return «type.typeName»Iterator.getIterator(((Deque<«type.boxedName»>) this.collection).descendingIterator());
+					«ELSE»
+						return ((Deque<«type.genericBoxedName»>) this.collection).descendingIterator();
+					«ENDIF»
+				} else if (this.collection instanceof NavigableSet<?>) {
 					«IF type.javaUnboxedType»
 						return «type.typeName»Iterator.getIterator(((NavigableSet<«type.boxedName»>) this.collection).descendingIterator());
 					«ELSE»
