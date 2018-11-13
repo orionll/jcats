@@ -25,6 +25,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 	def filteredContainerViewShortName() { type.shortName("FilteredContainerView") }
 	def limitedContainerViewShortName() { type.shortName("LimitedContainerView") }
 	def skippedContainerViewShortName() { type.shortName("SkippedContainerView") }
+	def reversedContainerViewShortName() { type.shortName("ReversedContainerView") }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -121,7 +122,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«ENDFOR»
 			default «genericName» filter(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
-				return new «type.shortName("FilteredContainerView")»<>(this, predicate);
+				return new «filteredContainerViewShortName»<>(this, predicate);
 			}
 
 			«IF type == Type.OBJECT»
@@ -135,7 +136,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				if (limit < 0) {
 					throw new IllegalArgumentException(Integer.toString(limit));
 				}
-				return new «type.shortName("LimitedContainerView")»<>(this, limit);
+				return new «limitedContainerViewShortName»<>(this, limit);
 			}
 
 			default «genericName» skip(final int skip) {
@@ -144,8 +145,12 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				} else if (skip == 0) {
 					return this;
 				} else {
-					return new «type.shortName("SkippedContainerView")»<>(this, skip);
+					return new «skippedContainerViewShortName»<>(this, skip);
 				}
+			}
+
+			default «genericName» reverse() {
+				return new «reversedContainerViewShortName»<>(this);
 			}
 			«IF type == Type.OBJECT»
 
@@ -1115,6 +1120,172 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			«toStr(type, skippedContainerViewShortName, false)»
+		}
+
+		class «reversedContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> implements «genericName» {
+			final C view;
+
+			«reversedContainerViewShortName»(final C view) {
+				this.view = view;
+			}
+
+			@Override
+			public int size() {
+				return this.view.size();
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return this.view.isEmpty();
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return this.view.isNotEmpty();
+			}
+
+			@Override
+			public boolean hasFixedSize() {
+				return this.view.hasFixedSize();
+			}
+
+			@Override
+			public boolean contains(final «type.genericName» value) {
+				return this.view.contains(value);
+			}
+
+			@Override
+			public «type.optionGenericName» firstMatch(final «type.boolFName» predicate) {
+				return this.view.lastMatch(predicate);
+			}
+
+			@Override
+			public «type.optionGenericName» lastMatch(final «type.boolFName» predicate) {
+				return this.view.firstMatch(predicate);
+			}
+
+			@Override
+			public boolean anyMatch(final «type.boolFName» predicate) {
+				return this.view.anyMatch(predicate);
+			}
+
+			@Override
+			public boolean allMatch(final «type.boolFName» predicate) {
+				return this.view.allMatch(predicate);
+			}
+
+			@Override
+			public boolean noneMatch(final «type.boolFName» predicate) {
+				return this.view.noneMatch(predicate);
+			}
+
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				return this.view.reverseIterator();
+			}
+
+			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				return this.view.iterator();
+			}
+
+			«IF type.javaUnboxedType»
+				@Override
+				public «type.javaName» sum() {
+					return this.view.sum();
+				}
+
+			«ENDIF»
+			«IF type == Type.INT»
+				@Override
+				public long sumToLong() {
+					return this.view.sumToLong();
+				}
+
+			«ENDIF»
+			«IF type == Type.OBJECT»
+				@Override
+				public «type.optionGenericName» max(final «type.ordGenericName» ord) {
+					return this.view.max(ord);
+				}
+
+				@Override
+				public «type.optionGenericName» min(final «type.ordGenericName» ord) {
+					return this.view.min(ord);
+				}
+			«ELSE»
+				@Override
+				public «type.optionGenericName» max() {
+					return this.view.max();
+				}
+
+				@Override
+				public «type.optionGenericName» min() {
+					return this.view.min();
+				}
+
+				@Override
+				public «type.optionGenericName» maxByOrd(final «type.ordGenericName» ord) {
+					return this.view.maxByOrd(ord);
+				}
+
+				@Override
+				public «type.optionGenericName» minByOrd(final «type.ordGenericName» ord) {
+					return this.view.minByOrd(ord);
+				}
+			«ENDIF»
+
+			@Override
+			«IF type == Type.OBJECT»
+				public <B extends Comparable<B>> «type.optionGenericName» maxBy(final F<A, B> f) {
+			«ELSE»
+				public <A extends Comparable<A>> «type.optionGenericName» maxBy(final «type.typeName»ObjectF<A> f) {
+			«ENDIF»
+				return this.view.maxBy(f);
+			}
+
+			«FOR to : Type.primitives»
+				@Override
+				«IF type == Type.OBJECT»
+					public «type.optionGenericName» maxBy«to.typeName»(final «to.typeName»F<A> f) {
+				«ELSE»
+					public «type.optionGenericName» maxBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
+				«ENDIF»
+					return this.view.maxBy«to.typeName»(f);
+				}
+
+			«ENDFOR»
+			@Override
+			«IF type == Type.OBJECT»
+				public <B extends Comparable<B>> «type.optionGenericName» minBy(final F<A, B> f) {
+			«ELSE»
+				public <A extends Comparable<A>> «type.optionGenericName» minBy(final «type.typeName»ObjectF<A> f) {
+			«ENDIF»
+				return this.view.minBy(f);
+			}
+
+			«FOR to : Type.primitives»
+				@Override
+				«IF type == Type.OBJECT»
+					public «type.optionGenericName» minBy«to.typeName»(final «to.typeName»F<A> f) {
+				«ELSE»
+					public «type.optionGenericName» minBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
+				«ENDIF»
+					return this.view.minBy«to.typeName»(f);
+				}
+
+			«ENDFOR»
+			@Override
+			public «genericName» reverse() {
+				return this.view;
+			}
+
+			@Override
+			public HashSet<«type.genericBoxedName»> toHashSet() {
+				return this.view.toHashSet();
+			}
+
+			«toStr(type, reversedContainerViewShortName, false)»
 		}
 	''' }
 }

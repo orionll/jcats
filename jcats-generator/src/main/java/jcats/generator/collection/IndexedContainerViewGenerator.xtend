@@ -25,6 +25,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 	def filteredIndexedContainerViewShortName() { type.shortName("FilteredIndexedContainerView") }
 	def limitedIndexedContainerViewShortName() { type.shortName("LimitedIndexedContainerView") }
 	def skippedIndexedContainerViewShortName() { type.shortName("SkippedIndexedContainerView") }
+	def reversedIndexedContainerViewShortName() { type.shortName("ReversedIndexedContainerView") }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -93,6 +94,11 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				} else {
 					return new «skippedIndexedContainerViewShortName»<>(this, skip);
 				}
+			}
+
+			@Override
+			default «genericName» reverse() {
+				return new «reversedIndexedContainerViewShortName»<>(this);
 			}
 			«IF type == Type.OBJECT»
 
@@ -320,7 +326,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.genericName» get(final int index) throws IndexOutOfBoundsException {
+			public «type.genericName» get(final int index) {
 				if (index < 0 || index >= this.limit) {
 					throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«limitedIndexedContainerViewShortName»"));
 				} else {
@@ -407,7 +413,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.genericName» get(final int index) throws IndexOutOfBoundsException {
+			public «type.genericName» get(final int index) {
 				if (index < 0) {
 					throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«skippedIndexedContainerViewShortName»"));
 				} else {
@@ -500,6 +506,61 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			«indexedEquals(type)»
 
 			«toStr(type, skippedIndexedContainerViewShortName, false)»
+		}
+
+		«IF type == Type.OBJECT»
+			final class «reversedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends ReversedContainerView<A, C> implements IndexedContainerView<A> {
+		«ELSE»
+			final class «reversedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»ReversedContainerView<C> implements «type.indexedContainerViewGenericName» {
+		«ENDIF»
+
+			«reversedIndexedContainerViewShortName»(final C view) {
+				super(view);
+			}
+
+			@Override
+			public «type.genericName» get(final int index) {
+				if (hasFixedSize()) {
+					try {
+						return this.view.get(size() - index - 1);
+					} catch (final IndexOutOfBoundsException __) {
+						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«reversedIndexedContainerViewShortName»"));
+					}
+				} else {
+					throw new UnsupportedOperationException("get() is unsupported if hasFixedSize() == false");
+				}
+			}
+
+			@Override
+			public «type.genericName» head() {
+				return this.view.last();
+			}
+
+			@Override
+			public «type.optionGenericName» headOption() {
+				return this.view.lastOption();
+			}
+
+			@Override
+			public «type.genericName» last() {
+				return this.view.head();
+			}
+
+			@Override
+			public «type.optionGenericName» lastOption() {
+				return this.view.headOption();
+			}
+
+			@Override
+			public «genericName» reverse() {
+				return this.view;
+			}
+
+			«hashcode(type)»
+
+			«indexedEquals(type)»
+
+			«toStr(type, reversedIndexedContainerViewShortName, false)»
 		}
 	''' }
 }
