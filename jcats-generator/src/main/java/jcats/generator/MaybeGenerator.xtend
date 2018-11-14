@@ -190,7 +190,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 
 			«ENDIF»
 			default «type.containerGenericName» as«type.containerShortName»() {
-				return new «type.diamondName("MaybeAsContainer")»(this);
+				return new «shortName»As«type.diamondName("Container")»(this);
 			}
 
 			default «type.stream2GenericName» stream() {
@@ -243,10 +243,10 @@ final class MaybeGenerator implements InterfaceGenerator {
 			«ENDIF»
 		}
 
-		final class «type.genericName("MaybeAsContainer")» implements «type.containerGenericName» {
+		final class «shortName»As«type.containerGenericName» implements «type.containerGenericName» {
 			private final «genericName» maybe;
 
-			«shortName»AsContainer(final «genericName» maybe) {
+			«shortName»As«type.containerShortName»(final «genericName» maybe) {
 				this.maybe = maybe;
 			}
 
