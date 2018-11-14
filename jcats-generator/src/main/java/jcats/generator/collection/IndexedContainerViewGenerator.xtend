@@ -22,7 +22,6 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 	def baseIndexedContainerViewShortName() { type.shortName("BaseIndexedContainerView") }
 	def mappedIndexedContainerViewShortName() { type.shortName("MappedIndexedContainerView") }
 	def mapTargetType() { if (type == Type.OBJECT) "B" else "A" }
-	def filteredIndexedContainerViewShortName() { type.shortName("FilteredIndexedContainerView") }
 	def limitedIndexedContainerViewShortName() { type.shortName("LimitedIndexedContainerView") }
 	def skippedIndexedContainerViewShortName() { type.shortName("SkippedIndexedContainerView") }
 	def reversedIndexedContainerViewShortName() { type.shortName("ReversedIndexedContainerView") }
@@ -71,12 +70,6 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				}
 
 			«ENDFOR»
-			@Override
-			default «type.containerViewGenericName» filter(final «type.boolFName» predicate) {
-				requireNonNull(predicate);
-				return new «type.shortName("FilteredIndexedContainerView")»<>(this, predicate);
-			}
-
 			@Override
 			default «genericName» limit(final int limit) {
 				if (limit < 0) {
@@ -290,31 +283,6 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 		«ENDFOR»
-		final class «filteredIndexedContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> extends «type.shortName("FilteredContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»C> {
-
-			«filteredIndexedContainerViewShortName»(final C view, final «type.boolFName» predicate) {
-				super(view, predicate);
-			}
-
-			@Override
-			public «type.iteratorGenericName» reverseIterator() {
-				«IF type.javaUnboxedType»
-					return new «type.diamondName("FilteredIterator")»(this.view.reverseIterator(), this.predicate);
-				«ELSEIF type == Type.OBJECT»
-					return new FilteredIterator<>(this.view.reverseIterator(), this.predicate);
-				«ELSE»
-					return new FilteredIterator<>(this.view.reverseIterator(), this.predicate::apply);
-				«ENDIF»
-			}
-
-			@Override
-			public «type.containerViewGenericName» filter(final «type.boolFName» p) {
-				return new «filteredIndexedContainerViewShortName»<>(this.view, and(this.predicate, p));
-			}
-
-			«toStr(type, filteredIndexedContainerViewShortName, false)»
-		}
-
 		«IF type == Type.OBJECT»
 			final class «limitedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends LimitedContainerView<A, C> implements IndexedContainerView<A> {
 		«ELSE»

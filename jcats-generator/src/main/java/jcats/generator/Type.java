@@ -279,6 +279,10 @@ public enum Type {
 		return genericName("IndexedContainerView");
 	}
 
+	public String indexedContainerViewWildcardName() {
+		return wildcardName("IndexedContainerView");
+	}
+
 	public String indexedGenericName() {
 		return genericName("Indexed");
 	}
