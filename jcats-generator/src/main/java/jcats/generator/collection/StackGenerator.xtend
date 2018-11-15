@@ -44,8 +44,6 @@ final class StackGenerator implements ClassGenerator {
 
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
-		import static java.util.Spliterators.emptySpliterator;
-		import static java.util.Spliterators.spliteratorUnknownSize;
 		import static «Constants.F».id;
 		import static «Constants.JCATS».«type.optionShortName».*;
 		import static «Constants.P».p;

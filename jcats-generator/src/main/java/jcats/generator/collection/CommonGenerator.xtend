@@ -237,6 +237,10 @@ final class CommonGenerator implements ClassGenerator {
 					return message;
 				}
 			}
+
+			static int clearBit(final int bits, final int bit) {
+				return bits & (~bit);
+			}
 		}
 
 		«FOR type : Type.values»

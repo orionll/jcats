@@ -34,6 +34,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 		import java.util.Spliterators;
 		import java.util.function.Consumer;
 		import java.util.stream.«type.streamName»;
+		import java.util.stream.StreamSupport;
 
 		import «Constants.COLLECTION».*;
 		import «Constants.FUNCTION».*;
@@ -46,6 +47,9 @@ final class MaybeGenerator implements InterfaceGenerator {
 			import static «Constants.JCATS».Empty«type.typeName»Iterator.empty«type.typeName»Iterator;
 		«ELSE»
 			import static java.util.Collections.emptyIterator;
+		«ENDIF»
+		«IF type.primitive»
+			import static «Constants.COLLECTION».«type.arrayShortName».*;
 		«ENDIF»
 		import static java.util.Objects.requireNonNull;
 
@@ -194,12 +198,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 			}
 
 			default «type.stream2GenericName» stream() {
-				«IF type == Type.OBJECT»
-					final A value = getOrNull();
-					return Stream2.from((value == null) ? «type.streamName».empty() : «type.streamName».of(value));
-				«ELSE»
-					return «type.stream2Name».from(isEmpty() ? «type.streamName».empty() : «type.streamName».of(get()));
-				«ENDIF»
+				return «type.stream2Name».from(StreamSupport.«type.streamName.firstToLowerCase»(spliterator(), false));
 			}
 
 			@Override
@@ -218,20 +217,20 @@ final class MaybeGenerator implements InterfaceGenerator {
 			default «type.spliteratorGenericName» spliterator() {
 				«IF type.javaUnboxedType»
 					if (isEmpty()) {
-						return Spliterators.«type.emptySpliteratorName»();
+						return empty«type.arrayShortName»().spliterator();
 					} else {
 						return Spliterators.spliterator(new «type.javaUnboxedName»[] { get() }, Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 					}
 				«ELSEIF type == Type.OBJECT»
 					final A value = getOrNull();
 					if (value == null) {
-						return Spliterators.emptySpliterator();
+						return «type.arrayShortName».<A> empty«type.arrayShortName»().spliterator();
 					} else {
 						return Spliterators.spliterator(new Object[] { value }, Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 					}
 				«ELSE»
 					if (isEmpty()) {
-						return Spliterators.emptySpliterator();
+						return empty«type.arrayShortName»().spliterator();
 					} else {
 						return Spliterators.spliterator(new «type.boxedName»[] { get() }, Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 					}

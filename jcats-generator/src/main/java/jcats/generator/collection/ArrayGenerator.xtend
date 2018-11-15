@@ -667,11 +667,7 @@ final class ArrayGenerator implements ClassGenerator {
 			«ELSE»
 				public Spliterator.Of«type.typeName» spliterator() {
 			«ENDIF»
-				if (isEmpty()) {
-					return Spliterators.«type.emptySpliteratorName»();
-				} else {
-					return Spliterators.spliterator(«IF type == Type.BOOLEAN»new BooleanArrayIterator(this.array), size()«ELSE»this.array«ENDIF», Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
-				}
+				return Spliterators.spliterator(«IF type == Type.BOOLEAN»new BooleanArrayIterator(this.array), size()«ELSE»this.array«ENDIF», Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 			}
 
 			@Override

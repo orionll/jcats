@@ -234,6 +234,11 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public int spliteratorCharacteristics() {
+				return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE;
+			}
+
+			@Override
 			public IntStream2 stream() {
 				if (this.closed) {
 					return IntStream2.rangeClosed(this.low, this.high);

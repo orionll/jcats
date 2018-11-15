@@ -410,6 +410,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			«ENDFOR»
 			@Override
+			public int spliteratorCharacteristics() {
+				return this.container.spliteratorCharacteristics();
+			}
+
+			@Override
 			public «type.spliteratorGenericName» spliterator() {
 				return this.container.spliterator();
 			}
@@ -617,6 +622,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return new «mappedContainerViewShortName»<>(this.view.skip(n), this.f);
 			}
 
+			@Override
+			public int spliteratorCharacteristics() {
+				return Common.clearBit(this.view.spliteratorCharacteristics(), Spliterator.DISTINCT | Spliterator.SORTED);
+			}
+
 			«toStr(Type.OBJECT, mappedContainerViewShortName, false)»
 		}
 
@@ -752,6 +762,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»ContainerView<>(this.view.skip(n), this.f);
 				}
 
+				@Override
+				public int spliteratorCharacteristics() {
+					return Common.clearBit(this.view.spliteratorCharacteristics(), Spliterator.DISTINCT | Spliterator.SORTED);
+				}
+
 				«toStr(toType, '''«IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»ContainerView''', false)»
 			}
 
@@ -827,6 +842,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 						return true;
 					}
 				});
+			}
+
+			@Override
+			public int spliteratorCharacteristics() {
+				return Common.clearBit(this.view.spliteratorCharacteristics(), Spliterator.DISTINCT | Spliterator.SORTED);
 			}
 
 			«toStr(Type.OBJECT, type.shortName("FlatMappedContainerView"), false)»
@@ -918,6 +938,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 					});
 				}
 
+				@Override
+				public int spliteratorCharacteristics() {
+					return Common.clearBit(this.view.spliteratorCharacteristics(), Spliterator.DISTINCT | Spliterator.SORTED);
+				}
+
 				«toStr(toType, '''«IF type.primitive»«type.typeName»«ENDIF»FlatMappedTo«toType.typeName»ContainerView''', false)»
 			}
 
@@ -1000,6 +1025,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return new «filteredContainerViewShortName»<>(this.view, and(this.predicate, p));
 			}
 
+			@Override
+			public int spliteratorCharacteristics() {
+				return this.view.spliteratorCharacteristics();
+			}
+
 			«toStr(type, filteredContainerViewShortName, false)»
 		}
 
@@ -1076,6 +1106,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				«ENDIF»
 			}
 
+			@Override
+			public int spliteratorCharacteristics() {
+				return this.view.spliteratorCharacteristics();
+			}
+
 			«toStr(type, limitedContainerViewShortName, false)»
 		}
 
@@ -1144,6 +1179,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				«ELSE»
 					return new SkippedIterator<>(this.view.iterator(), this.skip);
 				«ENDIF»
+			}
+
+			@Override
+			public int spliteratorCharacteristics() {
+				return this.view.spliteratorCharacteristics();
 			}
 
 			«toStr(type, skippedContainerViewShortName, false)»
@@ -1310,6 +1350,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public HashSet<«type.genericBoxedName»> toHashSet() {
 				return this.view.toHashSet();
+			}
+
+			@Override
+			public int spliteratorCharacteristics() {
+				return this.view.spliteratorCharacteristics();
 			}
 
 			«toStr(type, reversedContainerViewShortName, false)»

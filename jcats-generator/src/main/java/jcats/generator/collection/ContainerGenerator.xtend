@@ -778,6 +778,11 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
+				public int spliteratorCharacteristics() {
+					return this.container.spliteratorCharacteristics();
+				}
+
+				@Override
 				public Spliterator<«type.genericBoxedName»> spliterator() {
 					return this.container.spliterator();
 				}
