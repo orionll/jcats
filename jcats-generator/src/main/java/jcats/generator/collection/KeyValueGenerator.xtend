@@ -91,7 +91,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				}
 			}
 
-			default void ifDoesNotContainKey(final K key, final Eff0 eff) {
+			default void ifNotContainsKey(final K key, final Eff0 eff) {
 				requireNonNull(eff);
 				final A value = getOrNull(key);
 				if (value == null) {
@@ -99,12 +99,12 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				}
 			}
 
-			default void ifContainsKeyOrElse(final K key, final Eff<A> ifContains, final Eff0 ifDoesNotContain) {
+			default void ifContainsKeyOrElse(final K key, final Eff<A> ifContains, final Eff0 ifNotContains) {
 				requireNonNull(ifContains);
-				requireNonNull(ifDoesNotContain);
+				requireNonNull(ifNotContains);
 				final A value = getOrNull(key);
 				if (value == null) {
-					ifDoesNotContain.apply();
+					ifNotContains.apply();
 				} else {
 					ifContains.apply(value);
 				}
