@@ -503,24 +503,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 				return «type.arrayShortName».create(«type.toArrayName»());
 			}
 
-			«IF type.primitive»
-				default Array<«type.boxedName»> toArray() {
-					if (hasFixedSize()) {
-						if (isEmpty()) {
-							return emptyArray();
-						} else {
-							final Object[] array = new Object[size()];
-							foreachWithIndex((final int index, final «type.javaName» value) -> array[index] = value);
-							return new Array<>(array);
-						}
-					} else {
-						final ArrayBuilder<«type.boxedName»> builder = Array.builder();
-						foreach(builder::append);
-						return builder.build();
-					}
-				}
-
-			«ENDIF»
 			default «type.seqGenericName» to«type.seqShortName»() {
 				if (hasFixedSize()) {
 					return «type.seqShortName».sizedToSeq(iterator(), size());
@@ -531,18 +513,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
-			«IF type.primitive»
-				default Seq<«type.boxedName»> toSeq() {
-					if (hasFixedSize()) {
-						return Seq.sizedToSeq(iterator(), size());
-					} else {
-						final SeqBuilder<«type.boxedName»> builder = new SeqBuilder<>();
-						foreach(builder::append);
-						return builder.build();
-					}
-				}
-
-			«ENDIF»
 			«IF type == Type.OBJECT»
 				default Unique<A> toUnique() {
 					final UniqueBuilder<A> builder = Unique.builder();
@@ -837,21 +807,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 				«ENDFOR»
 				@Override
-				public Array<«type.boxedName»> toArray() {
-					return this.container.toArray();
-				}
-
-				@Override
-				public Seq<«type.boxedName»> toSeq() {
-					return this.container.toSeq();
-				}
-
-				@Override
-				public Object[] toObjectArray() {
-					return this.container.toArray().array;
-				}
-
-				@Override
 				public Collection<«type.boxedName»> asCollection() {
 					return this.container.asCollection();
 				}
@@ -1053,6 +1008,12 @@ final class ContainerGenerator implements InterfaceGenerator {
 			«IF type == Type.OBJECT»
 				public Object[] toObjectArray() {
 					return this.collection.toArray();
+				}
+
+				@Override
+				public A[] toPreciseArray(final IntObjectF<A[]> supplier) {
+					final A[] array = supplier.apply(this.collection.size());
+					return this.collection.toArray(array);
 				}
 			«ELSE»
 				public «type.javaName»[] toPrimitiveArray() {

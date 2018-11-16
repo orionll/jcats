@@ -424,25 +424,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return this.container.to«type.arrayShortName»();
 			}
 
-			«IF type.primitive»
-				@Override
-				public Array<«type.boxedName»> toArray() {
-					return this.container.toArray();
-				}
-
-			«ENDIF»
 			@Override
 			public «type.seqGenericName» to«type.seqShortName»() {
 				return this.container.to«type.seqShortName»();
 			}
 
-			«IF type.primitive»
-				@Override
-				public Seq<«type.boxedName»> toSeq() {
-					return this.container.toSeq();
-				}
-
-			«ENDIF»
 			@Override
 			public «type.javaName»[] «type.toArrayName»() {
 				return this.container.«type.toArrayName»();
