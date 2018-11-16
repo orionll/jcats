@@ -20,6 +20,7 @@ final class RangeGenerator implements ClassGenerator {
 		import java.io.Serializable;
 		import java.util.NoSuchElementException;
 		import java.util.PrimitiveIterator;
+		import java.util.Spliterator;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
