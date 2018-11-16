@@ -464,11 +464,6 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public LinkedHashSet<«type.genericBoxedName»> toLinkedHashSet() {
-				return this.container.toLinkedHashSet();
-			}
-
-			@Override
 			public «type.stream2GenericName» stream() {
 				return this.container.stream();
 			}

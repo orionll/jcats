@@ -298,10 +298,6 @@ final class Stream2Generator implements ClassGenerator {
 				return this.stream.collect(Collectors.toCollection(HashSet::new));
 			}
 
-			public LinkedHashSet<A> toLinkedHashSet() {
-				return this.stream.collect(Collectors.toCollection(LinkedHashSet::new));
-			}
-
 			public Seq<A> toSeq() {
 				return this.stream.collect(Seq.collector());
 			}

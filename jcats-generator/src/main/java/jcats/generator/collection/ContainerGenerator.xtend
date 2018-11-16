@@ -577,10 +577,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 				return new HashSet<>(asCollection());
 			}
 
-			default LinkedHashSet<«type.genericBoxedName»> toLinkedHashSet() {
-				return new LinkedHashSet<>(asCollection());
-			}
-
 			default «type.containerViewGenericName» view() {
 				return new «type.shortName("BaseContainerView")»<>(this);
 			}
@@ -819,11 +815,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 				@Override
 				public HashSet<«type.boxedName»> toHashSet() {
 					return this.container.toHashSet();
-				}
-
-				@Override
-				public LinkedHashSet<«type.boxedName»> toLinkedHashSet() {
-					return this.container.toLinkedHashSet();
 				}
 
 				@Override
