@@ -373,19 +373,6 @@ final class OrdGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
-			default Comparator<«type.genericBoxedName»> toComparator() {
-				«IF type == Type.OBJECT»
-					return (Comparator<«type.genericBoxedName»> & Serializable) (final «type.genericBoxedName» x, final «type.genericBoxedName» y) -> {
-						requireNonNull(x);
-						requireNonNull(y);
-						return order(x, y).toInt();
-					};
-				«ELSE»
-					return (Comparator<«type.genericBoxedName»> & Serializable) (final «type.genericBoxedName» x, final «type.genericBoxedName» y) ->
-						order(x, y).toInt();
-				«ENDIF»
-			}
-
 			«IF type == Type.OBJECT»
 				static <A> Ord<A> ord(final Ord<A> ord) {
 					return requireNonNull(ord);
@@ -557,11 +544,6 @@ final class OrdGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public Comparator<Comparable<Object>> toComparator() {
-					return Comparator.naturalOrder();
-				}
-
-				@Override
 				public Ord<Comparable<Object>> reverse() {
 					return ReverseOrd.INSTANCE;
 				}
@@ -604,11 +586,6 @@ final class OrdGenerator implements InterfaceGenerator {
 					«ENDFOR»
 				«ENDIF»
 				@Override
-				public Comparator<«type.genericBoxedName»> toComparator() {
-					return Comparator.naturalOrder();
-				}
-
-				@Override
 				public «genericName» reverse() {
 					return «type.typeName»ReverseOrd.INSTANCE;
 				}
@@ -624,11 +601,6 @@ final class OrdGenerator implements InterfaceGenerator {
 					requireNonNull(x);
 					requireNonNull(y);
 					return Order.fromInt(y.compareTo(x));
-				}
-
-				@Override
-				public Comparator<Comparable<Object>> toComparator() {
-					return Comparator.reverseOrder();
 				}
 
 				@Override
@@ -673,11 +645,6 @@ final class OrdGenerator implements InterfaceGenerator {
 
 					«ENDFOR»
 				«ENDIF»
-				@Override
-				public Comparator<«type.genericBoxedName»> toComparator() {
-					return Comparator.reverseOrder();
-				}
-
 				@Override
 				public «genericName» reverse() {
 					return «type.typeName»NaturalOrd.INSTANCE;
