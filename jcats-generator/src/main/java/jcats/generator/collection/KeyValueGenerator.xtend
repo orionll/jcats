@@ -15,6 +15,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 		import java.util.Collection;
 		import java.util.Collections;
 		import java.util.Iterator;
+		import java.util.HashMap;
 		import java.util.HashSet;
 		import java.util.Map;
 		import java.util.Map.Entry;
@@ -129,6 +130,10 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			default Map<K, A> asMap() {
 				return new KeyValueAsMap<>(this);
+			}
+
+			default HashMap<K, A> toHashMap() {
+				return new HashMap<>(asMap());
 			}
 
 			default Iterator<P<K, A>> reverseIterator() {

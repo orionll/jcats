@@ -41,6 +41,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		«ENDIF»
 		import java.util.Spliterator;
 		import java.util.Spliterators;
+		import java.util.TreeSet;
 		import java.util.stream.Collector;
 		import java.util.stream.«type.streamName»;
 
@@ -309,6 +310,12 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			@Override
 			public int size() {
 				return this.size;
+			}
+
+			public TreeSet<«type.genericBoxedName»> toTreeSet() {
+				final TreeSet<«type.genericBoxedName»> set = new TreeSet<>(this.ord);
+				foreach(set::add);
+				return set;
 			}
 
 			int checkHeight() {
