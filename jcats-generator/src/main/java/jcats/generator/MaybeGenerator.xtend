@@ -193,7 +193,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 				}
 
 			«ENDIF»
-			default «type.containerGenericName» as«type.containerShortName»() {
+			default «type.containerViewGenericName» as«type.containerShortName»() {
 				return new «shortName»As«type.diamondName("Container")»(this);
 			}
 
@@ -242,7 +242,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 			«ENDIF»
 		}
 
-		final class «shortName»As«type.containerGenericName» implements «type.containerGenericName» {
+		final class «shortName»As«type.containerGenericName» implements «type.containerViewGenericName» {
 			private final «genericName» maybe;
 
 			«shortName»As«type.containerShortName»(final «genericName» maybe) {
