@@ -310,6 +310,16 @@ final class MaybeGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public «type.stream2GenericName» stream() {
+				return this.maybe.stream();
+			}
+
+			@Override
+			public «type.stream2GenericName» parallelStream() {
+				return this.maybe.stream().parallel();
+			}
+
+			@Override
 			public String toString() {
 				return this.maybe.toString();
 			}

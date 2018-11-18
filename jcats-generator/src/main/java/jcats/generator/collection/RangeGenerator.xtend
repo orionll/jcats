@@ -250,11 +250,7 @@ final class RangeGenerator implements ClassGenerator {
 
 			@Override
 			public IntStream2 parallelStream() {
-				if (this.closed) {
-					return IntStream2.rangeClosed(this.low, this.high).parallel();
-				} else {
-					return IntStream2.range(this.low, this.high).parallel();
-				}
+				return stream().parallel();
 			}
 
 			«hashcode(Type.INT)»

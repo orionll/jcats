@@ -371,7 +371,17 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			public Spliterator<P<K, A>> spliterator() {
 				return this.keyValue.spliterator();
 			}
-		
+
+			@Override
+			public Stream2<P<K, A>> stream() {
+				return this.keyValue.stream();
+			}
+
+			@Override
+			public Stream2<P<K, A>> parallelStream() {
+				return this.keyValue.parallelStream();
+			}
+
 			«uniqueHashCode(Type.OBJECT)»
 
 			«uniqueEquals(Type.OBJECT)»
