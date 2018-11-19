@@ -30,6 +30,8 @@ import jcats.generator.collection.SeqGenerator
 import jcats.generator.collection.SortedDictBuilderGenerator
 import jcats.generator.collection.SortedDictGenerator
 import jcats.generator.collection.SortedUniqueBuilderGenerator
+import jcats.generator.collection.SortedUniqueContainerGenerator
+import jcats.generator.collection.SortedUniqueContainerViewGenerator
 import jcats.generator.collection.SortedUniqueGenerator
 import jcats.generator.collection.StackBuilderGenerator
 import jcats.generator.collection.StackGenerator
@@ -148,6 +150,8 @@ final class Main {
 			IndexedContainerViewGenerator.generators,
 			UniqueContainerGenerator.generators,
 			UniqueContainerViewGenerator.generators,
+			SortedUniqueContainerGenerator.generators,
+			SortedUniqueContainerViewGenerator.generators,
 			ArrayGenerator.generators,
 			ArrayBuilderGenerator.generators,
 			StackGenerator.generators,

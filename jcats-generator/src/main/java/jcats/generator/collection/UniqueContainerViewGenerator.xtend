@@ -47,9 +47,9 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			final class «baseUniqueContainerViewShortName»<A, C extends UniqueContainer<A>> extends BaseContainerView<A, C> implements UniqueContainerView<A> {
+			class «baseUniqueContainerViewShortName»<A, C extends UniqueContainer<A>> extends BaseContainerView<A, C> implements UniqueContainerView<A> {
 		«ELSE»
-			final class «baseUniqueContainerViewShortName»<C extends «type.uniqueContainerShortName»> extends «type.typeName»BaseContainerView<C> implements «type.uniqueContainerViewShortName» {
+			class «baseUniqueContainerViewShortName»<C extends «type.uniqueContainerShortName»> extends «type.typeName»BaseContainerView<C> implements «type.uniqueContainerViewShortName» {
 		«ENDIF»
 
 			«baseUniqueContainerViewShortName»(final C container) {

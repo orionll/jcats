@@ -52,13 +52,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		import static «Constants.JCATS».Order.*;
 		import static «Constants.P».p;
 		import static «Constants.COMMON».*;
-		«IF type.javaUnboxedType»
-			import static «Constants.JCATS».«type.optionShortName».*;
-		«ENDIF»
+		import static «Constants.JCATS».«type.optionShortName».*;
 		import static «Constants.JCATS».«type.ordShortName».*;
 		import static «Constants.STACK».*;
 
-		public final class «type.covariantName(baseName)» implements «type.uniqueContainerGenericName», Serializable {
+		public final class «type.covariantName(baseName)» implements «type.sortedUniqueContainerGenericName», Serializable {
 
 			«IF type == Type.OBJECT»
 				static final «wildcardName» EMPTY = new «diamondName»(null, null, null, Ord.<Integer>asc(), 0);
@@ -108,6 +106,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				}
 			«ENDIF»
 
+			@Override
 			public «type.ordGenericName» ord() {
 				return this.ord;
 			}
@@ -240,6 +239,28 @@ final class SortedUniqueGenerator implements ClassGenerator {
 						unique = unique.left;
 					}
 					return unique.entry;
+				}
+			}
+
+			@Override
+			public «type.genericName» last() throws NoSuchElementException {
+				if (isEmpty()) {
+					throw new NoSuchElementException();
+				} else {
+					«genericName» unique = this;
+					while (unique.right != null) {
+						unique = unique.right;
+					}
+					return unique.entry;
+				}
+			}
+
+			@Override
+			public «type.optionGenericName» lastOption() throws NoSuchElementException {
+				if (isEmpty()) {
+					return «type.noneName»();
+				} else {
+					return «type.someName»(last());
 				}
 			}
 

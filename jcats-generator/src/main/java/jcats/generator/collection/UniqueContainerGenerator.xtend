@@ -18,7 +18,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 	override className() { Constants.COLLECTION + "." + shortName }
 
 	def shortName() { type.uniqueContainerShortName }
-	def genericName() { type.genericName("UniqueContainer") }
+	def genericName() { type.uniqueContainerGenericName }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -47,7 +47,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			«IF type.primitive»
 				@Override
 				default UniqueContainerView<«type.boxedName»> asContainer() {
-					return new «shortName»AsUniqueContainer(this);
+					return new «shortName»AsUniqueContainer<>(this);
 				}
 
 			«ENDIF»
@@ -68,27 +68,15 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			@Deprecated
 			boolean equals(final Object other);
 
-			«IF type == Type.OBJECT»
-				static <A> UniqueContainer<A> asUniqueContainer(final Set<A> set) {
-					requireNonNull(set);
-					return new SetAsUniqueContainer<>(set, false);
-				}
+			static «IF type == Type.OBJECT»<A> «ENDIF»«type.uniqueContainerGenericName» as«type.uniqueContainerShortName»(final Set<«type.genericBoxedName»> set) {
+				requireNonNull(set);
+				return new «type.shortName("Set")»As«type.uniqueContainerShortName»<>(set, false);
+			}
 
-				static <A> UniqueContainer<A> asFixedSizeUniqueContainer(final Set<A> set) {
-					requireNonNull(set);
-					return new SetAsUniqueContainer<>(set, true);
-				}
-			«ELSE»
-				static «type.uniqueContainerGenericName» as«type.typeName»UniqueContainer(final Set<«type.boxedName»> set) {
-					requireNonNull(set);
-					return new «type.typeName»SetAs«type.typeName»UniqueContainer(set, false);
-				}
-
-				static «type.uniqueContainerGenericName» asFixedSize«type.typeName»UniqueContainer(final Set<«type.boxedName»> set) {
-					requireNonNull(set);
-					return new «type.typeName»SetAs«type.typeName»UniqueContainer(set, true);
-				}
-			«ENDIF»
+			static «IF type == Type.OBJECT»<A> «ENDIF»«type.uniqueContainerGenericName» asFixedSize«type.uniqueContainerShortName»(final Set<«type.genericBoxedName»> set) {
+				requireNonNull(set);
+				return new «type.shortName("Set")»As«type.uniqueContainerShortName»<>(set, true);
+			}
 			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»
@@ -96,9 +84,9 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type.primitive»
-			final class «shortName»AsUniqueContainer extends «type.typeName»ContainerAsContainer<«shortName»> implements UniqueContainerView<«type.boxedName»> {
+			class «shortName»AsUniqueContainer<C extends «shortName»> extends «type.typeName»ContainerAsContainer<C> implements UniqueContainerView<«type.boxedName»> {
 
-				«shortName»AsUniqueContainer(final «shortName» container) {
+				«shortName»AsUniqueContainer(final C container) {
 					super(container);
 				}
 
@@ -113,10 +101,14 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			}
 
 		«ENDIF»
-		final class «type.genericName("UniqueContainerAsSet")» extends AbstractImmutableSet<«type.genericBoxedName»> implements Serializable {
-			final «genericName» container;
+		«IF type == Type.OBJECT»
+			class UniqueContainerAsSet<A, C extends UniqueContainer<A>> extends AbstractImmutableSet<A> implements Serializable {
+		«ELSE»
+			class «type.typeName»UniqueContainerAsSet<C extends «type.uniqueContainerGenericName»> extends AbstractImmutableSet<«type.genericBoxedName»> implements Serializable {
+		«ENDIF»
+			final C container;
 
-			«shortName»AsSet(final «genericName» container) {
+			«shortName»AsSet(final C container) {
 				this.container = container;
 			}
 
@@ -171,16 +163,12 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			final class SetAsUniqueContainer<A> extends CollectionAsContainer<Set<A>, A> implements UniqueContainer<A> {
+			class SetAsUniqueContainer<C extends Set<A>, A> extends CollectionAsContainer<C, A> implements UniqueContainer<A> {
 		«ELSE»
-			final class «type.typeName»SetAs«type.typeName»UniqueContainer extends «type.typeName»CollectionAs«type.typeName»Container<Set<«type.boxedName»>> implements «type.typeName»UniqueContainer {
+			class «type.typeName»SetAs«type.typeName»UniqueContainer<C extends Set<«type.boxedName»>> extends «type.typeName»CollectionAs«type.typeName»Container<C> implements «type.typeName»UniqueContainer {
 		«ENDIF»
-			
-			«IF type == Type.OBJECT»
-				SetAsUniqueContainer(final Set<A> set, final boolean fixedSize) {
-			«ELSE»
-				«type.typeName»SetAs«type.typeName»UniqueContainer(final Set<«type.boxedName»> set, final boolean fixedSize) {
-			«ENDIF»
+
+			«type.shortName("Set")»As«type.uniqueContainerShortName»(final C set, final boolean fixedSize) {
 				super(set, fixedSize);
 			}
 

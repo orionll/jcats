@@ -307,6 +307,26 @@ public enum Type {
 		return shortName("UniqueContainerView");
 	}
 
+	public String sortedUniqueContainerGenericName() {
+		return genericName("SortedUniqueContainer");
+	}
+
+	public String sortedUniqueContainerShortName() {
+		return shortName("SortedUniqueContainer");
+	}
+
+	public String sortedUniqueContainerDiamondName() {
+		return diamondName("SortedUniqueContainer");
+	}
+
+	public String sortedUniqueContainerViewGenericName() {
+		return genericName("SortedUniqueContainerView");
+	}
+
+	public String sortedUniqueContainerViewShortName() {
+		return genericName("SortedUniqueContainerView");
+	}
+
 	public String iteratorShortName(final String baseName) {
 		return shortName(baseName + "Iterator");
 	}
