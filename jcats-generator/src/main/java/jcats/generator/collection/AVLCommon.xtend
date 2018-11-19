@@ -175,6 +175,28 @@ final class AVLCommon {
 		}
 	'''
 
+	def static deleteMinimum(String genericName, String diamondName, String deleteResultGenericName) '''
+		private «genericName» deleteMinimum(final «deleteResultGenericName» result) {
+			if (this.left == null) {
+				result.entry = this.entry;
+				result.heightDecreased = true;
+				return this.right;
+			}
+			final «genericName» newLeft = this.left.deleteMinimum(result);
+			if (!result.heightDecreased) {
+				return new «diamondName»(this.entry, newLeft, this.right, this.ord, this.balance);
+			} else if (this.balance == -1) {
+				// heightDecreased is already true
+				return new «diamondName»(this.entry, newLeft, this.right, this.ord, 0);
+			} else if (this.balance == 0) {
+				result.heightDecreased = false;
+				return new «diamondName»(this.entry, newLeft, this.right, this.ord, 1);
+			} else {
+				return deleteAndRotateLeft(newLeft, this.entry, result);
+			}
+		}
+	'''
+
 	def static deleteMaximum(String genericName, String diamondName, String deleteResultGenericName) '''
 		private «genericName» deleteMaximum(final «deleteResultGenericName» result) {
 			if (this.right == null) {

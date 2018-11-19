@@ -182,6 +182,8 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				«AVLCommon.delete(genericName, diamondName, "value", "entry")»
 			}
 
+			«AVLCommon.deleteMinimum(genericName, diamondName, deleteResultGenericName)»
+
 			«AVLCommon.deleteMaximum(genericName, diamondName, deleteResultGenericName)»
 
 			«AVLCommon.deleteAndRotateLeft(genericName, diamondName, type.genericName, deleteResultGenericName)»
@@ -261,6 +263,32 @@ final class SortedUniqueGenerator implements ClassGenerator {
 					return «type.noneName»();
 				} else {
 					return «type.someName»(last());
+				}
+			}
+
+			public «genericName» init() throws NoSuchElementException {
+				if (isEmpty()) {
+					throw new NoSuchElementException();
+				} else {
+					final «genericName» newUnique = deleteMaximum(new «deleteResultDiamondName»());
+					if (newUnique == null) {
+						return empty«shortName»By(this.ord);
+					} else {
+						return newUnique;
+					}
+				}
+			}
+
+			public «genericName» tail() throws NoSuchElementException {
+				if (isEmpty()) {
+					throw new NoSuchElementException();
+				} else {
+					final «genericName» newUnique = deleteMinimum(new «deleteResultDiamondName»());
+					if (newUnique == null) {
+						return empty«shortName»By(this.ord);
+					} else {
+						return newUnique;
+					}
 				}
 			}
 

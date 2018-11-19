@@ -146,6 +146,26 @@ final class ArrayGenerator implements ClassGenerator {
 				return new «diamondName»(result);
 			}
 
+			public «genericName» init() throws NoSuchElementException {
+				if (this.array.length == 0) {
+					throw new NoSuchElementException();
+				} else {
+					final «type.javaName»[] result = new «type.javaName»[this.array.length - 1];
+					System.arraycopy(this.array, 0, result, 0, result.length);
+					return new «diamondName»(result);
+				}
+			}
+
+			public «genericName» tail() throws NoSuchElementException {
+				if (this.array.length == 0) {
+					throw new NoSuchElementException();
+				} else {
+					final «type.javaName»[] result = new «type.javaName»[this.array.length - 1];
+					System.arraycopy(this.array, 1, result, 0, result.length);
+					return new «diamondName»(result);
+				}
+			}
+
 			public «genericName» removeAt(final int index) throws IndexOutOfBoundsException {
 				if (index < 0 || index >= this.array.length) {
 					throw new IndexOutOfBoundsException(Integer.toString(index));
