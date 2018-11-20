@@ -67,8 +67,8 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			final «type.genericName» entry;
 			final «genericName» left;
 			final «genericName» right;
-			private final int size;
-			private final «type.ordGenericName» ord;
+			final int size;
+			final «type.ordGenericName» ord;
 			private final int balance;
 
 			«IF type == Type.OBJECT»
@@ -190,11 +190,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			«AVLCommon.deleteAndRotateRight(genericName, diamondName, deleteResultGenericName)»
 
-			private static NullPointerException nullOrder(final Order order) {
+			static NullPointerException nullOrder(final Order order) {
 				if (order == null) {
-					return new NullPointerException("Ord.order() returned null");
+					return new NullPointerException("«type.ordShortName».order() returned null");
 				} else {
-					throw new AssertionError("Ord.order() returned unexpected value: " + order);
+					throw new AssertionError("«type.ordShortName».order() returned unexpected value: " + order);
 				}
 			}
 
@@ -329,7 +329,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				}
 			}
 
-			private void traverse(final «type.effGenericName» eff) {
+			void traverse(final «type.effGenericName» eff) {
 				if (this.left != null) {
 					this.left.traverse(eff);
 				}
@@ -367,6 +367,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				return set;
 			}
 
+			@Override
+			public «type.sortedUniqueContainerViewGenericName» view() {
+				return new «type.diamondName("SortedUniqueView")»(this);
+			}
+
 			int checkHeight() {
 				final int leftHeight = (this.left == null) ? 0 : this.left.checkHeight();
 				final int rightHeight = (this.right == null) ? 0 : this.right.checkHeight();
@@ -382,10 +387,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			«uniqueHashCode(type)»
 
-			@Override
-			public String toString() {
-				return iterableToString(this, "«shortName»");
-			}
+			«toStr(type, shortName, false)»
 
 			public static «paramComparableGenericName» empty«shortName»() {
 				return «IF type == Type.OBJECT»(«genericName») «ENDIF»EMPTY;
@@ -565,6 +567,172 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 				return result.entry;
 			}
+		}
+
+		final class «type.genericName("SortedUniqueView")» extends «type.shortName("BaseSortedUniqueContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»«genericName»> {
+
+			«shortName»View(final «genericName» container) {
+				super(container);
+			}
+
+			@Override
+			public «type.sortedUniqueContainerViewGenericName» subSet(final «type.genericName» from, final «type.genericName» to) {
+				«IF type == Type.OBJECT»
+					requireNonNull(from);
+					requireNonNull(to);
+				«ENDIF»
+				if (this.container.ord.greater(from, to)) {
+					throw new IllegalArgumentException("from > to");
+				}
+				return new «type.diamondName("SubSortedUniqueView")»(this.container, from, to);
+			}
+
+			«toStr(type, type.shortName("SortedUniqueView"), false)»
+		}
+
+		final class «type.genericName("SubSortedUniqueView")» implements «type.sortedUniqueContainerViewGenericName» {
+
+			private final «genericName» root;
+			private final «type.genericName» from;
+			private final «type.genericName» to;
+
+			«type.shortName("SubSortedUniqueView")»(final «genericName» root, final «type.genericName» from, final «type.genericName» to) {
+				this.root = root;
+				this.from = from;
+				this.to = to;
+			}
+
+			@Override
+			public «type.ordGenericName» ord() {
+				return this.root.ord;
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				if (this.root.isNotEmpty()) {
+					traverse(this.root, eff);
+				}
+			}
+
+			private void traverse(final «genericName» unique, final «type.effGenericName» eff) {
+				final Order fromOrder = this.root.ord.order(this.from, unique.entry);
+				final Order toOrder = this.root.ord.order(this.to, unique.entry);
+				if (fromOrder == LT) {
+					if (toOrder == LT) {
+						if (unique.left != null) {
+							traverse(unique.left, eff);
+						}
+					} else if (toOrder == EQ) {
+						if (unique.left != null) {
+							traverseFrom(unique.left, eff);
+						}
+						eff.apply(unique.entry);
+					} else if (toOrder == GT) {
+						if (unique.left != null) {
+							traverseFrom(unique.left, eff);
+						}
+						eff.apply(unique.entry);
+						if (unique.right != null) {
+							traverseTo(unique.right, eff);
+						}
+					} else {
+						throw «shortName».nullOrder(toOrder);
+					}
+				} else if (fromOrder == EQ) {
+					if (toOrder == EQ) {
+						eff.apply(unique.entry);
+					} else if (toOrder == GT) {
+						eff.apply(unique.entry);
+						if (unique.right != null) {
+							traverseTo(unique.right, eff);
+						}
+					} else if (toOrder == LT) {
+						throw new IllegalArgumentException("from == entry && entry > to");
+					} else {
+						throw «shortName».nullOrder(toOrder);
+					}
+				} else if (fromOrder == GT) {
+					if (toOrder == GT) {
+						if (unique.right != null) {
+							traverse(unique.right, eff);
+						}
+					} else if (toOrder == LT) {
+						throw new IllegalArgumentException("from > entry && entry > to");
+					} else if (toOrder == EQ) {
+						throw new IllegalArgumentException("from > entry && entry == to");
+					} else {
+						throw «shortName».nullOrder(toOrder);
+					}
+				} else {
+					throw «shortName».nullOrder(fromOrder);
+				}
+			}
+
+			private void traverseFrom(final «genericName» unique, final «type.effGenericName» eff) {
+				final Order order = this.root.ord.order(this.from, unique.entry);
+				if (order == LT) {
+					if (unique.left != null) {
+						traverseFrom(unique.left, eff);
+					}
+					eff.apply(unique.entry);
+					if (unique.right != null) {
+						unique.right.traverse(eff);
+					}
+				} else if (order == EQ) {
+					eff.apply(unique.entry);
+					if (unique.right != null) {
+						unique.right.traverse(eff);
+					}
+				} else if (order == GT) {
+					if (unique.right != null) {
+						traverseFrom(unique.right, eff);
+					}
+				} else {
+					throw «shortName».nullOrder(order);
+				}
+			}
+
+			private void traverseTo(final «genericName» unique, final «type.effGenericName» eff) {
+				final Order order = this.root.ord.order(this.to, unique.entry);
+				if (order == LT) {
+					if (unique.left != null) {
+						traverseTo(unique.left, eff);
+					}
+				} else if (order == EQ) {
+					if (unique.left != null) {
+						unique.left.traverse(eff);
+					}
+					eff.apply(unique.entry);
+				} else if (order == GT) {
+					if (unique.left != null) {
+						unique.left.traverse(eff);
+					}
+					eff.apply(unique.entry);
+					if (unique.right != null) {
+						traverseTo(unique.right, eff);
+					}
+				} else {
+					throw «shortName».nullOrder(order);
+				}
+			}
+
+			@Override
+			public «type.sortedUniqueContainerViewGenericName» subSet(final «type.genericName» from2, final «type.genericName» to2) {
+				final «type.genericName» newFrom = ord().max(this.from, from2);
+				final «type.genericName» newTo = ord().min(this.to, to2);
+				return new «type.diamondName("SubSortedUniqueView")»(this.root, newFrom, newTo);
+			}
+
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				throw new UnsupportedOperationException("Not implemented");
+			}
+
+			«uniqueEquals(type)»
+
+			«uniqueHashCode(type)»
+
+			«toStr(type, type.shortName("SubSortedUniqueView"), false)»
 		}
 	''' }
 }

@@ -35,6 +35,8 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 
 		public interface «type.covariantName("SortedUniqueContainerView")» extends «type.uniqueContainerViewGenericName», «type.sortedUniqueContainerGenericName» {
 
+			«genericName» subSet(final «type.genericName» from, final «type.genericName» to);
+
 			@Override
 			@Deprecated
 			default «type.sortedUniqueContainerViewGenericName» view() {
@@ -47,9 +49,9 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			final class «baseSortedUniqueContainerViewShortName»<A, C extends SortedUniqueContainer<A>> extends BaseUniqueContainerView<A, C> implements SortedUniqueContainerView<A> {
+			abstract class «baseSortedUniqueContainerViewShortName»<A, C extends SortedUniqueContainer<A>> extends BaseUniqueContainerView<A, C> implements SortedUniqueContainerView<A> {
 		«ELSE»
-			final class «baseSortedUniqueContainerViewShortName»<C extends «type.sortedUniqueContainerShortName»> extends «type.typeName»BaseUniqueContainerView<C> implements «type.sortedUniqueContainerViewShortName» {
+			abstract class «baseSortedUniqueContainerViewShortName»<C extends «type.sortedUniqueContainerShortName»> extends «type.typeName»BaseUniqueContainerView<C> implements «type.sortedUniqueContainerViewShortName» {
 		«ENDIF»
 
 			«baseSortedUniqueContainerViewShortName»(final C container) {
