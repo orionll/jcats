@@ -235,27 +235,15 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			@Deprecated
 			boolean equals(final Object other);
 
-			«IF type == Type.OBJECT»
-				static <A> IndexedContainer<A> asIndexedContainer(final List<A> list) {
-					requireNonNull(list);
-					return new ListAsIndexedContainer<>(list, false);
-				}
+			static «type.paramGenericName("IndexedContainerView")» as«type.indexedContainerShortName»(final List<«type.genericBoxedName»> list) {
+				requireNonNull(list);
+				return new «type.shortName("List")»As«type.indexedContainerDiamondName»(list, false);
+			}
 
-				static <A> IndexedContainer<A> asFixedSizeIndexedContainer(final List<A> list) {
-					requireNonNull(list);
-					return new ListAsIndexedContainer<>(list, true);
-				}
-			«ELSE»
-				static «type.indexedContainerGenericName» as«type.typeName»IndexedContainer(final List<«type.boxedName»> list) {
-					requireNonNull(list);
-					return new «type.typeName»ListAs«type.typeName»IndexedContainer(list, false);
-				}
-
-				static «type.indexedContainerGenericName» asFixedSize«type.typeName»IndexedContainer(final List<«type.boxedName»> list) {
-					requireNonNull(list);
-					return new «type.typeName»ListAs«type.typeName»IndexedContainer(list, true);
-				}
-			«ENDIF»
+			static «type.paramGenericName("IndexedContainerView")» asFixedSize«type.indexedContainerShortName»(final List<«type.genericBoxedName»> list) {
+				requireNonNull(list);
+				return new «type.shortName("List")»As«type.indexedContainerDiamondName»(list, true);
+			}
 			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»
@@ -414,9 +402,9 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			final class ListAsIndexedContainer<A> extends CollectionAsContainer<List<A>, A> implements IndexedContainer<A> {
+			final class ListAsIndexedContainer<A> extends CollectionAsContainer<List<A>, A> implements IndexedContainerView<A> {
 		«ELSE»
-			final class «type.typeName»ListAs«type.typeName»IndexedContainer extends «type.typeName»CollectionAs«type.typeName»Container<List<«type.boxedName»>> implements «type.typeName»IndexedContainer {
+			final class «type.typeName»ListAs«type.typeName»IndexedContainer extends «type.typeName»CollectionAs«type.typeName»Container<List<«type.boxedName»>> implements «type.indexedContainerViewGenericName» {
 		«ENDIF»
 
 			«IF type == Type.OBJECT»

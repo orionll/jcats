@@ -74,12 +74,12 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 				return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE;
 			}
 
-			static «IF type == Type.OBJECT»<A> «ENDIF»«type.sortedUniqueContainerGenericName» as«type.sortedUniqueContainerShortName»(final SortedSet<«type.genericBoxedName»> set) {
+			static «type.paramGenericName("SortedUniqueContainerView")» as«type.sortedUniqueContainerShortName»(final SortedSet<«type.genericBoxedName»> set) {
 				requireNonNull(set);
 				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(set, false);
 			}
 
-			static «IF type == Type.OBJECT»<A> «ENDIF»«type.sortedUniqueContainerGenericName» asFixedSize«type.sortedUniqueContainerShortName»(final SortedSet<«type.genericBoxedName»> set) {
+			static «type.paramGenericName("SortedUniqueContainerView")» asFixedSize«type.sortedUniqueContainerShortName»(final SortedSet<«type.genericBoxedName»> set) {
 				requireNonNull(set);
 				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(set, true);
 			}
@@ -146,9 +146,9 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			final class SortedSetAsSortedUniqueContainer<A> extends SetAsUniqueContainer<SortedSet<A>, A> implements SortedUniqueContainer<A> {
+			final class SortedSetAsSortedUniqueContainer<A> extends SetAsUniqueContainer<SortedSet<A>, A> implements SortedUniqueContainerView<A> {
 		«ELSE»
-			final class «type.shortName("SortedSet")»As«type.sortedUniqueContainerShortName» extends «type.shortName("Set")»As«type.uniqueContainerShortName»<SortedSet<«type.boxedName»>> implements «type.sortedUniqueContainerGenericName» {
+			final class «type.shortName("SortedSet")»As«type.sortedUniqueContainerShortName» extends «type.shortName("Set")»As«type.uniqueContainerShortName»<SortedSet<«type.boxedName»>> implements «type.sortedUniqueContainerViewGenericName» {
 		«ENDIF»
 
 			«type.shortName("SortedSet")»As«type.sortedUniqueContainerShortName»(final SortedSet<«type.genericBoxedName»> set, final boolean fixedSize) {

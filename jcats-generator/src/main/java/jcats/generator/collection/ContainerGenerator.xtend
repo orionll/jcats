@@ -589,27 +589,15 @@ final class ContainerGenerator implements InterfaceGenerator {
 				return new «type.stream2DiamondName»(StreamSupport.«type.streamFunction»(spliterator(), true));
 			}
 
-			«IF type == Type.OBJECT»
-				static <A> Container<A> asContainer(final Collection<A> collection) {
-					requireNonNull(collection);
-					return new CollectionAsContainer<>(collection, false);
-				}
+			static «type.paramGenericName("ContainerView")» as«type.containerShortName»(final Collection<«type.genericBoxedName»> collection) {
+				requireNonNull(collection);
+				return new «type.shortName("Collection")»As«type.containerShortName»<>(collection, false);
+			}
 
-				static <A> Container<A> asFixedSizeContainer(final Collection<A> collection) {
-					requireNonNull(collection);
-					return new CollectionAsContainer<>(collection, true);
-				}
-			«ELSE»
-				static «type.containerGenericName» as«type.typeName»Container(final Collection<«type.boxedName»> collection) {
-					requireNonNull(collection);
-					return new «type.typeName»CollectionAs«type.typeName»Container<>(collection, false);
-				}
-
-				static «type.containerGenericName» asFixedSize«type.typeName»Container(final Collection<«type.boxedName»> collection) {
-					requireNonNull(collection);
-					return new «type.typeName»CollectionAs«type.typeName»Container<>(collection, true);
-				}
-			«ENDIF»
+			static «type.paramGenericName("ContainerView")» asFixedSize«type.containerShortName»(final Collection<«type.genericBoxedName»> collection) {
+				requireNonNull(collection);
+				return new «type.shortName("Collection")»As«type.containerShortName»<>(collection, true);
+			}
 			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»
@@ -875,9 +863,9 @@ final class ContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			class CollectionAsContainer<C extends Collection<A>, A> implements Container<A>, Serializable {
+			class CollectionAsContainer<C extends Collection<A>, A> implements ContainerView<A>, Serializable {
 		«ELSE»
-			class «type.typeName»CollectionAs«type.typeName»Container<C extends Collection<«type.boxedName»>> implements «type.typeName»Container, Serializable {
+			class «type.typeName»CollectionAs«type.typeName»Container<C extends Collection<«type.boxedName»>> implements «type.containerViewGenericName», Serializable {
 		«ENDIF»
 			final C collection;
 			private final boolean fixedSize;
@@ -981,7 +969,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 						return ((NavigableSet<«type.genericBoxedName»>) this.collection).descendingIterator();
 					«ENDIF»
 				} else {
-					return «type.containerShortName».super.reverseIterator();
+					return «type.containerViewShortName».super.reverseIterator();
 				}
 			}
 

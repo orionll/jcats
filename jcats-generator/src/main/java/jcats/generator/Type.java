@@ -255,6 +255,10 @@ public enum Type {
 		return wildcardName("Container");
 	}
 
+	public String containerViewShortName() {
+		return shortName("ContainerView");
+	}
+
 	public String containerViewGenericName() {
 		return genericName("ContainerView");
 	}
@@ -265,6 +269,10 @@ public enum Type {
 
 	public String indexedContainerShortName() {
 		return shortName("IndexedContainer");
+	}
+
+	public String indexedContainerDiamondName() {
+		return diamondName("IndexedContainer");
 	}
 
 	public String indexedContainerWildcardName() {
