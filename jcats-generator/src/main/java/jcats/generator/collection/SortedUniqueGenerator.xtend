@@ -725,7 +725,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			@Override
 			public «type.iteratorGenericName» iterator() {
-				throw new UnsupportedOperationException("Not implemented");
+				return this.root.isEmpty() ? «type.emptyIterator» : new «type.iteratorDiamondName("SubSortedUnique")»(this.root, this.from, this.to);
 			}
 
 			«uniqueEquals(type)»
@@ -733,6 +733,101 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			«uniqueHashCode(type)»
 
 			«toStr(type, type.shortName("SubSortedUniqueView"), false)»
+		}
+
+		final class «type.iteratorGenericName("SubSortedUnique")» implements «type.iteratorGenericName» {
+			private final «genericName» end;
+			private Stack<«genericName»> stack;
+
+			«type.iteratorShortName("SubSortedUnique")»(final «genericName» root, final «type.genericName» from, final «type.genericName» to) {
+				final Stack<«genericName»> start = getStart(root, from);
+				if (start == null || root.ord.greater(start.head.entry, to)) {
+					this.stack = null;
+					this.end = null;
+				} else {
+					this.stack = start;
+					this.end = getEnd(root, to);
+				}
+			}
+
+			private static «IF type == Type.OBJECT»<A> «ENDIF»Stack<«genericName»> getStart(«genericName» unique, final «type.genericName» from) {
+				final «type.ordGenericName» ord = unique.ord;
+				Stack<«genericName»> minGreater = null;
+				Stack<«genericName»> stack = emptyStack();
+				while (true) {
+					final Order order = ord.order(from, unique.entry);
+					if (order == EQ) {
+						return stack.prepend(unique);
+					} else if (order == LT) {
+						if (unique.left == null) {
+							return stack.prepend(unique);
+						} else {
+							stack = stack.prepend(unique);
+							minGreater = stack;
+							unique = unique.left;
+						}
+					} else if (order == GT) {
+						if (unique.right == null) {
+							return minGreater;
+						} else {
+							unique = unique.right;
+						}
+					}
+				}
+			}
+
+			private static «paramGenericName» getEnd(«genericName» unique, final «type.genericName» to) {
+				final «type.ordGenericName» ord = unique.ord;
+				«genericName» maxLess = null;
+				while (true) {
+					final Order order = ord.order(to, unique.entry);
+					if (order == EQ) {
+						return unique;
+					} else if (order == LT) {
+						if (unique.left == null) {
+							return maxLess;
+						} else {
+							unique = unique.left;
+						}
+					} else if (order == GT) {
+						if (unique.right == null) {
+							return unique;
+						} else {
+							maxLess = unique;
+							unique = unique.right;
+						}
+					} else {
+						throw SortedUnique.nullOrder(order);
+					}
+				}
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (this.stack != null && this.stack.isNotEmpty());
+			}
+
+			@Override
+			public «type.iteratorReturnType» «type.iteratorNext»() {
+				if (this.stack == null) {
+					throw new NoSuchElementException();
+				}
+
+				final «genericName» result = this.stack.head;
+				if (result == this.end) {
+					this.stack = null;
+				} else {
+					this.stack = this.stack.tail;
+
+					if (result.right != null) {
+						for («genericName» unique = result.right; unique != null; unique = unique.left) {
+							this.stack = this.stack.prepend(unique);
+						}
+					}
+				}
+
+				return result.entry;
+			}
 		}
 	''' }
 }
