@@ -26,6 +26,8 @@ final class SortedUniqueGenerator implements ClassGenerator {
 	def deleteResultDiamondName() { "DeleteResult" + (if (type == Type.OBJECT) "<>" else "") }
 	def paramGenericName() { type.paramGenericName(baseName) }
 	def paramComparableGenericName() { if (type == Type.OBJECT) "<A extends Comparable<A>> " + genericName else genericName }
+	def subSortedUniqueViewShortName() { type.shortName("SubSortedUniqueView") }
+	def subSortedUniqueViewDiamondName() { type.diamondName("SubSortedUniqueView") }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -55,6 +57,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		import static «Constants.JCATS».«type.optionShortName».*;
 		import static «Constants.JCATS».«type.ordShortName».*;
 		import static «Constants.STACK».*;
+		import static «Constants.COLLECTION».«type.sortedUniqueShortName».*;
 
 		public final class «type.covariantName(baseName)» implements «type.sortedUniqueContainerGenericName», Serializable {
 
@@ -577,17 +580,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			@Override
 			public «type.sortedUniqueContainerViewGenericName» subSet(final «type.genericName» from, final «type.genericName» to) {
-				«IF type == Type.OBJECT»
-					requireNonNull(from);
-					requireNonNull(to);
-				«ENDIF»
-				if (this.container.ord.greater(from, to)) {
-					throw new IllegalArgumentException("from > to");
-				}
-				return new «type.diamondName("SubSortedUniqueView")»(this.container, from, to);
+				«subSortedUniqueViewShortName».checkRange(this.container.ord, from, to);
+				return new «subSortedUniqueViewDiamondName»(this.container, from, to);
 			}
 
-			«toStr(type, type.shortName("SortedUniqueView"), false)»
+			«toStr(type, type.sortedUniqueViewShortName, false)»
 		}
 
 		final class «type.genericName("SubSortedUniqueView")» implements «type.sortedUniqueContainerViewGenericName» {
@@ -596,7 +593,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			private final «type.genericName» from;
 			private final «type.genericName» to;
 
-			«type.shortName("SubSortedUniqueView")»(final «genericName» root, final «type.genericName» from, final «type.genericName» to) {
+			«subSortedUniqueViewShortName»(final «genericName» root, final «type.genericName» from, final «type.genericName» to) {
 				this.root = root;
 				this.from = from;
 				this.to = to;
@@ -718,9 +715,14 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			@Override
 			public «type.sortedUniqueContainerViewGenericName» subSet(final «type.genericName» from2, final «type.genericName» to2) {
-				final «type.genericName» newFrom = ord().max(this.from, from2);
-				final «type.genericName» newTo = ord().min(this.to, to2);
-				return new «type.diamondName("SubSortedUniqueView")»(this.root, newFrom, newTo);
+				checkRange(this.root.ord, from2, to2);
+				final «type.genericName» newFrom = this.root.ord.max(this.from, from2);
+				final «type.genericName» newTo = this.root.ord.min(this.to, to2);
+				if (this.root.ord.greater(newFrom, newTo)) {
+					return new «type.sortedUniqueViewDiamondName»(empty«shortName»By(this.root.ord));
+				} else {
+					return new «subSortedUniqueViewDiamondName»(this.root, newFrom, newTo);
+				}
 			}
 
 			@Override
@@ -732,7 +734,17 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			«uniqueHashCode(type)»
 
-			«toStr(type, type.shortName("SubSortedUniqueView"), false)»
+			«toStr(type, subSortedUniqueViewShortName, false)»
+
+			static «IF type == Type.OBJECT»<A> «ENDIF»void checkRange(final «type.ordGenericName» ord, final «type.genericName» from, final «type.genericName» to) {
+				«IF type == Type.OBJECT»
+					requireNonNull(from);
+					requireNonNull(to);
+				«ENDIF»
+				if (ord.greater(from, to)) {
+					throw new IllegalArgumentException("from > to");
+				}
+			}
 		}
 
 		final class «type.iteratorGenericName("SubSortedUnique")» implements «type.iteratorGenericName» {

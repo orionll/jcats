@@ -235,6 +235,14 @@ public enum Type {
 		return diamondName("SortedUniqueBuilder");
 	}
 
+	public String sortedUniqueViewShortName() {
+		return shortName("SortedUniqueView");
+	}
+
+	public String sortedUniqueViewDiamondName() {
+		return diamondName("SortedUniqueView");
+	}
+
 	public String effShortName() {
 		return shortName("Eff");
 	}
