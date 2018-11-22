@@ -100,8 +100,8 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public SortedUniqueContainerView<«type.boxedName»> subSet(final «type.boxedName» from, final «type.boxedName» to) {
-					return new «shortName»AsSortedUniqueContainer(this.container.view().subSet(from, to));
+				public SortedUniqueContainerView<«type.boxedName»> slice(final «type.boxedName» from, final «type.boxedName» to) {
+					return new «shortName»AsSortedUniqueContainer(this.container.view().slice(from, to));
 				}
 
 				@Override
@@ -124,7 +124,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			public SortedSet<«type.genericBoxedName»> subSet(final «type.genericBoxedName» fromElement, final «type.genericBoxedName» toElement) {
-				return new «type.diamondName("SortedUniqueContainerAsSortedSet")»(this.container.view().subSet(fromElement, toElement));
+				return new «type.diamondName("SortedUniqueContainerAsSortedSet")»(this.container.view().slice(fromElement, toElement));
 			}
 
 			@Override
@@ -164,7 +164,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.sortedUniqueContainerViewGenericName» subSet(final «type.genericName» from, final «type.genericName» to) {
+			public «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from, final «type.genericName» to) {
 				«IF type == Type.OBJECT»
 					requireNonNull(from);
 					requireNonNull(to);

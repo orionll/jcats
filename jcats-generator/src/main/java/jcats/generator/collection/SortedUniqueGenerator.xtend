@@ -26,8 +26,8 @@ final class SortedUniqueGenerator implements ClassGenerator {
 	def deleteResultDiamondName() { "DeleteResult" + (if (type == Type.OBJECT) "<>" else "") }
 	def paramGenericName() { type.paramGenericName(baseName) }
 	def paramComparableGenericName() { if (type == Type.OBJECT) "<A extends Comparable<A>> " + genericName else genericName }
-	def subSortedUniqueViewShortName() { type.shortName("SubSortedUniqueView") }
-	def subSortedUniqueViewDiamondName() { type.diamondName("SubSortedUniqueView") }
+	def slicedSortedUniqueViewShortName() { type.shortName("SlicedSortedUniqueView") }
+	def slicedSortedUniqueViewDiamondName() { type.diamondName("SlicedSortedUniqueView") }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -579,21 +579,21 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.sortedUniqueContainerViewGenericName» subSet(final «type.genericName» from, final «type.genericName» to) {
-				«subSortedUniqueViewShortName».checkRange(this.container.ord, from, to);
-				return new «subSortedUniqueViewDiamondName»(this.container, from, to);
+			public «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from, final «type.genericName» to) {
+				«slicedSortedUniqueViewShortName».checkRange(this.container.ord, from, to);
+				return new «slicedSortedUniqueViewDiamondName»(this.container, from, to);
 			}
 
 			«toStr(type, type.sortedUniqueViewShortName, false)»
 		}
 
-		final class «type.genericName("SubSortedUniqueView")» implements «type.sortedUniqueContainerViewGenericName» {
+		final class «type.genericName("SlicedSortedUniqueView")» implements «type.sortedUniqueContainerViewGenericName» {
 
 			private final «genericName» root;
 			private final «type.genericName» from;
 			private final «type.genericName» to;
 
-			«subSortedUniqueViewShortName»(final «genericName» root, final «type.genericName» from, final «type.genericName» to) {
+			«slicedSortedUniqueViewShortName»(final «genericName» root, final «type.genericName» from, final «type.genericName» to) {
 				this.root = root;
 				this.from = from;
 				this.to = to;
@@ -714,27 +714,27 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.sortedUniqueContainerViewGenericName» subSet(final «type.genericName» from2, final «type.genericName» to2) {
+			public «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from2, final «type.genericName» to2) {
 				checkRange(this.root.ord, from2, to2);
 				final «type.genericName» newFrom = this.root.ord.max(this.from, from2);
 				final «type.genericName» newTo = this.root.ord.min(this.to, to2);
 				if (this.root.ord.greater(newFrom, newTo)) {
 					return new «type.sortedUniqueViewDiamondName»(empty«shortName»By(this.root.ord));
 				} else {
-					return new «subSortedUniqueViewDiamondName»(this.root, newFrom, newTo);
+					return new «slicedSortedUniqueViewDiamondName»(this.root, newFrom, newTo);
 				}
 			}
 
 			@Override
 			public «type.iteratorGenericName» iterator() {
-				return this.root.isEmpty() ? «type.emptyIterator» : new «type.iteratorDiamondName("SubSortedUnique")»(this.root, this.from, this.to);
+				return this.root.isEmpty() ? «type.emptyIterator» : new «type.iteratorDiamondName("SlicedSortedUnique")»(this.root, this.from, this.to);
 			}
 
 			«uniqueEquals(type)»
 
 			«uniqueHashCode(type)»
 
-			«toStr(type, subSortedUniqueViewShortName, false)»
+			«toStr(type, slicedSortedUniqueViewShortName, false)»
 
 			static «IF type == Type.OBJECT»<A> «ENDIF»void checkRange(final «type.ordGenericName» ord, final «type.genericName» from, final «type.genericName» to) {
 				«IF type == Type.OBJECT»
@@ -747,11 +747,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 		}
 
-		final class «type.iteratorGenericName("SubSortedUnique")» implements «type.iteratorGenericName» {
+		final class «type.iteratorGenericName("SlicedSortedUnique")» implements «type.iteratorGenericName» {
 			private final «genericName» end;
 			private Stack<«genericName»> stack;
 
-			«type.iteratorShortName("SubSortedUnique")»(final «genericName» root, final «type.genericName» from, final «type.genericName» to) {
+			«type.iteratorShortName("SlicedSortedUnique")»(final «genericName» root, final «type.genericName» from, final «type.genericName» to) {
 				final Stack<«genericName»> start = getStart(root, from);
 				if (start == null || root.ord.greater(start.head.entry, to)) {
 					this.stack = null;
