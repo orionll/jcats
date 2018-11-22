@@ -26,6 +26,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 		import java.util.Collections;
 		import java.util.Comparator;
 		import java.util.«IF type.javaUnboxedType»Primitive«ENDIF»Iterator;
+		import java.util.NavigableSet;
 		import java.util.NoSuchElementException;
 		import java.util.SortedSet;
 		import java.util.Spliterator;
@@ -100,8 +101,8 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public SortedUniqueContainerView<«type.boxedName»> slice(final «type.boxedName» from, final «type.boxedName» to) {
-					return new «shortName»AsSortedUniqueContainer(this.container.view().slice(from, to));
+				public SortedUniqueContainerView<«type.boxedName»> slice(final «type.boxedName» from, final boolean fromInclusive, final «type.boxedName» to, final boolean toInclusive) {
+					return new «shortName»AsSortedUniqueContainer(this.container.view().slice(from, fromInclusive, to, toInclusive));
 				}
 
 				@Override
@@ -124,7 +125,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			public SortedSet<«type.genericBoxedName»> subSet(final «type.genericBoxedName» fromElement, final «type.genericBoxedName» toElement) {
-				return new «type.diamondName("SortedUniqueContainerAsSortedSet")»(this.container.view().slice(fromElement, toElement));
+				return new «type.diamondName("SortedUniqueContainerAsSortedSet")»(this.container.view().slice(fromElement, true, toElement, false));
 			}
 
 			@Override
@@ -164,12 +165,18 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from, final «type.genericName» to) {
+			public «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive) {
 				«IF type == Type.OBJECT»
 					requireNonNull(from);
 					requireNonNull(to);
 				«ENDIF»
-				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(this.collection.subSet(from, to), hasFixedSize());
+				final SortedSet<«type.genericBoxedName»> subSet;
+				if (fromInclusive && !toInclusive) {
+					subSet = this.collection.subSet(from, to);
+				} else {
+					subSet = ((NavigableSet<«type.genericBoxedName»>) this.collection).subSet(from, fromInclusive, to, toInclusive);
+				}
+				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(subSet, hasFixedSize());
 			}
 
 			@Override

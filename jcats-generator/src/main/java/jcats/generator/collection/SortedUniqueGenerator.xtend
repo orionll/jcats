@@ -579,9 +579,9 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from, final «type.genericName» to) {
+			public «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive) {
 				«slicedSortedUniqueViewShortName».checkRange(this.container.ord, from, to);
-				return new «slicedSortedUniqueViewDiamondName»(this.container, from, to);
+				return new «slicedSortedUniqueViewDiamondName»(this.container, from, fromInclusive, to, toInclusive);
 			}
 
 			«toStr(type, type.sortedUniqueViewShortName, false)»
@@ -591,12 +591,16 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			private final «genericName» root;
 			private final «type.genericName» from;
+			private final boolean fromInclusive;
 			private final «type.genericName» to;
+			private final boolean toInclusive;
 
-			«slicedSortedUniqueViewShortName»(final «genericName» root, final «type.genericName» from, final «type.genericName» to) {
+			«slicedSortedUniqueViewShortName»(final «genericName» root, final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive) {
 				this.root = root;
 				this.from = from;
+				this.fromInclusive = fromInclusive;
 				this.to = to;
+				this.toInclusive = toInclusive;
 			}
 
 			@Override
@@ -623,7 +627,9 @@ final class SortedUniqueGenerator implements ClassGenerator {
 						if (unique.left != null) {
 							traverseFrom(unique.left, eff);
 						}
-						eff.apply(unique.entry);
+						if (this.toInclusive) {
+							eff.apply(unique.entry);
+						}
 					} else if (toOrder == GT) {
 						if (unique.left != null) {
 							traverseFrom(unique.left, eff);
@@ -637,9 +643,13 @@ final class SortedUniqueGenerator implements ClassGenerator {
 					}
 				} else if (fromOrder == EQ) {
 					if (toOrder == EQ) {
-						eff.apply(unique.entry);
+						if (this.fromInclusive && this.toInclusive) {
+							eff.apply(unique.entry);
+						}
 					} else if (toOrder == GT) {
-						eff.apply(unique.entry);
+						if (this.fromInclusive) {
+							eff.apply(unique.entry);
+						}
 						if (unique.right != null) {
 							traverseTo(unique.right, eff);
 						}
@@ -676,7 +686,9 @@ final class SortedUniqueGenerator implements ClassGenerator {
 						unique.right.traverse(eff);
 					}
 				} else if (order == EQ) {
-					eff.apply(unique.entry);
+					if (this.fromInclusive) {
+						eff.apply(unique.entry);
+					}
 					if (unique.right != null) {
 						unique.right.traverse(eff);
 					}
@@ -699,7 +711,9 @@ final class SortedUniqueGenerator implements ClassGenerator {
 					if (unique.left != null) {
 						unique.left.traverse(eff);
 					}
-					eff.apply(unique.entry);
+					if (this.toInclusive) {
+						eff.apply(unique.entry);
+					}
 				} else if (order == GT) {
 					if (unique.left != null) {
 						unique.left.traverse(eff);
@@ -714,20 +728,52 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from2, final «type.genericName» to2) {
+			public «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from2, final boolean from2Inclusive, final «type.genericName» to2, final boolean to2Inclusive) {
 				checkRange(this.root.ord, from2, to2);
-				final «type.genericName» newFrom = this.root.ord.max(this.from, from2);
-				final «type.genericName» newTo = this.root.ord.min(this.to, to2);
+				final Order fromOrder = this.root.ord.order(this.from, from2);
+				final «type.genericName» newFrom;
+				final boolean newFromInclusive;
+				if (fromOrder == LT) {
+					newFrom = from2;
+					newFromInclusive = from2Inclusive;
+				} else if (fromOrder == EQ) {
+					newFrom = from2;
+					newFromInclusive = this.fromInclusive && from2Inclusive;
+				} else if (fromOrder == GT) {
+					newFrom = this.from;
+					newFromInclusive = this.fromInclusive;
+				} else {
+					throw SortedUnique.nullOrder(fromOrder);
+				}
+				final Order toOrder = this.root.ord.order(this.to, to2);
+				final «type.genericName» newTo;
+				final boolean newToInclusive;
+				if (toOrder == LT) {
+					newTo = this.to;
+					newToInclusive = this.toInclusive;
+				} else if (toOrder == EQ) {
+					newTo = to2;
+					newToInclusive = this.toInclusive && to2Inclusive;
+				} else if (toOrder == GT) {
+					newTo = to2;
+					newToInclusive = to2Inclusive;
+				} else {
+					throw SortedUnique.nullOrder(toOrder);
+				}
 				if (this.root.ord.greater(newFrom, newTo)) {
 					return new «type.sortedUniqueViewDiamondName»(empty«shortName»By(this.root.ord));
 				} else {
-					return new «slicedSortedUniqueViewDiamondName»(this.root, newFrom, newTo);
+					return new «slicedSortedUniqueViewDiamondName»(this.root, newFrom, newFromInclusive, newTo, newToInclusive);
 				}
 			}
 
 			@Override
 			public «type.iteratorGenericName» iterator() {
-				return this.root.isEmpty() ? «type.emptyIterator» : new «type.iteratorDiamondName("SlicedSortedUnique")»(this.root, this.from, this.to);
+				if (this.root.isEmpty()) {
+					return «type.emptyIterator»;
+				} else {
+					return new «type.iteratorDiamondName("SlicedSortedUnique")»(this.root, this.from, this.fromInclusive, this.to, this.toInclusive);
+				}
 			}
 
 			«uniqueEquals(type)»
@@ -751,36 +797,41 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			private final «genericName» end;
 			private Stack<«genericName»> stack;
 
-			«type.iteratorShortName("SlicedSortedUnique")»(final «genericName» root, final «type.genericName» from, final «type.genericName» to) {
-				final Stack<«genericName»> start = getStart(root, from);
-				if (start == null || root.ord.greater(start.head.entry, to)) {
+			«type.iteratorShortName("SlicedSortedUnique")»(final «genericName» root, final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive) {
+				final Stack<«genericName»> first = getFirst(root, from, fromInclusive);
+				final «genericName» last = getLast(root, to, toInclusive);
+				if (first.isEmpty() || last == null || root.ord.greater(first.head.entry, last.entry)) {
 					this.stack = null;
 					this.end = null;
 				} else {
-					this.stack = start;
-					this.end = getEnd(root, to);
+					this.stack = first;
+					this.end = last;
 				}
 			}
 
-			private static «IF type == Type.OBJECT»<A> «ENDIF»Stack<«genericName»> getStart(«genericName» unique, final «type.genericName» from) {
+			private static «IF type == Type.OBJECT»<A> «ENDIF»Stack<«genericName»> getFirst(«genericName» unique, final «type.genericName» from, final boolean inclusive) {
 				final «type.ordGenericName» ord = unique.ord;
-				Stack<«genericName»> minGreater = null;
 				Stack<«genericName»> stack = emptyStack();
 				while (true) {
 					final Order order = ord.order(from, unique.entry);
 					if (order == EQ) {
-						return stack.prepend(unique);
+						if (inclusive) {
+							return stack.prepend(unique);
+						} else if (unique.right == null) {
+							return stack;
+						} else {
+							unique = unique.right;
+						}
 					} else if (order == LT) {
 						if (unique.left == null) {
 							return stack.prepend(unique);
 						} else {
 							stack = stack.prepend(unique);
-							minGreater = stack;
 							unique = unique.left;
 						}
 					} else if (order == GT) {
 						if (unique.right == null) {
-							return minGreater;
+							return stack;
 						} else {
 							unique = unique.right;
 						}
@@ -788,13 +839,19 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				}
 			}
 
-			private static «paramGenericName» getEnd(«genericName» unique, final «type.genericName» to) {
+			private static «paramGenericName» getLast(«genericName» unique, final «type.genericName» to, final boolean inclusive) {
 				final «type.ordGenericName» ord = unique.ord;
 				«genericName» maxLess = null;
 				while (true) {
 					final Order order = ord.order(to, unique.entry);
 					if (order == EQ) {
-						return unique;
+						if (inclusive) {
+							return unique;
+						} else if (unique.left == null) {
+							return maxLess;
+						} else {
+							unique = unique.left;
+						}
 					} else if (order == LT) {
 						if (unique.left == null) {
 							return maxLess;
