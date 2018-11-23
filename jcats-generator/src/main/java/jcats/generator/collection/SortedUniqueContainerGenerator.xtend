@@ -97,7 +97,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 
 				@Override
 				public Ord<«type.boxedName»> ord() {
-					throw new UnsupportedOperationException("Not implemented");
+					return this.container.ord().toOrd();
 				}
 
 				@Override

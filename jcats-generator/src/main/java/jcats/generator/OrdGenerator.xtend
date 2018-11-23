@@ -28,6 +28,7 @@ final class OrdGenerator implements InterfaceGenerator {
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.ORD».*;
 		import static «Constants.ORDER».*;
 		import static «Constants.JCATS».«type.optionShortName».*;
 
@@ -371,6 +372,11 @@ final class OrdGenerator implements InterfaceGenerator {
 					return (final «type.genericName» x, final «type.genericName» y) ->
 						requireNonNull(order(x, y));
 				}
+
+				default Ord<«type.boxedName»> toOrd() {
+					return (Ord<«type.boxedName»> & Serializable) (final «type.boxedName» x, final «type.boxedName» y) ->
+							requireNonNull(order(x, y));
+				}
 			«ENDIF»
 
 			«IF type == Type.OBJECT»
@@ -589,6 +595,11 @@ final class OrdGenerator implements InterfaceGenerator {
 				public «genericName» reverse() {
 					return «type.typeName»ReverseOrd.INSTANCE;
 				}
+
+				@Override
+				public Ord<«type.boxedName»> toOrd() {
+					return asc();
+				}
 			}
 		«ENDIF»
 
@@ -648,6 +659,11 @@ final class OrdGenerator implements InterfaceGenerator {
 				@Override
 				public «genericName» reverse() {
 					return «type.typeName»NaturalOrd.INSTANCE;
+				}
+
+				@Override
+				public Ord<«type.boxedName»> toOrd() {
+					return desc();
 				}
 			}
 		«ENDIF»
