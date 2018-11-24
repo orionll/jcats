@@ -566,30 +566,22 @@ final class OrdGenerator implements InterfaceGenerator {
 				«IF type.javaUnboxedType»
 					@Override
 					public «type.genericName» max(final «type.genericName» value1, final «type.genericName» value2) {
-						return «type.genericBoxedName».max(value1, value2);
+						«IF type.floatingPoint»
+							return («type.genericBoxedName».compare(value1, value2) > 0) ? value1 : value2;
+						«ELSE»
+							return «type.genericBoxedName».max(value1, value2);
+						«ENDIF»
 					}
 
 					@Override
 					public «type.genericName» min(final «type.genericName» value1, final «type.genericName» value2) {
-						return «type.genericBoxedName».min(value1, value2);
+						«IF type.floatingPoint»
+							return («type.genericBoxedName».compare(value1, value2) < 0) ? value1 : value2;
+						«ELSE»
+							return «type.genericBoxedName».min(value1, value2);
+						«ENDIF»
 					}
 
-				«ENDIF»
-				«IF type.floatingPoint»
-					@Override
-					public <A> Ord<A> contraMap(final «type.typeName»F<A> f) {
-						requireNonNull(f);
-						return new ContraMapped«type.typeName»NaturalOrd<>(f);
-					}
-
-					«FOR from : Type.primitives»
-						@Override
-						public «from.typeName»Ord contraMapFrom«from.typeName»(final «from.typeName»«type.typeName»F f) {
-							requireNonNull(f);
-							return new ContraMapped«from.typeName»«type.typeName»NaturalOrd(f);
-						}
-
-					«ENDFOR»
 				«ENDIF»
 				@Override
 				public «genericName» reverse() {
@@ -631,30 +623,22 @@ final class OrdGenerator implements InterfaceGenerator {
 				«IF type.javaUnboxedType»
 					@Override
 					public «type.genericName» min(final «type.genericName» value1, final «type.genericName» value2) {
-						return «type.genericBoxedName».max(value1, value2);
+						«IF type.floatingPoint»
+							return («type.genericBoxedName».compare(value1, value2) > 0) ? value1 : value2;
+						«ELSE»
+							return «type.genericBoxedName».max(value1, value2);
+						«ENDIF»
 					}
 
 					@Override
 					public «type.genericName» max(final «type.genericName» value1, final «type.genericName» value2) {
-						return «type.genericBoxedName».min(value1, value2);
+						«IF type.floatingPoint»
+							return («type.genericBoxedName».compare(value1, value2) < 0) ? value1 : value2;
+						«ELSE»
+							return «type.genericBoxedName».min(value1, value2);
+						«ENDIF»
 					}
 
-				«ENDIF»
-				«IF type.floatingPoint»
-					@Override
-					public <A> Ord<A> contraMap(final «type.typeName»F<A> f) {
-						requireNonNull(f);
-						return new ContraMapped«type.typeName»ReverseOrd<>(f);
-					}
-
-					«FOR from : Type.primitives»
-						@Override
-						public «from.typeName»Ord contraMapFrom«from.typeName»(final «from.typeName»«type.typeName»F f) {
-							requireNonNull(f);
-							return new ContraMapped«from.typeName»«type.typeName»ReverseOrd(f);
-						}
-
-					«ENDFOR»
 				«ENDIF»
 				@Override
 				public «genericName» reverse() {
@@ -667,59 +651,7 @@ final class OrdGenerator implements InterfaceGenerator {
 				}
 			}
 		«ENDIF»
-		«IF type.floatingPoint»
-			«FOR natural : #[true, false]»
-				«FOR from : Type.values»
-					«IF from == Type.OBJECT»
-						final class ContraMapped«type.typeName»«kind(natural)»Ord<A> implements Ord<A>, Serializable {
-							private final «type.typeName»F<A> f;
 
-							ContraMapped«type.typeName»«kind(natural)»Ord(final «type.typeName»F<A> f) {
-								this.f = f;
-							}
-					«ELSE»
-						final class ContraMapped«from.typeName»«type.typeName»«kind(natural)»Ord implements «from.typeName»Ord, Serializable {
-							private final «from.typeName»«type.typeName»F f;
-
-							ContraMapped«from.typeName»«type.typeName»«kind(natural)»Ord(final «from.typeName»«type.typeName»F f) {
-								this.f = f;
-							}
-					«ENDIF»
-
-						@Override
-						public Order order(final «from.genericName» x, final «from.genericName» y) {
-							«IF from == Type.OBJECT»
-								requireNonNull(x);
-								requireNonNull(y);
-							«ENDIF»
-							final double value1 = this.f.apply(x);
-							final double value2 = this.f.apply(y);
-							return «type.typeName»«kind(natural)»Ord.INSTANCE.order(value1, value2);
-						}
-
-						@Override
-						public «from.genericName» «if (natural) "min" else "max"»(final «from.genericName» x, final «from.genericName» y) {
-							«IF from == Type.OBJECT»
-								requireNonNull(x);
-								requireNonNull(y);
-							«ENDIF»
-							final double value1 = this.f.apply(x);
-							final double value2 = this.f.apply(y);
-							if (Double.isNaN(value1)) {
-								return x;
-							} else if (Double.isNaN(value2)) {
-								return y;
-							} else {
-								return Double.compare(value1, value2) <= 0 ? x : y;
-							}
-						}
-					}
-
-				«ENDFOR»
-			«ENDFOR»
-		«ELSE»
-
-		«ENDIF»
 		«IF type == Type.OBJECT»
 			final class MinCollector<A> implements Consumer<A> {
 				A min;

@@ -450,19 +450,11 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 			«ELSE»
 				default «type.optionGenericName» max() {
-					«IF type.javaUnboxedType»
-						return reduceLeft(«type.boxedName»::max);
-					«ELSE»
-						return maxByOrd(«type.asc»());
-					«ENDIF»
+					return reduceLeft(«type.asc»()::max);
 				}
 
 				default «type.optionGenericName» min() {
-					«IF type.javaUnboxedType»
-						return reduceLeft(«type.boxedName»::min);
-					«ELSE»
-						return minByOrd(«type.desc»());
-					«ENDIF»
+					return reduceLeft(«type.asc»()::min);
 				}
 
 				default «type.optionGenericName» maxByOrd(final «type.ordGenericName» ord) {
