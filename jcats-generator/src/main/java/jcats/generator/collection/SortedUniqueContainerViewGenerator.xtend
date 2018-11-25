@@ -37,6 +37,10 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 
 			«genericName» slice(final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive);
 
+			«genericName» sliceFrom(final «type.genericName» from, final boolean inclusive);
+
+			«genericName» sliceTo(final «type.genericName» to, final boolean inclusive);
+
 			@Override
 			@Deprecated
 			default «type.sortedUniqueContainerViewGenericName» view() {
@@ -85,10 +89,7 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 				}
 
 			«ENDIF»
-			@Override
-			public String toString() {
-				return iterableToString(this, "«baseSortedUniqueContainerViewShortName»");
-			}
+			«toStr(type, baseSortedUniqueContainerViewShortName, false)»
 		}
 	''' }
 }

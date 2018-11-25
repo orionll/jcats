@@ -581,7 +581,17 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			@Override
 			public «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive) {
 				«slicedSortedUniqueViewShortName».checkRange(this.container.ord, from, to);
-				return new «slicedSortedUniqueViewDiamondName»(this.container, from, fromInclusive, to, toInclusive);
+				return new «slicedSortedUniqueViewDiamondName»(this.container, from, true, fromInclusive, to, true, toInclusive);
+			}
+
+			@Override
+			public «type.sortedUniqueContainerViewGenericName» sliceFrom(final «type.genericName» from, final boolean inclusive) {
+				return new «slicedSortedUniqueViewDiamondName»(this.container, from, true, inclusive, «type.defaultValue», false, false);
+			}
+
+			@Override
+			public «type.sortedUniqueContainerViewGenericName» sliceTo(final «type.genericName» to, final boolean inclusive) {
+				return new «slicedSortedUniqueViewDiamondName»(this.container, «type.defaultValue», false, false, to, true, inclusive);
 			}
 
 			«toStr(type, type.sortedUniqueViewShortName, false)»
@@ -591,15 +601,21 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			private final «genericName» root;
 			private final «type.genericName» from;
+			private final boolean hasFrom;
 			private final boolean fromInclusive;
 			private final «type.genericName» to;
+			private final boolean hasTo;
 			private final boolean toInclusive;
 
-			«slicedSortedUniqueViewShortName»(final «genericName» root, final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive) {
+			«slicedSortedUniqueViewShortName»(final «genericName» root,
+				final «type.genericName» from, final boolean hasFrom, final boolean fromInclusive,
+				final «type.genericName» to, final boolean hasTo, final boolean toInclusive) {
 				this.root = root;
 				this.from = from;
+				this.hasFrom = hasFrom;
 				this.fromInclusive = fromInclusive;
 				this.to = to;
+				this.hasTo = hasTo;
 				this.toInclusive = toInclusive;
 			}
 
@@ -611,7 +627,15 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				if (this.root.isNotEmpty()) {
-					traverse(this.root, eff);
+					if (this.hasFrom) {
+						if (this.hasTo) {
+							traverse(this.root, eff);
+						} else {
+							traverseFrom(this.root, eff);
+						}
+					} else {
+						traverseTo(this.root, eff);
+					}
 				}
 			}
 
@@ -763,8 +787,18 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				if (this.root.ord.greater(newFrom, newTo)) {
 					return new «type.sortedUniqueViewDiamondName»(empty«shortName»By(this.root.ord));
 				} else {
-					return new «slicedSortedUniqueViewDiamondName»(this.root, newFrom, newFromInclusive, newTo, newToInclusive);
+					return new «slicedSortedUniqueViewDiamondName»(this.root, newFrom, true, newFromInclusive, newTo, true, newToInclusive);
 				}
+			}
+
+			@Override
+			public «type.sortedUniqueContainerViewGenericName» sliceFrom(final «type.genericName» from2, final boolean inclusive2) {
+				throw new UnsupportedOperationException("Not implemented");
+			}
+
+			@Override
+			public «type.sortedUniqueContainerViewGenericName» sliceTo(final «type.genericName» to2, final boolean inclusive2) {
+				throw new UnsupportedOperationException("Not implemented");
 			}
 
 			@Override
@@ -772,7 +806,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				if (this.root.isEmpty()) {
 					return «type.emptyIterator»;
 				} else {
-					return new «type.iteratorDiamondName("SlicedSortedUnique")»(this.root, this.from, this.fromInclusive, this.to, this.toInclusive);
+					return new «type.iteratorDiamondName("SlicedSortedUnique")»(this.root, this.from, this.hasFrom, this.fromInclusive, this.to, this.hasTo, this.toInclusive);
 				}
 			}
 
@@ -797,9 +831,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			private final «genericName» end;
 			private Stack<«genericName»> stack;
 
-			«type.iteratorShortName("SlicedSortedUnique")»(final «genericName» root, final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive) {
-				final Stack<«genericName»> first = getFirst(root, from, fromInclusive);
-				final «genericName» last = getLast(root, to, toInclusive);
+			«type.iteratorShortName("SlicedSortedUnique")»(final «genericName» root,
+				final «type.genericName» from, final boolean hasFrom, final boolean fromInclusive,
+				final «type.genericName» to, final boolean hasTo, final boolean toInclusive) {
+				final Stack<«genericName»> first = getFirst(root, from, hasFrom, fromInclusive);
+				final «genericName» last = getLast(root, to, hasTo, toInclusive);
 				if (first.isEmpty() || last == null || root.ord.greater(first.head.entry, last.entry)) {
 					this.stack = null;
 					this.end = null;
@@ -809,65 +845,80 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				}
 			}
 
-			private static «IF type == Type.OBJECT»<A> «ENDIF»Stack<«genericName»> getFirst(«genericName» unique, final «type.genericName» from, final boolean inclusive) {
+			private static «IF type == Type.OBJECT»<A> «ENDIF»Stack<«genericName»> getFirst(«genericName» unique, final «type.genericName» from, final boolean hasFrom, final boolean inclusive) {
 				final «type.ordGenericName» ord = unique.ord;
 				Stack<«genericName»> stack = emptyStack();
-				while (true) {
-					final Order order = ord.order(from, unique.entry);
-					if (order == EQ) {
-						if (inclusive) {
-							return stack.prepend(unique);
-						} else if (unique.right == null) {
-							return stack;
-						} else {
-							unique = unique.right;
-						}
-					} else if (order == LT) {
-						if (unique.left == null) {
-							return stack.prepend(unique);
-						} else {
-							stack = stack.prepend(unique);
-							unique = unique.left;
-						}
-					} else if (order == GT) {
-						if (unique.right == null) {
-							return stack;
-						} else {
-							unique = unique.right;
+				if (hasFrom) {
+					while (true) {
+						final Order order = ord.order(from, unique.entry);
+						if (order == EQ) {
+							if (inclusive) {
+								return stack.prepend(unique);
+							} else if (unique.right == null) {
+								return stack;
+							} else {
+								unique = unique.right;
+							}
+						} else if (order == LT) {
+							if (unique.left == null) {
+								return stack.prepend(unique);
+							} else {
+								stack = stack.prepend(unique);
+								unique = unique.left;
+							}
+						} else if (order == GT) {
+							if (unique.right == null) {
+								return stack;
+							} else {
+								unique = unique.right;
+							}
 						}
 					}
+				} else {
+					while (unique != null) {
+						stack = stack.prepend(unique);
+						unique = unique.left;
+					}
+					return stack;
 				}
 			}
 
-			private static «paramGenericName» getLast(«genericName» unique, final «type.genericName» to, final boolean inclusive) {
+			private static «paramGenericName» getLast(«genericName» unique, final «type.genericName» to, final boolean hasTo, final boolean inclusive) {
 				final «type.ordGenericName» ord = unique.ord;
-				«genericName» maxLess = null;
-				while (true) {
-					final Order order = ord.order(to, unique.entry);
-					if (order == EQ) {
-						if (inclusive) {
-							return unique;
-						} else if (unique.left == null) {
-							return maxLess;
+				if (hasTo) {
+					«genericName» maxLess = null;
+					while (true) {
+						final Order order = ord.order(to, unique.entry);
+						if (order == EQ) {
+							if (inclusive) {
+								return unique;
+							} else if (unique.left == null) {
+								return maxLess;
+							} else {
+								unique = unique.left;
+							}
+						} else if (order == LT) {
+							if (unique.left == null) {
+								return maxLess;
+							} else {
+								unique = unique.left;
+							}
+						} else if (order == GT) {
+							if (unique.right == null) {
+								return unique;
+							} else {
+								maxLess = unique;
+								unique = unique.right;
+							}
 						} else {
-							unique = unique.left;
+							throw SortedUnique.nullOrder(order);
 						}
-					} else if (order == LT) {
-						if (unique.left == null) {
-							return maxLess;
-						} else {
-							unique = unique.left;
-						}
-					} else if (order == GT) {
-						if (unique.right == null) {
-							return unique;
-						} else {
-							maxLess = unique;
-							unique = unique.right;
-						}
-					} else {
-						throw SortedUnique.nullOrder(order);
 					}
+				} else {
+					while (unique.right != null) {
+						unique = unique.right;
+					}
+					return unique;
 				}
 			}
 
