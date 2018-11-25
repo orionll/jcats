@@ -754,51 +754,80 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			@Override
 			public «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from2, final boolean from2Inclusive, final «type.genericName» to2, final boolean to2Inclusive) {
 				checkRange(this.root.ord, from2, to2);
-				final Order fromOrder = this.root.ord.order(this.from, from2);
-				final «type.genericName» newFrom;
-				final boolean newFromInclusive;
-				if (fromOrder == LT) {
-					newFrom = from2;
-					newFromInclusive = from2Inclusive;
-				} else if (fromOrder == EQ) {
-					newFrom = from2;
-					newFromInclusive = this.fromInclusive && from2Inclusive;
-				} else if (fromOrder == GT) {
-					newFrom = this.from;
-					newFromInclusive = this.fromInclusive;
-				} else {
-					throw SortedUnique.nullOrder(fromOrder);
-				}
-				final Order toOrder = this.root.ord.order(this.to, to2);
-				final «type.genericName» newTo;
-				final boolean newToInclusive;
-				if (toOrder == LT) {
-					newTo = this.to;
-					newToInclusive = this.toInclusive;
-				} else if (toOrder == EQ) {
-					newTo = to2;
-					newToInclusive = this.toInclusive && to2Inclusive;
-				} else if (toOrder == GT) {
-					newTo = to2;
-					newToInclusive = to2Inclusive;
-				} else {
-					throw SortedUnique.nullOrder(toOrder);
-				}
-				if (this.root.ord.greater(newFrom, newTo)) {
-					return new «type.sortedUniqueViewDiamondName»(empty«shortName»By(this.root.ord));
-				} else {
-					return new «slicedSortedUniqueViewDiamondName»(this.root, newFrom, true, newFromInclusive, newTo, true, newToInclusive);
-				}
+				return slice(from2, true, from2Inclusive, to2, true, to2Inclusive);
 			}
 
 			@Override
 			public «type.sortedUniqueContainerViewGenericName» sliceFrom(final «type.genericName» from2, final boolean inclusive2) {
-				throw new UnsupportedOperationException("Not implemented");
+				return slice(from2, true, inclusive2, «type.defaultValue», false, false);
 			}
 
 			@Override
 			public «type.sortedUniqueContainerViewGenericName» sliceTo(final «type.genericName» to2, final boolean inclusive2) {
-				throw new UnsupportedOperationException("Not implemented");
+				return slice(«type.defaultValue», false, false, to2, true, inclusive2);
+			}
+
+			private «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from2, final boolean hasFrom2, final boolean from2Inclusive,
+				final «type.genericName» to2, final boolean hasTo2, final boolean to2Inclusive) {
+				final «type.genericName» newFrom;
+				final boolean newFromInclusive;
+				if (this.hasFrom) {
+					if (hasFrom2) {
+						final Order fromOrder = this.root.ord.order(this.from, from2);
+						if (fromOrder == LT) {
+							newFrom = from2;
+							newFromInclusive = from2Inclusive;
+						} else if (fromOrder == EQ) {
+							newFrom = from2;
+							newFromInclusive = this.fromInclusive && from2Inclusive;
+						} else if (fromOrder == GT) {
+							newFrom = this.from;
+							newFromInclusive = this.fromInclusive;
+						} else {
+							throw SortedUnique.nullOrder(fromOrder);
+						}
+					} else {
+						newFrom = this.from;
+						newFromInclusive = this.fromInclusive;
+					}
+				} else {
+					newFrom = from2;
+					newFromInclusive = from2Inclusive;
+				}
+
+				final «type.genericName» newTo;
+				final boolean newToInclusive;
+				if (this.hasTo) {
+					if (hasTo2) {
+						final Order toOrder = this.root.ord.order(this.to, to2);
+						if (toOrder == LT) {
+							newTo = this.to;
+							newToInclusive = this.toInclusive;
+						} else if (toOrder == EQ) {
+							newTo = to2;
+							newToInclusive = this.toInclusive && to2Inclusive;
+						} else if (toOrder == GT) {
+							newTo = to2;
+							newToInclusive = to2Inclusive;
+						} else {
+							throw SortedUnique.nullOrder(toOrder);
+						}
+					} else {
+						newTo = this.to;
+						newToInclusive = this.toInclusive;
+					}
+				} else {
+					newTo = to2;
+					newToInclusive = to2Inclusive;
+				}
+
+				final boolean newHasFrom = this.hasFrom || hasFrom2;
+				final boolean newHasTo = this.hasTo || hasTo2;
+				if (newHasFrom && newHasTo && this.root.ord.greater(newFrom, newTo)) {
+					return new «type.sortedUniqueViewDiamondName»(empty«shortName»By(this.root.ord));
+				} else {
+					return new «slicedSortedUniqueViewDiamondName»(this.root, newFrom, newHasFrom, newFromInclusive, newTo, newHasTo, newToInclusive);
+				}
 			}
 
 			@Override
