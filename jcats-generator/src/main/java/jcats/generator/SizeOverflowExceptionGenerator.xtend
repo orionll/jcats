@@ -8,9 +8,6 @@ final class SizeOverflowExceptionGenerator implements ClassGenerator {
 		package «Constants.JCATS»;
 
 		public final class SizeOverflowException extends ArithmeticException {
-
-			public SizeOverflowException() {
-			}
 		}
 	''' }
 }
