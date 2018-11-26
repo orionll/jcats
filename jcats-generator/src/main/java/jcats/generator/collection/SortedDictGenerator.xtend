@@ -431,7 +431,7 @@ final class SortedDictGenerator implements ClassGenerator {
 					}
 				}
 
-				final SortedDict<K, A> result = this.stack.head();
+				final SortedDict<K, A> result = this.stack.first();
 				this.stack = this.stack.tail;
 
 				if (result.right != null) {
@@ -466,7 +466,7 @@ final class SortedDictGenerator implements ClassGenerator {
 					}
 				}
 
-				final SortedDict<K, A> result = this.stack.head();
+				final SortedDict<K, A> result = this.stack.first();
 				this.stack = this.stack.tail;
 
 				if (result.left != null) {

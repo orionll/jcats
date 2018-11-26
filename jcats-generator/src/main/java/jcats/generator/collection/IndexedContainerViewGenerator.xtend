@@ -116,7 +116,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.genericName» last() {
-				return this.container.head();
+				return this.container.first();
 			}
 
 			@Override
@@ -500,23 +500,23 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.genericName» head() {
+			public «type.genericName» first() {
 				return this.view.last();
 			}
 
 			@Override
-			public «type.optionGenericName» headOption() {
+			public «type.optionGenericName» firstOption() {
 				return this.view.lastOption();
 			}
 
 			@Override
 			public «type.genericName» last() {
-				return this.view.head();
+				return this.view.first();
 			}
 
 			@Override
 			public «type.optionGenericName» lastOption() {
-				return this.view.headOption();
+				return this.view.firstOption();
 			}
 
 			@Override

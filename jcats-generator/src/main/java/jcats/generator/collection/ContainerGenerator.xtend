@@ -175,16 +175,16 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 		public interface «type.covariantName("Container")» extends Iterable<«type.genericBoxedName»>, Sized {
 
-			default «type.genericName» head() throws NoSuchElementException {
+			default «type.genericName» first() throws NoSuchElementException {
 				return iterator().«type.iteratorNext»();
 			}
 
-			default «type.optionGenericName» headOption() {
+			default «type.optionGenericName» firstOption() {
 				if (hasFixedSize()) {
 					if (isEmpty()) {
 						return «type.noneName»();
 					} else {
-						return «type.someName»(head());
+						return «type.someName»(first());
 					}
 				} else {
 					final «type.iteratorGenericName» iterator = iterator();
@@ -625,13 +625,13 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public «type.boxedName» head() {
-					return this.container.head();
+				public «type.boxedName» first() {
+					return this.container.first();
 				}
 
 				@Override
-				public Option<«type.boxedName»> headOption() {
-					return this.container.headOption().toOption();
+				public Option<«type.boxedName»> firstOption() {
+					return this.container.firstOption().toOption();
 				}
 
 				@Override

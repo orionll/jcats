@@ -12,7 +12,7 @@ public final class TestSeqBuilder {
 	public void appendEmptySeqBuilder() {
 		final Seq<Integer> seq = Seq.<Integer> builder().append(0).appendSeqBuilder(Seq.builder()).build();
 		assertEquals(1, seq.size());
-		assertEquals(0, (int) seq.head());
+		assertEquals(0, (int) seq.first());
 	}
 
 	@Test

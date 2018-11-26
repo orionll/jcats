@@ -150,7 +150,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.genericBoxedName» first() {
-				return this.container.head();
+				return this.container.first();
 			}
 
 			@Override

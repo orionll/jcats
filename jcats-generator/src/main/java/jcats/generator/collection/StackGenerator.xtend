@@ -107,7 +107,7 @@ final class StackGenerator implements ClassGenerator {
 			 * O(1)
 			 */
 			@Override
-			public «type.genericName» head() throws NoSuchElementException {
+			public «type.genericName» first() throws NoSuchElementException {
 				if (isEmpty()) {
 					throw new NoSuchElementException();
 				} else {
@@ -130,7 +130,7 @@ final class StackGenerator implements ClassGenerator {
 			 * O(1)
 			 */
 			@Override
-			public «type.optionGenericName» headOption() {
+			public «type.optionGenericName» firstOption() {
 				return isEmpty() ? «type.noneName»() : «type.someName»(this.head);
 			}
 

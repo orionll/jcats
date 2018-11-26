@@ -235,7 +235,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.genericName» head() throws NoSuchElementException {
+			public «type.genericName» first() throws NoSuchElementException {
 				if (isEmpty()) {
 					throw new NoSuchElementException();
 				} else {
@@ -524,7 +524,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 					}
 				}
 
-				final «genericName» result = this.stack.head();
+				final «genericName» result = this.stack.first();
 				this.stack = this.stack.tail;
 
 				if (result.right != null) {
@@ -559,7 +559,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 					}
 				}
 
-				final «genericName» result = this.stack.head();
+				final «genericName» result = this.stack.first();
 				this.stack = this.stack.tail;
 
 				if (result.left != null) {

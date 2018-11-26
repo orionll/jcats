@@ -186,13 +186,13 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.genericName» head() {
-				return this.container.head();
+			public «type.genericName» first() {
+				return this.container.first();
 			}
 
 			@Override
-			public «type.optionGenericName» headOption() {
-				return this.container.headOption();
+			public «type.optionGenericName» firstOption() {
+				return this.container.firstOption();
 			}
 
 			@Override
@@ -510,13 +510,13 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «mapTargetType» head() {
-				return requireNonNull(this.f.apply(this.view.head()));
+			public «mapTargetType» first() {
+				return requireNonNull(this.f.apply(this.view.first()));
 			}
 
 			@Override
-			public Option<«mapTargetType»> headOption() {
-				return this.view.headOption().map(this.f);
+			public Option<«mapTargetType»> firstOption() {
+				return this.view.firstOption().map(this.f);
 			}
 
 			@Override
@@ -654,13 +654,13 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public «toType.genericName» head() {
-					return this.f.apply(this.view.head());
+				public «toType.genericName» first() {
+					return this.f.apply(this.view.first());
 				}
 
 				@Override
-				public «toType.optionGenericName» headOption() {
-					return this.view.headOption().mapTo«toType.typeName»(this.f);
+				public «toType.optionGenericName» firstOption() {
+					return this.view.firstOption().mapTo«toType.typeName»(this.f);
 				}
 
 				@Override
@@ -1050,20 +1050,20 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.genericName» head() {
+			public «type.genericName» first() {
 				if (this.limit == 0) {
 					throw new NoSuchElementException();
 				} else {
-					return this.view.head();
+					return this.view.first();
 				}
 			}
 
 			@Override
-			public «type.optionGenericName» headOption() {
+			public «type.optionGenericName» firstOption() {
 				if (this.limit == 0) {
 					return «type.noneName»();
 				} else {
-					return this.view.headOption();
+					return this.view.firstOption();
 				}
 			}
 

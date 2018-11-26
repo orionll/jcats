@@ -86,7 +86,7 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public int head() throws NoSuchElementException {
+			public int first() throws NoSuchElementException {
 				if (isEmpty()) {
 					throw new NoSuchElementException();
 				} else {
@@ -95,7 +95,7 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public IntOption headOption() {
+			public IntOption firstOption() {
 				if (isEmpty()) {
 					return intNone();
 				} else {

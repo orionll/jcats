@@ -110,7 +110,7 @@ public class TestSeq {
 			final int step = step(i);
 			seq = seq.append(i % 63);
 			assertEquals(i + 1, seq.size());
-			assertEquals(0, seq.head().intValue());
+			assertEquals(0, seq.first().intValue());
 			assertEquals(i % 63, seq.last().intValue());
 			for (int j = 0; j <= i; j += step) {
 				assertElementEquals(seq, j, j % 63);
@@ -431,7 +431,7 @@ public class TestSeq {
 			final Seq<Integer> concat = seq1.concat(seq2);
 			assertEquals(seq1.size() + seq2.size(), concat.size());
 			if (seq1.isNotEmpty()) {
-				assertEquals(seq1.head(), concat.head());
+				assertEquals(seq1.first(), concat.first());
 				assertEquals(seq1.last(), concat.get(seq1.size() - 1));
 			}
 			if (seq2.isNotEmpty()) {
@@ -475,7 +475,7 @@ public class TestSeq {
 						try {
 							final Seq<Integer> concat = seq.appendAll(list);
 							assertEquals("(seq.size = " + seq.size() + ", list.size = " + list.size() + ")", list.size() + array.length + 1, concat.size());
-							assertEquals("(seq.size = " + seq.size() + ", list.size = " + list.size() + ")", -1, (int) concat.head());
+							assertEquals("(seq.size = " + seq.size() + ", list.size = " + list.size() + ")", -1, (int) concat.first());
 							if (!list.isEmpty()) {
 								assertEquals("(seq.size = " + seq.size() + ", list.size = " + list.size() + ")", 0, (int) concat.get(1));
 							}

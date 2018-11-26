@@ -124,7 +124,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			default «type.genericName» head() throws NoSuchElementException {
+			default «type.genericName» first() throws NoSuchElementException {
 				try {
 					return get(0);
 				} catch (final IndexOutOfBoundsException __) {
