@@ -264,4 +264,29 @@ final class AVLCommon {
 			}
 		}
 	'''
+
+	def static firstOrLast(String genericName, String name, String getKey, String leftOrRight) '''
+		if (isEmpty()) {
+			throw new NoSuchElementException();
+		} else {
+			«genericName» «name» = this;
+			while («name».«leftOrRight» != null) {
+				«name» = «name».«leftOrRight»;
+			}
+			return «name».«getKey»;
+		}
+	'''
+
+	def static initOrTail(String genericName, String shortName, String deleteResultDiamondName, String deleteMinimumOrMaximum) '''
+		if (isEmpty()) {
+			throw new NoSuchElementException();
+		} else {
+			final «genericName» result = «deleteMinimumOrMaximum»(new «deleteResultDiamondName»());
+			if (result == null) {
+				return empty«shortName»By(this.ord);
+			} else {
+				return result;
+			}
+		}
+	'''
 }

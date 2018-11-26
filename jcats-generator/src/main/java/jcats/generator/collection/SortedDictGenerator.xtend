@@ -23,6 +23,7 @@ final class SortedDictGenerator implements ClassGenerator {
 		import java.util.List;
 		import java.util.Map;
 		import java.util.Map.Entry;
+		import java.util.NoSuchElementException;
 		import java.util.SortedMap;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
@@ -136,6 +137,8 @@ final class SortedDictGenerator implements ClassGenerator {
 				«AVLCommon.delete(genericName, diamondName, "key", "entry.get1()")»
 			}
 
+			«AVLCommon.deleteMinimum(genericName, diamondName, "DeleteResult<K, A>")»
+
 			«AVLCommon.deleteMaximum(genericName, diamondName, "DeleteResult<K, A>")»
 
 			«AVLCommon.deleteAndRotateLeft(genericName, diamondName, "P<K, A>", "DeleteResult<K, A>")»
@@ -148,6 +151,22 @@ final class SortedDictGenerator implements ClassGenerator {
 				} else {
 					throw new AssertionError("Ord.order() returned unexpected value: " + order);
 				}
+			}
+
+			public K firstKey() throws NoSuchElementException {
+				«AVLCommon.firstOrLast(genericName, "dict", "entry.get1()", "left")»
+			}
+
+			public K lastKey() throws NoSuchElementException {
+				«AVLCommon.firstOrLast(genericName, "dict", "entry.get1()", "right")»
+			}
+
+			public «genericName» init() throws NoSuchElementException {
+				«AVLCommon.initOrTail(genericName, shortName, "DeleteResult<>", "deleteMaximum")»
+			}
+
+			public «genericName» tail() throws NoSuchElementException {
+				«AVLCommon.initOrTail(genericName, shortName, "DeleteResult<>", "deleteMinimum")»
 			}
 
 			@Override

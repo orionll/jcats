@@ -236,28 +236,12 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			@Override
 			public «type.genericName» first() throws NoSuchElementException {
-				if (isEmpty()) {
-					throw new NoSuchElementException();
-				} else {
-					«genericName» unique = this;
-					while (unique.left != null) {
-						unique = unique.left;
-					}
-					return unique.entry;
-				}
+				«AVLCommon.firstOrLast(genericName, "unique", "entry", "left")»
 			}
 
 			@Override
 			public «type.genericName» last() throws NoSuchElementException {
-				if (isEmpty()) {
-					throw new NoSuchElementException();
-				} else {
-					«genericName» unique = this;
-					while (unique.right != null) {
-						unique = unique.right;
-					}
-					return unique.entry;
-				}
+				«AVLCommon.firstOrLast(genericName, "unique", "entry", "right")»
 			}
 
 			@Override
@@ -270,29 +254,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			public «genericName» init() throws NoSuchElementException {
-				if (isEmpty()) {
-					throw new NoSuchElementException();
-				} else {
-					final «genericName» newUnique = deleteMaximum(new «deleteResultDiamondName»());
-					if (newUnique == null) {
-						return empty«shortName»By(this.ord);
-					} else {
-						return newUnique;
-					}
-				}
+				«AVLCommon.initOrTail(genericName, shortName, deleteResultDiamondName, "deleteMaximum")»
 			}
 
 			public «genericName» tail() throws NoSuchElementException {
-				if (isEmpty()) {
-					throw new NoSuchElementException();
-				} else {
-					final «genericName» newUnique = deleteMinimum(new «deleteResultDiamondName»());
-					if (newUnique == null) {
-						return empty«shortName»By(this.ord);
-					} else {
-						return newUnique;
-					}
-				}
+				«AVLCommon.initOrTail(genericName, shortName, deleteResultDiamondName, "deleteMinimum")»
 			}
 
 			public «genericName» reverse() {
