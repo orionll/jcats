@@ -218,7 +218,8 @@ final class OrdGenerator implements InterfaceGenerator {
 				}
 			}
 
-			default «genericName» reverse() {
+			@Override
+			default «genericName» reversed() {
 				«IF type == Type.OBJECT»
 					return («genericName» & Serializable) (final «type.genericName» x, final «type.genericName» y) -> {
 						requireNonNull(x);
@@ -550,7 +551,7 @@ final class OrdGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public Ord<Comparable<Object>> reverse() {
+				public Ord<Comparable<Object>> reversed() {
 					return ReverseOrd.INSTANCE;
 				}
 			}
@@ -584,7 +585,7 @@ final class OrdGenerator implements InterfaceGenerator {
 
 				«ENDIF»
 				@Override
-				public «genericName» reverse() {
+				public «genericName» reversed() {
 					return «type.typeName»ReverseOrd.INSTANCE;
 				}
 
@@ -607,7 +608,7 @@ final class OrdGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public Ord<Comparable<Object>> reverse() {
+				public Ord<Comparable<Object>> reversed() {
 					return NaturalOrd.INSTANCE;
 				}
 			}
@@ -641,7 +642,7 @@ final class OrdGenerator implements InterfaceGenerator {
 
 				«ENDIF»
 				@Override
-				public «genericName» reverse() {
+				public «genericName» reversed() {
 					return «type.typeName»NaturalOrd.INSTANCE;
 				}
 

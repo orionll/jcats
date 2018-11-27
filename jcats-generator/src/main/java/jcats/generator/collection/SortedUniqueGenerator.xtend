@@ -266,7 +266,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			public «genericName» reverse() {
-				final «type.sortedUniqueBuilderGenericName» builder = new «type.sortedUniqueBuilderDiamondName»(this.ord.reverse());
+				final «type.sortedUniqueBuilderGenericName» builder = new «type.sortedUniqueBuilderDiamondName»(this.ord.reversed());
 				builder.putAll(this);
 				return builder.build();
 			}
