@@ -121,11 +121,15 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				«ENDIF»
 				if (isEmpty()) {
 					return false;
+				} else {
+					return search(this, value);
 				}
+			}
 
-				«genericName» unique = this;
+			static «IF type == Type.OBJECT»<A> «ENDIF»boolean search(«genericName» unique, final «type.genericName» value) {
+				final «type.ordGenericName» ord = unique.ord;
 				while (true) {
-					final Order order = this.ord.order(value, unique.entry);
+					final Order order = ord.order(value, unique.entry);
 					if (order == EQ) {
 						return true;
 					} else if (order == LT) {
@@ -719,6 +723,26 @@ final class SortedUniqueGenerator implements ClassGenerator {
 					}
 				} else {
 					throw «shortName».nullOrder(order);
+				}
+			}
+
+			@Override
+			public boolean contains(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
+				if (this.root.isEmpty()) {
+					return false;
+				} else if (this.hasFrom &&
+						(this.fromInclusive && this.root.ord.less(value, this.from) ||
+						!this.fromInclusive && this.root.ord.lessOrEqual(value, this.from))) {
+					return false;
+				} else if (this.hasTo &&
+						(this.toInclusive && this.root.ord.greater(value, this.to) ||
+						!this.toInclusive && this.root.ord.greaterOrEqual(value, this.to))) {
+					return false;
+				} else {
+					return «shortName».search(this.root, value);
 				}
 			}
 
