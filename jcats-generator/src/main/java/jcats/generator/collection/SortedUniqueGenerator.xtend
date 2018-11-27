@@ -586,6 +586,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public boolean hasFixedSize() {
+				return false;
+			}
+
+			@Override
 			public «type.ordGenericName» ord() {
 				return this.root.ord;
 			}
