@@ -429,73 +429,11 @@ final class SortedDictGenerator implements ClassGenerator {
 		}
 
 		final class SortedDictIterator<K, A> implements Iterator<P<K, A>> {
-			private final SortedDict<K, A> root;
-			private Stack<SortedDict<K, A>> stack;
-
-			SortedDictIterator(final SortedDict<K, A> root) {
-				this.root = root;
-			}
-
-			@Override
-			public boolean hasNext() {
-				return (this.stack == null || this.stack.isNotEmpty());
-			}
-
-			@Override
-			public P<K, A> next() {
-				if (this.stack == null) {
-					this.stack = emptyStack();
-					for (SortedDict<K, A> dict = this.root; dict != null; dict = dict.left) {
-						this.stack = this.stack.prepend(dict);
-					}
-				}
-
-				final SortedDict<K, A> result = this.stack.first();
-				this.stack = this.stack.tail;
-
-				if (result.right != null) {
-					for (SortedDict<K, A> dict = result.right; dict != null; dict = dict.left) {
-						this.stack = this.stack.prepend(dict);
-					}
-				}
-
-				return result.entry;
-			}
+			«AVLCommon.iterator(genericName, "dict", "SortedDictIterator", "P<K, A>", "next", false)»
 		}
 
 		final class SortedDictReverseIterator<K, A> implements Iterator<P<K, A>> {
-			private final SortedDict<K, A> root;
-			private Stack<SortedDict<K, A>> stack;
-
-			SortedDictReverseIterator(final SortedDict<K, A> root) {
-				this.root = root;
-			}
-
-			@Override
-			public boolean hasNext() {
-				return (this.stack == null || this.stack.isNotEmpty());
-			}
-
-			@Override
-			public P<K, A> next() {
-				if (this.stack == null) {
-					this.stack = emptyStack();
-					for (SortedDict<K, A> dict = this.root; dict != null; dict = dict.right) {
-						this.stack = this.stack.prepend(dict);
-					}
-				}
-
-				final SortedDict<K, A> result = this.stack.first();
-				this.stack = this.stack.tail;
-
-				if (result.left != null) {
-					for (SortedDict<K, A> dict = result.left; dict != null; dict = dict.right) {
-						this.stack = this.stack.prepend(dict);
-					}
-				}
-
-				return result.entry;
-			}
+			«AVLCommon.iterator(genericName, "dict", "SortedDictReverseIterator", "P<K, A>", "next", true)»
 		}
 	''' }
 }

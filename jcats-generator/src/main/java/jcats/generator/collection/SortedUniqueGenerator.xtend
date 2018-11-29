@@ -473,73 +473,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		}
 
 		final class «type.iteratorGenericName(baseName)» implements «type.iteratorGenericName» {
-			private final «genericName» root;
-			private Stack<«genericName»> stack;
-
-			«type.iteratorShortName(baseName)»(final «genericName» root) {
-				this.root = root;
-			}
-
-			@Override
-			public boolean hasNext() {
-				return (this.stack == null || this.stack.isNotEmpty());
-			}
-
-			@Override
-			public «type.iteratorReturnType» «type.iteratorNext»() {
-				if (this.stack == null) {
-					this.stack = emptyStack();
-					for («genericName» unique = this.root; unique != null; unique = unique.left) {
-						this.stack = this.stack.prepend(unique);
-					}
-				}
-
-				final «genericName» result = this.stack.first();
-				this.stack = this.stack.tail;
-
-				if (result.right != null) {
-					for («genericName» unique = result.right; unique != null; unique = unique.left) {
-						this.stack = this.stack.prepend(unique);
-					}
-				}
-
-				return result.entry;
-			}
+			«AVLCommon.iterator(genericName, "unique", type.iteratorShortName(baseName), type.iteratorReturnType, type.iteratorNext, false)»
 		}
 
-		final class «type.genericName(baseName + "ReverseIterator")» implements «type.iteratorGenericName» {
-			private final «genericName» root;
-			private Stack<«genericName»> stack;
-
-			«type.shortName(baseName + "ReverseIterator")»(final «genericName» root) {
-				this.root = root;
-			}
-
-			@Override
-			public boolean hasNext() {
-				return (this.stack == null || this.stack.isNotEmpty());
-			}
-
-			@Override
-			public «type.iteratorReturnType» «type.iteratorNext»() {
-				if (this.stack == null) {
-					this.stack = emptyStack();
-					for («genericName» unique = this.root; unique != null; unique = unique.right) {
-						this.stack = this.stack.prepend(unique);
-					}
-				}
-
-				final «genericName» result = this.stack.first();
-				this.stack = this.stack.tail;
-
-				if (result.left != null) {
-					for («genericName» unique = result.left; unique != null; unique = unique.right) {
-						this.stack = this.stack.prepend(unique);
-					}
-				}
-
-				return result.entry;
-			}
+		final class «type.iteratorGenericName(baseName + "Reverse")» implements «type.iteratorGenericName» {
+			«AVLCommon.iterator(genericName, "unique", type.iteratorShortName(baseName + "Reverse"), type.iteratorReturnType, type.iteratorNext, true)»
 		}
 
 		final class «type.genericName("SortedUniqueView")» extends «type.shortName("BaseSortedUniqueContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»«genericName»> {

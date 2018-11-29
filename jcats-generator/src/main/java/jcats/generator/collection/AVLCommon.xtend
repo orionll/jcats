@@ -289,4 +289,39 @@ final class AVLCommon {
 			}
 		}
 	'''
+
+	def static iterator(String genericName, String name, String iteratorShortName, String iteratorReturnType, String iteratorNext, boolean reversed) '''
+		private final «genericName» root;
+		private Stack<«genericName»> stack;
+
+		«iteratorShortName»(final «genericName» root) {
+			this.root = root;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return (this.stack == null || this.stack.isNotEmpty());
+		}
+
+		@Override
+		public «iteratorReturnType» «iteratorNext»() {
+			if (this.stack == null) {
+				this.stack = emptyStack();
+				for («genericName» «name» = this.root; «name» != null; «name» = «name».«IF reversed»right«ELSE»left«ENDIF») {
+					this.stack = this.stack.prepend(«name»);
+				}
+			}
+
+			final «genericName» result = this.stack.first();
+			this.stack = this.stack.tail;
+
+			if (result.«IF reversed»left«ELSE»right«ENDIF» != null) {
+				for («genericName» «name» = result.«IF reversed»left«ELSE»right«ENDIF»; «name» != null; «name» = «name».«IF reversed»right«ELSE»left«ENDIF») {
+					this.stack = this.stack.prepend(«name»);
+				}
+			}
+
+			return result.entry;
+		}
+	'''
 }
