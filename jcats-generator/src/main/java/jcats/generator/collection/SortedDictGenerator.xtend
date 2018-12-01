@@ -44,6 +44,8 @@ final class SortedDictGenerator implements ClassGenerator {
 		public final class SortedDict<K, @Covariant A> implements KeyValue<K, A>, Serializable {
 			private static final SortedDict<?, ?> EMPTY =
 					new SortedDict<>(null, null, null, Ord.<Integer>asc(), 0);
+			private static final SortedDict<?, ?> EMPTY_REVERSED =
+					new SortedDict<>(null, null, null, Ord.<Integer>desc(), 0);
 
 			final P<K, A> entry;
 			final SortedDict<K, A> left;
@@ -330,6 +332,8 @@ final class SortedDictGenerator implements ClassGenerator {
 				requireNonNull(ord);
 				if (ord == asc()) {
 					return (SortedDict<K, A>) EMPTY;
+				} else if (ord == desc()) {
+					return (SortedDict<K, A>) EMPTY_REVERSED;
 				} else {
 					return new SortedDict<>(null, null, null, ord, 0);
 				}

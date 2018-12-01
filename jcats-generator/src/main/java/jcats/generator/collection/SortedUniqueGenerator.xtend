@@ -63,8 +63,10 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			«IF type == Type.OBJECT»
 				static final «wildcardName» EMPTY = new «diamondName»(null, null, null, Ord.<Integer>asc(), 0);
+				static final «wildcardName» EMPTY_REVERSED = new «diamondName»(null, null, null, Ord.<Integer>desc(), 0);
 			«ELSE»
 				static final «shortName» EMPTY = new «shortName»(«type.asc»());
+				static final «shortName» EMPTY_REVERSED = new «shortName»(«type.desc»());
 			«ENDIF»
 
 			final «type.genericName» entry;
@@ -371,12 +373,16 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				«IF type == Type.OBJECT»
 					if (ord == asc()) {
 						return («genericName») EMPTY;
+					} else if (ord == desc()) {
+						return («genericName») EMPTY_REVERSED;
 					} else {
 						return new «diamondName»(null, null, null, ord, 0«IF type.primitive», true«ENDIF»);
 					}
 				«ELSE»
 					if (ord == «type.asc»()) {
 						return EMPTY;
+					} else if (ord == «type.desc»()) {
+						return EMPTY_REVERSED;
 					} else {
 						return new «diamondName»(ord);
 					}
