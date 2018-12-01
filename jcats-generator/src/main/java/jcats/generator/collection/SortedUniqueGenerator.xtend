@@ -774,7 +774,16 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				if (this.root.isEmpty()) {
 					return «type.emptyIterator»;
 				} else {
-					return new «type.iteratorDiamondName("SlicedSortedUnique")»(this.root, this.from, this.hasFrom, this.fromInclusive, this.to, this.hasTo, this.toInclusive);
+					return new «type.iteratorDiamondName("Sliced" + baseName)»(this.root, this.from, this.hasFrom, this.fromInclusive, this.to, this.hasTo, this.toInclusive);
+				}
+			}
+
+			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				if (this.root.isEmpty()) {
+					return «type.emptyIterator»;
+				} else {
+					return new «type.iteratorDiamondName("Sliced" + baseName + "Reverse")»(this.root, this.from, this.hasFrom, this.fromInclusive, this.to, this.hasTo, this.toInclusive);
 				}
 			}
 
@@ -795,127 +804,12 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 		}
 
-		final class «type.iteratorGenericName("SlicedSortedUnique")» implements «type.iteratorGenericName» {
-			private final «genericName» end;
-			private Stack<«genericName»> stack;
+		final class «type.iteratorGenericName("Sliced" + baseName)» implements «type.iteratorGenericName» {
+			«AVLCommon.slicedIterator(genericName, "unique", type.iteratorShortName("Sliced" + baseName), type.genericName, "entry", "<A> ", type.ordGenericName, type.iteratorReturnType, type.iteratorNext, false)»
+		}
 
-			«type.iteratorShortName("SlicedSortedUnique")»(final «genericName» root,
-				final «type.genericName» from, final boolean hasFrom, final boolean fromInclusive,
-				final «type.genericName» to, final boolean hasTo, final boolean toInclusive) {
-				final Stack<«genericName»> first = getFirst(root, from, hasFrom, fromInclusive);
-				final «genericName» last = getLast(root, to, hasTo, toInclusive);
-				if (first.isEmpty() || last == null || root.ord.greater(first.head.entry, last.entry)) {
-					this.stack = null;
-					this.end = null;
-				} else {
-					this.stack = first;
-					this.end = last;
-				}
-			}
-
-			private static «IF type == Type.OBJECT»<A> «ENDIF»Stack<«genericName»> getFirst(«genericName» unique, final «type.genericName» from, final boolean hasFrom, final boolean inclusive) {
-				final «type.ordGenericName» ord = unique.ord;
-				Stack<«genericName»> stack = emptyStack();
-				if (hasFrom) {
-					while (true) {
-						final Order order = ord.order(from, unique.entry);
-						if (order == EQ) {
-							if (inclusive) {
-								return stack.prepend(unique);
-							} else if (unique.right == null) {
-								return stack;
-							} else {
-								unique = unique.right;
-							}
-						} else if (order == LT) {
-							if (unique.left == null) {
-								return stack.prepend(unique);
-							} else {
-								stack = stack.prepend(unique);
-								unique = unique.left;
-							}
-						} else if (order == GT) {
-							if (unique.right == null) {
-								return stack;
-							} else {
-								unique = unique.right;
-							}
-						}
-					}
-				} else {
-					while (unique != null) {
-						stack = stack.prepend(unique);
-						unique = unique.left;
-					}
-					return stack;
-				}
-			}
-
-			private static «paramGenericName» getLast(«genericName» unique, final «type.genericName» to, final boolean hasTo, final boolean inclusive) {
-				final «type.ordGenericName» ord = unique.ord;
-				if (hasTo) {
-					«genericName» maxLess = null;
-					while (true) {
-						final Order order = ord.order(to, unique.entry);
-						if (order == EQ) {
-							if (inclusive) {
-								return unique;
-							} else if (unique.left == null) {
-								return maxLess;
-							} else {
-								unique = unique.left;
-							}
-						} else if (order == LT) {
-							if (unique.left == null) {
-								return maxLess;
-							} else {
-								unique = unique.left;
-							}
-						} else if (order == GT) {
-							if (unique.right == null) {
-								return unique;
-							} else {
-								maxLess = unique;
-								unique = unique.right;
-							}
-						} else {
-							throw SortedUnique.nullOrder(order);
-						}
-					}
-				} else {
-					while (unique.right != null) {
-						unique = unique.right;
-					}
-					return unique;
-				}
-			}
-
-			@Override
-			public boolean hasNext() {
-				return (this.stack != null && this.stack.isNotEmpty());
-			}
-
-			@Override
-			public «type.iteratorReturnType» «type.iteratorNext»() {
-				if (this.stack == null) {
-					throw new NoSuchElementException();
-				}
-
-				final «genericName» result = this.stack.head;
-				if (result == this.end) {
-					this.stack = null;
-				} else {
-					this.stack = this.stack.tail;
-
-					if (result.right != null) {
-						for («genericName» unique = result.right; unique != null; unique = unique.left) {
-							this.stack = this.stack.prepend(unique);
-						}
-					}
-				}
-
-				return result.entry;
-			}
+		final class «type.iteratorGenericName("Sliced" + baseName + "Reverse")» implements «type.iteratorGenericName» {
+			«AVLCommon.slicedIterator(genericName, "unique", type.iteratorShortName("Sliced" + baseName + "Reverse"), type.genericName, "entry", "<A> ", type.ordGenericName, type.iteratorReturnType, type.iteratorNext, true)»
 		}
 	''' }
 }

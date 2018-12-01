@@ -324,4 +324,145 @@ final class AVLCommon {
 			return result.entry;
 		}
 	'''
+
+	def static slicedIterator(String genericName, String name, String iteratorShortName, String keyGenericName, String getKey, String params,
+		String ordGenericName, String iteratorReturnType, String iteratorNext, boolean reversed) {
+		val first = if (reversed) "last" else "first"
+		val last = if (reversed) "first" else "last"
+		val getFirst = if (reversed) "getLast" else "getFirst"
+		val getLast = if (reversed) "getFirst" else "getLast"
+		val from = if (reversed) "to" else "from"
+		val to = if (reversed) "from" else "to"
+		val hasFrom = if (reversed) "hasTo" else "hasFrom"
+		val hasTo = if (reversed) "hasFrom" else "hasTo"
+		val greater = if (reversed) "less" else "greater"
+		val left = if (reversed) "right" else "left"
+		val right = if (reversed) "left" else "right"
+		val lt = if (reversed) "GT" else "LT"
+		val gt = if (reversed) "LT" else "GT"
+		val maxLess = if (reversed) "minGreater" else "maxLess"
+		'''
+			private final «genericName» end;
+			private Stack<«genericName»> stack;
+
+			«iteratorShortName»(final «genericName» root,
+				final «keyGenericName» from, final boolean hasFrom, final boolean fromInclusive,
+				final «keyGenericName» to, final boolean hasTo, final boolean toInclusive) {
+				final Stack<«genericName»> «first» = «getFirst»(root, «from», «hasFrom», «from»Inclusive);
+				final «genericName» «last» = «getLast»(root, «to», «hasTo», «to»Inclusive);
+				if («first».isEmpty() || «last» == null || root.ord.«greater»(«first».head.«getKey», «last».«getKey»)) {
+					this.stack = null;
+					this.end = null;
+				} else {
+					this.stack = «first»;
+					this.end = «last»;
+				}
+			}
+
+			private static «params»Stack<«genericName»> «getFirst»(«genericName» «name», final «keyGenericName» «from», final boolean «hasFrom», final boolean inclusive) {
+				final «ordGenericName» ord = «name».ord;
+				Stack<«genericName»> stack = emptyStack();
+				if («hasFrom») {
+					while (true) {
+						final Order order = ord.order(«from», «name».«getKey»);
+						if (order == EQ) {
+							if (inclusive) {
+								return stack.prepend(«name»);
+							} else if («name».«right» == null) {
+								return stack;
+							} else {
+								«name» = «name».«right»;
+							}
+						} else if (order == «lt») {
+							if («name».«left» == null) {
+								return stack.prepend(«name»);
+							} else {
+								stack = stack.prepend(«name»);
+								«name» = «name».«left»;
+							}
+						} else if (order == «gt») {
+							if («name».«right» == null) {
+								return stack;
+							} else {
+								«name» = «name».«right»;
+							}
+						} else {
+							throw nullOrder(order);
+						}
+					}
+				} else {
+					while («name» != null) {
+						stack = stack.prepend(«name»);
+						«name» = «name».«left»;
+					}
+					return stack;
+				}
+			}
+
+			private static «params»«genericName» «getLast»(«genericName» «name», final «keyGenericName» «to», final boolean «hasTo», final boolean inclusive) {
+				final «ordGenericName» ord = «name».ord;
+				if («hasTo») {
+					«genericName» «maxLess» = null;
+					while (true) {
+						final Order order = ord.order(«to», «name».«getKey»);
+						if (order == EQ) {
+							if (inclusive) {
+								return «name»;
+							} else if («name».«left» == null) {
+								return «maxLess»;
+							} else {
+								«name» = «name».«left»;
+							}
+						} else if (order == «lt») {
+							if («name».«left» == null) {
+								return «maxLess»;
+							} else {
+								«name» = «name».«left»;
+							}
+						} else if (order == «gt») {
+							if («name».«right» == null) {
+								return «name»;
+							} else {
+								«maxLess» = «name»;
+								«name» = «name».«right»;
+							}
+						} else {
+							throw nullOrder(order);
+						}
+					}
+				} else {
+					while («name».«right» != null) {
+						«name» = «name».«right»;
+					}
+					return «name»;
+				}
+			}
+
+			@Override
+			public boolean hasNext() {
+				return (this.stack != null && this.stack.isNotEmpty());
+			}
+
+			@Override
+			public «iteratorReturnType» «iteratorNext»() {
+				if (this.stack == null) {
+					throw new NoSuchElementException();
+				}
+
+				final «genericName» result = this.stack.head;
+				if (result == this.end) {
+					this.stack = null;
+				} else {
+					this.stack = this.stack.tail;
+
+					if (result.«right» != null) {
+						for («genericName» «name» = result.«right»; «name» != null; «name» = «name».«left») {
+							this.stack = this.stack.prepend(«name»);
+						}
+					}
+				}
+
+				return result.«getKey»;
+			}
+	''' }
 }
