@@ -533,6 +533,10 @@ final class OrdGenerator implements InterfaceGenerator {
 					}
 				«ENDIF»
 			«ENDFOR»
+
+			static «type.paramGenericName("Ord")» allEqual() {
+				return «IF type == Type.OBJECT»(«genericName») «ENDIF»«type.shortName("AllEqualOrd")».INSTANCE;
+			}
 			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #["A"], #[])»
@@ -652,6 +656,20 @@ final class OrdGenerator implements InterfaceGenerator {
 				}
 			}
 		«ENDIF»
+
+		final class «type.shortName("AllEqualOrd")» implements «shortName»«IF type == Type.OBJECT»<Object>«ENDIF», Serializable {
+			static final «type.shortName("AllEqualOrd")» INSTANCE = new «type.shortName("AllEqualOrd")»();
+
+			@Override
+			public Order order(final «type.javaName» x, final «type.javaName» y) {
+				return EQ;
+			}
+
+			@Override
+			public «shortName»«IF type == Type.OBJECT»<Object>«ENDIF» reversed() {
+				return this;
+			}
+		}
 
 		«IF type == Type.OBJECT»
 			final class MinCollector<A> implements Consumer<A> {
