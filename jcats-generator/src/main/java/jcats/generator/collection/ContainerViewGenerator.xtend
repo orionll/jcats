@@ -25,7 +25,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 	def filteredContainerViewShortName() { type.shortName("FilteredContainerView") }
 	def limitedContainerViewShortName() { type.shortName("LimitedContainerView") }
 	def skippedContainerViewShortName() { type.shortName("SkippedContainerView") }
-	def reversedContainerViewShortName() { type.shortName("ReversedContainerView") }
+	def reverseContainerViewShortName() { type.shortName("ReverseContainerView") }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -150,7 +150,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			default «genericName» reverse() {
-				return new «reversedContainerViewShortName»<>(this);
+				return new «reverseContainerViewShortName»<>(this);
 			}
 			«IF type == Type.OBJECT»
 
@@ -1170,10 +1170,10 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«toStr(type, skippedContainerViewShortName, false)»
 		}
 
-		class «reversedContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> implements «genericName» {
+		class «reverseContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> implements «genericName» {
 			final C view;
 
-			«reversedContainerViewShortName»(final C view) {
+			«reverseContainerViewShortName»(final C view) {
 				this.view = view;
 			}
 
@@ -1338,7 +1338,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return this.view.spliteratorCharacteristics();
 			}
 
-			«toStr(type, reversedContainerViewShortName, false)»
+			«toStr(type, reverseContainerViewShortName, false)»
 		}
 	''' }
 }

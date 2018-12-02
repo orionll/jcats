@@ -24,7 +24,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 	def mapTargetType() { if (type == Type.OBJECT) "B" else "A" }
 	def limitedIndexedContainerViewShortName() { type.shortName("LimitedIndexedContainerView") }
 	def skippedIndexedContainerViewShortName() { type.shortName("SkippedIndexedContainerView") }
-	def reversedIndexedContainerViewShortName() { type.shortName("ReversedIndexedContainerView") }
+	def reverseIndexedContainerViewShortName() { type.shortName("ReverseIndexedContainerView") }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -91,7 +91,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			default «genericName» reverse() {
-				return new «reversedIndexedContainerViewShortName»<>(this);
+				return new «reverseIndexedContainerViewShortName»<>(this);
 			}
 			«IF type == Type.OBJECT»
 
@@ -477,12 +477,12 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			final class «reversedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends ReversedContainerView<A, C> implements IndexedContainerView<A> {
+			final class «reverseIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends ReverseContainerView<A, C> implements IndexedContainerView<A> {
 		«ELSE»
-			final class «reversedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»ReversedContainerView<C> implements «type.indexedContainerViewGenericName» {
+			final class «reverseIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»ReverseContainerView<C> implements «type.indexedContainerViewGenericName» {
 		«ENDIF»
 
-			«reversedIndexedContainerViewShortName»(final C view) {
+			«reverseIndexedContainerViewShortName»(final C view) {
 				super(view);
 			}
 
@@ -492,7 +492,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					try {
 						return this.view.get(size() - index - 1);
 					} catch (final IndexOutOfBoundsException __) {
-						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«reversedIndexedContainerViewShortName»"));
+						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«reverseIndexedContainerViewShortName»"));
 					}
 				} else {
 					throw new UnsupportedOperationException("get() is unsupported if hasFixedSize() == false");
@@ -528,7 +528,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			«indexedEquals(type)»
 
-			«toStr(type, reversedIndexedContainerViewShortName, false)»
+			«toStr(type, reverseIndexedContainerViewShortName, false)»
 		}
 	''' }
 }
