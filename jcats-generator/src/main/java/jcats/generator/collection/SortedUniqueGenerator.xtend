@@ -284,11 +284,6 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public int spliteratorCharacteristics() {
-				return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE;
-			}
-
-			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				if (isNotEmpty()) {
 					traverse(eff);
