@@ -20,6 +20,7 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 	def shortName() { type.shortName("UniqueContainerView") }
 	def genericName() { type.genericName("UniqueContainerView") }
 	def baseUniqueContainerViewShortName() { type.shortName("BaseUniqueContainerView") }
+	def reverseUniqueContainerViewShortName() { type.shortName("ReverseUniqueContainerView") }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
@@ -39,6 +40,11 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 			@Deprecated
 			default «type.uniqueContainerViewGenericName» view() {
 				return this;
+			}
+
+			@Override
+			default «genericName» reverse() {
+				return new «reverseUniqueContainerViewShortName»<>(this);
 			}
 			«IF type == Type.OBJECT»
 
@@ -72,10 +78,29 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 
 			«uniqueEquals(type)»
 
-			@Override
-			public String toString() {
-				return iterableToString(this, "«baseUniqueContainerViewShortName»");
+			«toStr(type, baseUniqueContainerViewShortName, false)»
+		}
+
+		«IF type == Type.OBJECT»
+			final class «reverseUniqueContainerViewShortName»<A, C extends «genericName»> extends ReverseContainerView<A, C> implements «genericName» {
+		«ELSE»
+			final class «reverseUniqueContainerViewShortName»<C extends «genericName»> extends «type.typeName»ReverseContainerView<C> implements «genericName» {
+		«ENDIF»
+
+			«reverseUniqueContainerViewShortName»(final C view) {
+				super(view);
 			}
+
+			@Override
+			public «genericName» reverse() {
+				return this.view;
+			}
+
+			«uniqueHashCode(type)»
+
+			«uniqueEquals(type)»
+
+			«toStr(type, reverseUniqueContainerViewShortName, false)»
 		}
 	''' }
 }

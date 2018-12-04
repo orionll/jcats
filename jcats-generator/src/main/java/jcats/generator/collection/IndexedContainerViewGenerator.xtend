@@ -477,9 +477,9 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			final class «reverseIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends ReverseContainerView<A, C> implements IndexedContainerView<A> {
+			final class «reverseIndexedContainerViewShortName»<A, C extends «genericName»> extends ReverseContainerView<A, C> implements «genericName» {
 		«ELSE»
-			final class «reverseIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»ReverseContainerView<C> implements «type.indexedContainerViewGenericName» {
+			final class «reverseIndexedContainerViewShortName»<C extends «genericName»> extends «type.typeName»ReverseContainerView<C> implements «genericName» {
 		«ENDIF»
 
 			«reverseIndexedContainerViewShortName»(final C view) {
