@@ -116,15 +116,15 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				forEach((final P<K, A> entry) -> eff.apply(entry.get1(), entry.get2()));
 			}
 
-			default UniqueContainer<K> keys() {
+			default UniqueContainerView<K> keys() {
 				return new Keys<>(this);
 			}
 
-			default Container<A> values() {
+			default ContainerView<A> values() {
 				return new Values<>(this);
 			}
 
-			default UniqueContainer<P<K, A>> asUniqueContainer() {
+			default UniqueContainerView<P<K, A>> asUniqueContainer() {
 				return new KeyValueAsUniqueContainer<>(this);
 			}
 
@@ -179,7 +179,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			«cast(#["K", "A"], #[], #["A"])»
 		}
 
-		final class Values<A> implements Container<A> {
+		final class Values<A> implements ContainerView<A> {
 			private final KeyValue<?, A> keyValue;
 
 			Values(final KeyValue<?, A> keyValue) {
@@ -242,7 +242,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 		}
 
-		final class Keys<K> implements UniqueContainer<K> {
+		final class Keys<K> implements UniqueContainerView<K> {
 			private final KeyValue<K, ?> keyValue;
 
 			Keys(final KeyValue<K, ?> keyValue) {
@@ -309,7 +309,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 		}
 
-		final class KeyValueAsUniqueContainer<K, A> implements UniqueContainer<P<K, A>> {
+		final class KeyValueAsUniqueContainer<K, A> implements UniqueContainerView<P<K, A>> {
 			private final KeyValue<K, A> keyValue;
 		
 			KeyValueAsUniqueContainer(final KeyValue<K, A> keyValue) {
