@@ -520,6 +520,46 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				requireNonNull(eff);
+				if (this.view.hasFixedSize()) {
+					for (int i = this.view.size() - 1; i >= 0; i--) {
+						eff.apply(this.view.get(i));
+					}
+				} else {
+					super.foreach(eff);
+				}
+			}
+
+			@Override
+			public void foreachWithIndex(final Int«type.typeName»Eff2«IF type == Type.OBJECT»<A>«ENDIF» eff) {
+				requireNonNull(eff);
+				if (this.view.hasFixedSize()) {
+					final int size = this.view.size();
+					for (int i = 0; i < size; i++) {
+						eff.apply(i, this.view.get(size - i - 1));
+					}
+				} else {
+					super.foreachWithIndex(eff);
+				}
+			}
+
+			@Override
+			public boolean foreachUntil(final «type.boolFName» eff) {
+				requireNonNull(eff);
+				if (this.view.hasFixedSize()) {
+					for (int i = this.view.size() - 1; i >= 0; i--) {
+						if (!eff.apply(this.view.get(i))) {
+							return false;
+						}
+					}
+					return true;
+				} else {
+					return super.foreachUntil(eff);
+				}
+			}
+
+			@Override
 			public «genericName» reverse() {
 				return this.view;
 			}
