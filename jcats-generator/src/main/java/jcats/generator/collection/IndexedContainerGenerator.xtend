@@ -235,6 +235,24 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			@Deprecated
 			boolean equals(final Object other);
 
+			«IF type == Type.INT»
+				static IntIndexedContainer range(final int lowInclusive, final int highExclusive) {
+					if (lowInclusive >= highExclusive) {
+						return Range.EMPTY;
+					} else {
+						return new Range(lowInclusive, highExclusive, false);
+					}
+				}
+
+				static IntIndexedContainer rangeClosed(final int lowInclusive, final int highInclusive) {
+					if (lowInclusive > highInclusive) {
+						return Range.EMPTY;
+					} else {
+						return new Range(lowInclusive, highInclusive, true);
+					}
+				}
+
+			«ENDIF»
 			static «type.paramGenericName("IndexedContainerView")» as«type.indexedContainerShortName»(final List<«type.genericBoxedName»> list) {
 				requireNonNull(list);
 				return new «type.shortName("List")»As«type.indexedContainerDiamondName»(list, false);

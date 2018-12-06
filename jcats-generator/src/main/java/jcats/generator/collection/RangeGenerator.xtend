@@ -29,9 +29,9 @@ final class RangeGenerator implements ClassGenerator {
 		import static «Constants.JCATS».IntOption.*;
 		import static «Constants.COMMON».*;
 
-		public final class Range implements IntIndexedContainer, Serializable {
+		final class Range implements IntIndexedContainer, Serializable {
 
-			private static final Range EMPTY = new Range(0, 0, false);
+			static final Range EMPTY = new Range(0, 0, false);
 
 			private final int low;
 			private final int high;
@@ -130,11 +130,11 @@ final class RangeGenerator implements ClassGenerator {
 				return (value >= this.low) && (this.closed ? value <= this.high : value < this.high);
 			}
 
-			public Range limit(final int n) {
+			Range limit(final int n) {
 				if (n < 0) {
 					throw new IllegalArgumentException(Integer.toString(n));
 				} else if (n == 0) {
-					return emptyRange();
+					return EMPTY;
 				} else {
 					final long upTo = (long) this.low + n;
 					if (upTo != (int) upTo ||
@@ -147,7 +147,7 @@ final class RangeGenerator implements ClassGenerator {
 				}
 			}
 
-			public Range skip(final int n) {
+			Range skip(final int n) {
 				if (n < 0) {
 					throw new IllegalArgumentException(Integer.toString(n));
 				} else if (n == 0) {
@@ -157,7 +157,7 @@ final class RangeGenerator implements ClassGenerator {
 					if (from != (int) from ||
 							this.closed && from >= this.high+1L ||
 							!this.closed && from >= this.high) {
-						return emptyRange();
+						return EMPTY;
 					} else {
 						return new Range((int) from, this.high, this.closed);
 					}
@@ -255,30 +255,21 @@ final class RangeGenerator implements ClassGenerator {
 
 			«hashcode(Type.INT)»
 
-			/**
-			 * «equalsDeprecatedJavaDoc»
-			 */
 			@Override
-			@Deprecated
 			public boolean equals(final Object obj) {
 				if (obj == this) {
 					return true;
 				} else if (obj instanceof Range) {
-					return isStrictlyEqualTo((Range) obj);
+					final Range other = (Range) obj;
+					if (this.low == other.low) {
+						final long high1 = this.closed ? this.high + 1L : this.high;
+						final long high2 = other.closed ? other.high + 1L : other.high;
+						return (high1 == high2);
+					} else {
+						return false;
+					}
 				} else if (obj instanceof IntIndexedContainer) {
 					return intIndexedContainersEqual(this, (IntIndexedContainer) obj);
-				} else {
-					return false;
-				}
-			}
-
-			public boolean isStrictlyEqualTo(final Range other) {
-				if (other == this) {
-					return true;
-				} else if (this.low == other.low) {
-					final long high1 = this.closed ? this.high + 1L : this.high;
-					final long high2 = other.closed ? other.high + 1L : other.high;
-					return (high1 == high2);
 				} else {
 					return false;
 				}
@@ -287,26 +278,6 @@ final class RangeGenerator implements ClassGenerator {
 			@Override
 			public String toString() {
 				return "[" + this.low + ", " + this.high + (this.closed ? "]" : ")");
-			}
-
-			public static Range emptyRange() {
-				return EMPTY;
-			}
-
-			public static Range range(final int lowInclusive, final int highExclusive) {
-				if (lowInclusive >= highExclusive) {
-					return EMPTY;
-				} else {
-					return new Range(lowInclusive, highExclusive, false);
-				}
-			}
-
-			public static Range rangeClosed(final int lowInclusive, final int highInclusive) {
-				if (lowInclusive > highInclusive) {
-					return EMPTY;
-				} else {
-					return new Range(lowInclusive, highInclusive, true);
-				}
 			}
 		}
 
