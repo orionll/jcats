@@ -1299,7 +1299,7 @@ class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			«toStr(type, true)»
+			«toStr(type)»
 
 			«IF type == Type.OBJECT»
 				public final <B, C> Seq<C> zip(final Iterable<B> that, final F2<A, B, C> f) {
@@ -1433,7 +1433,7 @@ class SeqGenerator implements ClassGenerator {
 				return new «type.diamondName("SeqView")»(this.container.skip(n));
 			}
 
-			«toStr(type, type.shortName("SeqView"), false)»
+			«toStr(type)»
 		}
 	''' }
 }

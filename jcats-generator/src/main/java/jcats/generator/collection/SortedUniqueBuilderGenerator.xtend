@@ -116,7 +116,7 @@ final class SortedUniqueBuilderGenerator implements ClassGenerator {
 				return this.unique;
 			}
 
-			«toStr(type, shortName, false, "this.unique")»
+			«toStr(type, "this.unique")»
 		}
 	''' }
 }

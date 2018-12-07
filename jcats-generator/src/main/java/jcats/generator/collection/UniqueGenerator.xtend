@@ -278,10 +278,7 @@ final class UniqueGenerator implements ClassGenerator {
 
 			«uniqueHashCode(Type.OBJECT)»
 
-			@Override
-			public String toString() {
-				return iterableToString(this, "«shortName»");
-			}
+			«toStr»
 
 			public static «paramGenericName» empty«shortName»() {
 				return («genericName») EMPTY;

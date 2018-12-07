@@ -78,7 +78,7 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 
 			«uniqueEquals(type)»
 
-			«toStr(type, baseUniqueContainerViewShortName, false)»
+			«toStr(type)»
 		}
 
 		«IF type == Type.OBJECT»
@@ -100,7 +100,7 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 
 			«uniqueEquals(type)»
 
-			«toStr(type, reverseUniqueContainerViewShortName, false)»
+			«toStr(type)»
 		}
 	''' }
 }

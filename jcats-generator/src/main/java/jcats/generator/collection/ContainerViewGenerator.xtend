@@ -473,7 +473,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return this.container.parallelStream();
 			}
 
-			«toStr(type, baseContainerViewShortName, false)»
+			«toStr(type)»
 		}
 
 		class «mappedContainerViewShortName»<A, «IF type == Type.OBJECT»B, «ENDIF»C extends «genericName»> implements ContainerView<«mapTargetType»> {
@@ -608,7 +608,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return Common.clearBit(this.view.spliteratorCharacteristics(), Spliterator.DISTINCT | Spliterator.SORTED);
 			}
 
-			«toStr(Type.OBJECT, mappedContainerViewShortName, false)»
+			«toStr(Type.OBJECT)»
 		}
 
 		«FOR toType : Type.primitives»
@@ -748,7 +748,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 					return Common.clearBit(this.view.spliteratorCharacteristics(), Spliterator.DISTINCT | Spliterator.SORTED);
 				}
 
-				«toStr(toType, '''«IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»ContainerView''', false)»
+				«toStr(toType)»
 			}
 
 		«ENDFOR»
@@ -830,7 +830,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return Common.clearBit(this.view.spliteratorCharacteristics(), Spliterator.DISTINCT | Spliterator.SORTED);
 			}
 
-			«toStr(Type.OBJECT, type.shortName("FlatMappedContainerView"), false)»
+			«toStr»
 		}
 
 		«FOR toType : Type.primitives»
@@ -924,7 +924,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 					return Common.clearBit(this.view.spliteratorCharacteristics(), Spliterator.DISTINCT | Spliterator.SORTED);
 				}
 
-				«toStr(toType, '''«IF type.primitive»«type.typeName»«ENDIF»FlatMappedTo«toType.typeName»ContainerView''', false)»
+				«toStr(toType)»
 			}
 
 		«ENDFOR»
@@ -1011,7 +1011,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return this.view.spliteratorCharacteristics();
 			}
 
-			«toStr(type, filteredContainerViewShortName, false)»
+			«toStr(type)»
 		}
 
 		class «limitedContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> implements «genericName» {
@@ -1092,7 +1092,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return this.view.spliteratorCharacteristics();
 			}
 
-			«toStr(type, limitedContainerViewShortName, false)»
+			«toStr(type)»
 		}
 
 		class «skippedContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> implements «genericName» {
@@ -1167,7 +1167,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return this.view.spliteratorCharacteristics();
 			}
 
-			«toStr(type, skippedContainerViewShortName, false)»
+			«toStr(type)»
 		}
 
 		class «reverseContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> implements «genericName» {
@@ -1338,7 +1338,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return this.view.spliteratorCharacteristics();
 			}
 
-			«toStr(type, reverseContainerViewShortName, false)»
+			«toStr(type)»
 		}
 	''' }
 }

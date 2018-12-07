@@ -710,7 +710,10 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			«toStr(type, false)»
+			@Override
+			public String toString() {
+				return Arrays.toString(this.array);
+			}
 
 			«IF type == Type.OBJECT»
 				public <B, C> Array<C> zip(final Iterable<B> that, final F2<A, B, C> f) {
@@ -971,7 +974,7 @@ final class ArrayGenerator implements ClassGenerator {
 				super(array);
 			}
 
-			«toStr(type, type.shortName("ArrayView"), false)»
+			«toStr(type)»
 		}
 	''' }
 }

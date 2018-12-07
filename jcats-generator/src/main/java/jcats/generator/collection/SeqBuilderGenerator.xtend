@@ -378,7 +378,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 				}
 			}
 
-			«toStr(type, shortName, false, "build()")»
+			«toStr(type, "build()")»
 		}
 	''' }
 }

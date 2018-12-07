@@ -93,7 +93,7 @@ final class DictBuilderGenerator implements ClassGenerator {
 				return this.dict;
 			}
 
-			«toStr(Type.OBJECT, "DictBuilder", false, "this.dict")»
+			«toStr(Type.OBJECT, "this.dict")»
 		}
 	''' }
 }

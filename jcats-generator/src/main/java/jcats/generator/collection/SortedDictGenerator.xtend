@@ -319,10 +319,7 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			«keyValueHashCode»
 
-			@Override
-			public String toString() {
-				return iterableToString(this, "SortedDict");
-			}
+			«toStr»
 
 			public static <K extends Comparable<K>, A> SortedDict<K, A> emptySortedDict() {
 				return (SortedDict<K, A>) EMPTY;

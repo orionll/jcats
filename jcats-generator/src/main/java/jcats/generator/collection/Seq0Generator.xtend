@@ -159,6 +159,11 @@ class Seq0Generator extends SeqGenerator {
 				requireNonNull(eff);
 				return true;
 			}
+
+			@Override
+			public String toString() {
+				return "[]";
+			}
 		}
 	''' }
 }

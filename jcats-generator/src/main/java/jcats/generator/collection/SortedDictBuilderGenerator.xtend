@@ -91,7 +91,7 @@ final class SortedDictBuilderGenerator implements ClassGenerator {
 				return this.dict;
 			}
 
-			«toStr(Type.OBJECT, "SortedDictBuilder", false, "this.dict")»
+			«toStr(Type.OBJECT, "this.dict")»
 		}
 	''' }
 }

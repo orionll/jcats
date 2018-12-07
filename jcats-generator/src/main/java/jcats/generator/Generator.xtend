@@ -36,19 +36,17 @@ interface Generator {
 		}
 	''' }
 
-	def toStr() { toStr(Type.OBJECT, false) }
+	def toStr() { toStr(Type.OBJECT) }
 
-	def toStr(Type type, boolean isFinal) { toStr(type, name, isFinal) }
+	def toStr(Type type) { toStr(type, "this") }
 
-	def toStr(Type type, String name, boolean isFinal) { toStr(type, name, isFinal, "this") }
-
-	def toStr(Type type, String name, boolean isFinal, String obj) { '''
+	def toStr(Type type, String obj) { '''
 		@Override
-		public «IF isFinal»final «ENDIF»String toString() {
+		public String toString() {
 			«IF type.javaUnboxedType»
-				return «type.containerShortName.firstToLowerCase»ToString(«obj», "«name»");
+				return «type.containerShortName.firstToLowerCase»ToString(«obj»);
 			«ELSE»
-				return iterableToString(«obj», "«name»");
+				return iterableToString(«obj»);
 			«ENDIF»
 		}
 	'''}

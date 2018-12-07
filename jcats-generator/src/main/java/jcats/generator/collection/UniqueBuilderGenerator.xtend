@@ -82,7 +82,7 @@ final class UniqueBuilderGenerator implements ClassGenerator {
 				return this.unique;
 			}
 
-			«toStr(Type.OBJECT, "UniqueBuilder", false, "this.unique")»
+			«toStr(Type.OBJECT, "this.unique")»
 		}
 	''' }
 }

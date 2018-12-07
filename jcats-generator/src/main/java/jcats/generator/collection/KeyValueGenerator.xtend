@@ -236,10 +236,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				return Spliterator.NONNULL | Spliterator.IMMUTABLE;
 			}
 
-			@Override
-			public String toString() {
-				return iterableToString(this, "Values");
-			}
+			«toStr»
 		}
 
 		final class Keys<K> implements UniqueContainerView<K> {
@@ -303,10 +300,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			«uniqueEquals(Type.OBJECT)»
 
-			@Override
-			public String toString() {
-				return iterableToString(this, "Keys");
-			}
+			«toStr»
 		}
 
 		final class KeyValueAsUniqueContainer<K, A> implements UniqueContainerView<P<K, A>> {

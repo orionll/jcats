@@ -337,7 +337,7 @@ final class VNGenerators {
 
 					@Override
 					public String toString() {
-						return "«shortName»(" + «(1 .. arity).map["this.a" + it].join(''' + ", " + ''')» + ")";
+						return "[" + «(1 .. arity).map["this.a" + it].join(''' + ", " + ''')» + "]";
 					}
 
 					public static «type.paramGenericName(baseName)» «factoryMethodName»(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {

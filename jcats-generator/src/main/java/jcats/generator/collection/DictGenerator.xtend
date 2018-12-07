@@ -285,10 +285,7 @@ class DictGenerator implements ClassGenerator {
 
 			«keyValueHashCode»
 
-			@Override
-			public String toString() {
-				return iterableToString(this, "«shortName»");
-			}
+			«toStr»
 
 			public static «paramGenericName» empty«shortName»() {
 				return («genericName») EMPTY;

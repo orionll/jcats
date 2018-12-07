@@ -357,7 +357,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			«uniqueHashCode(type)»
 
-			«toStr(type, shortName, false)»
+			«toStr(type)»
 
 			public static «paramComparableGenericName» empty«shortName»() {
 				return «IF type == Type.OBJECT»(«genericName») «ENDIF»EMPTY;
@@ -503,7 +503,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				return new «slicedSortedUniqueViewDiamondName»(this.container, «type.defaultValue», false, false, to, true, inclusive);
 			}
 
-			«toStr(type, type.sortedUniqueViewShortName, false)»
+			«toStr(type)»
 		}
 
 		final class «type.genericName("SlicedSortedUniqueView")» implements «type.sortedUniqueContainerViewGenericName» {
@@ -786,7 +786,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			«uniqueHashCode(type)»
 
-			«toStr(type, slicedSortedUniqueViewShortName, false)»
+			«toStr(type)»
 
 			static «IF type == Type.OBJECT»<A> «ENDIF»void checkRange(final «type.ordGenericName» ord, final «type.genericName» from, final «type.genericName» to) {
 				«IF type == Type.OBJECT»

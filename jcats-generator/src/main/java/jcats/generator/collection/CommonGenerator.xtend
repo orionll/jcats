@@ -168,33 +168,46 @@ final class CommonGenerator implements ClassGenerator {
 				}
 			}
 
-			static String iterableToString(final Iterable<?> iterable, final String name) {
-				final StringBuilder builder = new StringBuilder(name);
-				builder.append("(");
+			static String iterableToString(final Iterable<?> iterable) {
 				final Iterator<?> iterator = iterable.iterator();
-				while (iterator.hasNext()) {
-					builder.append(iterator.next());
-					if (iterator.hasNext()) {
+				if (iterator.hasNext()) {
+					final StringBuilder builder = new StringBuilder();
+					builder.append("[");
+					while (true) {
+						final Object next = iterator.next();
+						if (next == iterable) {
+							builder.append("(this Iterable)");
+						} else {
+							builder.append(next);
+						}
+						if (!iterator.hasNext()) {
+							builder.append("]");
+							return builder.toString();
+						}
 						builder.append(", ");
 					}
+				} else {
+					return "[]";
 				}
-				builder.append(")");
-				return builder.toString();
 			}
 
 			«FOR type : Type.javaUnboxedTypes»
-				static String «type.containerShortName.firstToLowerCase»ToString(final «type.containerWildcardName» container, final String name) {
+				static String «type.containerShortName.firstToLowerCase»ToString(final «type.containerWildcardName» container) {
 					final «type.iteratorGenericName» iterator = container.iterator();
-					final StringBuilder builder = new StringBuilder(name);
-					builder.append("(");
-					while (iterator.hasNext()) {
-						builder.append(iterator.«type.iteratorNext»());
-						if (iterator.hasNext()) {
+					if (iterator.hasNext()) {
+						final StringBuilder builder = new StringBuilder();
+						builder.append("[");
+						while (true) {
+							builder.append(iterator.«type.iteratorNext»());
+							if (!iterator.hasNext()) {
+								builder.append("]");
+								return builder.toString();
+							}
 							builder.append(", ");
 						}
+					} else {
+						return "[]";
 					}
-					builder.append(")");
-					return builder.toString();
 				}
 
 			«ENDFOR»

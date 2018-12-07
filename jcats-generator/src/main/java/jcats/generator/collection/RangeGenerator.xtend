@@ -411,10 +411,7 @@ final class RangeGenerator implements ClassGenerator {
 				return new RangeView(this.container.skip(n));
 			}
 
-			@Override
-			public String toString() {
-				return intContainerToString(this, "RangeView");
-			}
+			«toStr(Type.INT)»
 		}
 	''' }
 }

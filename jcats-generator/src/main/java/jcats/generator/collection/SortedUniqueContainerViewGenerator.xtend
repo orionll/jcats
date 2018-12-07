@@ -89,7 +89,7 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 				}
 
 			«ENDIF»
-			«toStr(type, baseSortedUniqueContainerViewShortName, false)»
+			«toStr(type)»
 		}
 	''' }
 }

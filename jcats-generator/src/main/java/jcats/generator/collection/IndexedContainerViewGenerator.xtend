@@ -160,10 +160,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			«indexedEquals(type)»
 
-			@Override
-			public String toString() {
-				return iterableToString(this, "«baseIndexedContainerViewShortName»");
-			}
+			«toStr(type)»
 		}
 
 		«IF type == Type.OBJECT»
@@ -221,7 +218,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			«indexedEquals(Type.OBJECT)»
 
-			«toStr(Type.OBJECT, mappedIndexedContainerViewShortName, false)»
+			«toStr»
 		}
 
 		«FOR toType : Type.primitives»
@@ -279,7 +276,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 				«indexedEquals(toType)»
 
-				«toStr(toType, '''«IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView''', false)»
+				«toStr(toType)»
 			}
 
 		«ENDFOR»
@@ -367,7 +364,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			«indexedEquals(type)»
 
-			«toStr(type, limitedIndexedContainerViewShortName, false)»
+			«toStr(type)»
 		}
 
 		«IF type == Type.OBJECT»
@@ -473,7 +470,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			«indexedEquals(type)»
 
-			«toStr(type, skippedIndexedContainerViewShortName, false)»
+			«toStr(type)»
 		}
 
 		«IF type == Type.OBJECT»
@@ -568,7 +565,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			«indexedEquals(type)»
 
-			«toStr(type, reverseIndexedContainerViewShortName, false)»
+			«toStr(type)»
 		}
 	''' }
 }

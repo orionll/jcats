@@ -18,6 +18,7 @@ final class Seq1Generator extends SeqGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
+		import java.util.Arrays;
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ELSE»
@@ -372,6 +373,11 @@ final class Seq1Generator extends SeqGenerator {
 					}
 				}
 				return true;
+			}
+
+			@Override
+			public String toString() {
+				return Arrays.toString(this.node1);
 			}
 		}
 	''' }
