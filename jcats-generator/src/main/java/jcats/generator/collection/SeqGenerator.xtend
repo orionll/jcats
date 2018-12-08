@@ -508,7 +508,9 @@ class SeqGenerator implements ClassGenerator {
 
 			public static «paramGenericName» tabulate(final int size, final Int«type.typeName»F«IF type == Type.OBJECT»<A>«ENDIF» f) {
 				requireNonNull(f);
-				if (size <= 0) {
+				if (size < 0) {
+					throw new IllegalArgumentException(Integer.toString(size));
+				} else if (size == 0) {
 					return empty«shortName»();
 				} else {
 					«IF type == Type.OBJECT»

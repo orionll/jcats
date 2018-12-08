@@ -824,7 +824,20 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 
 			«ENDIF»
-			«repeat(type, paramGenericName)»
+			public static «paramGenericName» repeat(final int size, final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
+				if (size < 0) {
+					throw new IllegalArgumentException(Integer.toString(size));
+				} else if (size == 0) {
+					return empty«shortName»();
+				} else {
+					final «type.javaName»[] array = new «type.javaName»[size];
+					Arrays.fill(array, value);
+					return new «diamondName»(array);
+				}
+			}
 
 			«fill(type, paramGenericName)»
 
@@ -832,7 +845,9 @@ final class ArrayGenerator implements ClassGenerator {
 
 			public static «paramGenericName» tabulate(final int size, final Int«type.typeName»F«IF type == Type.OBJECT»<A>«ENDIF» f) {
 				requireNonNull(f);
-				if (size <= 0) {
+				if (size < 0) {
+					throw new IllegalArgumentException(Integer.toString(size));
+				} else if (size == 0) {
 					return empty«shortName»();
 				} else {
 					final «type.javaName»[] array = new «type.javaName»[size];
