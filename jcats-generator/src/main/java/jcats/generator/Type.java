@@ -251,6 +251,10 @@ public enum Type {
 		return genericName("Eff");
 	}
 
+	public String intEff2GenericName() {
+		return "Int" + typeName() + "Eff2" + (this == OBJECT ? "<A>" : "");
+	}
+
 	public String containerShortName() {
 		return shortName("Container");
 	}

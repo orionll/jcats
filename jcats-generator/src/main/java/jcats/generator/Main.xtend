@@ -18,6 +18,7 @@ import jcats.generator.collection.IndexedContainerViewGenerator
 import jcats.generator.collection.KeyValueGenerator
 import jcats.generator.collection.PrimitiveStream2Generator
 import jcats.generator.collection.RangeGenerator
+import jcats.generator.collection.RepeatedIndexedContainerGenerator
 import jcats.generator.collection.Seq0Generator
 import jcats.generator.collection.Seq1Generator
 import jcats.generator.collection.Seq2Generator
@@ -171,6 +172,7 @@ final class Main {
 			PGenerator.generators,
 			IndexedGenerator.generators,
 			PrimitiveStream2Generator.generators,
+			RepeatedIndexedContainerGenerator.generators,
 			VNGenerators.generators
 		].flatten.toList
 	}

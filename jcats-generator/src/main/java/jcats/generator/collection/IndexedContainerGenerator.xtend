@@ -48,6 +48,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			import static «Constants.JCATS».«type.optionShortName».*;
 		«ENDIF»
 		import static «Constants.COMMON».*;
+		import static «Constants.COLLECTION».«type.arrayShortName».*;
 
 		public interface «type.covariantName("IndexedContainer")» extends «type.containerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
 
@@ -253,6 +254,19 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				}
 
 			«ENDIF»
+			static «type.paramGenericName("IndexedContainer")» repeat(final int size, final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
+				if (size < 0) {
+					throw new IllegalArgumentException(Integer.toString(size));
+				} else if (size == 0) {
+					return empty«type.arrayShortName»();
+				} else {
+					return new «type.diamondName("RepeatedIndexedContainer")»(size, value);
+				}
+			}
+
 			static «type.paramGenericName("IndexedContainerView")» as«type.indexedContainerShortName»(final List<«type.genericBoxedName»> list) {
 				requireNonNull(list);
 				return new «type.shortName("List")»As«type.indexedContainerDiamondName»(list, false);
