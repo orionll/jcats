@@ -18,11 +18,14 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 	override className() { Constants.COLLECTION + "." + shortName }
 	def shortName() { type.shortName("RepeatedIndexedContainer") }
 	def genericName() { type.genericName("RepeatedIndexedContainer") }
+	def wildcardName() { type.wildcardName("RepeatedIndexedContainer") }
 
 	override sourceCode() '''
 		package «Constants.COLLECTION»;
 
 		import java.io.Serializable;
+		import java.util.Collections;
+		import java.util.List;
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
 		«ELSE»
@@ -193,9 +196,54 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 				return this;
 			}
 
-			«hashcode(type)»
+			«IF type.primitive»
+				@Override
+				public IndexedContainerView<«type.boxedName»> asContainer() {
+					return new RepeatedIndexedContainer<>(this.size, this.value);
+				}
 
-			«indexedEquals(type)»
+			«ENDIF»
+			@Override
+			public List<«type.genericBoxedName»> asCollection() {
+				return Collections.nCopies(this.size, this.value);
+			}
+
+			@Override
+			public int hashCode() {
+				int pow = 31;
+				int sum = 1;
+				for (int i = Integer.numberOfLeadingZeros(this.size) + 1; i < Integer.SIZE; i++) {
+					sum *= pow + 1;
+					pow *= pow;
+					if ((this.size << i) < 0) {
+						pow *= 31;
+						sum = sum * 31 + 1;
+					}
+				}
+				«IF type == Type.OBJECT»
+					return pow + sum * this.value.hashCode();
+				«ELSE»
+					return pow + sum * «type.genericBoxedName».hashCode(this.value);
+				«ENDIF»
+			}
+
+			@Override
+			public boolean equals(final Object obj) {
+				if (obj == this) {
+					return true;
+				} else if (obj instanceof «wildcardName») {
+					final «wildcardName» other = («wildcardName») obj;
+					«IF type == Type.OBJECT»
+						return (this.size == other.size) && this.value.equals(other.value);
+					«ELSE»
+						return (this.size == other.size) && (this.value == other.value);
+					«ENDIF»
+				} else if (obj instanceof «type.indexedContainerWildcardName») {
+					return «type.indexedContainerShortName.firstToLowerCase»sEqual(this, («type.indexedContainerWildcardName») obj);
+				} else {
+					return false;
+				}
+			}
 
 			«toStr(type)»
 		}
