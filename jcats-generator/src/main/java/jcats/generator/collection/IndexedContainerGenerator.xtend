@@ -267,6 +267,19 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
+			static «type.paramGenericName("IndexedContainer")» tabulate(final int size, final Int«type.typeName»F«IF type == Type.OBJECT»<A>«ENDIF» f) {
+				«IF type == Type.OBJECT»
+					requireNonNull(f);
+				«ENDIF»
+				if (size < 0) {
+					throw new IllegalArgumentException(Integer.toString(size));
+				} else if (size == 0) {
+					return empty«type.arrayShortName»();
+				} else {
+					return new «type.diamondName("TableIndexedContainer")»(size, f);
+				}
+			}
+
 			static «type.paramGenericName("IndexedContainerView")» as«type.indexedContainerShortName»(final List<«type.genericBoxedName»> list) {
 				requireNonNull(list);
 				return new «type.shortName("List")»As«type.indexedContainerDiamondName»(list, false);

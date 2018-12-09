@@ -37,6 +37,7 @@ import jcats.generator.collection.SortedUniqueGenerator
 import jcats.generator.collection.StackBuilderGenerator
 import jcats.generator.collection.StackGenerator
 import jcats.generator.collection.Stream2Generator
+import jcats.generator.collection.TableIndexedContainerGenerator
 import jcats.generator.collection.UniqueBuilderGenerator
 import jcats.generator.collection.UniqueContainerGenerator
 import jcats.generator.collection.UniqueContainerViewGenerator
@@ -173,6 +174,7 @@ final class Main {
 			IndexedGenerator.generators,
 			PrimitiveStream2Generator.generators,
 			RepeatedIndexedContainerGenerator.generators,
+			TableIndexedContainerGenerator.generators,
 			VNGenerators.generators
 		].flatten.toList
 	}
