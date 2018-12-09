@@ -253,6 +253,11 @@ final class RangeGenerator implements ClassGenerator {
 				return stream().parallel();
 			}
 
+			@Override
+			public Spliterator.OfInt spliterator() {
+				return stream().spliterator();
+			}
+
 			«hashcode(Type.INT)»
 
 			@Override
