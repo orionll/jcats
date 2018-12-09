@@ -254,6 +254,24 @@ final class CommonGenerator implements ClassGenerator {
 			static int clearBit(final int bits, final int bit) {
 				return bits & (~bit);
 			}
+			«FOR type : Type.primitives»
+
+				static Object[] «type.containerShortName.firstToLowerCase»ToArray(final «type.containerShortName» container) {
+					if (container.hasFixedSize()) {
+						if (container.isEmpty()) {
+							return EMPTY_OBJECT_ARRAY;
+						} else {
+							final Object[] array = new Object[container.size()];
+							container.foreachWithIndex((final int index, final «type.genericName» value) -> array[index] = value);
+							return array;
+						}
+					} else {
+						final ArrayBuilder<Object> builder = Array.builder();
+						container.foreach(builder::append);
+						return builder.buildArray();
+					}
+				}
+			«ENDFOR»
 		}
 
 		«FOR type : Type.values»

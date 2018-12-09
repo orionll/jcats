@@ -423,13 +423,15 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				return this.container.isEmpty();
 			}
 
-			«IF type == Type.OBJECT»
-				@Override
-				public Object[] toArray() {
+			@Override
+			public Object[] toArray() {
+				«IF type == Type.OBJECT»
 					return this.container.toObjectArray();
-				}
+				«ELSE»
+					return «type.containerShortName.firstToLowerCase»ToArray(this.container);
+				«ENDIF»
+			}
 
-			«ENDIF»
 			@Override
 			public Iterator<«type.genericBoxedName»> iterator() {
 				return this.container.iterator();
