@@ -62,6 +62,16 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public boolean isEmpty() {
+				return false;
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return true;
+			}
+
+			@Override
 			public «type.genericName» get(final int index) {
 				if (index >= 0 && index < this.size) {
 					return this.value;
