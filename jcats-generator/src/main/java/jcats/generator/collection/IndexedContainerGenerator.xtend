@@ -239,7 +239,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			«IF type == Type.INT»
 				static IntIndexedContainer range(final int lowInclusive, final int highExclusive) {
 					if (lowInclusive >= highExclusive) {
-						return Range.EMPTY;
+						return emptyIntArray();
 					} else {
 						return new Range(lowInclusive, highExclusive, false);
 					}
@@ -247,7 +247,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 				static IntIndexedContainer rangeClosed(final int lowInclusive, final int highInclusive) {
 					if (lowInclusive > highInclusive) {
-						return Range.EMPTY;
+						return emptyIntArray();
 					} else {
 						return new Range(lowInclusive, highInclusive, true);
 					}

@@ -28,10 +28,9 @@ final class RangeGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.JCATS».IntOption.*;
 		import static «Constants.COMMON».*;
+		import static «Constants.COLLECTION».IntArray.*;
 
-		final class Range implements IntIndexedContainer, Serializable {
-
-			static final Range EMPTY = new Range(0, 0, false);
+		final class Range implements IntIndexedContainerView, Serializable {
 
 			private final int low;
 			private final int high;
@@ -54,19 +53,19 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
-				final long size = (long) this.high - this.low + (this.closed ? 1 : 0);
-				return (size == (int) size);
-			}
-
-			@Override
 			public boolean isEmpty() {
-				return (this == EMPTY);
+				return false;
 			}
 
 			@Override
 			public boolean isNotEmpty() {
-				return (this != EMPTY);
+				return true;
+			}
+
+			@Override
+			public boolean hasFixedSize() {
+				final long size = (long) this.high - this.low + (this.closed ? 1 : 0);
+				return (size == (int) size);
 			}
 
 			@Override
@@ -86,28 +85,18 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public int first() throws NoSuchElementException {
-				if (isEmpty()) {
-					throw new NoSuchElementException();
-				} else {
-					return this.low;
-				}
+			public int first() {
+				return this.low;
 			}
 
 			@Override
 			public IntOption firstOption() {
-				if (isEmpty()) {
-					return intNone();
-				} else {
-					return intSome(this.low);
-				}
+				return intSome(this.low);
 			}
 
 			@Override
 			public int last() throws NoSuchElementException {
-				if (isEmpty()) {
-					throw new NoSuchElementException();
-				} else if (this.closed) {
+				if (this.closed) {
 					return this.high;
 				} else {
 					return this.high - 1;
@@ -116,9 +105,7 @@ final class RangeGenerator implements ClassGenerator {
 
 			@Override
 			public IntOption lastOption() {
-				if (isEmpty()) {
-					return intNone();
-				} else if (this.closed) {
+				if (this.closed) {
 					return intSome(this.high);
 				} else {
 					return intSome(this.high - 1);
@@ -130,11 +117,12 @@ final class RangeGenerator implements ClassGenerator {
 				return (value >= this.low) && (this.closed ? value <= this.high : value < this.high);
 			}
 
-			Range limit(final int n) {
+			@Override
+			public IntIndexedContainerView limit(final int n) {
 				if (n < 0) {
 					throw new IllegalArgumentException(Integer.toString(n));
 				} else if (n == 0) {
-					return EMPTY;
+					return emptyIntArray().view();
 				} else {
 					final long upTo = (long) this.low + n;
 					if (upTo != (int) upTo ||
@@ -147,7 +135,8 @@ final class RangeGenerator implements ClassGenerator {
 				}
 			}
 
-			Range skip(final int n) {
+			@Override
+			public IntIndexedContainerView skip(final int n) {
 				if (n < 0) {
 					throw new IllegalArgumentException(Integer.toString(n));
 				} else if (n == 0) {
@@ -157,7 +146,7 @@ final class RangeGenerator implements ClassGenerator {
 					if (from != (int) from ||
 							this.closed && from >= this.high+1L ||
 							!this.closed && from >= this.high) {
-						return EMPTY;
+						return emptyIntArray().view();
 					} else {
 						return new Range((int) from, this.high, this.closed);
 					}
@@ -209,9 +198,7 @@ final class RangeGenerator implements ClassGenerator {
 
 			@Override
 			public PrimitiveIterator.OfInt iterator() {
-				if (isEmpty()) {
-					return intNone().iterator();
-				} else if (this.closed) {
+				if (this.closed) {
 					return new ClosedRangeIterator(this.low, this.high);
 				} else {
 					return new RangeIterator(this.low, this.high);
@@ -220,18 +207,11 @@ final class RangeGenerator implements ClassGenerator {
 
 			@Override
 			public PrimitiveIterator.OfInt reverseIterator() {
-				if (isEmpty()) {
-					return intNone().iterator();
-				} else if (this.closed) {
+				if (this.closed) {
 					return new ClosedRangeReverseIterator(this.low, this.high);
 				} else {
 					return new RangeReverseIterator(this.low, this.high);
 				}
-			}
-
-			@Override
-			public IntIndexedContainerView view() {
-				return new RangeView(this);
 			}
 
 			@Override
@@ -280,10 +260,7 @@ final class RangeGenerator implements ClassGenerator {
 				}
 			}
 
-			@Override
-			public String toString() {
-				return "[" + this.low + ", " + this.high + (this.closed ? "]" : ")");
-			}
+			«toStr(Type.INT)»
 		}
 
 		final class RangeIterator implements PrimitiveIterator.OfInt {
@@ -398,25 +375,6 @@ final class RangeGenerator implements ClassGenerator {
 					throw new NoSuchElementException();
 				}
 			}
-		}
-
-		final class RangeView extends IntBaseIndexedContainerView<Range> {
-
-			RangeView(final Range range) {
-				super(range);
-			}
-
-			@Override
-			public IntIndexedContainerView limit(final int n) {
-				return new RangeView(this.container.limit(n));
-			}
-
-			@Override
-			public IntIndexedContainerView skip(final int n) {
-				return new RangeView(this.container.skip(n));
-			}
-
-			«toStr(Type.INT)»
 		}
 	''' }
 }
