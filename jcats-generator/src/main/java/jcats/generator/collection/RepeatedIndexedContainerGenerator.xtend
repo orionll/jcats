@@ -42,6 +42,9 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.COMMON».*;
 		import static «Constants.JCATS».IntOption.*;
+		«IF type != Type.INT»
+			import static «Constants.JCATS».«type.optionShortName».*;
+		«ENDIF»
 		«IF type.primitive»
 			import static «Constants.COLLECTION».«type.arrayShortName».*;
 		«ENDIF»
@@ -69,6 +72,26 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 			@Override
 			public boolean isNotEmpty() {
 				return true;
+			}
+
+			@Override
+			public «type.genericName» first() {
+				return this.value;
+			}
+
+			@Override
+			public «type.optionGenericName» firstOption() {
+				return «type.someName»(this.value);
+			}
+
+			@Override
+			public «type.genericName» last() {
+				return this.value;
+			}
+
+			@Override
+			public «type.optionGenericName» lastOption() {
+				return «type.someName»(this.value);
 			}
 
 			@Override
