@@ -566,7 +566,13 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			default HashSet<«type.genericBoxedName»> toHashSet() {
-				return new HashSet<>(asCollection());
+				if (hasFixedSize()) {
+					return new HashSet<>(asCollection());
+				} else {
+					final HashSet<«type.genericBoxedName»> set = new HashSet<>();
+					foreach(set::add);
+					return set;
+				}
 			}
 
 			default «type.containerViewGenericName» view() {
