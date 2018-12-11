@@ -39,6 +39,7 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.COMMON».*;
+		import static «Constants.JCATS».«type.optionShortName».*;
 		«IF type.primitive»
 			import static «Constants.COLLECTION».«type.arrayShortName».*;
 		«ENDIF»
@@ -66,6 +67,26 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 			@Override
 			public boolean isNotEmpty() {
 				return true;
+			}
+
+			@Override
+			public «type.genericName» first() {
+				return «type.requireNonNull("this.f.apply(0)")»;
+			}
+
+			@Override
+			public «type.optionGenericName» firstOption() {
+				return «type.someName»(this.f.apply(0));
+			}
+
+			@Override
+			public «type.genericName» last() {
+				return «type.requireNonNull("this.f.apply(this.size - 1)")»;
+			}
+
+			@Override
+			public «type.optionGenericName» lastOption() {
+				return «type.someName»(this.f.apply(this.size - 1));
 			}
 
 			@Override
