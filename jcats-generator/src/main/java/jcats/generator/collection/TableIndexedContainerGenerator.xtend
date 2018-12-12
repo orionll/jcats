@@ -19,7 +19,6 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 	def shortName() { type.shortName("TableIndexedContainer") }
 	def genericName() { type.genericName("TableIndexedContainer") }
 	def wildcardName() { type.wildcardName("TableIndexedContainer") }
-	def fName() { if (type == Type.OBJECT) "IntObjectF<A>" else "Int" + type.typeName + "F" }
 
 	override sourceCode() '''
 		package «Constants.COLLECTION»;
@@ -46,9 +45,9 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 
 		final class «genericName» implements «type.indexedContainerViewGenericName», Serializable {
 			private final int size;
-			private final «fName» f;
+			private final «type.intFGenericName» f;
 
-			«shortName»(final int size, final «fName» f) {
+			«shortName»(final int size, final «type.intFGenericName» f) {
 				assert (size > 0);
 				this.size = size;
 				this.f = f;
@@ -134,12 +133,19 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 
 			@Override
 			public «type.iteratorGenericName» iterator() {
-				«IF type.javaUnboxedType»
-					return new Table«type.typeName»Iterator(this.size, this.f);
-				«ELSEIF type == Type.OBJECT»
-					return new TableIterator<>(this.size, this.f);
+				«IF type == Type.OBJECT || type.javaUnboxedType»
+					return new «type.diamondName("TableIterator")»(this.size, this.f);
 				«ELSE»
 					return new TableIterator<>(this.size, this.f.toIntObjectF());
+				«ENDIF»
+			}
+
+			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				«IF type == Type.OBJECT || type.javaUnboxedType»
+					return new «type.diamondName("ReverseTableIterator")»(this.size, this.f);
+				«ELSE»
+					return new ReverseTableIterator<>(this.size, this.f.toIntObjectF());
 				«ENDIF»
 			}
 

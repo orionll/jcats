@@ -513,12 +513,10 @@ class SeqGenerator implements ClassGenerator {
 				} else if (size == 0) {
 					return empty«shortName»();
 				} else {
-					«IF type == Type.OBJECT»
-						return sizedToSeq(new TableIterator<>(size, f), size);
-					«ELSEIF type == Type.BOOLEAN»
-						return sizedToSeq(new TableIterator<>(size, f.toIntObjectF()), size);
+					«IF type == Type.OBJECT || type.javaUnboxedType»
+						return sizedToSeq(new «type.diamondName("TableIterator")»(size, f), size);
 					«ELSE»
-						return sizedToSeq(new Table«type.typeName»Iterator(size, f), size);
+						return sizedToSeq(new TableIterator<>(size, f.toIntObjectF()), size);
 					«ENDIF»
 				}
 			}

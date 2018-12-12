@@ -772,53 +772,78 @@ final class CommonGenerator implements ClassGenerator {
 			}
 
 		«ENDFOR»
-		final class TableIterator<A> implements Iterator<A> {
-			private final int size;
-			private final IntObjectF<A> f;
-			private int i;
-
-			TableIterator(final int size, final IntObjectF<A> f) {
-				this.size = size;
-				this.f = f;
-			}
-
-			@Override
-			public boolean hasNext() {
-				return i != size;
-			}
-
-			@Override
-			public A next() {
-				if (i >= size) {
-					throw new NoSuchElementException();
-				} else {
-					return f.apply(i++);
-				}
-			}
-		}
-
-		«FOR type : Type.javaUnboxedTypes»
-			final class Table«type.typeName»Iterator implements PrimitiveIterator.Of«type.typeName» {
+		«FOR type : Iterables.concat(#[Type.OBJECT], Type.javaUnboxedTypes)»
+			final class «type.genericName("TableIterator")» implements «type.iteratorGenericName» {
 				private final int size;
-				private final Int«type.typeName»F f;
+				private final «type.intFGenericName» f;
 				private int i;
 
-				Table«type.typeName»Iterator(final int size, final Int«type.typeName»F f) {
+				«type.shortName("TableIterator")»(final int size, final «type.intFGenericName» f) {
 					this.size = size;
 					this.f = f;
 				}
 
 				@Override
 				public boolean hasNext() {
-					return i != size;
+					return (this.i < this.size);
 				}
 
 				@Override
-				public «type.javaName» next«type.typeName»() {
-					if (i >= size) {
-						throw new NoSuchElementException();
+				public «type.iteratorReturnType» «type.iteratorNext»() {
+					if (this.i < this.size) {
+						return «type.requireNonNull("this.f.apply(this.i++)")»;
 					} else {
-						return f.apply(i++);
+						throw new NoSuchElementException();
+					}
+				}
+
+				@Override
+				«IF type.javaUnboxedType»
+					public void forEachRemaining(final «type.typeName»Consumer action) {
+				«ELSE»
+					public void forEachRemaining(final Consumer<? super «type.genericBoxedName»> action) {
+				«ENDIF»
+					requireNonNull(action);
+					while (this.i < this.size) {
+						action.accept(«type.requireNonNull("this.f.apply(this.i++)")»);
+					}
+				}
+			}
+
+		«ENDFOR»
+		«FOR type : Iterables.concat(#[Type.OBJECT], Type.javaUnboxedTypes)»
+			final class «type.genericName("ReverseTableIterator")» implements «type.iteratorGenericName» {
+				private final «type.intFGenericName» f;
+				private int i;
+
+				«type.shortName("ReverseTableIterator")»(final int size, final «type.intFGenericName» f) {
+					this.f = f;
+					this.i = size - 1;
+				}
+
+				@Override
+				public boolean hasNext() {
+					return (this.i >= 0);
+				}
+
+				@Override
+				public «type.iteratorReturnType» «type.iteratorNext»() {
+					if (this.i >= 0) {
+						return «type.requireNonNull("this.f.apply(this.i--)")»;
+					} else {
+						throw new NoSuchElementException();
+					}
+				}
+
+				@Override
+				«IF type.javaUnboxedType»
+					public void forEachRemaining(final «type.typeName»Consumer action) {
+				«ELSE»
+					public void forEachRemaining(final Consumer<? super «type.genericBoxedName»> action) {
+				«ENDIF»
+					requireNonNull(action);
+					while (this.i >= 0) {
+						action.accept(«type.requireNonNull("this.f.apply(this.i--)")»);
 					}
 				}
 			}
