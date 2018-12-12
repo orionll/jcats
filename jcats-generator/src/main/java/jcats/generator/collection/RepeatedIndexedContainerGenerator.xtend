@@ -24,7 +24,9 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.io.Serializable;
+		import java.util.Arrays;
 		import java.util.Collections;
+		import java.util.HashSet;
 		import java.util.List;
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
@@ -155,6 +157,29 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 				for (int i = 0; i < this.size; i++) {
 					eff.apply(i, this.value);
 				}
+			}
+
+			@Override
+			public «type.javaName»[] «type.toArrayName»() {
+				final «type.javaName»[] array = new «type.javaName»[this.size];
+				Arrays.fill(array, this.value);
+				return array;
+			}
+
+			«IF type == Type.OBJECT»
+				@Override
+				public A[] toPreciseArray(final IntObjectF<A[]> supplier) {
+					final A[] array = supplier.apply(this.size);
+					Arrays.fill(array, this.value);
+					return array;
+				}
+
+			«ENDIF»
+			@Override
+			public HashSet<«type.genericBoxedName»> toHashSet() {
+				final HashSet<«type.genericBoxedName»> set = new HashSet<>(1);
+				set.add(this.value);
+				return set;
 			}
 
 			@Override
