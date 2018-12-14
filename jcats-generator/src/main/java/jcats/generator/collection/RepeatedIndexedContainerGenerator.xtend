@@ -254,6 +254,86 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 				return this;
 			}
 
+			«IF type == Type.OBJECT»
+				@Override
+				public «type.optionGenericName» max(final «type.ordGenericName» ord) {
+					requireNonNull(ord);
+					return «type.someName»(this.value);
+				}
+
+				@Override
+				public «type.optionGenericName» min(final «type.ordGenericName» ord) {
+					requireNonNull(ord);
+					return «type.someName»(this.value);
+				}
+			«ELSE»
+				@Override
+				public «type.optionGenericName» max() {
+					return «type.someName»(this.value);
+				}
+
+				@Override
+				public «type.optionGenericName» min() {
+					return «type.someName»(this.value);
+				}
+
+				@Override
+				public «type.optionGenericName» maxByOrd(final «type.ordGenericName» ord) {
+					requireNonNull(ord);
+					return «type.someName»(this.value);
+				}
+
+				@Override
+				public «type.optionGenericName» minByOrd(final «type.ordGenericName» ord) {
+					requireNonNull(ord);
+					return «type.someName»(this.value);
+				}
+			«ENDIF»
+
+			@Override
+			«IF type == Type.OBJECT»
+				public <B extends Comparable<B>> «type.optionGenericName» maxBy(final F<A, B> f) {
+			«ELSE»
+				public <A extends Comparable<A>> «type.optionGenericName» maxBy(final «type.typeName»ObjectF<A> f) {
+			«ENDIF»
+				requireNonNull(f);
+				return «type.someName»(this.value);
+			}
+
+			«FOR to : Type.primitives»
+				@Override
+				«IF type == Type.OBJECT»
+					public «type.optionGenericName» maxBy«to.typeName»(final «to.typeName»F<A> f) {
+				«ELSE»
+					public «type.optionGenericName» maxBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
+				«ENDIF»
+					requireNonNull(f);
+					return «type.someName»(this.value);
+				}
+
+			«ENDFOR»
+			@Override
+			«IF type == Type.OBJECT»
+				public <B extends Comparable<B>> «type.optionGenericName» minBy(final F<A, B> f) {
+			«ELSE»
+				public <A extends Comparable<A>> «type.optionGenericName» minBy(final «type.typeName»ObjectF<A> f) {
+			«ENDIF»
+				requireNonNull(f);
+				return «type.someName»(this.value);
+			}
+
+			«FOR to : Type.primitives»
+				@Override
+				«IF type == Type.OBJECT»
+					public «type.optionGenericName» minBy«to.typeName»(final «to.typeName»F<A> f) {
+				«ELSE»
+					public «type.optionGenericName» minBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
+				«ENDIF»
+					requireNonNull(f);
+					return «type.someName»(this.value);
+				}
+
+			«ENDFOR»
 			«IF type.primitive»
 				@Override
 				public IndexedContainerView<«type.boxedName»> asContainer() {

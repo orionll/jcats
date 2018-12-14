@@ -215,6 +215,20 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public IntOption max() {
+				if (this.closed) {
+					return intSome(this.high);
+				} else {
+					return intSome(this.high - 1);
+				}
+			}
+
+			@Override
+			public IntOption min() {
+				return intSome(this.low);
+			}
+
+			@Override
 			public int spliteratorCharacteristics() {
 				return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE;
 			}
