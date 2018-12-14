@@ -35,6 +35,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.JCATS».«type.optionShortName».*;
+		import static «Constants.JCATS».«type.ordShortName».*;
 
 		public interface «type.covariantName("SortedUniqueContainer")» extends «type.uniqueContainerGenericName» {
 
@@ -219,7 +220,12 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.ordGenericName» ord() {
-				return «type.ordShortName».fromComparator((Comparator<«type.genericBoxedName»>) this.collection.comparator());
+				final Comparator<«type.genericBoxedName»> comparator = (Comparator<«type.genericBoxedName»>) this.collection.comparator();
+				if (comparator == null) {
+					return «IF type == Type.OBJECT»(Ord<A>) «ENDIF»«type.asc»();
+				} else {
+					return «type.ordShortName».fromComparator(comparator);
+				}
 			}
 
 			@Override
