@@ -53,6 +53,54 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
+			«IF type == Type.OBJECT»
+				@Override
+				default «type.optionGenericName» max(final «type.ordGenericName» ord) {
+					if (ord == ord()) {
+						return lastOption();
+					} else {
+						return «type.uniqueContainerShortName».super.max(ord);
+					}
+				}
+
+				@Override
+				default «type.optionGenericName» min(final «type.ordGenericName» ord) {
+					if (ord == ord()) {
+						return firstOption();
+					} else {
+						return «type.uniqueContainerShortName».super.min(ord);
+					}
+				}
+			«ELSE»
+				@Override
+				default «type.optionGenericName» max() {
+					return lastOption();
+				}
+
+				@Override
+				default «type.optionGenericName» min() {
+					return firstOption();
+				}
+
+				@Override
+				default «type.optionGenericName» maxByOrd(final «type.ordGenericName» ord) {
+					if (ord == ord()) {
+						return lastOption();
+					} else {
+						return «type.uniqueContainerShortName».super.maxByOrd(ord);
+					}
+				}
+
+				@Override
+				default «type.optionGenericName» minByOrd(final «type.ordGenericName» ord) {
+					if (ord == ord()) {
+						return firstOption();
+					} else {
+						return «type.uniqueContainerShortName».super.minByOrd(ord);
+					}
+				}
+			«ENDIF»
+
 			@Override
 			«type.sortedUniqueContainerViewGenericName» view();
 
