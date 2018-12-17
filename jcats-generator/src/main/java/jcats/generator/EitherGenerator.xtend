@@ -205,6 +205,30 @@ final class EitherGenerator implements ClassGenerator {
 				return isLeft() ? this.left : other;
 			}
 
+			public void ifLeft(final «leftType.genericName("Eff", "X")» eff) {
+				requireNonNull(eff);
+				if (isLeft()) {
+					eff.apply(this.left);
+				}
+			}
+
+			public void ifRight(final «rightType.effGenericName» eff) {
+				requireNonNull(eff);
+				if (isRight()) {
+					eff.apply(this.right);
+				}
+			}
+
+			public void ifLeftOrElse(final «leftType.genericName("Eff", "X")» ifLeft, final «rightType.effGenericName» ifRight) {
+				requireNonNull(ifLeft);
+				requireNonNull(ifRight);
+				if (isLeft()) {
+					ifLeft.apply(this.left);
+				} else {
+					ifRight.apply(this.right);
+				}
+			}
+
 			«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
 				public <B> B match(final F<X, B> ifLeft, final F<A, B> ifRight) {
 			«ELSEIF leftType != Type.OBJECT && rightType == Type.OBJECT»

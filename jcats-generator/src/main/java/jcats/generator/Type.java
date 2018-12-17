@@ -68,7 +68,11 @@ public enum Type {
 	}
 
 	public String genericName(final String clazz) {
-		return (this == OBJECT) ? clazz + "<A>" : typeName() + clazz;
+		return genericName(clazz, "A");
+	}
+
+	public String genericName(final String clazz, final String typeParam) {
+		return (this == OBJECT) ? clazz + "<" + typeParam + ">" : typeName() + clazz;
 	}
 
 	public String covariantName(final String clazz) {
