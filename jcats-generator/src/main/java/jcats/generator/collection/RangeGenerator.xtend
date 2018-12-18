@@ -63,7 +63,7 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
+			public boolean hasKnownFixedSize() {
 				final long size = (long) this.high - this.low + (this.closed ? 1 : 0);
 				return (size == (int) size);
 			}
@@ -167,7 +167,7 @@ final class RangeGenerator implements ClassGenerator {
 			@Override
 			public void foreachWithIndex(final IntIntEff2 eff) {
 				requireNonNull(eff);
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					int index = 0;
 					for (int i = this.low; i < this.high; i++, index++) {
 						eff.apply(index, i);

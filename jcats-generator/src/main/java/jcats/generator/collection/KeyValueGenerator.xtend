@@ -146,7 +146,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			default Spliterator<P<K, A>> spliterator() {
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					return Spliterators.spliterator(iterator(), size(), spliteratorCharacteristics());
 				} else {
 					return Spliterators.spliteratorUnknownSize(iterator(), spliteratorCharacteristics());
@@ -192,8 +192,8 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
-				return this.keyValue.hasFixedSize();
+			public boolean hasKnownFixedSize() {
+				return this.keyValue.hasKnownFixedSize();
 			}
 
 			@Override
@@ -252,8 +252,8 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
-				return this.keyValue.hasFixedSize();
+			public boolean hasKnownFixedSize() {
+				return this.keyValue.hasKnownFixedSize();
 			}
 
 			@Override
@@ -316,8 +316,8 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
-				return this.keyValue.hasFixedSize();
+			public boolean hasKnownFixedSize() {
+				return this.keyValue.hasKnownFixedSize();
 			}
 
 			@Override
@@ -499,7 +499,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
+			public boolean hasKnownFixedSize() {
 				return this.fixedSize;
 			}
 

@@ -180,7 +180,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			default «type.optionGenericName» firstOption() {
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					if (isEmpty()) {
 						return «type.noneName»();
 					} else {
@@ -188,6 +188,27 @@ final class ContainerGenerator implements InterfaceGenerator {
 					}
 				} else {
 					final «type.iteratorGenericName» iterator = iterator();
+					if (iterator.hasNext()) {
+						return «type.someName»(iterator.«type.iteratorNext»());
+					} else {
+						return «type.noneName»();
+					}
+				}
+			}
+
+			default «type.genericName» last() throws NoSuchElementException {
+				return reverseIterator().«type.iteratorNext»();
+			}
+
+			default «type.optionGenericName» lastOption() {
+				if (hasKnownFixedSize()) {
+					if (isEmpty()) {
+						return «type.noneName»();
+					} else {
+						return «type.someName»(last());
+					}
+				} else {
+					final «type.iteratorGenericName» iterator = reverseIterator();
 					if (iterator.hasNext()) {
 						return «type.someName»(iterator.«type.iteratorNext»());
 					} else {
@@ -484,7 +505,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			default «type.spliteratorGenericName» spliterator() {
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					return Spliterators.spliterator(iterator(), size(), spliteratorCharacteristics());
 				} else {
 					return Spliterators.spliteratorUnknownSize(iterator(), spliteratorCharacteristics());
@@ -496,7 +517,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			default «type.seqGenericName» to«type.seqShortName»() {
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					return «type.seqShortName».sizedToSeq(iterator(), size());
 				} else {
 					final «type.seqBuilderGenericName» builder = new «type.seqBuilderDiamondName»();
@@ -521,7 +542,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			«ENDIF»
 			default «type.javaName»[] «type.toArrayName»() {
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					if (isEmpty()) {
 						return «type.emptyArrayName»;
 					} else {
@@ -538,7 +559,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			«IF type == Type.OBJECT»
 				default A[] toPreciseArray(final IntObjectF<A[]> supplier) {
-					if (hasFixedSize()) {
+					if (hasKnownFixedSize()) {
 						final A[] array = supplier.apply(size());
 						requireNonNull(array);
 						foreachWithIndex((final int index, final A value) -> array[index] = value);
@@ -566,7 +587,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			default HashSet<«type.genericBoxedName»> toHashSet() {
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					return new HashSet<>(asCollection());
 				} else {
 					final HashSet<«type.genericBoxedName»> set = new HashSet<>();
@@ -626,8 +647,8 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public boolean hasFixedSize() {
-					return this.container.hasFixedSize();
+				public boolean hasKnownFixedSize() {
+					return this.container.hasKnownFixedSize();
 				}
 
 				@Override
@@ -638,6 +659,16 @@ final class ContainerGenerator implements InterfaceGenerator {
 				@Override
 				public Option<«type.boxedName»> firstOption() {
 					return this.container.firstOption().toOption();
+				}
+
+				@Override
+				public «type.boxedName» last() {
+					return this.container.last();
+				}
+
+				@Override
+				public Option<«type.boxedName»> lastOption() {
+					return this.container.lastOption().toOption();
 				}
 
 				@Override
@@ -895,7 +926,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
+			public boolean hasKnownFixedSize() {
 				return this.fixedSize;
 			}
 

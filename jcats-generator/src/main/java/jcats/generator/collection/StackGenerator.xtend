@@ -99,7 +99,7 @@ final class StackGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
+			public boolean hasKnownFixedSize() {
 				return false;
 			}
 

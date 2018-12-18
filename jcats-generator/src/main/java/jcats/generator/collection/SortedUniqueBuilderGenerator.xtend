@@ -108,7 +108,7 @@ final class SortedUniqueBuilderGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
+			public boolean hasKnownFixedSize() {
 				return false;
 			}
 

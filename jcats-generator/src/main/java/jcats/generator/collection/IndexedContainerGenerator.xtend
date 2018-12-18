@@ -54,20 +54,20 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			default «type.iteratorGenericName» iterator() {
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					if (isEmpty()) {
 						return «type.emptyIterator»;
 					} else {
 						return new «type.diamondName("IndexedContainerIterator")»(this);
 					}
 				} else {
-					throw new UnsupportedOperationException("Cannot get default Iterator implementation if hasFixedSize() == false");
+					throw new UnsupportedOperationException("Cannot get default Iterator implementation if hasKnownFixedSize() == false");
 				}
 			}
 
 			@Override
 			default «type.iteratorGenericName» reverseIterator() {
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					if (isEmpty()) {
 						return «type.emptyIterator»;
 					} else {
@@ -81,7 +81,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			@Override
 			default void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					final int size = size();
 					for (int i = 0; i < size; i++) {
 						eff.apply(get(i));
@@ -98,7 +98,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				default void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
 			«ENDIF»
 				requireNonNull(eff);
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					final int size = size();
 					for (int i = 0; i < size; i++) {
 						eff.apply(i, get(i));
@@ -111,7 +111,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			@Override
 			default boolean foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					final int size = size();
 					for (int i = 0; i < size; i++) {
 						if (!eff.apply(get(i))) {
@@ -133,8 +133,9 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
+			@Override
 			default «type.genericName» last() throws NoSuchElementException {
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					if (isEmpty()) {
 						throw new NoSuchElementException();
 					} else {
@@ -142,23 +143,6 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 					}
 				} else {
 					return reverseIterator().«type.iteratorNext»();
-				}
-			}
-
-			default «type.optionGenericName» lastOption() {
-				if (hasFixedSize()) {
-					if (isEmpty()) {
-						return «type.noneName»();
-					} else {
-						return «type.someName»(get(size() - 1));
-					}
-				} else {
-					final «type.iteratorGenericName» iterator = reverseIterator();
-					if (iterator.hasNext()) {
-						return «type.someName»(iterator.«type.iteratorNext»());
-					} else {
-						return «type.noneName»();
-					}
 				}
 			}
 
@@ -358,16 +342,6 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				@Override
 				public «type.boxedName» get(final int index) throws IndexOutOfBoundsException {
 					return this.container.get(index);
-				}
-
-				@Override
-				public «type.boxedName» last() {
-					return this.container.last();
-				}
-
-				@Override
-				public Option<«type.boxedName»> lastOption() {
-					return this.container.lastOption().toOption();
 				}
 
 				@Override

@@ -204,7 +204,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
+			public boolean hasKnownFixedSize() {
 				return false;
 			}
 

@@ -115,16 +115,6 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.genericName» last() {
-				return this.container.first();
-			}
-
-			@Override
-			public «type.optionGenericName» lastOption() {
-				return this.container.lastOption();
-			}
-
-			@Override
 			public IntOption indexOf(final «type.genericName» value) {
 				return this.container.indexOf(value);
 			}
@@ -317,7 +307,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
-				if (this.view.hasFixedSize()) {
+				if (this.view.hasKnownFixedSize()) {
 					final int size = Math.min(this.limit, this.view.size());
 					for (int i = 0; i < size; i++) {
 						eff.apply(this.view.get(i));
@@ -334,7 +324,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				public void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
 			«ENDIF»
 				requireNonNull(eff);
-				if (this.view.hasFixedSize()) {
+				if (this.view.hasKnownFixedSize()) {
 					final int size = Math.min(this.limit, this.view.size());
 					for (int i = 0; i < size; i++) {
 						eff.apply(i, this.view.get(i));
@@ -347,7 +337,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public boolean foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
-				if (this.view.hasFixedSize()) {
+				if (this.view.hasKnownFixedSize()) {
 					final int size = Math.min(this.limit, this.view.size());
 					for (int i = 0; i < size; i++) {
 						if (!eff.apply(this.view.get(i))) {
@@ -414,7 +404,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
-				if (this.view.hasFixedSize()) {
+				if (this.view.hasKnownFixedSize()) {
 					final int size = this.view.size();
 					for (int i = this.skip; i < size; i++) {
 						eff.apply(this.view.get(i));
@@ -431,7 +421,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				public void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
 			«ENDIF»
 				requireNonNull(eff);
-				if (this.view.hasFixedSize()) {
+				if (this.view.hasKnownFixedSize()) {
 					final int size = this.view.size();
 					for (int i = this.skip; i < size; i++) {
 						eff.apply(i - this.skip, this.view.get(i));
@@ -444,7 +434,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public boolean foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
-				if (this.view.hasFixedSize()) {
+				if (this.view.hasKnownFixedSize()) {
 					final int size = this.view.size();
 					for (int i = this.skip; i < size; i++) {
 						if (!eff.apply(this.view.get(i))) {
@@ -459,7 +449,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.iteratorGenericName» iterator() {
-				if (this.view.hasFixedSize()) {
+				if (this.view.hasKnownFixedSize()) {
 					return «type.indexedContainerViewShortName».super.iterator();
 				} else {
 					return super.iterator();
@@ -485,14 +475,14 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.genericName» get(final int index) {
-				if (hasFixedSize()) {
+				if (hasKnownFixedSize()) {
 					try {
 						return this.view.get(size() - index - 1);
 					} catch (final IndexOutOfBoundsException __) {
 						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«reverseIndexedContainerViewShortName»"));
 					}
 				} else {
-					throw new UnsupportedOperationException("get() is unsupported if hasFixedSize() == false");
+					throw new UnsupportedOperationException("get() is unsupported if hasKnownFixedSize() == false");
 				}
 			}
 
@@ -519,7 +509,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
-				if (this.view.hasFixedSize()) {
+				if (this.view.hasKnownFixedSize()) {
 					for (int i = this.view.size() - 1; i >= 0; i--) {
 						eff.apply(this.view.get(i));
 					}
@@ -531,7 +521,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public void foreachWithIndex(final Int«type.typeName»Eff2«IF type == Type.OBJECT»<A>«ENDIF» eff) {
 				requireNonNull(eff);
-				if (this.view.hasFixedSize()) {
+				if (this.view.hasKnownFixedSize()) {
 					final int size = this.view.size();
 					for (int i = 0; i < size; i++) {
 						eff.apply(i, this.view.get(size - i - 1));
@@ -544,7 +534,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public boolean foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
-				if (this.view.hasFixedSize()) {
+				if (this.view.hasKnownFixedSize()) {
 					for (int i = this.view.size() - 1; i >= 0; i--) {
 						if (!eff.apply(this.view.get(i))) {
 							return false;

@@ -167,7 +167,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 					return appendArray(((«arrayGenericName») iterable).array);
 				} else if (iterable instanceof «type.containerWildcardName») {
 					return append«type.containerShortName»((«type.containerGenericName») iterable);
-				} else if (iterable instanceof Sized && ((Sized) iterable).hasFixedSize()) {
+				} else if (iterable instanceof Sized && ((Sized) iterable).hasKnownFixedSize()) {
 					return appendSized(iterable, ((Sized) iterable).size());
 				} else {
 					if (iterable instanceof Collection<?> && iterable instanceof RandomAccess) {
@@ -184,7 +184,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			}
 
 			private «genericName» append«type.containerShortName»(final «type.containerGenericName» container) {
-				if (container.hasFixedSize()) {
+				if (container.hasKnownFixedSize()) {
 					if (container.isNotEmpty()) {
 						ensureCapacityInternal(this.size + container.size());
 						container.foreach((final «type.genericName» value) -> this.array[this.size++] = value);
@@ -215,7 +215,7 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
+			public boolean hasKnownFixedSize() {
 				return false;
 			}
 

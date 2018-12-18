@@ -216,7 +216,7 @@ class SeqGenerator implements ClassGenerator {
 					return ofAll(suffix);
 				} else if (suffix instanceof «shortName») {
 					return concat((«genericName») suffix);
-				} else if (suffix instanceof Sized && ((Sized) suffix).hasFixedSize()) {
+				} else if (suffix instanceof Sized && ((Sized) suffix).hasKnownFixedSize()) {
 					final int suffixSize = ((Sized) suffix).size();
 					if (suffixSize == 0) {
 						return this;
@@ -235,7 +235,7 @@ class SeqGenerator implements ClassGenerator {
 					return ofAll(prefix);
 				} else if (prefix instanceof «shortName») {
 					return ((«genericName») prefix).concat(this);
-				} else if (prefix instanceof Sized && ((Sized) prefix).hasFixedSize()) {
+				} else if (prefix instanceof Sized && ((Sized) prefix).hasKnownFixedSize()) {
 					final int prefixSize = ((Sized) prefix).size();
 					if (prefixSize == 0) {
 						return this;
@@ -838,7 +838,7 @@ class SeqGenerator implements ClassGenerator {
 				requireNonNull(iterable);
 				if (iterable instanceof «type.containerWildcardName») {
 					return ((«type.containerGenericName») iterable).to«shortName»();
-				} else if (iterable instanceof Sized && ((Sized) iterable).hasFixedSize()) {
+				} else if (iterable instanceof Sized && ((Sized) iterable).hasKnownFixedSize()) {
 					return sizedToSeq(«type.getIterator("iterable.iterator()")», ((Sized) iterable).size());
 				} else {
 					final «seqBuilderName» builder = new «seqBuilderDiamondName»();
@@ -1309,7 +1309,7 @@ class SeqGenerator implements ClassGenerator {
 				requireNonNull(f);
 				if (isEmpty()) {
 					return emptySeq();
-				} else if (that instanceof Container<?> && ((Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»>) that).hasFixedSize()) {
+				} else if (that instanceof Container<?> && ((Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»>) that).hasKnownFixedSize()) {
 					final Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> cont = (Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»>) that;
 					if (cont.isEmpty()) {
 						return emptySeq();

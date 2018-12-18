@@ -250,15 +250,6 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				«AVLCommon.firstOrLast(genericName, "unique", "entry", "right")»
 			}
 
-			@Override
-			public «type.optionGenericName» lastOption() throws NoSuchElementException {
-				if (isEmpty()) {
-					return «type.noneName»();
-				} else {
-					return «type.someName»(last());
-				}
-			}
-
 			public «genericName» init() throws NoSuchElementException {
 				«AVLCommon.initOrTail(genericName, shortName, deleteResultDiamondName, "deleteMaximum")»
 			}
@@ -529,7 +520,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
+			public boolean hasKnownFixedSize() {
 				return false;
 			}
 

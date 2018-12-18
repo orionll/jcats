@@ -83,7 +83,7 @@ final class CommonGenerator implements ClassGenerator {
 			«ENDFOR»
 			«FOR type : Type.values»
 				static boolean «type.indexedContainerShortName.firstToLowerCase»sEqual(final «type.indexedContainerWildcardName» c1, final «type.indexedContainerWildcardName» c2) {
-					if (c1.hasFixedSize() && c2.hasFixedSize()) {
+					if (c1.hasKnownFixedSize() && c2.hasKnownFixedSize()) {
 						if (c1.size() == c2.size()) {
 							final «type.iteratorWildcardName» iterator1 = c1.iterator();
 							final «type.iteratorWildcardName» iterator2 = c2.iterator();
@@ -244,7 +244,7 @@ final class CommonGenerator implements ClassGenerator {
 
 			static String getIndexOutOfBoundsMessage(final int index, final Sized sized, final String name) {
 				final String message = "Index " + index + " is out of range";
-				if (sized.hasFixedSize()) {
+				if (sized.hasKnownFixedSize()) {
 					return message + " (" + name + " length = " + sized.size() + ")";
 				} else {
 					return message;
@@ -257,7 +257,7 @@ final class CommonGenerator implements ClassGenerator {
 			«FOR type : Type.primitives»
 
 				static Object[] «type.containerShortName.firstToLowerCase»ToArray(final «type.containerShortName» container) {
-					if (container.hasFixedSize()) {
+					if (container.hasKnownFixedSize()) {
 						if (container.isEmpty()) {
 							return EMPTY_OBJECT_ARRAY;
 						} else {

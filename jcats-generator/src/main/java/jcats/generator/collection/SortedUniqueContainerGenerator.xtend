@@ -41,19 +41,6 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 
 			«type.ordGenericName» ord();
 
-			default «type.genericName» last() throws NoSuchElementException {
-				return reverseIterator().«type.iteratorNext»();
-			}
-
-			default «type.optionGenericName» lastOption() {
-				final «type.iteratorGenericName» iterator = reverseIterator();
-				if (iterator.hasNext()) {
-					return «type.someName»(iterator.«type.iteratorNext»());
-				} else {
-					return «type.noneName»();
-				}
-			}
-
 			«IF type == Type.OBJECT»
 				@Override
 				default «type.optionGenericName» max(final «type.ordGenericName» ord) {
@@ -240,7 +227,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 				} else {
 					subSet = ((NavigableSet<«type.genericBoxedName»>) this.collection).subSet(from, fromInclusive, to, toInclusive);
 				}
-				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(subSet, hasFixedSize());
+				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(subSet, hasKnownFixedSize());
 			}
 
 			@Override
@@ -254,7 +241,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 				} else {
 					tailSet = ((NavigableSet<«type.genericBoxedName»>) this.collection).tailSet(from, inclusive);
 				}
-				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(tailSet, hasFixedSize());
+				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(tailSet, hasKnownFixedSize());
 			}
 
 			@Override
@@ -268,7 +255,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 				} else {
 					headSet = this.collection.headSet(to);
 				}
-				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(headSet, hasFixedSize());
+				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(headSet, hasKnownFixedSize());
 			}
 
 			@Override

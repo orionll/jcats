@@ -306,7 +306,7 @@ final class ArrayGenerator implements ClassGenerator {
 					return ofAll(suffix);
 				} else if (suffix instanceof «shortName») {
 					return concat((«genericName») suffix);
-				} else if (suffix instanceof Sized && ((Sized) suffix).hasFixedSize()) {
+				} else if (suffix instanceof Sized && ((Sized) suffix).hasKnownFixedSize()) {
 					return appendSized(suffix, ((Sized) suffix).size());
 				} else {
 					final «arrayBuilderName» builder;
@@ -335,7 +335,7 @@ final class ArrayGenerator implements ClassGenerator {
 					return ofAll(prefix);
 				} else if (prefix instanceof «shortName») {
 					return ((«genericName») prefix).concat(this);
-				} else if (prefix instanceof Sized && ((Sized) prefix).hasFixedSize()) {
+				} else if (prefix instanceof Sized && ((Sized) prefix).hasKnownFixedSize()) {
 					return prependSized(prefix, ((Sized) prefix).size());
 				} else {
 					final «arrayBuilderName» builder;
@@ -723,7 +723,7 @@ final class ArrayGenerator implements ClassGenerator {
 				requireNonNull(f);
 				if (isEmpty()) {
 					return emptyArray();
-				} else if (that instanceof Container<?> && ((Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»>) that).hasFixedSize()) {
+				} else if (that instanceof Container<?> && ((Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»>) that).hasKnownFixedSize()) {
 					final Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> cont = (Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»>) that;
 					if (cont.isEmpty()) {
 						return emptyArray();
@@ -885,7 +885,7 @@ final class ArrayGenerator implements ClassGenerator {
 			public static «paramGenericName» ofAll(final Iterable<«type.genericBoxedName»> iterable) {
 				if (iterable instanceof «type.containerWildcardName») {
 					return ((«type.containerGenericName») iterable).to«type.arrayShortName»();
-				} else if (iterable instanceof Sized && ((Sized) iterable).hasFixedSize()) {
+				} else if (iterable instanceof Sized && ((Sized) iterable).hasKnownFixedSize()) {
 					return sizedToArray(iterable, ((Sized) iterable).size());
 				«IF type == Type.OBJECT»
 					} else if (iterable instanceof Collection) {

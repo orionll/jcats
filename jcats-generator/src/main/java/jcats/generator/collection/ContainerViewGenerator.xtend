@@ -181,8 +181,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
-				return this.container.hasFixedSize();
+			public boolean hasKnownFixedSize() {
+				return this.container.hasKnownFixedSize();
 			}
 
 			@Override
@@ -193,6 +193,16 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public «type.optionGenericName» firstOption() {
 				return this.container.firstOption();
+			}
+
+			@Override
+			public «type.genericName» last() {
+				return this.container.last();
+			}
+
+			@Override
+			public «type.optionGenericName» lastOption() {
+				return this.container.lastOption();
 			}
 
 			@Override
@@ -505,8 +515,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
-				return this.view.hasFixedSize();
+			public boolean hasKnownFixedSize() {
+				return this.view.hasKnownFixedSize();
 			}
 
 			@Override
@@ -530,7 +540,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public Iterator<«mapTargetType»> reverseIterator() {
-				if (this.view.hasFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
+				if (this.view.hasKnownFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
 					«IF type == Type.OBJECT»
 						return new MappedIterator<>(this.view.reverseIterator(), this.f);
 					«ELSE»
@@ -649,8 +659,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public boolean hasFixedSize() {
-					return this.view.hasFixedSize();
+				public boolean hasKnownFixedSize() {
+					return this.view.hasKnownFixedSize();
 				}
 
 				@Override
@@ -674,7 +684,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 				@Override
 				public «toType.iteratorGenericName» reverseIterator() {
-					if (this.view.hasFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
+					if (this.view.hasKnownFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
 						«IF type == Type.OBJECT»
 							return new MappedObject«toType.typeName»Iterator<>(this.view.reverseIterator(), this.f);
 						«ELSE»
@@ -770,7 +780,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
+			public boolean hasKnownFixedSize() {
 				return false;
 			}
 
@@ -781,7 +791,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public Iterator<«mapTargetType»> reverseIterator() {
-				if (this.view.hasFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
+				if (this.view.hasKnownFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
 					return new FlatMapped«IF type != Type.OBJECT»«type.typeName»Object«ENDIF»ReverseIterator<>(this.view.reverseIterator(), this.f);
 				} else {
 					return ContainerView.super.reverseIterator();
@@ -852,7 +862,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public boolean hasFixedSize() {
+				public boolean hasKnownFixedSize() {
 					return false;
 				}
 
@@ -867,7 +877,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 				@Override
 				public «toType.iteratorGenericName» reverseIterator() {
-					if (this.view.hasFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
+					if (this.view.hasKnownFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
 						«IF type == Type.OBJECT»
 							return new FlatMappedObject«toType.typeName»ReverseIterator<>(this.view.reverseIterator(), this.f);
 						«ELSE»
@@ -948,7 +958,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
+			public boolean hasKnownFixedSize() {
 				return false;
 			}
 
@@ -963,7 +973,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.iteratorGenericName» reverseIterator() {
-				if (this.view.hasFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
+				if (this.view.hasKnownFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
 					«IF type == Type.OBJECT || type.javaUnboxedType»
 						return new «type.diamondName("FilteredIterator")»(this.view.reverseIterator(), this.predicate);
 					«ELSE»
@@ -1027,7 +1037,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			public int size() {
 				if (this.limit == 0) {
 					return 0;
-				} else if (this.view.hasFixedSize()) {
+				} else if (this.view.hasKnownFixedSize()) {
 					return Math.min(this.limit, this.view.size());
 				} else {
 					return «shortName».super.size();
@@ -1045,8 +1055,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
-				return (this.limit == 0) || this.view.hasFixedSize();
+			public boolean hasKnownFixedSize() {
+				return (this.limit == 0) || this.view.hasKnownFixedSize();
 			}
 
 			@Override
@@ -1106,7 +1116,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public int size() {
-				if (this.view.hasFixedSize()) {
+				if (this.view.hasKnownFixedSize()) {
 					return Math.max(this.view.size() - this.skip, 0);
 				} else {
 					return «shortName».super.size();
@@ -1115,7 +1125,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public boolean isEmpty() {
-				if (this.view.hasFixedSize()) {
+				if (this.view.hasKnownFixedSize()) {
 					return (this.skip >= this.view.size());
 				} else {
 					return «shortName».super.isEmpty();
@@ -1124,7 +1134,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public boolean isNotEmpty() {
-				if (this.view.hasFixedSize()) {
+				if (this.view.hasKnownFixedSize()) {
 					return (this.skip < this.view.size());
 				} else {
 					return «shortName».super.isNotEmpty();
@@ -1132,8 +1142,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
-				return this.view.hasFixedSize();
+			public boolean hasKnownFixedSize() {
+				return this.view.hasKnownFixedSize();
 			}
 
 			@Override
@@ -1193,8 +1203,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
-				return this.view.hasFixedSize();
+			public boolean hasKnownFixedSize() {
+				return this.view.hasKnownFixedSize();
 			}
 
 			@Override

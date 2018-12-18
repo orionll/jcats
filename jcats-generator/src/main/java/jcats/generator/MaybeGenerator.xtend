@@ -265,8 +265,8 @@ final class MaybeGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public boolean hasFixedSize() {
-				return this.maybe.hasFixedSize();
+			public boolean hasKnownFixedSize() {
+				return this.maybe.hasKnownFixedSize();
 			}
 
 			@Override
@@ -276,6 +276,16 @@ final class MaybeGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.optionGenericName» firstOption() {
+				return this.maybe.to«type.optionShortName»();
+			}
+
+			@Override
+			public «type.genericName» last() {
+				return this.maybe.get();
+			}
+
+			@Override
+			public «type.optionGenericName» lastOption() {
 				return this.maybe.to«type.optionShortName»();
 			}
 
