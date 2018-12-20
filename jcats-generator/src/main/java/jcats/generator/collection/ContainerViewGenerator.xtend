@@ -530,6 +530,16 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public «mapTargetType» last() {
+				return requireNonNull(this.f.apply(this.view.last()));
+			}
+
+			@Override
+			public Option<«mapTargetType»> lastOption() {
+				return this.view.lastOption().map(this.f);
+			}
+
+			@Override
 			public Iterator<«mapTargetType»> iterator() {
 				«IF type == Type.OBJECT»
 					return new MappedIterator<>(this.view.iterator(), this.f);
@@ -1205,6 +1215,26 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public boolean hasKnownFixedSize() {
 				return this.view.hasKnownFixedSize();
+			}
+
+			@Override
+			public «type.genericName» first() {
+				return this.view.last();
+			}
+
+			@Override
+			public «type.optionGenericName» firstOption() {
+				return this.view.lastOption();
+			}
+
+			@Override
+			public «type.genericName» last() {
+				return this.view.first();
+			}
+
+			@Override
+			public «type.optionGenericName» lastOption() {
+				return this.view.firstOption();
 			}
 
 			@Override

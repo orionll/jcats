@@ -169,16 +169,6 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «mapTargetType» last() {
-				return requireNonNull(this.f.apply(this.view.last()));
-			}
-
-			@Override
-			public Option<«mapTargetType»> lastOption() {
-				return this.view.lastOption().map(this.f);
-			}
-
-			@Override
 			«IF type == Type.OBJECT»
 				public <D> IndexedContainerView<D> map(final F<B, D> g) {
 			«ELSE»
@@ -484,26 +474,6 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				} else {
 					throw new UnsupportedOperationException("get() is unsupported if hasKnownFixedSize() == false");
 				}
-			}
-
-			@Override
-			public «type.genericName» first() {
-				return this.view.last();
-			}
-
-			@Override
-			public «type.optionGenericName» firstOption() {
-				return this.view.lastOption();
-			}
-
-			@Override
-			public «type.genericName» last() {
-				return this.view.first();
-			}
-
-			@Override
-			public «type.optionGenericName» lastOption() {
-				return this.view.firstOption();
 			}
 
 			@Override
