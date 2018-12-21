@@ -530,6 +530,21 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public «type.genericName» last() {
+				return reverseIterator().«type.iteratorNext»();
+			}
+
+			@Override
+			public «type.optionGenericName» lastOption() {
+				final «type.iteratorGenericName» iterator = reverseIterator();
+				if (iterator.hasNext()) {
+					return «type.someName»(iterator.«type.iteratorNext»());
+				} else {
+					return «type.noneName»();
+				}
+			}
+
+			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				if (this.root.isNotEmpty()) {
 					if (this.hasFrom) {
