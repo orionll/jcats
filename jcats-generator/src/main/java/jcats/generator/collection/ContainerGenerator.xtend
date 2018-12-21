@@ -197,7 +197,18 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			default «type.genericName» last() throws NoSuchElementException {
-				return reverseIterator().«type.iteratorNext»();
+				if (hasKnownFixedSize()) {
+					return reverseIterator().«type.iteratorNext»();
+				} else {
+					final «type.iteratorGenericName» iterator = iterator();
+					«type.genericName» result = iterator.«type.iteratorNext»();
+					while (true) {
+						if (!iterator.hasNext()) {
+							return result;
+						}
+						result = iterator.«type.iteratorNext»();
+					}
+				}
 			}
 
 			default «type.optionGenericName» lastOption() {
@@ -208,9 +219,13 @@ final class ContainerGenerator implements InterfaceGenerator {
 						return «type.someName»(last());
 					}
 				} else {
-					final «type.iteratorGenericName» iterator = reverseIterator();
+					final «type.iteratorGenericName» iterator = iterator();
 					if (iterator.hasNext()) {
-						return «type.someName»(iterator.«type.iteratorNext»());
+						«type.genericName» result = iterator.«type.iteratorNext»();
+						while (iterator.hasNext()) {
+							result = iterator.«type.iteratorNext»();
+						}
+						return «type.someName»(result);
 					} else {
 						return «type.noneName»();
 					}
