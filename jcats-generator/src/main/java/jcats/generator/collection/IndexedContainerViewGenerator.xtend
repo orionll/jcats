@@ -26,19 +26,24 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 	def skippedIndexedContainerViewShortName() { type.shortName("SkippedIndexedContainerView") }
 	def reverseIndexedContainerViewShortName() { type.shortName("ReverseIndexedContainerView") }
 
-	override sourceCode() { '''
+	override sourceCode() '''
 		package «Constants.COLLECTION»;
 
-		import java.util.Iterator;
+		import java.util.Collections;
+		«IF !type.javaUnboxedType»
+			import java.util.Iterator;
+		«ENDIF»
 		import java.util.List;
-		import java.util.PrimitiveIterator;
+		«IF type.javaUnboxedType»
+			import java.util.PrimitiveIterator;
+		«ENDIF»
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.JCATS».IntOption.*;
 		import static «Constants.COMMON».*;
-		import static «Constants.FUNCTION».«type.shortName("BooleanF")».*;
 
 		public interface «type.covariantName("IndexedContainerView")» extends «type.containerViewGenericName», «type.indexedContainerGenericName» {
 
@@ -92,6 +97,15 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			default «genericName» reverse() {
 				return new «reverseIndexedContainerViewShortName»<>(this);
+			}
+
+			static «type.paramGenericName("IndexedContainerView")» «type.shortName("ListView").firstToLowerCase»(final List<«type.genericBoxedName»> list) {
+				return «type.shortName("ListView").firstToLowerCase»(list, true);
+			}
+
+			static «type.paramGenericName("IndexedContainerView")» «type.shortName("ListView").firstToLowerCase»(final List<«type.genericBoxedName»> list, final boolean hasKnownFixedSize) {
+				requireNonNull(list);
+				return new «type.shortName("List")»As«type.indexedContainerDiamondName»(list, hasKnownFixedSize);
 			}
 			«IF type == Type.OBJECT»
 
@@ -527,5 +541,46 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			«toStr(type)»
 		}
-	''' }
+
+		«IF type == Type.OBJECT»
+			final class ListAsIndexedContainer<A> extends CollectionAsContainer<List<A>, A> implements IndexedContainerView<A> {
+		«ELSE»
+			final class «type.typeName»ListAs«type.typeName»IndexedContainer extends «type.typeName»CollectionAs«type.typeName»Container<List<«type.boxedName»>> implements «type.indexedContainerViewGenericName» {
+		«ENDIF»
+
+			«IF type == Type.OBJECT»
+				ListAsIndexedContainer(final List<A> list, final boolean fixedSize) {
+			«ELSE»
+				«type.typeName»ListAs«type.typeName»IndexedContainer(final List<«type.boxedName»> list, final boolean fixedSize) {
+			«ENDIF»
+				super(list, fixedSize);
+			}
+
+			@Override
+			public «type.genericName» get(final int index) {
+				return this.collection.get(index);
+			}
+
+			@Override
+			public IntOption indexOf(final «type.genericName» value) {
+				final int index = this.collection.indexOf(value);
+				return (index >= 0) ? intSome(index) : intNone();
+			}
+
+			@Override
+			public IntOption lastIndexOf(final «type.genericName» value) {
+				final int index = this.collection.lastIndexOf(value);
+				return (index >= 0) ? intSome(index) : intNone();
+			}
+
+			@Override
+			public List<«type.genericBoxedName»> asCollection() {
+				return Collections.unmodifiableList(this.collection);
+			}
+
+			«hashcode(type)»
+
+			«equals(type, type.indexedContainerWildcardName, false)»
+		}
+	'''
 }

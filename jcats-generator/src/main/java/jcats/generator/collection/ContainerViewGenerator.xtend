@@ -27,18 +27,23 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 	def skippedContainerViewShortName() { type.shortName("SkippedContainerView") }
 	def reverseContainerViewShortName() { type.shortName("ReverseContainerView") }
 
-	override sourceCode() { '''
+	override sourceCode() '''
 		package «Constants.COLLECTION»;
 
 		import java.util.ArrayList;
 		import java.util.Collection;
+		import java.util.Collections;
+		import java.util.Deque;
 		import java.util.Iterator;
 		import java.util.HashSet;
-		import java.util.LinkedHashSet;
+		import java.util.List;
+		import java.util.NavigableSet;
 		import java.util.NoSuchElementException;
 		import java.util.PrimitiveIterator;
+		import java.util.RandomAccess;
 		import java.util.Spliterator;
 		import java.util.function.Consumer;
+		import java.io.Serializable;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -151,6 +156,15 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			default «genericName» reverse() {
 				return new «reverseContainerViewShortName»<>(this);
+			}
+
+			static «type.paramGenericName("ContainerView")» «type.shortName("CollectionView").firstToLowerCase»(final Collection<«type.genericBoxedName»> collection) {
+				return «type.shortName("CollectionView").firstToLowerCase»(collection, true);
+			}
+
+			static «type.paramGenericName("ContainerView")» «type.shortName("CollectionView").firstToLowerCase»(final Collection<«type.genericBoxedName»> collection, final boolean hasKnownFixedSize) {
+				requireNonNull(collection);
+				return new «type.shortName("Collection")»As«type.containerShortName»<>(collection, hasKnownFixedSize);
 			}
 			«IF type == Type.OBJECT»
 
@@ -1380,5 +1394,154 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			«toStr(type)»
 		}
-	''' }
+
+		«IF type == Type.OBJECT»
+			class CollectionAsContainer<C extends Collection<A>, A> implements ContainerView<A>, Serializable {
+		«ELSE»
+			class «type.typeName»CollectionAs«type.typeName»Container<C extends Collection<«type.boxedName»>> implements «type.containerViewGenericName», Serializable {
+		«ENDIF»
+			final C collection;
+			private final boolean fixedSize;
+
+			«IF type == Type.OBJECT»
+				CollectionAsContainer(final C collection, final boolean fixedSize) {
+			«ELSE»
+				«type.typeName»CollectionAs«type.typeName»Container(final C collection, final boolean fixedSize) {
+			«ENDIF»
+				this.collection = collection;
+				this.fixedSize = fixedSize;
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return this.collection.isEmpty();
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return !this.collection.isEmpty();
+			}
+
+			@Override
+			public int size() {
+				return this.collection.size();
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return this.fixedSize;
+			}
+
+			@Override
+			public boolean contains(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
+				return this.collection.contains(value);
+			}
+
+			@Override
+			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
+				this.collection.forEach(action);
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				«IF type == Type.OBJECT»
+					this.collection.forEach(eff.toConsumer());
+				«ELSE»
+					this.collection.forEach(eff::apply);
+				«ENDIF»
+			}
+
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				«IF type.javaUnboxedType»
+					return «type.typeName»Iterator.getIterator(this.collection.iterator());
+				«ELSE»
+					return this.collection.iterator();
+				«ENDIF»
+			}
+
+			@Override
+			public «type.spliteratorGenericName» spliterator() {
+				«IF type.javaUnboxedType»
+					return «type.typeName»Spliterator.getSpliterator(this.collection.spliterator());
+				«ELSE»
+					return this.collection.spliterator();
+				«ENDIF»
+			}
+
+			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				if (this.collection instanceof List<?> && this.collection instanceof RandomAccess) {
+					final int size = this.collection.size();
+					if (size == 0) {
+						«IF type.javaUnboxedType»
+							return «type.noneName»().iterator();
+						«ELSE»
+							return Collections.emptyIterator();
+						«ENDIF»
+					} else {
+						«IF type.javaUnboxedType»
+							return new «type.typeName»ListReverseIterator((List<«type.genericBoxedName»>) this.collection, size);
+						«ELSE»
+							return new ListReverseIterator<>((List<«type.genericBoxedName»>) this.collection, size);
+						«ENDIF»
+					}
+				} else if (this.collection instanceof Deque<?>) {
+					«IF type.javaUnboxedType»
+						return «type.typeName»Iterator.getIterator(((Deque<«type.boxedName»>) this.collection).descendingIterator());
+					«ELSE»
+						return ((Deque<«type.genericBoxedName»>) this.collection).descendingIterator();
+					«ENDIF»
+				} else if (this.collection instanceof NavigableSet<?>) {
+					«IF type.javaUnboxedType»
+						return «type.typeName»Iterator.getIterator(((NavigableSet<«type.boxedName»>) this.collection).descendingIterator());
+					«ELSE»
+						return ((NavigableSet<«type.genericBoxedName»>) this.collection).descendingIterator();
+					«ENDIF»
+				} else {
+					return «type.containerViewShortName».super.reverseIterator();
+				}
+			}
+
+			@Override
+			public «type.stream2GenericName» stream() {
+				return «type.stream2Name».from«IF type.javaUnboxedType»Stream«ENDIF»(this.collection.stream());
+			}
+
+			@Override
+			public «type.stream2GenericName» parallelStream() {
+				return «type.stream2Name».from«IF type.javaUnboxedType»Stream«ENDIF»(this.collection.parallelStream());
+			}
+
+			@Override
+			«IF type == Type.OBJECT»
+				public Object[] toObjectArray() {
+					return this.collection.toArray();
+				}
+
+				@Override
+				public A[] toPreciseArray(final IntObjectF<A[]> supplier) {
+					final A[] array = supplier.apply(this.collection.size());
+					return this.collection.toArray(array);
+				}
+			«ELSE»
+				public «type.javaName»[] toPrimitiveArray() {
+					return new Array<>(this.collection.toArray()).mapTo«type.typeName»(i -> («type.javaName») i).array;
+				}
+			«ENDIF»
+
+			@Override
+			public Collection<«type.genericBoxedName»> asCollection() {
+				return Collections.unmodifiableCollection(this.collection);
+			}
+
+			@Override
+			public String toString() {
+				return this.collection.toString();
+			}
+		}
+	'''
 }

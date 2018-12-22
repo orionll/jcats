@@ -21,10 +21,12 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 	def shortName() { type.shortName(baseName) }
 	def genericName() { type.genericName(baseName) }
 
-	override sourceCode() { '''
+	override sourceCode() '''
 		package «Constants.COLLECTION»;
 
-		import java.util.Collections;
+		«IF !type.javaUnboxedType»
+			import java.util.Collections;
+		«ENDIF»
 		import java.util.Iterator;
 		import java.util.List;
 		import java.util.NoSuchElementException;
@@ -40,14 +42,13 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
-		«IF type == Type.OBJECT»
-			import static «Constants.JCATS».IntOption.*;
-		«ENDIF»
 		import static «Constants.JCATS».IntOption.*;
-		«IF type != Type.INT»
+		«IF type != Type.INT && type.javaUnboxedType»
 			import static «Constants.JCATS».«type.optionShortName».*;
 		«ENDIF»
-		import static «Constants.COMMON».*;
+		«IF type.primitive»
+			import static «Constants.COMMON».*;
+		«ENDIF»
 		import static «Constants.COLLECTION».«type.arrayShortName».*;
 
 		public interface «type.covariantName("IndexedContainer")» extends «type.containerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
@@ -263,16 +264,6 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 					return new «type.diamondName("TableIndexedContainer")»(size, f);
 				}
 			}
-
-			static «type.paramGenericName("IndexedContainerView")» as«type.indexedContainerShortName»(final List<«type.genericBoxedName»> list) {
-				requireNonNull(list);
-				return new «type.shortName("List")»As«type.indexedContainerDiamondName»(list, false);
-			}
-
-			static «type.paramGenericName("IndexedContainerView")» asFixedSize«type.indexedContainerShortName»(final List<«type.genericBoxedName»> list) {
-				requireNonNull(list);
-				return new «type.shortName("List")»As«type.indexedContainerDiamondName»(list, true);
-			}
 			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»
@@ -423,47 +414,6 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			final class ListAsIndexedContainer<A> extends CollectionAsContainer<List<A>, A> implements IndexedContainerView<A> {
-		«ELSE»
-			final class «type.typeName»ListAs«type.typeName»IndexedContainer extends «type.typeName»CollectionAs«type.typeName»Container<List<«type.boxedName»>> implements «type.indexedContainerViewGenericName» {
-		«ENDIF»
-
-			«IF type == Type.OBJECT»
-				ListAsIndexedContainer(final List<A> list, final boolean fixedSize) {
-			«ELSE»
-				«type.typeName»ListAs«type.typeName»IndexedContainer(final List<«type.boxedName»> list, final boolean fixedSize) {
-			«ENDIF»
-				super(list, fixedSize);
-			}
-
-			@Override
-			public «type.genericName» get(final int index) {
-				return this.collection.get(index);
-			}
-
-			@Override
-			public IntOption indexOf(final «type.genericName» value) {
-				final int index = this.collection.indexOf(value);
-				return (index >= 0) ? intSome(index) : intNone();
-			}
-
-			@Override
-			public IntOption lastIndexOf(final «type.genericName» value) {
-				final int index = this.collection.lastIndexOf(value);
-				return (index >= 0) ? intSome(index) : intNone();
-			}
-
-			@Override
-			public List<«type.genericBoxedName»> asCollection() {
-				return Collections.unmodifiableList(this.collection);
-			}
-
-			«hashcode(type)»
-
-			«equals(type, type.indexedContainerWildcardName, false)»
-		}
-
-		«IF type == Type.OBJECT»
 			final class IndexFinder<A> implements BooleanF<A> {
 				int index;
 				boolean found;
@@ -508,5 +458,5 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				}
 			}
 		«ENDIF»
-	''' }
+	'''
 }

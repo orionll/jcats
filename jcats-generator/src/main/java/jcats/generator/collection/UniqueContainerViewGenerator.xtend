@@ -22,16 +22,15 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 	def baseUniqueContainerViewShortName() { type.shortName("BaseUniqueContainerView") }
 	def reverseUniqueContainerViewShortName() { type.shortName("ReverseUniqueContainerView") }
 
-	override sourceCode() { '''
+	override sourceCode() '''
 		package «Constants.COLLECTION»;
 
+		import java.util.Collections;
 		import java.util.Set;
 
 		import «Constants.JCATS».*;
 
-		«IF type == Type.OBJECT»
-			import static java.util.Objects.requireNonNull;
-		«ENDIF»
+		import static java.util.Objects.requireNonNull;
 		import static «Constants.COMMON».*;
 
 		public interface «type.covariantName("UniqueContainerView")» extends «type.containerViewGenericName», «type.uniqueContainerGenericName» {
@@ -45,6 +44,15 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			default «genericName» reverse() {
 				return new «reverseUniqueContainerViewShortName»<>(this);
+			}
+
+			static «type.paramGenericName("UniqueContainerView")» «type.shortName("SetView").firstToLowerCase»(final Set<«type.genericBoxedName»> set) {
+				return «type.shortName("SetView").firstToLowerCase»(set, true);
+			}
+
+			static «type.paramGenericName("UniqueContainerView")» «type.shortName("SetView").firstToLowerCase»(final Set<«type.genericBoxedName»> set, final boolean hasKnownFixedSize) {
+				requireNonNull(set);
+				return new «type.shortName("Set")»As«type.uniqueContainerShortName»<>(set, hasKnownFixedSize);
 			}
 			«IF type == Type.OBJECT»
 
@@ -102,5 +110,25 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 
 			«toStr(type)»
 		}
-	''' }
+
+		«IF type == Type.OBJECT»
+			class SetAsUniqueContainer<C extends Set<A>, A> extends CollectionAsContainer<C, A> implements UniqueContainerView<A> {
+		«ELSE»
+			class «type.typeName»SetAs«type.typeName»UniqueContainer<C extends Set<«type.boxedName»>> extends «type.typeName»CollectionAs«type.typeName»Container<C> implements «type.uniqueContainerViewGenericName» {
+		«ENDIF»
+
+			«type.shortName("Set")»As«type.uniqueContainerShortName»(final C set, final boolean fixedSize) {
+				super(set, fixedSize);
+			}
+
+			@Override
+			public Set<«type.genericBoxedName»> asCollection() {
+				return Collections.unmodifiableSet(this.collection);
+			}
+
+			«uniqueHashCode(type)»
+
+			«uniqueEquals(type)»
+		}
+	'''
 }

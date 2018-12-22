@@ -20,15 +20,12 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 	def shortName() { type.uniqueContainerShortName }
 	def genericName() { type.uniqueContainerGenericName }
 
-	override sourceCode() { '''
+	override sourceCode() '''
 		package «Constants.COLLECTION»;
 
-		import java.util.Collection;
-		import java.util.Collections;
 		import java.util.Iterator;
 		import java.util.Set;
 		import java.util.Spliterator;
-		import java.util.Spliterators;
 		import java.util.function.Consumer;
 		import java.io.Serializable;
 
@@ -53,7 +50,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			«ENDIF»
 			@Override
 			default Set<«type.genericBoxedName»> asCollection() {
-				return new «type.diamondName("UniqueContainerAsSet")»(this);
+				return new «type.shortName("UniqueContainerAsSet")»<>(this);
 			}
 
 			@Override
@@ -67,16 +64,6 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			@Override
 			@Deprecated
 			boolean equals(final Object other);
-
-			static «type.paramGenericName("UniqueContainerView")» as«type.uniqueContainerShortName»(final Set<«type.genericBoxedName»> set) {
-				requireNonNull(set);
-				return new «type.shortName("Set")»As«type.uniqueContainerShortName»<>(set, false);
-			}
-
-			static «type.paramGenericName("UniqueContainerView")» asFixedSize«type.uniqueContainerShortName»(final Set<«type.genericBoxedName»> set) {
-				requireNonNull(set);
-				return new «type.shortName("Set")»As«type.uniqueContainerShortName»<>(set, true);
-			}
 			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»
@@ -163,25 +150,5 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 				this.container.forEach(action);
 			}
 		}
-
-		«IF type == Type.OBJECT»
-			class SetAsUniqueContainer<C extends Set<A>, A> extends CollectionAsContainer<C, A> implements UniqueContainerView<A> {
-		«ELSE»
-			class «type.typeName»SetAs«type.typeName»UniqueContainer<C extends Set<«type.boxedName»>> extends «type.typeName»CollectionAs«type.typeName»Container<C> implements «type.uniqueContainerViewGenericName» {
-		«ENDIF»
-
-			«type.shortName("Set")»As«type.uniqueContainerShortName»(final C set, final boolean fixedSize) {
-				super(set, fixedSize);
-			}
-
-			@Override
-			public Set<«type.genericBoxedName»> asCollection() {
-				return Collections.unmodifiableSet(this.collection);
-			}
-
-			«uniqueHashCode(type)»
-
-			«uniqueEquals(type)»
-		}
-	''' }
+	'''
 }

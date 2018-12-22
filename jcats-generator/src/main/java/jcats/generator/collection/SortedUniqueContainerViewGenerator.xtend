@@ -21,17 +21,19 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 	def genericName() { type.genericName("SortedUniqueContainerView") }
 	def baseSortedUniqueContainerViewShortName() { type.shortName("BaseSortedUniqueContainerView") }
 	
-	override sourceCode() { '''
+	override sourceCode() '''
 		package «Constants.COLLECTION»;
 
+		import java.util.Collections;
+		import java.util.Comparator;
+		import java.util.NavigableSet;
 		import java.util.SortedSet;
 
 		import «Constants.JCATS».*;
 
-		«IF type == Type.OBJECT»
-			import static java.util.Objects.requireNonNull;
-		«ENDIF»
+		import static java.util.Objects.requireNonNull;
 		import static «Constants.COMMON».*;
+		import static «Constants.JCATS».«type.ordShortName».*;
 
 		public interface «type.covariantName("SortedUniqueContainerView")» extends «type.uniqueContainerViewGenericName», «type.sortedUniqueContainerGenericName» {
 
@@ -45,6 +47,15 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 			@Deprecated
 			default «type.sortedUniqueContainerViewGenericName» view() {
 				return this;
+			}
+
+			static «type.paramGenericName("SortedUniqueContainerView")» «type.shortName("SortedSetView").firstToLowerCase»(final SortedSet<«type.genericBoxedName»> sortedSet) {
+				return «type.shortName("SortedSetView").firstToLowerCase»(sortedSet, true);
+			}
+
+			static «type.paramGenericName("SortedUniqueContainerView")» «type.shortName("SortedSetView").firstToLowerCase»(final SortedSet<«type.genericBoxedName»> sortedSet, final boolean hasKnownFixedSize) {
+				requireNonNull(sortedSet);
+				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(sortedSet, hasKnownFixedSize);
 			}
 			«IF type == Type.OBJECT»
 
@@ -91,5 +102,74 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 			«ENDIF»
 			«toStr(type)»
 		}
-	''' }
+
+		«IF type == Type.OBJECT»
+			final class SortedSetAsSortedUniqueContainer<A> extends SetAsUniqueContainer<SortedSet<A>, A> implements SortedUniqueContainerView<A> {
+		«ELSE»
+			final class «type.shortName("SortedSet")»As«type.sortedUniqueContainerShortName» extends «type.shortName("Set")»As«type.uniqueContainerShortName»<SortedSet<«type.boxedName»>> implements «type.sortedUniqueContainerViewGenericName» {
+		«ENDIF»
+
+			«type.shortName("SortedSet")»As«type.sortedUniqueContainerShortName»(final SortedSet<«type.genericBoxedName»> set, final boolean fixedSize) {
+				super(set, fixedSize);
+			}
+
+			@Override
+			public «type.ordGenericName» ord() {
+				final Comparator<«type.genericBoxedName»> comparator = (Comparator<«type.genericBoxedName»>) this.collection.comparator();
+				if (comparator == null) {
+					return «IF type == Type.OBJECT»(Ord<A>) «ENDIF»«type.asc»();
+				} else {
+					return «type.ordShortName».fromComparator(comparator);
+				}
+			}
+
+			@Override
+			public «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive) {
+				«IF type == Type.OBJECT»
+					requireNonNull(from);
+					requireNonNull(to);
+				«ENDIF»
+				final SortedSet<«type.genericBoxedName»> subSet;
+				if (fromInclusive && !toInclusive) {
+					subSet = this.collection.subSet(from, to);
+				} else {
+					subSet = ((NavigableSet<«type.genericBoxedName»>) this.collection).subSet(from, fromInclusive, to, toInclusive);
+				}
+				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(subSet, hasKnownFixedSize());
+			}
+
+			@Override
+			public «type.sortedUniqueContainerViewGenericName» sliceFrom(final «type.genericName» from, final boolean inclusive) {
+				«IF type == Type.OBJECT»
+					requireNonNull(from);
+				«ENDIF»
+				final SortedSet<«type.genericBoxedName»> tailSet;
+				if (inclusive) {
+					tailSet = this.collection.tailSet(from);
+				} else {
+					tailSet = ((NavigableSet<«type.genericBoxedName»>) this.collection).tailSet(from, inclusive);
+				}
+				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(tailSet, hasKnownFixedSize());
+			}
+
+			@Override
+			public «type.sortedUniqueContainerViewGenericName» sliceTo(final «type.genericName» to, final boolean inclusive) {
+				«IF type == Type.OBJECT»
+					requireNonNull(to);
+				«ENDIF»
+				final SortedSet<«type.genericBoxedName»> headSet;
+				if (inclusive) {
+					headSet = ((NavigableSet<«type.genericBoxedName»>) this.collection).headSet(to, inclusive);
+				} else {
+					headSet = this.collection.headSet(to);
+				}
+				return new «type.shortName("SortedSet")»As«type.sortedUniqueContainerDiamondName»(headSet, hasKnownFixedSize());
+			}
+
+			@Override
+			public SortedSet<«type.genericBoxedName»> asCollection() {
+				return Collections.unmodifiableSortedSet(this.collection);
+			}
+		}
+	'''
 }
