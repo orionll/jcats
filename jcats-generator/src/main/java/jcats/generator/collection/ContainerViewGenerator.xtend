@@ -357,8 +357,13 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public String joinToStringWithSeparator(final String separator) {
-				return this.container.joinToStringWithSeparator(separator);
+			public String joinToString(final String separator) {
+				return this.container.joinToString(separator);
+			}
+
+			@Override
+			public String joinToString(final String separator, final String prefix, final String suffix) {
+				return this.container.joinToString(separator, prefix, suffix);
 			}
 
 			«IF type == Type.OBJECT»

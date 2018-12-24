@@ -296,8 +296,12 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 				return this.stream.mapToObj(«type.boxedName»::toString).collect(Collectors.joining());
 			}
 
-			public String joinToStringWithSeparator(final String separator) {
+			public String joinToString(final String separator) {
 				return this.stream.mapToObj(«type.boxedName»::toString).collect(Collectors.joining(separator));
+			}
+
+			public String joinToString(final String separator, final String prefix, final String suffix) {
+				return this.stream.mapToObj(«type.boxedName»::toString).collect(Collectors.joining(separator, prefix, suffix));
 			}
 
 			@Override

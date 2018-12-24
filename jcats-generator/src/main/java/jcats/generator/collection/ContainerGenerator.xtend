@@ -459,16 +459,26 @@ final class ContainerGenerator implements InterfaceGenerator {
 				return builder.toString();
 			}
 
-			default String joinToStringWithSeparator(final String separator) {
-				final StringBuilder builder = new StringBuilder();
+			default String joinToString(final String separator) {
+				return joinToString(separator, "", "");
+			}
+
+			default String joinToString(final String separator, final String prefix, final String suffix) {
 				final «type.iteratorGenericName» iterator = iterator();
-				while (iterator.hasNext()) {
-					builder.append(iterator.«type.iteratorNext»());
-					if (iterator.hasNext()) {
+				if (iterator.hasNext()) {
+					final StringBuilder builder = new StringBuilder();
+					builder.append(prefix);
+					while (true) {
+						builder.append(iterator.«type.iteratorNext»());
+						if (!iterator.hasNext()) {
+							builder.append(suffix);
+							return builder.toString();
+						}
 						builder.append(separator);
 					}
+				} else {
+					return prefix.concat(suffix);
 				}
-				return builder.toString();
 			}
 
 			«IF type == Type.OBJECT»
@@ -781,8 +791,13 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public String joinToStringWithSeparator(final String separator) {
-					return this.container.joinToStringWithSeparator(separator);
+				public String joinToString(final String separator) {
+					return this.container.joinToString(separator);
+				}
+
+				@Override
+				public String joinToString(final String separator, final String prefix, final String suffix) {
+					return this.container.joinToString(separator, prefix, suffix);
 				}
 
 				@Override

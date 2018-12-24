@@ -277,8 +277,12 @@ final class Stream2Generator implements ClassGenerator {
 				return this.stream.map(Object::toString).collect(Collectors.joining());
 			}
 
-			public String joinToStringWithSeparator(final String separator) {
+			public String joinToString(final String separator) {
 				return this.stream.map(Object::toString).collect(Collectors.joining(separator));
+			}
+
+			public String joinToString(final String separator, final String prefix, final String suffix) {
+				return this.stream.map(Object::toString).collect(Collectors.joining(separator, prefix, suffix));
 			}
 
 			public List<A> toUnmodifiableList() {
