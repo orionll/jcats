@@ -121,7 +121,8 @@ final class FGenerator implements InterfaceGenerator {
 
 		@FunctionalInterface
 		public interface «shortName»«variantTypeParams» {
-			«toName» apply(final «fromName» value);
+
+			«toName» apply(«fromName» value);
 
 			«IF from == Type.OBJECT && to == Type.OBJECT»
 				default <C> F<A, C> map(final F<B, C> f) {

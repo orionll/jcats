@@ -102,7 +102,7 @@ class SeqGenerator implements ClassGenerator {
 			 * O(log(size))
 			 */
 			@Override
-			public abstract «type.genericName» get(final int index) throws IndexOutOfBoundsException;
+			public abstract «type.genericName» get(int index) throws IndexOutOfBoundsException;
 
 			/**
 			 * O(log(size))
@@ -118,23 +118,23 @@ class SeqGenerator implements ClassGenerator {
 			/**
 			 * O(log(size))
 			 */
-			public abstract «genericName» update(final int index, final «type.updateFunction» f) throws IndexOutOfBoundsException;
+			public abstract «genericName» update(int index, «type.updateFunction» f) throws IndexOutOfBoundsException;
 
-			public abstract «genericName» limit(final int n);
+			public abstract «genericName» limit(int n);
 
-			public abstract «genericName» skip(final int n);
+			public abstract «genericName» skip(int n);
 
 			«takeWhile(true, type)»
 
 			/**
 			 * O(1)
 			 */
-			public abstract «genericName» prepend(final «type.genericName» value);
+			public abstract «genericName» prepend(«type.genericName» value);
 
 			/**
 			 * O(1)
 			 */
-			public abstract «genericName» append(final «type.genericName» value);
+			public abstract «genericName» append(«type.genericName» value);
 
 			public final «genericName» removeAt(final int index) throws IndexOutOfBoundsException {
 				final int size = size();
@@ -206,10 +206,10 @@ class SeqGenerator implements ClassGenerator {
 			}
 
 			// Assume suffixSize > 0
-			abstract «genericName» appendSized(final «type.iteratorGenericName» suffix, final int suffixSize);
+			abstract «genericName» appendSized(«type.iteratorGenericName» suffix, int suffixSize);
 
 			// Assume prefixSize > 0
-			abstract «genericName» prependSized(final «type.iteratorGenericName» prefix, final int prefixSize);
+			abstract «genericName» prependSized(«type.iteratorGenericName» prefix, int prefixSize);
 
 			public final «genericName» appendAll(final Iterable<«type.genericBoxedName»> suffix) {
 				if (isEmpty()) {
@@ -377,7 +377,7 @@ class SeqGenerator implements ClassGenerator {
 					return array;
 				}
 
-				abstract void copyToArray(final Object[] array);
+				abstract void copyToArray(Object[] array);
 
 				Object[] toSharedObjectArray() {
 					return toObjectArray();
@@ -1273,7 +1273,7 @@ class SeqGenerator implements ClassGenerator {
 						- (1 << 15)*(lastNode4.length - 1) - init.length;
 			}
 
-			abstract void initSeqBuilder(final «seqBuilderName» builder);
+			abstract void initSeqBuilder(«seqBuilderName» builder);
 
 			«joinCollection(type, "Seq")»
 

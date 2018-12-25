@@ -41,6 +41,7 @@ final class F0Generator implements InterfaceGenerator {
 
 		@FunctionalInterface
 		public interface «type.covariantName("F0")» {
+
 			«type.genericName» apply();
 
 			«IF type == Type.OBJECT»

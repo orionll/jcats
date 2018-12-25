@@ -35,7 +35,7 @@ final class OrdGenerator implements InterfaceGenerator {
 		@FunctionalInterface
 		public interface «type.contravariantName("Ord")» extends Comparator<«type.genericBoxedName»> {
 
-			Order order(final «type.genericName» x, final «type.genericName» y);
+			Order order(«type.genericName» x, «type.genericName» y);
 
 			/**
 			 * @deprecated Use {@link #order} instead

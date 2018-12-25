@@ -21,7 +21,7 @@ final class FXGenerator implements InterfaceGenerator {
 		@FunctionalInterface
 		public interface FX<@Contravariant A, @Covariant B, @Covariant X extends Throwable> {
 
-			B apply(final A value) throws X;
+			B apply(A value) throws X;
 
 			default <C> FX<A, C, X> map(final F<B, C> f) {
 				requireNonNull(f);

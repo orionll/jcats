@@ -11,7 +11,7 @@ final class OrderedGenerator implements InterfaceGenerator {
 
 		public interface Ordered<A> extends Comparable<A> {
 
-			Order order(final A other);
+			Order order(A other);
 
 			@Override
 			default int compareTo(final A other) {

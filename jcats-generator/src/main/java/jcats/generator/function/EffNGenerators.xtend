@@ -25,7 +25,8 @@ final class EffNGenerators {
 
 				@FunctionalInterface
 				public interface Eff«arity»<«(1 .. arity).map["@Contravariant A" + it].join(", ")»> {
-					void apply(«(1 .. arity).map["final A" + it + " a" + it].join(", ")»);
+
+					void apply(«(1 .. arity).map["A" + it + " a" + it].join(", ")»);
 
 					«FOR i : 1 .. arity»
 						default <B> Eff«arity»<«(1 .. arity).map[(if (it == i) "B" else "A" + it)].join(", ")»> contraMap«i»(final F<B, A«i»> f) {

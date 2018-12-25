@@ -68,7 +68,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				}
 			}
 
-			A getOrNull(final K key);
+			A getOrNull(K key);
 
 			default boolean containsKey(final K key) {
 				return (getOrNull(key) != null);
@@ -166,7 +166,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			 */
 			@Override
 			@Deprecated
-			boolean equals(final Object other);
+			boolean equals(Object other);
 
 			static <K, A> KeyValue<K, A> asKeyValue(final Map<K, A> map) {
 				return new MapAsKeyValue<>(map, false);

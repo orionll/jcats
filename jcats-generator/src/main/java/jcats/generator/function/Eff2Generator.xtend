@@ -91,7 +91,8 @@ class Eff2Generator implements InterfaceGenerator {
 
 		@FunctionalInterface
 		public interface «variantName» {
-			void apply(final «type1GenericName» value1, final «type2GenericName» value2);
+
+			void apply(«type1GenericName» value1, «type2GenericName» value2);
 
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 				default Eff2<A2, A1> reverse() {

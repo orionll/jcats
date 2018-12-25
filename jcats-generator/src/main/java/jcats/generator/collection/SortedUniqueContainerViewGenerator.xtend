@@ -37,11 +37,11 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 
 		public interface «type.covariantName("SortedUniqueContainerView")» extends «type.uniqueContainerViewGenericName», «type.sortedUniqueContainerGenericName» {
 
-			«genericName» slice(final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive);
+			«genericName» slice(«type.genericName» from, boolean fromInclusive, «type.genericName» to, boolean toInclusive);
 
-			«genericName» sliceFrom(final «type.genericName» from, final boolean inclusive);
+			«genericName» sliceFrom(«type.genericName» from, boolean inclusive);
 
-			«genericName» sliceTo(final «type.genericName» to, final boolean inclusive);
+			«genericName» sliceTo(«type.genericName» to, boolean inclusive);
 
 			@Override
 			@Deprecated

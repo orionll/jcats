@@ -219,7 +219,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			 */
 			@Override
 			@Deprecated
-			boolean equals(final Object other);
+			boolean equals(Object other);
 
 			«IF type == Type.INT»
 				static IntIndexedContainer range(final int lowInclusive, final int highExclusive) {

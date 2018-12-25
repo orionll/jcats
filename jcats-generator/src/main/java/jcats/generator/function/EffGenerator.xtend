@@ -40,7 +40,8 @@ final class EffGenerator implements InterfaceGenerator {
 
 		@FunctionalInterface
 		public interface «contravariantName» {
-			void apply(final «type.genericName» value);
+
+			void apply(«type.genericName» value);
 
 			«IF type == Type.OBJECT»
 				default <B> Eff<B> contraMap(final F<B, A> f) {

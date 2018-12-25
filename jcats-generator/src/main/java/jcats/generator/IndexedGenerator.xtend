@@ -21,7 +21,8 @@ final class IndexedGenerator implements InterfaceGenerator {
 		import static java.util.Objects.requireNonNull;
 
 		public interface «type.covariantName("Indexed")» {
-			«type.genericName» get(final int index) throws IndexOutOfBoundsException;
+
+			«type.genericName» get(int index) throws IndexOutOfBoundsException;
 			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»

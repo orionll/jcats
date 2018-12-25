@@ -32,7 +32,8 @@ final class FNGenerators {
 
 				@FunctionalInterface
 				public interface F«arity»<«(1 .. arity).map["@Contravariant A" + it + ", "].join»@Covariant B> {
-					B apply(«(1 .. arity).map["final A" + it + " a" + it].join(", ")»);
+
+					B apply(«(1 .. arity).map["A" + it + " a" + it].join(", ")»);
 
 					default <C> F«arity»<«(1 .. arity).map["A" + it + ", "].join»C> map(final F<B, C> f) {
 						requireNonNull(f);

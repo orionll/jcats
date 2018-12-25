@@ -22,7 +22,7 @@ final class EffXGenerator implements InterfaceGenerator {
 		@FunctionalInterface
 		public interface EffX<@Contravariant A, @Covariant X extends Throwable> {
 
-			void apply(final A value) throws X;
+			void apply(A value) throws X;
 
 			default <B> EffX<B, X> contraMap(final F<B, A> f) {
 				requireNonNull(f);

@@ -63,7 +63,7 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			 */
 			@Override
 			@Deprecated
-			boolean equals(final Object other);
+			boolean equals(Object other);
 			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»

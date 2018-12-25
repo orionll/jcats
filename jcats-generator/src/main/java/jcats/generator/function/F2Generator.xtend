@@ -149,7 +149,7 @@ class F2Generator implements InterfaceGenerator {
 		@FunctionalInterface
 		public interface «variantName» {
 
-			«returnTypeGenericName» apply(final «type1GenericName» value1, final «type2GenericName» value2);
+			«returnTypeGenericName» apply(«type1GenericName» value1, «type2GenericName» value2);
 
 			default «mapReturnType» map(final «mapFunction» f) {
 				requireNonNull(f);
