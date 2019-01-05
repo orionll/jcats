@@ -118,6 +118,27 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public IntOption indexOf(final int value) {
+				if (value >= this.low &&
+						(this.closed && value <= this.high ||
+						!this.closed && value < this.high)) {
+					final int index = value - this.low;
+					if (index < 0) {
+						throw new SizeOverflowException();
+					} else {
+						return intSome(index);
+					}
+				} else {
+					return intNone();
+				}
+			}
+
+			@Override
+			public IntOption lastIndexOf(final int value) {
+				return indexOf(value);
+			}
+
+			@Override
 			public IntIndexedContainerView limit(final int n) {
 				if (n < 0) {
 					throw new IllegalArgumentException(Integer.toString(n));
