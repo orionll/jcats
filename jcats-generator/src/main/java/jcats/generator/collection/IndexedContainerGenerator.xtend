@@ -147,7 +147,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
-			default IntOption indexOf(final «type.genericName» value) {
+			default IntOption indexOf(final «type.genericName» value) throws SizeOverflowException {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
@@ -158,22 +158,17 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				«ENDIF»
 			}
 
-			default IntOption indexWhere(final «type.boolFName» predicate) {
+			default IntOption indexWhere(final «type.boolFName» predicate) throws SizeOverflowException {
 				requireNonNull(predicate);
-				«IF type.primitive»
-					final «type.typeName»IndexFinder finder = new «type.typeName»IndexFinder(predicate);
-				«ELSE»
-					final IndexFinder<A> finder = new IndexFinder<>(predicate);
-				«ENDIF»
-				foreachUntil(finder);
-				if (finder.found) {
-					return intSome(finder.index);
-				} else {
+				final «type.genericName("IndexFinder")» finder = new «type.diamondName("IndexFinder")»(predicate);
+				if (foreachUntil(finder)) {
 					return intNone();
+				} else {
+					return intSome(finder.index);
 				}
 			}
 
-			default IntOption lastIndexOf(final «type.genericName» value) {
+			default IntOption lastIndexOf(final «type.genericName» value) throws SizeOverflowException {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
@@ -184,17 +179,27 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				«ENDIF»
 			}
 
-			default IntOption lastIndexWhere(final «type.boolFName» predicate) {
+			default IntOption lastIndexWhere(final «type.boolFName» predicate) throws SizeOverflowException {
 				requireNonNull(predicate);
-				int index = size() - 1;
-				final «type.iteratorGenericName» iterator = reverseIterator();
-				while (iterator.hasNext()) {
-					if (predicate.apply(iterator.«type.iteratorNext»())) {
-						return intSome(index);
+				if (hasKnownFixedSize()) {
+					int index = size() - 1;
+					final «type.iteratorGenericName» iterator = reverseIterator();
+					while (iterator.hasNext()) {
+						if (predicate.apply(iterator.«type.iteratorNext»())) {
+							return intSome(index);
+						}
+						index--;
 					}
-					index--;
+					return intNone();
+				} else {
+					final «type.genericName("LastIndexFinder")» finder = new «type.diamondName("LastIndexFinder")»(predicate);
+					foreach(finder);
+					if (finder.lastIndex < 0) {
+						return intNone();
+					} else {
+						return intSome(finder.lastIndex);
+					}
 				}
-				return intNone();
 			}
 
 			@Override
@@ -413,50 +418,44 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			}
 		}
 
-		«IF type == Type.OBJECT»
-			final class IndexFinder<A> implements BooleanF<A> {
-				int index;
-				boolean found;
-				final BooleanF<A> predicate;
-			
-				IndexFinder(final BooleanF<A> predicate) {
-					this.predicate = predicate;
-				}
+		final class «type.genericName("IndexFinder")» implements «type.boolFName» {
+			int index;
+			final «type.boolFName» predicate;
+		
+			«type.shortName("IndexFinder")»(final «type.boolFName» predicate) {
+				this.predicate = predicate;
+			}
 
-				@Override
-				public boolean apply(final A value) {
-					if (this.predicate.apply(value)) {
-						this.found = true;
-						return false;
-					}
-					if (++this.index < 0) {
-						throw new SizeOverflowException();
-					}
-					return true;
+			@Override
+			public boolean apply(final «type.genericName» value) {
+				if (this.predicate.apply(value)) {
+					return false;
+				}
+				if (++this.index < 0) {
+					throw new SizeOverflowException();
+				}
+				return true;
+			}
+		}
+
+		final class «type.genericName("LastIndexFinder")» implements «type.effGenericName» {
+			int index;
+			int lastIndex = -1;
+			final «type.boolFName» predicate;
+		
+			«type.shortName("LastIndexFinder")»(final «type.boolFName» predicate) {
+				this.predicate = predicate;
+			}
+
+			@Override
+			public void apply(final «type.genericName» value) {
+				if (this.predicate.apply(value)) {
+					this.lastIndex = this.index;
+				}
+				if (++this.index < 0) {
+					throw new SizeOverflowException();
 				}
 			}
-		«ELSE»
-			final class «type.typeName»IndexFinder implements «type.typeName»BooleanF {
-				int index;
-				boolean found;
-				final «type.typeName»BooleanF predicate;
-			
-				«type.typeName»IndexFinder(final «type.typeName»BooleanF predicate) {
-					this.predicate = predicate;
-				}
-
-				@Override
-				public boolean apply(final «type.javaName» value) {
-					if (this.predicate.apply(value)) {
-						this.found = true;
-						return false;
-					}
-					if (++this.index < 0) {
-						throw new SizeOverflowException();
-					}
-					return true;
-				}
-			}
-		«ENDIF»
+		}
 	'''
 }
