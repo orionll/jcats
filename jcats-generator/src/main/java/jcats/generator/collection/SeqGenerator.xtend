@@ -36,15 +36,13 @@ class SeqGenerator implements ClassGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.io.Serializable;
-		import java.util.Arrays;
-		import java.util.Collection;
+		«IF type == Type.OBJECT || type.javaUnboxedType»
+			import java.util.Arrays;
+		«ENDIF»
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
-		«ENDIF»
-		«IF type.javaUnboxedType»
-			import java.util.function.«type.typeName»Consumer;
 		«ENDIF»
 		import java.util.stream.Collector;
 		import java.util.stream.«type.streamName»;
@@ -60,18 +58,15 @@ class SeqGenerator implements ClassGenerator {
 		«ENDFOR»
 		«IF type == Type.OBJECT»
 			import static «Constants.ORD».*;
-			import static «Constants.P».*;
-			import static «Constants.JCATS».IntObjectP.*;
 			import static «Constants.F».*;
 			import static «Constants.FUNCTION».IntObjectF.*;
 		«ELSEIF type == Type.INT»
-			import static «Constants.JCATS».Int«type.typeName»P.*;
 			import static «Constants.FUNCTION».IntIntF.*;
 		«ELSE»
-			import static «Constants.JCATS».Int«type.typeName»P.*;
 			import static «Constants.FUNCTION».Int«type.typeName»F.*;
 			import static «Constants.FUNCTION».«type.typeName»«type.typeName»F.*;
 		«ENDIF»
+		import static «Constants.JCATS».IntOption.*;
 		import static «Constants.COMMON».*;
 
 
@@ -119,6 +114,19 @@ class SeqGenerator implements ClassGenerator {
 			 * O(log(size))
 			 */
 			public abstract «genericName» update(int index, «type.updateFunction» f) throws IndexOutOfBoundsException;
+
+			@Override
+			public IntOption lastIndexWhere(final «type.boolFName» predicate) {
+				int index = size() - 1;
+				final «type.iteratorGenericName» iterator = reverseIterator();
+				while (iterator.hasNext()) {
+					if (predicate.apply(iterator.«type.iteratorNext»())) {
+						return intSome(index);
+					}
+					index--;
+				}
+				return intNone();
+			}
 
 			public abstract «genericName» limit(int n);
 

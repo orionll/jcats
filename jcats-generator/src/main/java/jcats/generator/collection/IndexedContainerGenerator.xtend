@@ -182,13 +182,10 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			default IntOption lastIndexWhere(final «type.boolFName» predicate) throws SizeOverflowException {
 				requireNonNull(predicate);
 				if (hasKnownFixedSize()) {
-					int index = size() - 1;
-					final «type.iteratorGenericName» iterator = reverseIterator();
-					while (iterator.hasNext()) {
-						if (predicate.apply(iterator.«type.iteratorNext»())) {
-							return intSome(index);
+					for (int i = size() - 1; i >= 0; i--) {
+						if (predicate.apply(get(i))) {
+							return intSome(i);
 						}
-						index--;
 					}
 					return intNone();
 				} else {
