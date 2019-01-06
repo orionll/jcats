@@ -33,6 +33,8 @@ final class UniqueGenerator implements ClassGenerator {
 		import static «Constants.P».p;
 		import static «Constants.COMMON».*;
 		import static «Constants.COLLECTION».HashTableCommon.*;
+		import static «Constants.ARRAY».*;
+		import static «Constants.SEQ».*;
 
 		public final class «shortName»<@Covariant A> implements UniqueContainer<A>, Serializable {
 			private static final «wildcardName» EMPTY = new «diamondName»(0, 0, Common.«Type.OBJECT.emptyArrayName», 0);
@@ -246,6 +248,28 @@ final class UniqueGenerator implements ClassGenerator {
 					final UniqueBuilder<A> builder = new UniqueBuilder<>(this);
 					builder.putAll(iterable);
 					return builder.build();
+				}
+			}
+
+			@Override
+			public Array<A> toArray() {
+				if (isEmpty()) {
+					return emptyArray();
+				} else if (this.treeMap == 0) {
+					return new Array<>(this.slots);
+				} else {
+					return UniqueContainer.super.toArray();
+				}
+			}
+
+			@Override
+			public Seq<A> toSeq() {
+				if (isEmpty()) {
+					return emptySeq();
+				} else if (this.treeMap == 0) {
+					return new Seq1<>(this.slots);
+				} else {
+					return UniqueContainer.super.toSeq();
 				}
 			}
 
