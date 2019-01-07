@@ -458,6 +458,13 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return this.container.to«type.seqShortName»();
 			}
 
+			«IF type == Type.OBJECT»
+				@Override
+				public Unique<A> toUnique() {
+					return this.container.toUnique();
+				}
+
+			«ENDIF»
 			@Override
 			public «type.javaName»[] «type.toArrayName»() {
 				return this.container.«type.toArrayName»();
@@ -1387,6 +1394,13 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return this.view;
 			}
 
+			«IF type == Type.OBJECT»
+				@Override
+				public Unique<A> toUnique() {
+					return this.view.toUnique();
+				}
+
+			«ENDIF»
 			@Override
 			public HashSet<«type.genericBoxedName»> toHashSet() {
 				return this.view.toHashSet();

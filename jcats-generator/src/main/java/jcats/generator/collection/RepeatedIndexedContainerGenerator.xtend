@@ -50,6 +50,9 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 		«IF type.primitive»
 			import static «Constants.COLLECTION».«type.arrayShortName».*;
 		«ENDIF»
+		«IF type == Type.OBJECT»
+			import static «Constants.COLLECTION».Unique.*;
+		«ENDIF»
 
 		final class «genericName» implements «type.indexedContainerViewGenericName», Serializable {
 			private final int size;
@@ -172,6 +175,11 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 					final A[] array = supplier.apply(this.size);
 					Arrays.fill(array, this.value);
 					return array;
+				}
+
+				@Override
+				public Unique<A> toUnique() {
+					return singleUnique(this.value);
 				}
 
 			«ENDIF»
