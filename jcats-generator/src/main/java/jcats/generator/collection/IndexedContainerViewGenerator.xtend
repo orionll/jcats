@@ -160,11 +160,15 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				return this.container.asCollection();
 			}
 
-			«hashcode(type)»
+			@Override
+			public int hashCode() {
+				return this.container.hashCode();
+			}
 
-			«indexedEquals(type)»
-
-			«toStr(type)»
+			@Override
+			public boolean equals(final Object obj) {
+				return this.container.equals(obj);
+			}
 		}
 
 		«IF type == Type.OBJECT»

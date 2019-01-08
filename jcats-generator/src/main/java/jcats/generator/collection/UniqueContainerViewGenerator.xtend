@@ -82,11 +82,15 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 				}
 
 			«ENDIF»
-			«uniqueHashCode(type)»
+			@Override
+			public int hashCode() {
+				return this.container.hashCode();
+			}
 
-			«uniqueEquals(type)»
-
-			«toStr(type)»
+			@Override
+			public boolean equals(final Object obj) {
+				return this.container.equals(obj);
+			}
 		}
 
 		«IF type == Type.OBJECT»

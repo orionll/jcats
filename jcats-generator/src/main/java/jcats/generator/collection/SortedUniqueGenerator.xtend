@@ -493,8 +493,6 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			public «type.sortedUniqueContainerViewGenericName» sliceTo(final «type.genericName» to, final boolean inclusive) {
 				return new «slicedSortedUniqueViewDiamondName»(this.container, «type.defaultValue», false, false, to, true, inclusive);
 			}
-
-			«toStr(type)»
 		}
 
 		final class «type.genericName("SlicedSortedUniqueView")» implements «type.sortedUniqueContainerViewGenericName» {

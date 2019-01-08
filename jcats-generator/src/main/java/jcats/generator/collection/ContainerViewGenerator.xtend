@@ -509,7 +509,10 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				return this.container.parallelStream();
 			}
 
-			«toStr(type)»
+			@Override
+			public String toString() {
+				return this.container.toString();
+			}
 		}
 
 		class «mappedContainerViewShortName»<A, «IF type == Type.OBJECT»B, «ENDIF»C extends «genericName»> implements ContainerView<«mapTargetType»> {

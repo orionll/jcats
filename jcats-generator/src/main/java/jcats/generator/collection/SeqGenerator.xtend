@@ -1440,8 +1440,6 @@ class SeqGenerator implements ClassGenerator {
 			public «type.indexedContainerViewGenericName» skip(final int n) {
 				return new «type.diamondName("SeqView")»(this.container.skip(n));
 			}
-
-			«toStr(type)»
 		}
 	''' }
 }
