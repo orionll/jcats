@@ -135,7 +135,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			default Iterator<P<K, A>> reverseIterator() {
-				return asUniqueContainer().reverseIterator();
+				return asUniqueContainer().toArray().reverseIterator();
 			}
 
 			default int spliteratorCharacteristics() {
