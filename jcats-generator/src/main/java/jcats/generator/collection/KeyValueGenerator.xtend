@@ -11,12 +11,10 @@ final class KeyValueGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
-		import java.util.ArrayList;
 		import java.util.Collection;
 		import java.util.Collections;
 		import java.util.Iterator;
 		import java.util.HashMap;
-		import java.util.HashSet;
 		import java.util.Map;
 		import java.util.Map.Entry;
 		import java.util.Set;
@@ -55,7 +53,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			default <X> Either<X, A> getOrError(final K key, final F0<X> error) {
 				requireNonNull(error);
 				final A value = getOrNull(key);
-				return (value == null) ? left(requireNonNull(error.apply())) : right(value);
+				return (value == null) ? left(error.apply()) : right(value);
 			}
 
 			default <X extends Throwable> A getOrThrow(final K key, final F0<X> f) throws X {
@@ -137,7 +135,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			default Iterator<P<K, A>> reverseIterator() {
-				return asUniqueContainer().toArray().reverseIterator();
+				return asUniqueContainer().reverseIterator();
 			}
 
 			default int spliteratorCharacteristics() {
