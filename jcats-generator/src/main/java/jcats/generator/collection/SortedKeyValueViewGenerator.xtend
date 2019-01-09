@@ -14,6 +14,7 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 		import java.util.Comparator;
 		import java.util.NavigableMap;
 		import java.util.SortedMap;
+		import java.util.TreeMap;
 
 		import «Constants.JCATS».Covariant;
 		import «Constants.ORD»;
@@ -71,6 +72,11 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			@Override
 			public SortedUniqueContainerView<K> keys() {
 				return this.keyValue.keys();
+			}
+
+			@Override
+			public TreeMap<K, A> toTreeMap() {
+				return this.keyValue.toTreeMap();
 			}
 
 			@Override

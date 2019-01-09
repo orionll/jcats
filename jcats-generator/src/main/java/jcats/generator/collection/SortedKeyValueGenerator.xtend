@@ -14,6 +14,7 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 		import java.util.NoSuchElementException;
 		import java.util.SortedMap;
 		import java.util.Spliterator;
+		import java.util.TreeMap;
 
 		import «Constants.JCATS».Covariant;
 		import «Constants.ORD»;
@@ -35,6 +36,12 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			SortedKeyValueView<K, A> view();
+
+			default TreeMap<K, A> toTreeMap() {
+				final TreeMap<K, A> map = new TreeMap<>(ord());
+				foreach(map::put);
+				return map;
+			}
 
 			@Override
 			default SortedMap<K, A> asMap() {

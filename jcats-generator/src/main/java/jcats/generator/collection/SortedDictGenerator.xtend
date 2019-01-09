@@ -23,12 +23,9 @@ final class SortedDictGenerator implements ClassGenerator {
 		import java.util.Iterator;
 		import java.util.List;
 		import java.util.Map;
-		import java.util.Map.Entry;
 		import java.util.NoSuchElementException;
 		import java.util.SortedMap;
 		import java.util.Spliterator;
-		import java.util.Spliterators;
-		import java.util.TreeMap;
 		import java.util.function.Consumer;
 		import java.util.stream.Stream;
 
@@ -214,12 +211,6 @@ final class SortedDictGenerator implements ClassGenerator {
 			@Override
 			public SortedKeyValueView<K, A> view() {
 				return new SortedDictView<>(this);
-			}
-
-			public TreeMap<K, A> toTreeMap() {
-				final TreeMap<K, A> map = new TreeMap<>(this.ord);
-				foreach(map::put);
-				return map;
 			}
 
 			int checkHeight() {
