@@ -231,10 +231,10 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			«toStr»
 		}
 
-		final class Keys<K> implements UniqueContainerView<K> {
-			private final KeyValue<K, ?> keyValue;
+		class Keys<K, KV extends KeyValue<K, ?>> implements UniqueContainerView<K> {
+			final KV keyValue;
 
-			Keys(final KeyValue<K, ?> keyValue) {
+			Keys(final KV keyValue) {
 				this.keyValue = keyValue;
 			}
 

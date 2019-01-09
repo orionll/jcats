@@ -29,6 +29,11 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			K lastKey() throws NoSuchElementException;
 
 			@Override
+			default SortedUniqueContainerView<K> keys() {
+				return new SortedKeys<>(this);
+			}
+
+			@Override
 			SortedKeyValueView<K, A> view();
 
 			@Override
@@ -42,6 +47,33 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			}
 
 			«cast(#["K", "A"], #[], #["A"])»
+		}
+
+		final class SortedKeys<K> extends Keys<K, SortedKeyValue<K, ?>> implements SortedUniqueContainerView<K> {
+
+			SortedKeys(final SortedKeyValue<K, ?> keyValue) {
+				super(keyValue);
+			}
+
+			@Override
+			public Ord<K> ord() {
+				return this.keyValue.ord();
+			}
+
+			@Override
+			public SortedUniqueContainerView<K> slice(final K from, final boolean fromInclusive, final K to, final boolean toInclusive) {
+				return new SortedKeys<>(this.keyValue.view().slice(from, fromInclusive, to, toInclusive));
+			}
+
+			@Override
+			public SortedUniqueContainerView<K> sliceFrom(final K from, final boolean inclusive) {
+				return new SortedKeys<>(this.keyValue.view().sliceFrom(from, inclusive));
+			}
+
+			@Override
+			public SortedUniqueContainerView<K> sliceTo(final K to, final boolean inclusive) {
+				return new SortedKeys<>(this.keyValue.view().sliceTo(to, inclusive));
+			}
 		}
 
 		final class SortedKeyValueAsSortedMap<K, A> extends KeyValueAsMap<K, A, SortedKeyValue<K, A>> implements SortedMap<K, A> {

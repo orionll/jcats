@@ -69,6 +69,11 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public SortedUniqueContainerView<K> keys() {
+				return this.keyValue.keys();
+			}
+
+			@Override
 			public SortedMap<K, A> asMap() {
 				return this.keyValue.asMap();
 			}
