@@ -58,6 +58,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		import static «Constants.JCATS».«type.ordShortName».*;
 		import static «Constants.STACK».*;
 		import static «Constants.COLLECTION».«type.sortedUniqueShortName».*;
+		import static «Constants.COLLECTION».AVLCommon.*;
 
 		public final class «type.covariantName(baseName)» implements «type.sortedUniqueContainerGenericName», Serializable {
 
@@ -164,12 +165,12 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			private «genericName» update(final «type.genericName» value, final InsertResult result) {
-				«AVLCommon.update(genericName, diamondName, "value", "entry", "value", "value == this.entry", "value")»
+				«AVLCommonGenerator.update(genericName, diamondName, "value", "entry", "value", "value == this.entry", "value")»
 			}
 
-			«AVLCommon.insertAndRotateRight(genericName, diamondName)»
+			«AVLCommonGenerator.insertAndRotateRight(genericName, diamondName)»
 
-			«AVLCommon.insertAndRotateLeft(genericName, diamondName)»
+			«AVLCommonGenerator.insertAndRotateLeft(genericName, diamondName)»
 
 			public «genericName» remove(final «type.genericName» value) {
 				«IF type == Type.OBJECT»
@@ -188,24 +189,16 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			private «genericName» delete(final «type.genericName» value, final «deleteResultGenericName» result) {
-				«AVLCommon.delete(genericName, diamondName, "value", "entry")»
+				«AVLCommonGenerator.delete(genericName, diamondName, "value", "entry")»
 			}
 
-			«AVLCommon.deleteMinimum(genericName, diamondName, deleteResultGenericName)»
+			«AVLCommonGenerator.deleteMinimum(genericName, diamondName, deleteResultGenericName)»
 
-			«AVLCommon.deleteMaximum(genericName, diamondName, deleteResultGenericName)»
+			«AVLCommonGenerator.deleteMaximum(genericName, diamondName, deleteResultGenericName)»
 
-			«AVLCommon.deleteAndRotateLeft(genericName, diamondName, type.genericName, deleteResultGenericName)»
+			«AVLCommonGenerator.deleteAndRotateLeft(genericName, diamondName, type.genericName, deleteResultGenericName)»
 
-			«AVLCommon.deleteAndRotateRight(genericName, diamondName, deleteResultGenericName)»
-
-			static NullPointerException nullOrder(final Order order) {
-				if (order == null) {
-					return new NullPointerException("«type.ordShortName».order() returned null");
-				} else {
-					throw new AssertionError("«type.ordShortName».order() returned unexpected value: " + order);
-				}
-			}
+			«AVLCommonGenerator.deleteAndRotateRight(genericName, diamondName, deleteResultGenericName)»
 
 			public «genericName» merge(final «genericName» other) {
 				requireNonNull(other);
@@ -242,20 +235,20 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			@Override
 			public «type.genericName» first() throws NoSuchElementException {
-				«AVLCommon.firstOrLast(genericName, "unique", "entry", "left")»
+				«AVLCommonGenerator.firstOrLast(genericName, "unique", "entry", "left")»
 			}
 
 			@Override
 			public «type.genericName» last() throws NoSuchElementException {
-				«AVLCommon.firstOrLast(genericName, "unique", "entry", "right")»
+				«AVLCommonGenerator.firstOrLast(genericName, "unique", "entry", "right")»
 			}
 
 			public «genericName» init() throws NoSuchElementException {
-				«AVLCommon.initOrTail(genericName, shortName, deleteResultDiamondName, "deleteMaximum")»
+				«AVLCommonGenerator.initOrTail(genericName, shortName, deleteResultDiamondName, "deleteMaximum")»
 			}
 
 			public «genericName» tail() throws NoSuchElementException {
-				«AVLCommon.initOrTail(genericName, shortName, deleteResultDiamondName, "deleteMinimum")»
+				«AVLCommonGenerator.initOrTail(genericName, shortName, deleteResultDiamondName, "deleteMinimum")»
 			}
 
 			public «genericName» reverse() {
@@ -465,11 +458,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		}
 
 		final class «type.iteratorGenericName(baseName)» implements «type.iteratorGenericName» {
-			«AVLCommon.iterator(genericName, "unique", type.iteratorShortName(baseName), type.iteratorReturnType, type.iteratorNext, false)»
+			«AVLCommonGenerator.iterator(genericName, "unique", type.iteratorShortName(baseName), type.iteratorReturnType, type.iteratorNext, false)»
 		}
 
 		final class «type.iteratorGenericName(baseName + "Reverse")» implements «type.iteratorGenericName» {
-			«AVLCommon.iterator(genericName, "unique", type.iteratorShortName(baseName + "Reverse"), type.iteratorReturnType, type.iteratorNext, true)»
+			«AVLCommonGenerator.iterator(genericName, "unique", type.iteratorShortName(baseName + "Reverse"), type.iteratorReturnType, type.iteratorNext, true)»
 		}
 
 		final class «type.genericName("SortedUniqueView")» extends «type.shortName("BaseSortedUniqueContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»«genericName»> {
@@ -480,7 +473,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			@Override
 			public «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive) {
-				«slicedSortedUniqueViewShortName».checkRange(this.container.ord, from, to);
+				«IF type.primitive»«slicedSortedUniqueViewShortName».«ENDIF»checkRange(this.container.ord, from, to);
 				return new «slicedSortedUniqueViewDiamondName»(this.container, from, true, fromInclusive, to, true, toInclusive);
 			}
 
@@ -542,151 +535,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				}
 			}
 
-			@Override
-			public void foreach(final «type.effGenericName» eff) {
-				if (this.root.isNotEmpty()) {
-					if (this.hasFrom) {
-						if (this.hasTo) {
-							traverse(this.root, eff);
-						} else {
-							traverseFrom(this.root, eff);
-						}
-					} else {
-						traverseTo(this.root, eff);
-					}
-				}
-			}
-
-			private void traverse(final «genericName» unique, final «type.effGenericName» eff) {
-				final Order fromOrder = this.root.ord.order(this.from, unique.entry);
-				final Order toOrder = this.root.ord.order(this.to, unique.entry);
-				if (fromOrder == LT) {
-					if (toOrder == LT) {
-						if (unique.left != null) {
-							traverse(unique.left, eff);
-						}
-					} else if (toOrder == EQ) {
-						if (unique.left != null) {
-							traverseFrom(unique.left, eff);
-						}
-						if (this.toInclusive) {
-							eff.apply(unique.entry);
-						}
-					} else if (toOrder == GT) {
-						if (unique.left != null) {
-							traverseFrom(unique.left, eff);
-						}
-						eff.apply(unique.entry);
-						if (unique.right != null) {
-							traverseTo(unique.right, eff);
-						}
-					} else {
-						throw «shortName».nullOrder(toOrder);
-					}
-				} else if (fromOrder == EQ) {
-					if (toOrder == EQ) {
-						if (this.fromInclusive && this.toInclusive) {
-							eff.apply(unique.entry);
-						}
-					} else if (toOrder == GT) {
-						if (this.fromInclusive) {
-							eff.apply(unique.entry);
-						}
-						if (unique.right != null) {
-							traverseTo(unique.right, eff);
-						}
-					} else if (toOrder == LT) {
-						throw new IllegalArgumentException("from == entry && entry > to");
-					} else {
-						throw «shortName».nullOrder(toOrder);
-					}
-				} else if (fromOrder == GT) {
-					if (toOrder == GT) {
-						if (unique.right != null) {
-							traverse(unique.right, eff);
-						}
-					} else if (toOrder == LT) {
-						throw new IllegalArgumentException("from > entry && entry > to");
-					} else if (toOrder == EQ) {
-						throw new IllegalArgumentException("from > entry && entry == to");
-					} else {
-						throw «shortName».nullOrder(toOrder);
-					}
-				} else {
-					throw «shortName».nullOrder(fromOrder);
-				}
-			}
-
-			private void traverseFrom(final «genericName» unique, final «type.effGenericName» eff) {
-				final Order order = this.root.ord.order(this.from, unique.entry);
-				if (order == LT) {
-					if (unique.left != null) {
-						traverseFrom(unique.left, eff);
-					}
-					eff.apply(unique.entry);
-					if (unique.right != null) {
-						unique.right.traverse(eff);
-					}
-				} else if (order == EQ) {
-					if (this.fromInclusive) {
-						eff.apply(unique.entry);
-					}
-					if (unique.right != null) {
-						unique.right.traverse(eff);
-					}
-				} else if (order == GT) {
-					if (unique.right != null) {
-						traverseFrom(unique.right, eff);
-					}
-				} else {
-					throw «shortName».nullOrder(order);
-				}
-			}
-
-			private void traverseTo(final «genericName» unique, final «type.effGenericName» eff) {
-				final Order order = this.root.ord.order(this.to, unique.entry);
-				if (order == LT) {
-					if (unique.left != null) {
-						traverseTo(unique.left, eff);
-					}
-				} else if (order == EQ) {
-					if (unique.left != null) {
-						unique.left.traverse(eff);
-					}
-					if (this.toInclusive) {
-						eff.apply(unique.entry);
-					}
-				} else if (order == GT) {
-					if (unique.left != null) {
-						unique.left.traverse(eff);
-					}
-					eff.apply(unique.entry);
-					if (unique.right != null) {
-						traverseTo(unique.right, eff);
-					}
-				} else {
-					throw «shortName».nullOrder(order);
-				}
-			}
+			«AVLCommonGenerator.slicedForEach("foreach", genericName, "unique", "entry", type.effGenericName, "apply")»
 
 			@Override
 			public boolean contains(final «type.genericName» value) {
-				«IF type == Type.OBJECT»
-					requireNonNull(value);
-				«ENDIF»
-				if (this.root.isEmpty()) {
-					return false;
-				} else if (this.hasFrom &&
-						(this.fromInclusive && this.root.ord.less(value, this.from) ||
-						!this.fromInclusive && this.root.ord.lessOrEqual(value, this.from))) {
-					return false;
-				} else if (this.hasTo &&
-						(this.toInclusive && this.root.ord.greater(value, this.to) ||
-						!this.toInclusive && this.root.ord.greaterOrEqual(value, this.to))) {
-					return false;
-				} else {
-					return «shortName».search(this.root, value);
-				}
+				«AVLCommonGenerator.slicedSearch(type, "value", "false", shortName)»
 			}
 
 			@Override
@@ -707,65 +560,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			private «type.sortedUniqueContainerViewGenericName» slice(final «type.genericName» from2, final boolean hasFrom2, final boolean from2Inclusive,
 				final «type.genericName» to2, final boolean hasTo2, final boolean to2Inclusive) {
-				final «type.genericName» newFrom;
-				final boolean newFromInclusive;
-				if (this.hasFrom) {
-					if (hasFrom2) {
-						final Order fromOrder = this.root.ord.order(this.from, from2);
-						if (fromOrder == LT) {
-							newFrom = from2;
-							newFromInclusive = from2Inclusive;
-						} else if (fromOrder == EQ) {
-							newFrom = from2;
-							newFromInclusive = this.fromInclusive && from2Inclusive;
-						} else if (fromOrder == GT) {
-							newFrom = this.from;
-							newFromInclusive = this.fromInclusive;
-						} else {
-							throw SortedUnique.nullOrder(fromOrder);
-						}
-					} else {
-						newFrom = this.from;
-						newFromInclusive = this.fromInclusive;
-					}
-				} else {
-					newFrom = from2;
-					newFromInclusive = from2Inclusive;
-				}
-
-				final «type.genericName» newTo;
-				final boolean newToInclusive;
-				if (this.hasTo) {
-					if (hasTo2) {
-						final Order toOrder = this.root.ord.order(this.to, to2);
-						if (toOrder == LT) {
-							newTo = this.to;
-							newToInclusive = this.toInclusive;
-						} else if (toOrder == EQ) {
-							newTo = to2;
-							newToInclusive = this.toInclusive && to2Inclusive;
-						} else if (toOrder == GT) {
-							newTo = to2;
-							newToInclusive = to2Inclusive;
-						} else {
-							throw SortedUnique.nullOrder(toOrder);
-						}
-					} else {
-						newTo = this.to;
-						newToInclusive = this.toInclusive;
-					}
-				} else {
-					newTo = to2;
-					newToInclusive = to2Inclusive;
-				}
-
-				final boolean newHasFrom = this.hasFrom || hasFrom2;
-				final boolean newHasTo = this.hasTo || hasTo2;
-				if (newHasFrom && newHasTo && this.root.ord.greater(newFrom, newTo)) {
-					return new «type.sortedUniqueViewDiamondName»(empty«shortName»By(this.root.ord));
-				} else {
-					return new «slicedSortedUniqueViewDiamondName»(this.root, newFrom, newHasFrom, newFromInclusive, newTo, newHasTo, newToInclusive);
-				}
+				«AVLCommonGenerator.slicedSlice(type.genericName, type.sortedUniqueViewDiamondName, slicedSortedUniqueViewDiamondName, shortName)»
 			}
 
 			@Override
@@ -791,24 +586,22 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			«uniqueHashCode(type)»
 
 			«toStr(type)»
+			«IF type.primitive»
 
-			static «IF type == Type.OBJECT»<A> «ENDIF»void checkRange(final «type.ordGenericName» ord, final «type.genericName» from, final «type.genericName» to) {
-				«IF type == Type.OBJECT»
-					requireNonNull(from);
-					requireNonNull(to);
-				«ENDIF»
-				if (ord.greater(from, to)) {
-					throw new IllegalArgumentException("from > to");
+				static void checkRange(final «type.ordGenericName» ord, final «type.genericName» from, final «type.genericName» to) {
+					if (ord.greater(from, to)) {
+						throw new IllegalArgumentException("from > to");
+					}
 				}
-			}
+			«ENDIF»
 		}
 
 		final class «type.iteratorGenericName("Sliced" + baseName)» implements «type.iteratorGenericName» {
-			«AVLCommon.slicedIterator(genericName, "unique", type.iteratorShortName("Sliced" + baseName), type.genericName, "entry", "<A> ", type.ordGenericName, type.iteratorReturnType, type.iteratorNext, false)»
+			«AVLCommonGenerator.slicedIterator(genericName, "unique", type.iteratorShortName("Sliced" + baseName), type.genericName, "entry", "<A> ", type.ordGenericName, type.iteratorReturnType, type.iteratorNext, false)»
 		}
 
 		final class «type.iteratorGenericName("Sliced" + baseName + "Reverse")» implements «type.iteratorGenericName» {
-			«AVLCommon.slicedIterator(genericName, "unique", type.iteratorShortName("Sliced" + baseName + "Reverse"), type.genericName, "entry", "<A> ", type.ordGenericName, type.iteratorReturnType, type.iteratorNext, true)»
+			«AVLCommonGenerator.slicedIterator(genericName, "unique", type.iteratorShortName("Sliced" + baseName + "Reverse"), type.genericName, "entry", "<A> ", type.ordGenericName, type.iteratorReturnType, type.iteratorNext, true)»
 		}
 	''' }
 }

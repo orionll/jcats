@@ -2,6 +2,7 @@ package jcats.generator.collection
 
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
+import jcats.generator.Type
 
 final class SortedDictGenerator implements ClassGenerator {
 	override className() { Constants.COLLECTION + "." + shortName }
@@ -35,13 +36,16 @@ final class SortedDictGenerator implements ClassGenerator {
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
+		import static java.util.Collections.emptyIterator;
 		import static «Constants.JCATS».Order.*;
 		import static «Constants.JCATS».Ord.*;
 		import static «Constants.P».p;
 		import static «Constants.COMMON».*;
 		import static «Constants.STACK».*;
+		import static «Constants.SORTED_DICT».*;
+		import static «Constants.COLLECTION».AVLCommon.*;
 
-		public final class SortedDict<K, @Covariant A> implements KeyValue<K, A>, Serializable {
+		public final class SortedDict<K, @Covariant A> implements SortedKeyValue<K, A>, Serializable {
 			private static final SortedDict<?, ?> EMPTY =
 					new SortedDict<>(null, null, null, Ord.<Integer>asc(), 0);
 			private static final SortedDict<?, ?> EMPTY_REVERSED =
@@ -51,7 +55,7 @@ final class SortedDictGenerator implements ClassGenerator {
 			final SortedDict<K, A> left;
 			final SortedDict<K, A> right;
 			private final int size;
-			private final Ord<K> ord;
+			final Ord<K> ord;
 			private final int balance;
 
 			private SortedDict(final P<K, A> entry, final SortedDict<K, A> left, final SortedDict<K, A> right, final Ord<K> ord, final int balance) {
@@ -67,6 +71,7 @@ final class SortedDictGenerator implements ClassGenerator {
 				this.balance = balance;
 			}
 
+			@Override
 			public Ord<K> ord() {
 				return this.ord;
 			}
@@ -76,11 +81,15 @@ final class SortedDictGenerator implements ClassGenerator {
 				requireNonNull(key);
 				if (this.entry == null) {
 					return null;
+				} else {
+					return search(this, key);
 				}
+			}
 
-				SortedDict<K, A> dict = this;
+			static <K, A> A search(«genericName» dict, final K key) {
+				final Ord<K> ord = dict.ord;
 				while (true) {
-					final Order order = this.ord.order(key, dict.entry.get1());
+					final Order order = ord.order(key, dict.entry.get1());
 					if (order == EQ) {
 						return dict.entry.get2();
 					} else if (order == LT) {
@@ -113,13 +122,13 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			private «genericName» update(final K key, final A value, final InsertResult result) {
-				«AVLCommon.update(genericName, diamondName, "key", "entry.get1()", "p(key, value)",
+				«AVLCommonGenerator.update(genericName, diamondName, "key", "entry.get1()", "p(key, value)",
 					"key == this.entry.get1() && value == this.entry.get2()", "key, value")»
 			}
 
-			«AVLCommon.insertAndRotateRight(genericName, diamondName)»
+			«AVLCommonGenerator.insertAndRotateRight(genericName, diamondName)»
 
-			«AVLCommon.insertAndRotateLeft(genericName, diamondName)»
+			«AVLCommonGenerator.insertAndRotateLeft(genericName, diamondName)»
 
 			public SortedDict<K, A> remove(final K key) {
 				requireNonNull(key);
@@ -136,39 +145,33 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			private SortedDict<K, A> delete(final K key, final DeleteResult<K, A> result) {
-				«AVLCommon.delete(genericName, diamondName, "key", "entry.get1()")»
+				«AVLCommonGenerator.delete(genericName, diamondName, "key", "entry.get1()")»
 			}
 
-			«AVLCommon.deleteMinimum(genericName, diamondName, "DeleteResult<K, A>")»
+			«AVLCommonGenerator.deleteMinimum(genericName, diamondName, "DeleteResult<K, A>")»
 
-			«AVLCommon.deleteMaximum(genericName, diamondName, "DeleteResult<K, A>")»
+			«AVLCommonGenerator.deleteMaximum(genericName, diamondName, "DeleteResult<K, A>")»
 
-			«AVLCommon.deleteAndRotateLeft(genericName, diamondName, "P<K, A>", "DeleteResult<K, A>")»
+			«AVLCommonGenerator.deleteAndRotateLeft(genericName, diamondName, "P<K, A>", "DeleteResult<K, A>")»
 
-			«AVLCommon.deleteAndRotateRight(genericName, diamondName, "DeleteResult<K, A>")»
+			«AVLCommonGenerator.deleteAndRotateRight(genericName, diamondName, "DeleteResult<K, A>")»
 
-			private static NullPointerException nullOrder(final Order order) {
-				if (order == null) {
-					return new NullPointerException("Ord.order() returned null");
-				} else {
-					throw new AssertionError("Ord.order() returned unexpected value: " + order);
-				}
-			}
-
+			@Override
 			public K firstKey() throws NoSuchElementException {
-				«AVLCommon.firstOrLast(genericName, "dict", "entry.get1()", "left")»
+				«AVLCommonGenerator.firstOrLast(genericName, "dict", "entry.get1()", "left")»
 			}
 
+			@Override
 			public K lastKey() throws NoSuchElementException {
-				«AVLCommon.firstOrLast(genericName, "dict", "entry.get1()", "right")»
+				«AVLCommonGenerator.firstOrLast(genericName, "dict", "entry.get1()", "right")»
 			}
 
 			public «genericName» init() throws NoSuchElementException {
-				«AVLCommon.initOrTail(genericName, shortName, "DeleteResult<>", "deleteMaximum")»
+				«AVLCommonGenerator.initOrTail(genericName, shortName, "DeleteResult<>", "deleteMaximum")»
 			}
 
 			public «genericName» tail() throws NoSuchElementException {
-				«AVLCommon.initOrTail(genericName, shortName, "DeleteResult<>", "deleteMinimum")»
+				«AVLCommonGenerator.initOrTail(genericName, shortName, "DeleteResult<>", "deleteMinimum")»
 			}
 
 			@Override
@@ -193,7 +196,7 @@ final class SortedDictGenerator implements ClassGenerator {
 				}
 			}
 
-			private void traverse(final Consumer<? super P<K, A>> action) {
+			void traverse(final Consumer<? super P<K, A>> action) {
 				if (this.left != null) {
 					this.left.traverse(action);
 				}
@@ -206,6 +209,11 @@ final class SortedDictGenerator implements ClassGenerator {
 			@Override
 			public int size() {
 				return this.size;
+			}
+
+			@Override
+			public SortedKeyValueView<K, A> view() {
+				return new SortedDictView<>(this);
 			}
 
 			public TreeMap<K, A> toTreeMap() {
@@ -430,11 +438,149 @@ final class SortedDictGenerator implements ClassGenerator {
 		}
 
 		final class SortedDictIterator<K, A> implements Iterator<P<K, A>> {
-			«AVLCommon.iterator(genericName, "dict", "SortedDictIterator", "P<K, A>", "next", false)»
+			«AVLCommonGenerator.iterator(genericName, "dict", "SortedDictIterator", "P<K, A>", "next", false)»
 		}
 
 		final class SortedDictReverseIterator<K, A> implements Iterator<P<K, A>> {
-			«AVLCommon.iterator(genericName, "dict", "SortedDictReverseIterator", "P<K, A>", "next", true)»
+			«AVLCommonGenerator.iterator(genericName, "dict", "SortedDictReverseIterator", "P<K, A>", "next", true)»
+		}
+
+		final class SortedDictView<K, A> extends BaseSortedKeyValueView<K, A, SortedDict<K, A>> {
+
+			SortedDictView(final SortedDict<K, A> keyValue) {
+				super(keyValue);
+			}
+
+			@Override
+			public SortedKeyValueView<K, A> slice(final K from, final boolean fromInclusive, final K to, final boolean toInclusive) {
+				checkRange(this.keyValue.ord, from, to);
+				return new SlicedSortedDictView<>(this.keyValue, from, true, fromInclusive, to, true, toInclusive);
+			}
+
+			@Override
+			public SortedKeyValueView<K, A> sliceFrom(final K from, final boolean inclusive) {
+				return new SlicedSortedDictView<>(this.keyValue, from, true, inclusive, null, false, false);
+			}
+
+			@Override
+			public SortedKeyValueView<K, A> sliceTo(final K to, final boolean inclusive) {
+				return new SlicedSortedDictView<>(this.keyValue, null, false, false, to, true, inclusive);
+			}
+		}
+
+		final class SlicedSortedDictView<K, A> implements SortedKeyValueView<K, A> {
+
+			private final «genericName» root;
+			private final K from;
+			private final boolean hasFrom;
+			private final boolean fromInclusive;
+			private final K to;
+			private final boolean hasTo;
+			private final boolean toInclusive;
+
+			SlicedSortedDictView(final «genericName» root,
+				final K from, final boolean hasFrom, final boolean fromInclusive,
+				final K to, final boolean hasTo, final boolean toInclusive) {
+				this.root = root;
+				this.from = from;
+				this.hasFrom = hasFrom;
+				this.fromInclusive = fromInclusive;
+				this.to = to;
+				this.hasTo = hasTo;
+				this.toInclusive = toInclusive;
+			}
+
+			@Override
+			public int size() {
+				final int[] size = { 0 };
+				forEach((final P<K, A> __) -> {
+					size[0]++;
+					if (size[0] < 0) {
+						throw new SizeOverflowException();
+					}
+				});
+				return size[0];
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return false;
+			}
+
+			@Override
+			public Ord<K> ord() {
+				return this.root.ord;
+			}
+
+			@Override
+			public K firstKey() {
+				return iterator().next().get1();
+			}
+
+			@Override
+			public K lastKey() {
+				return reverseIterator().next().get1();
+			}
+
+			«AVLCommonGenerator.slicedForEach("forEach", genericName, "dict", "entry.get1()", "Consumer<? super P<K, A>>", "accept")»
+
+			@Override
+			public A getOrNull(final K key) {
+				«AVLCommonGenerator.slicedSearch(Type.OBJECT, "key", "null", shortName)»
+			}
+
+			@Override
+			public SortedKeyValueView<K, A> slice(final K from2, final boolean from2Inclusive, final K to2, final boolean to2Inclusive) {
+				checkRange(this.root.ord, from2, to2);
+				return slice(from2, true, from2Inclusive, to2, true, to2Inclusive);
+			}
+
+			@Override
+			public SortedKeyValueView<K, A> sliceFrom(final K from2, final boolean inclusive2) {
+				return slice(from2, true, inclusive2, null, false, false);
+			}
+
+			@Override
+			public SortedKeyValueView<K, A> sliceTo(final K to2, final boolean inclusive2) {
+				return slice(null, false, false, to2, true, inclusive2);
+			}
+
+			private SortedKeyValueView<K, A> slice(final K from2, final boolean hasFrom2, final boolean from2Inclusive,
+				final K to2, final boolean hasTo2, final boolean to2Inclusive) {
+				«AVLCommonGenerator.slicedSlice("K", "SortedDictView<>", "SlicedSortedDictView<>", "SortedDict")»
+			}
+
+			@Override
+			public Iterator<P<K, A>> iterator() {
+				if (this.root.isEmpty()) {
+					return emptyIterator();
+				} else {
+					return new SlicedSortedDictIterator<>(this.root, this.from, this.hasFrom, this.fromInclusive, this.to, this.hasTo, this.toInclusive);
+				}
+			}
+
+			@Override
+			public Iterator<P<K, A>> reverseIterator() {
+				if (this.root.isEmpty()) {
+					return emptyIterator();
+				} else {
+					return new SlicedSortedDictReverseIterator<>(this.root, this.from, this.hasFrom, this.fromInclusive, this.to, this.hasTo, this.toInclusive);
+				}
+			}
+
+			«keyValueEquals»
+
+			«keyValueHashCode»
+
+			«toStr»
+		}
+
+		final class SlicedSortedDictIterator<K, A> implements Iterator<P<K, A>> {
+			«AVLCommonGenerator.slicedIterator(genericName, "dict", "SlicedSortedDictIterator", "K", "entry.get1()", "<K, A> ", "Ord<K>", "P<K, A>", "next", false)»
+		}
+
+		final class SlicedSortedDictReverseIterator<K, A> implements Iterator<P<K, A>> {
+			«AVLCommonGenerator.slicedIterator(genericName, "dict", "SlicedSortedDictReverseIterator", "K", "entry.get1()", "<K, A> ", "Ord<K>", "P<K, A>", "next", true)»
 		}
 	''' }
 }

@@ -1,6 +1,43 @@
 package jcats.generator.collection
 
-final class AVLCommon {
+import jcats.generator.ClassGenerator
+import jcats.generator.Type
+import jcats.generator.Constants
+
+final class AVLCommonGenerator implements ClassGenerator {
+
+	override className() { "jcats.collection.AVLCommon" }
+	
+	override sourceCode() '''
+		package «Constants.COLLECTION»;
+
+		import «Constants.ORD»;
+		import «Constants.ORDER»;
+
+		import static java.util.Objects.requireNonNull;
+
+		final class AVLCommon {
+
+			private AVLCommon() {
+			}
+
+			static NullPointerException nullOrder(final Order order) {
+				if (order == null) {
+					return new NullPointerException("order() returned null");
+				} else {
+					throw new AssertionError("order() returned unexpected value: " + order);
+				}
+			}
+
+			static <A> void checkRange(final Ord<A> ord, final A from, final A to) {
+				requireNonNull(from);
+				requireNonNull(to);
+				if (ord.greater(from, to)) {
+					throw new IllegalArgumentException("from > to");
+				}
+			}
+		}
+	'''
 
 	def static update(String genericName, String diamondName, String key, String getKey, String createEntry, String sameEntry, String updateArgs) '''
 		final Order order = this.ord.order(«key», this.«getKey»);
@@ -325,6 +362,216 @@ final class AVLCommon {
 		}
 	'''
 
+	def static slicedForEach(String methodName, String genericName, String name, String getKey, String effGenericName, String apply) '''
+		@Override
+		public void «methodName»(final «effGenericName» eff) {
+			if (this.root.isNotEmpty()) {
+				if (this.hasFrom) {
+					if (this.hasTo) {
+						traverse(this.root, eff);
+					} else {
+						traverseFrom(this.root, eff);
+					}
+				} else {
+					traverseTo(this.root, eff);
+				}
+			}
+		}
+
+		private void traverse(final «genericName» «name», final «effGenericName» eff) {
+			final Order fromOrder = this.root.ord.order(this.from, «name».«getKey»);
+			final Order toOrder = this.root.ord.order(this.to, «name».«getKey»);
+			if (fromOrder == LT) {
+				if (toOrder == LT) {
+					if («name».left != null) {
+						traverse(«name».left, eff);
+					}
+				} else if (toOrder == EQ) {
+					if («name».left != null) {
+						traverseFrom(«name».left, eff);
+					}
+					if (this.toInclusive) {
+						eff.«apply»(«name».entry);
+					}
+				} else if (toOrder == GT) {
+					if («name».left != null) {
+						traverseFrom(«name».left, eff);
+					}
+					eff.«apply»(«name».entry);
+					if («name».right != null) {
+						traverseTo(«name».right, eff);
+					}
+				} else {
+					throw nullOrder(toOrder);
+				}
+			} else if (fromOrder == EQ) {
+				if (toOrder == EQ) {
+					if (this.fromInclusive && this.toInclusive) {
+						eff.«apply»(«name».entry);
+					}
+				} else if (toOrder == GT) {
+					if (this.fromInclusive) {
+						eff.«apply»(«name».entry);
+					}
+					if («name».right != null) {
+						traverseTo(«name».right, eff);
+					}
+				} else if (toOrder == LT) {
+					throw new IllegalArgumentException("from == entry && entry > to");
+				} else {
+					throw nullOrder(toOrder);
+				}
+			} else if (fromOrder == GT) {
+				if (toOrder == GT) {
+					if («name».right != null) {
+						traverse(«name».right, eff);
+					}
+				} else if (toOrder == LT) {
+					throw new IllegalArgumentException("from > entry && entry > to");
+				} else if (toOrder == EQ) {
+					throw new IllegalArgumentException("from > entry && entry == to");
+				} else {
+					throw nullOrder(toOrder);
+				}
+			} else {
+				throw nullOrder(fromOrder);
+			}
+		}
+
+		private void traverseFrom(final «genericName» «name», final «effGenericName» eff) {
+			final Order order = this.root.ord.order(this.from, «name».«getKey»);
+			if (order == LT) {
+				if («name».left != null) {
+					traverseFrom(«name».left, eff);
+				}
+				eff.«apply»(«name».entry);
+				if («name».right != null) {
+					«name».right.traverse(eff);
+				}
+			} else if (order == EQ) {
+				if (this.fromInclusive) {
+					eff.«apply»(«name».entry);
+				}
+				if («name».right != null) {
+					«name».right.traverse(eff);
+				}
+			} else if (order == GT) {
+				if («name».right != null) {
+					traverseFrom(«name».right, eff);
+				}
+			} else {
+				throw nullOrder(order);
+			}
+		}
+
+		private void traverseTo(final «genericName» «name», final «effGenericName» eff) {
+			final Order order = this.root.ord.order(this.to, «name».«getKey»);
+			if (order == LT) {
+				if («name».left != null) {
+					traverseTo(«name».left, eff);
+				}
+			} else if (order == EQ) {
+				if («name».left != null) {
+					«name».left.traverse(eff);
+				}
+				if (this.toInclusive) {
+					eff.«apply»(«name».entry);
+				}
+			} else if (order == GT) {
+				if («name».left != null) {
+					«name».left.traverse(eff);
+				}
+				eff.«apply»(«name».entry);
+				if («name».right != null) {
+					traverseTo(«name».right, eff);
+				}
+			} else {
+				throw nullOrder(order);
+			}
+		}
+	'''
+
+	def static slicedSearch(Type type, String key, String none, String shortName) '''
+		«IF type == Type.OBJECT»
+			requireNonNull(«key»);
+		«ENDIF»
+		if (this.root.isEmpty()) {
+			return «none»;
+		} else if (this.hasFrom &&
+				(this.fromInclusive && this.root.ord.less(«key», this.from) ||
+				!this.fromInclusive && this.root.ord.lessOrEqual(«key», this.from))) {
+			return «none»;
+		} else if (this.hasTo &&
+				(this.toInclusive && this.root.ord.greater(«key», this.to) ||
+				!this.toInclusive && this.root.ord.greaterOrEqual(«key», this.to))) {
+			return «none»;
+		} else {
+			return «shortName».search(this.root, «key»);
+		}
+	'''
+
+	def static slicedSlice(String keyGenericName, String diamondName, String slicedDiamondName, String shortName) '''
+		final «keyGenericName» newFrom;
+		final boolean newFromInclusive;
+		if (this.hasFrom) {
+			if (hasFrom2) {
+				final Order fromOrder = this.root.ord.order(this.from, from2);
+				if (fromOrder == LT) {
+					newFrom = from2;
+					newFromInclusive = from2Inclusive;
+				} else if (fromOrder == EQ) {
+					newFrom = from2;
+					newFromInclusive = this.fromInclusive && from2Inclusive;
+				} else if (fromOrder == GT) {
+					newFrom = this.from;
+					newFromInclusive = this.fromInclusive;
+				} else {
+					throw nullOrder(fromOrder);
+				}
+			} else {
+				newFrom = this.from;
+				newFromInclusive = this.fromInclusive;
+			}
+		} else {
+			newFrom = from2;
+			newFromInclusive = from2Inclusive;
+		}
+
+		final «keyGenericName» newTo;
+		final boolean newToInclusive;
+		if (this.hasTo) {
+			if (hasTo2) {
+				final Order toOrder = this.root.ord.order(this.to, to2);
+				if (toOrder == LT) {
+					newTo = this.to;
+					newToInclusive = this.toInclusive;
+				} else if (toOrder == EQ) {
+					newTo = to2;
+					newToInclusive = this.toInclusive && to2Inclusive;
+				} else if (toOrder == GT) {
+					newTo = to2;
+					newToInclusive = to2Inclusive;
+				} else {
+					throw nullOrder(toOrder);
+				}
+			} else {
+				newTo = this.to;
+				newToInclusive = this.toInclusive;
+			}
+		} else {
+			newTo = to2;
+			newToInclusive = to2Inclusive;
+		}
+
+		final boolean newHasFrom = this.hasFrom || hasFrom2;
+		final boolean newHasTo = this.hasTo || hasTo2;
+		if (newHasFrom && newHasTo && this.root.ord.greater(newFrom, newTo)) {
+			return new «diamondName»(empty«shortName»By(this.root.ord));
+		} else {
+			return new «slicedDiamondName»(this.root, newFrom, newHasFrom, newFromInclusive, newTo, newHasTo, newToInclusive);
+		}
+	'''
+
 	def static slicedIterator(String genericName, String name, String iteratorShortName, String keyGenericName, String getKey, String params,
 		String ordGenericName, String iteratorReturnType, String iteratorNext, boolean reversed) {
 		val first = if (reversed) "last" else "first"
@@ -462,7 +709,7 @@ final class AVLCommon {
 					}
 				}
 
-				return result.«getKey»;
+				return result.entry;
 			}
 	''' }
 }

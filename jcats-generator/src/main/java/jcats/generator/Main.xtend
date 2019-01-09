@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.util.Arrays
 import java.util.List
+import jcats.generator.collection.AVLCommonGenerator
 import jcats.generator.collection.ArrayBuilderGenerator
 import jcats.generator.collection.ArrayGenerator
 import jcats.generator.collection.ContainerGenerator
@@ -16,6 +17,7 @@ import jcats.generator.collection.HashTableCommonGenerator
 import jcats.generator.collection.IndexedContainerGenerator
 import jcats.generator.collection.IndexedContainerViewGenerator
 import jcats.generator.collection.KeyValueGenerator
+import jcats.generator.collection.KeyValueViewGenerator
 import jcats.generator.collection.PrimitiveStream2Generator
 import jcats.generator.collection.RangeGenerator
 import jcats.generator.collection.RepeatedIndexedContainerGenerator
@@ -30,6 +32,8 @@ import jcats.generator.collection.SeqBuilderGenerator
 import jcats.generator.collection.SeqGenerator
 import jcats.generator.collection.SortedDictBuilderGenerator
 import jcats.generator.collection.SortedDictGenerator
+import jcats.generator.collection.SortedKeyValueGenerator
+import jcats.generator.collection.SortedKeyValueViewGenerator
 import jcats.generator.collection.SortedUniqueBuilderGenerator
 import jcats.generator.collection.SortedUniqueContainerGenerator
 import jcats.generator.collection.SortedUniqueContainerViewGenerator
@@ -118,6 +122,9 @@ final class Main {
 			new CloseableXGenerator,
 			new RangeGenerator,
 			new KeyValueGenerator,
+			new KeyValueViewGenerator,
+			new SortedKeyValueGenerator,
+			new SortedKeyValueViewGenerator,
 			new DictGenerator,
 			new DictBuilderGenerator,
 			new UniqueGenerator,
@@ -125,6 +132,7 @@ final class Main {
 			new SortedDictGenerator,
 			new SortedDictBuilderGenerator,
 			new HashTableCommonGenerator,
+			new AVLCommonGenerator,
 			new CommonGenerator,
 			new CastGenerator,
 			new String1Generator,

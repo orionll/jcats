@@ -12,7 +12,6 @@ final class KeyValueGenerator implements InterfaceGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.util.Collection;
-		import java.util.Collections;
 		import java.util.Iterator;
 		import java.util.HashMap;
 		import java.util.Map;
@@ -30,7 +29,6 @@ final class KeyValueGenerator implements InterfaceGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.COMMON».*;
 		import static «Constants.EITHER».*;
-		import static «Constants.P».*;
 
 		public interface KeyValue<K, @Covariant A> extends Iterable<P<K, A>>, Equatable<KeyValue<K, A>>, Sized {
 
@@ -151,6 +149,10 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				}
 			}
 
+			default KeyValue<K, A> view() {
+				return new BaseKeyValueView<>(this);
+			}
+
 			default Stream2<P<K, A>> stream() {
 				return new Stream2<>(StreamSupport.stream(spliterator(), false));
 			}
@@ -165,14 +167,6 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			@Deprecated
 			boolean equals(Object other);
-
-			static <K, A> KeyValue<K, A> asKeyValue(final Map<K, A> map) {
-				return new MapAsKeyValue<>(map, false);
-			}
-
-			static <K, A> KeyValue<K, A> asFixedSizeKeyValue(final Map<K, A> map) {
-				return new MapAsKeyValue<>(map, true);
-			}
 
 			«cast(#["K", "A"], #[], #["A"])»
 		}
@@ -384,10 +378,10 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 		}
 
-		final class KeyValueAsMap<K, A> extends AbstractImmutableMap<K, A> {
-			private final KeyValue<K, A> keyValue;
+		class KeyValueAsMap<K, A, KV extends KeyValue<K, A>> extends AbstractImmutableMap<K, A> {
+			final KV keyValue;
 
-			KeyValueAsMap(final KeyValue<K, A> keyValue) {
+			KeyValueAsMap(final KV keyValue) {
 				this.keyValue = keyValue;
 			}
 
@@ -448,103 +442,6 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public void forEach(final BiConsumer<? super K, ? super A> action) {
 				this.keyValue.forEach((final P<K, A> entry) -> action.accept(entry.get1(), entry.get2()));
-			}
-		}
-
-		final class MapAsKeyValue<K, A> implements KeyValue<K, A> {
-			private final Map<K, A> map;
-			private final boolean fixedSize;
-
-			MapAsKeyValue(final Map<K, A> map, final boolean fixedSize) {
-				this.map = map;
-				this.fixedSize = fixedSize;
-			}
-
-			@Override
-			public A getOrNull(final K key) {
-				if (this.map.containsKey(key)) {
-					return requireNonNull(this.map.get(key));
-				} else {
-					return null;
-				}
-			}
-
-			@Override
-			public boolean containsKey(final K key) {
-				requireNonNull(key);
-				return this.map.containsKey(key);
-			}
-
-			@Override
-			public boolean containsValue(final A value) {
-				requireNonNull(value);
-				return this.map.containsValue(value);
-			}
-
-			@Override
-			public int size() {
-				return this.map.size();
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return this.map.isEmpty();
-			}
-
-			@Override
-			public boolean isNotEmpty() {
-				return !this.map.isEmpty();
-			}
-
-			@Override
-			public boolean hasKnownFixedSize() {
-				return this.fixedSize;
-			}
-
-			@Override
-			public Iterator<P<K, A>> iterator() {
-				return new MappedIterator<>(this.map.entrySet().iterator(),
-						(final Entry<K, A> entry) -> p(entry.getKey(), entry.getValue()));
-			}
-
-			@Override
-			public Spliterator<P<K, A>> spliterator() {
-				return new MappedSpliterator<>(this.map.entrySet().spliterator(),
-						(final Entry<K, A> entry) -> p(entry.getKey(), entry.getValue()));
-			}
-
-			@Override
-			public void forEach(final Consumer<? super P<K, A>> action) {
-				this.map.forEach((final K key, final A value) -> action.accept(p(key ,value)));
-			}
-
-			@Override
-			public void foreach(final Eff2<K, A> eff) {
-				this.map.forEach(eff::apply);
-			}
-
-			@Override
-			public Stream2<P<K, A>> stream() {
-				return Stream2.from(this.map.entrySet().stream().map(P::fromEntry));
-			}
-
-			@Override
-			public Stream2<P<K, A>> parallelStream() {
-				return Stream2.from(this.map.entrySet().parallelStream().map(P::fromEntry));
-			}
-
-			@Override
-			public Map<K, A> asMap() {
-				return Collections.unmodifiableMap(this.map);
-			}
-
-			«keyValueHashCode»
-
-			«keyValueEquals»
-
-			@Override
-			public String toString() {
-				return this.map.toString();
 			}
 		}
 

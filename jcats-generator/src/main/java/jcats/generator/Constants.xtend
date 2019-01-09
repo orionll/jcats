@@ -34,7 +34,7 @@ final class Constants {
 	val public static ARRAY = "jcats.collection.Array"
 	val public static RANGE = "jcats.collection.Range"
 	val public static SEQ = "jcats.collection.Seq"
-	val public static FLIST = "jcats.collection.FList"
 	val public static V = "jcats.collection.V"
+	val public static SORTED_DICT = "jcats.collection.SortedDict"
 	val public static COMMON = "jcats.collection.Common"
 }
