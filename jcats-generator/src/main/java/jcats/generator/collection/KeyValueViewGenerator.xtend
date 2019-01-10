@@ -18,14 +18,8 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 		import java.util.Spliterator;
 		import java.util.function.Consumer;
 
-		import «Constants.JCATS».Covariant;
-		import «Constants.EITHER»;
-		import «Constants.OPTION»;
-		import «Constants.P»;
-		import «Constants.EFF»;
-		import «Constants.EFF0»;
-		import «Constants.FUNCTION».Eff2;
-		import «Constants.F0»;
+		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.P».*;

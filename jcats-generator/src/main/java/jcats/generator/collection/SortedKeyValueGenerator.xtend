@@ -16,8 +16,7 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 		import java.util.Spliterator;
 		import java.util.TreeMap;
 
-		import «Constants.JCATS».Covariant;
-		import «Constants.ORD»;
+		import «Constants.JCATS».*;
 
 		import static java.util.Objects.requireNonNull;
 
