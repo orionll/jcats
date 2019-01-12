@@ -51,7 +51,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		«ENDIF»
 		import static «Constants.COLLECTION».«type.arrayShortName».*;
 
-		public interface «type.covariantName("IndexedContainer")» extends «type.containerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
+		public interface «type.covariantName("IndexedContainer")» extends «type.orderedContainerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
 
 			@Override
 			default «type.iteratorGenericName» iterator() {
@@ -75,7 +75,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 						return new «type.diamondName("IndexedContainerReverseIterator")»(this);
 					}
 				} else {
-					return «type.containerShortName».super.reverseIterator();
+					return «type.orderedContainerShortName».super.reverseIterator();
 				}
 			}
 
@@ -88,7 +88,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 						eff.apply(get(i));
 					}
 				} else {
-					«type.containerShortName».super.foreach(eff);
+					«type.orderedContainerShortName».super.foreach(eff);
 				}
 			}
 
@@ -105,7 +105,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 						eff.apply(i, get(i));
 					}
 				} else {
-					«type.containerShortName».super.foreachWithIndex(eff);
+					«type.orderedContainerShortName».super.foreachWithIndex(eff);
 				}
 			}
 
@@ -121,7 +121,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 					}
 					return true;
 				} else {
-					return «type.containerShortName».super.foreachUntil(eff);
+					return «type.orderedContainerShortName».super.foreachUntil(eff);
 				}
 			}
 
@@ -326,7 +326,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type.primitive»
-			final class «shortName»AsIndexedContainer extends «type.typeName»ContainerAsContainer<«shortName»> implements IndexedContainerView<«type.boxedName»> {
+			final class «shortName»AsIndexedContainer extends «type.typeName»OrderedContainerAsOrderedContainer<«shortName»> implements IndexedContainerView<«type.boxedName»> {
 
 				«shortName»AsIndexedContainer(final «shortName» container) {
 					super(container);

@@ -280,16 +280,6 @@ final class MaybeGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.genericName» last() {
-				return this.maybe.get();
-			}
-
-			@Override
-			public «type.optionGenericName» lastOption() {
-				return this.maybe.to«type.optionShortName»();
-			}
-
-			@Override
 			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
 				this.maybe.forEach(action);
 			}
@@ -306,11 +296,6 @@ final class MaybeGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.iteratorGenericName» iterator() {
-				return this.maybe.iterator();
-			}
-
-			@Override
-			public «type.iteratorGenericName» reverseIterator() {
 				return this.maybe.iterator();
 			}
 

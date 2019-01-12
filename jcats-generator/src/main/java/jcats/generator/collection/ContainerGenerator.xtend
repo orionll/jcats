@@ -191,42 +191,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
-			default «type.genericName» last() throws NoSuchElementException {
-				if (hasKnownFixedSize()) {
-					return reverseIterator().«type.iteratorNext»();
-				} else {
-					final «type.iteratorGenericName» iterator = iterator();
-					«type.genericName» result = iterator.«type.iteratorNext»();
-					while (true) {
-						if (!iterator.hasNext()) {
-							return result;
-						}
-						result = iterator.«type.iteratorNext»();
-					}
-				}
-			}
-
-			default «type.optionGenericName» lastOption() {
-				if (hasKnownFixedSize()) {
-					if (isEmpty()) {
-						return «type.noneName»();
-					} else {
-						return «type.someName»(last());
-					}
-				} else {
-					final «type.iteratorGenericName» iterator = iterator();
-					if (iterator.hasNext()) {
-						«type.genericName» result = iterator.«type.iteratorNext»();
-						while (iterator.hasNext()) {
-							result = iterator.«type.iteratorNext»();
-						}
-						return «type.someName»(result);
-					} else {
-						return «type.noneName»();
-					}
-				}
-			}
-
 			default boolean contains(final «type.genericName» value) {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
@@ -255,18 +219,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 						}
 					}
 				«ENDIF»
-				return «type.noneName»();
-			}
-
-			default «type.optionGenericName» lastMatch(final «type.boolFName» predicate) {
-				requireNonNull(predicate);
-				final «type.iteratorGenericName» iterator = reverseIterator();
-				while (iterator.hasNext()) {
-					final «type.genericName» value = iterator.«type.iteratorNext»();
-					if (predicate.apply(value)) {
-						return «type.someName»(value);
-					}
-				}
 				return «type.noneName»();
 			}
 
@@ -322,39 +274,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 				«ENDFOR»
 			«ENDIF»
-			«IF type.primitive»
-				default <A> A foldRight(final A start, final «type.typeName»ObjectObjectF2<A, A> f2) {
-			«ELSE»
-				default <B> B foldRight(final B start, final F2<A, B, B> f2) {
-			«ENDIF»
-				requireNonNull(start);
-				requireNonNull(f2);
-				«IF type == Type.OBJECT»B«ELSE»A«ENDIF» result = start;
-				final «type.iteratorGenericName» iterator = reverseIterator();
-				while (iterator.hasNext()) {
-					final «type.genericName» value = iterator.«type.iteratorNext»();
-					result = requireNonNull(f2.apply(value, result));
-				}
-				return result;
-			}
-
-			«FOR returnType : Type.primitives»
-				«IF type == Type.OBJECT»
-					default «returnType.javaName» foldRightTo«returnType.typeName»(final «returnType.javaName» start, final Object«returnType.typeName»«returnType.typeName»F2<A> f2) {
-				«ELSE»
-					default «returnType.javaName» foldRightTo«returnType.typeName»(final «returnType.javaName» start, final «type.typeName»«returnType.typeName»«returnType.typeName»F2 f2) {
-				«ENDIF»
-					requireNonNull(f2);
-					«returnType.javaName» result = start;
-					final «type.iteratorGenericName» iterator = reverseIterator();
-					while (iterator.hasNext()) {
-						final «type.genericName» value = iterator.«type.iteratorNext»();
-						result = f2.apply(value, result);
-					}
-					return result;
-				}
-
-			«ENDFOR»
 			«IF type == Type.OBJECT»
 				default Option<A> reduceLeft(final F2<A, A, A> f2) {
 					requireNonNull(f2);
@@ -449,10 +368,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 				«type.iteratorGenericName» iterator();
 
 			«ENDIF»
-			default «type.iteratorGenericName» reverseIterator() {
-				return to«type.arrayShortName»().reverseIterator();
-			}
-
 			default String joinToString() {
 				final StringBuilder builder = new StringBuilder();
 				foreach(builder::append);
@@ -520,7 +435,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			«ENDFOR»
 			default int spliteratorCharacteristics() {
-				return Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE;
+				return Spliterator.NONNULL | Spliterator.IMMUTABLE;
 			}
 
 			@Override
@@ -672,16 +587,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public «type.boxedName» last() {
-					return this.container.last();
-				}
-
-				@Override
-				public Option<«type.boxedName»> lastOption() {
-					return this.container.lastOption().toOption();
-				}
-
-				@Override
 				public boolean contains(final «type.boxedName» value) {
 					return this.container.contains(value);
 				}
@@ -689,11 +594,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 				@Override
 				public Option<«type.boxedName»> firstMatch(final BooleanF<«type.boxedName»> predicate) {
 					return this.container.firstMatch(predicate::apply).toOption();
-				}
-
-				@Override
-				public Option<«type.boxedName»> lastMatch(final BooleanF<«type.boxedName»> predicate) {
-					return this.container.lastMatch(predicate::apply).toOption();
 				}
 
 				@Override
@@ -720,18 +620,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 					@Override
 					public «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»Object«returnType.typeName»F2<«type.boxedName»> f2) {
 						return this.container.foldLeftTo«returnType.typeName»(start, f2::apply);
-					}
-
-				«ENDFOR»
-				@Override
-				public <A> A foldRight(final A start, final F2<«type.boxedName», A, A> f2) {
-					return this.container.foldRight(start, f2::apply);
-				}
-
-				«FOR returnType : Type.primitives»
-					@Override
-					public «returnType.javaName» foldRightTo«returnType.typeName»(final «returnType.javaName» start, final Object«returnType.typeName»«returnType.typeName»F2<«type.boxedName»> f2) {
-						return this.container.foldRightTo«returnType.typeName»(start, f2::apply);
 					}
 
 				«ENDFOR»
@@ -778,11 +666,6 @@ final class ContainerGenerator implements InterfaceGenerator {
 				@Override
 				public Spliterator<«type.genericBoxedName»> spliterator() {
 					return this.container.spliterator();
-				}
-
-				@Override
-				public Iterator<«type.genericBoxedName»> reverseIterator() {
-					return this.container.reverseIterator();
 				}
 
 				@Override

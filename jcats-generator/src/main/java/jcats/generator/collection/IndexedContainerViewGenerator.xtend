@@ -45,7 +45,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		import static «Constants.JCATS».IntOption.*;
 		import static «Constants.COMMON».*;
 
-		public interface «type.covariantName("IndexedContainerView")» extends «type.containerViewGenericName», «type.indexedContainerGenericName» {
+		public interface «type.covariantName("IndexedContainerView")» extends «type.orderedContainerViewGenericName», «type.indexedContainerGenericName» {
 
 			@Override
 			@Deprecated
@@ -114,9 +114,9 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			class «baseIndexedContainerViewShortName»<A, C extends IndexedContainer<A>> extends BaseContainerView<A, C> implements IndexedContainerView<A> {
+			class «baseIndexedContainerViewShortName»<A, C extends IndexedContainer<A>> extends BaseOrderedContainerView<A, C> implements IndexedContainerView<A> {
 		«ELSE»
-			class «baseIndexedContainerViewShortName»<C extends «type.indexedContainerShortName»> extends «type.typeName»BaseContainerView<C> implements «type.indexedContainerViewShortName» {
+			class «baseIndexedContainerViewShortName»<C extends «type.indexedContainerShortName»> extends «type.typeName»BaseOrderedContainerView<C> implements «type.indexedContainerViewShortName» {
 		«ENDIF»
 
 			«baseIndexedContainerViewShortName»(final C container) {
@@ -171,11 +171,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 		}
 
-		«IF type == Type.OBJECT»
-			final class «mappedIndexedContainerViewShortName»<A, B, C extends IndexedContainerView<A>> extends MappedContainerView<A, B, C> implements IndexedContainerView<B> {
-		«ELSE»
-			final class «mappedIndexedContainerViewShortName»<A, C extends «type.indexedContainerViewShortName»> extends «type.typeName»MappedContainerView<A, C> implements IndexedContainerView<A> {
-		«ENDIF»
+		final class «mappedIndexedContainerViewShortName»<A, «IF type == Type.OBJECT»B, «ENDIF»C extends «genericName»> extends «type.shortName("MappedOrderedContainerView")»<A, «IF type == Type.OBJECT»B, «ENDIF»C> implements IndexedContainerView<«mapTargetType»> {
 
 			«mappedIndexedContainerViewShortName»(final C view, final «IF type == Type.OBJECT»F<A, B>«ELSE»«type.typeName»ObjectF<A>«ENDIF» f) {
 				super(view, f);
@@ -215,15 +211,13 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			«hashcode(Type.OBJECT)»
 
 			«indexedEquals(Type.OBJECT)»
-
-			«toStr»
 		}
 
 		«FOR toType : Type.primitives»
 			«IF type == Type.OBJECT»
-				class MappedTo«toType.typeName»IndexedContainerView<A, C extends «genericName»> extends MappedTo«toType.typeName»ContainerView<A, C> implements «toType.indexedContainerViewGenericName» {
+				class MappedTo«toType.typeName»IndexedContainerView<A, C extends «genericName»> extends MappedTo«toType.typeName»OrderedContainerView<A, C> implements «toType.indexedContainerViewGenericName» {
 			«ELSE»
-				class «type.typeName»MappedTo«toType.typeName»IndexedContainerView<C extends «genericName»> extends «type.typeName»MappedTo«toType.typeName»ContainerView<C> implements «toType.indexedContainerViewGenericName» {
+				class «type.typeName»MappedTo«toType.typeName»IndexedContainerView<C extends «genericName»> extends «type.typeName»MappedTo«toType.typeName»OrderedContainerView<C> implements «toType.indexedContainerViewGenericName» {
 			«ENDIF»
 				«IF type == Type.OBJECT»
 					MappedTo«toType.typeName»IndexedContainerView(final C view, final «toType.typeName»F<A> f) {
@@ -273,15 +267,13 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				«hashcode(toType)»
 
 				«indexedEquals(toType)»
-
-				«toStr(toType)»
 			}
 
 		«ENDFOR»
 		«IF type == Type.OBJECT»
-			final class «limitedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends LimitedContainerView<A, C> implements IndexedContainerView<A> {
+			final class «limitedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends LimitedOrderedContainerView<A, C> implements IndexedContainerView<A> {
 		«ELSE»
-			final class «limitedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»LimitedContainerView<C> implements «type.indexedContainerViewGenericName» {
+			final class «limitedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»LimitedOrderedContainerView<C> implements «type.indexedContainerViewGenericName» {
 		«ENDIF»
 
 			«limitedIndexedContainerViewShortName»(final C view, final int limit) {
@@ -361,14 +353,12 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			«hashcode(type)»
 
 			«indexedEquals(type)»
-
-			«toStr(type)»
 		}
 
 		«IF type == Type.OBJECT»
-			final class «skippedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends SkippedContainerView<A, C> implements IndexedContainerView<A> {
+			final class «skippedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends SkippedOrderedContainerView<A, C> implements IndexedContainerView<A> {
 		«ELSE»
-			final class «skippedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»SkippedContainerView<C> implements «type.indexedContainerViewGenericName» {
+			final class «skippedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»SkippedOrderedContainerView<C> implements «type.indexedContainerViewGenericName» {
 		«ENDIF»
 
 			«skippedIndexedContainerViewShortName»(final C view, final int skip) {
@@ -467,14 +457,12 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			«hashcode(type)»
 
 			«indexedEquals(type)»
-
-			«toStr(type)»
 		}
 
 		«IF type == Type.OBJECT»
-			final class «reverseIndexedContainerViewShortName»<A, C extends «genericName»> extends ReverseContainerView<A, C> implements «genericName» {
+			final class «reverseIndexedContainerViewShortName»<A, C extends «genericName»> extends ReverseOrderedContainerView<A, C> implements «genericName» {
 		«ELSE»
-			final class «reverseIndexedContainerViewShortName»<C extends «genericName»> extends «type.typeName»ReverseContainerView<C> implements «genericName» {
+			final class «reverseIndexedContainerViewShortName»<C extends «genericName»> extends «type.typeName»ReverseOrderedContainerView<C> implements «genericName» {
 		«ENDIF»
 
 			«reverseIndexedContainerViewShortName»(final C view) {
@@ -542,21 +530,15 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			«hashcode(type)»
 
 			«indexedEquals(type)»
-
-			«toStr(type)»
 		}
 
 		«IF type == Type.OBJECT»
-			final class ListAsIndexedContainer<A> extends CollectionAsContainer<List<A>, A> implements IndexedContainerView<A> {
+			final class ListAsIndexedContainer<A> extends CollectionAsOrderedContainer<List<A>, A> implements IndexedContainerView<A> {
 		«ELSE»
-			final class «type.typeName»ListAs«type.typeName»IndexedContainer extends «type.typeName»CollectionAs«type.typeName»Container<List<«type.boxedName»>> implements «type.indexedContainerViewGenericName» {
+			final class «type.typeName»ListAs«type.typeName»IndexedContainer extends «type.typeName»CollectionAs«type.typeName»OrderedContainer<List<«type.boxedName»>> implements «type.indexedContainerViewGenericName» {
 		«ENDIF»
 
-			«IF type == Type.OBJECT»
-				ListAsIndexedContainer(final List<A> list, final boolean fixedSize) {
-			«ELSE»
-				«type.typeName»ListAs«type.typeName»IndexedContainer(final List<«type.boxedName»> list, final boolean fixedSize) {
-			«ENDIF»
+			«type.shortName("List")»As«type.shortName("IndexedContainer")»(final List<«type.genericBoxedName»> list, final boolean fixedSize) {
 				super(list, fixedSize);
 			}
 

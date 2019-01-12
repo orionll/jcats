@@ -26,16 +26,22 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 
 		import java.util.Collections;
 		import java.util.Comparator;
+		«IF type.javaUnboxedType»
+			import java.util.PrimitiveIterator;
+		«ELSE»
+			import java.util.Iterator;
+		«ENDIF»
 		import java.util.NavigableSet;
 		import java.util.SortedSet;
 
 		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.COMMON».*;
 		import static «Constants.JCATS».«type.ordShortName».*;
 
-		public interface «type.covariantName("SortedUniqueContainerView")» extends «type.uniqueContainerViewGenericName», «type.sortedUniqueContainerGenericName» {
+		public interface «type.covariantName("SortedUniqueContainerView")» extends «type.uniqueContainerViewGenericName», «type.sortedUniqueContainerGenericName», «type.orderedContainerViewGenericName» {
 
 			«genericName» slice(«type.genericName» from, boolean fromInclusive, «type.genericName» to, boolean toInclusive);
 
@@ -86,6 +92,36 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public «type.optionGenericName» lastOption() {
 				return this.container.lastOption();
+			}
+
+			@Override
+			public «type.optionGenericName» lastMatch(final «type.boolFName» predicate) {
+				return this.container.lastMatch(predicate);
+			}
+
+			@Override
+			«IF type.primitive»
+				public <A> A foldRight(final A start, final «type.typeName»ObjectObjectF2<A, A> f2) {
+			«ELSE»
+				public <B> B foldRight(final B start, final F2<A, B, B> f2) {
+			«ENDIF»
+				return this.container.foldRight(start, f2);
+			}
+
+			«FOR returnType : Type.primitives»
+				@Override
+				«IF type == Type.OBJECT»
+					public «returnType.javaName» foldRightTo«returnType.typeName»(final «returnType.javaName» start, final Object«returnType.typeName»«returnType.typeName»F2<A> f2) {
+				«ELSE»
+					public «returnType.javaName» foldRightTo«returnType.typeName»(final «returnType.javaName» start, final «type.typeName»«returnType.typeName»«returnType.typeName»F2 f2) {
+				«ENDIF»
+					return this.container.foldRightTo«returnType.typeName»(start, f2);
+				}
+
+			«ENDFOR»
+			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				return this.container.reverseIterator();
 			}
 
 			@Override

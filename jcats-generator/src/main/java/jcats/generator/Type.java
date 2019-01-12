@@ -275,12 +275,32 @@ public enum Type {
 		return wildcardName("Container");
 	}
 
+	public String orderedContainerShortName() {
+		return shortName("OrderedContainer");
+	}
+
+	public String orderedContainerGenericName() {
+		return genericName("OrderedContainer");
+	}
+
+	public String orderedContainerWildcardName() {
+		return wildcardName("OrderedContainer");
+	}
+
 	public String containerViewShortName() {
 		return shortName("ContainerView");
 	}
 
 	public String containerViewGenericName() {
 		return genericName("ContainerView");
+	}
+
+	public String orderedContainerViewShortName() {
+		return shortName("OrderedContainerView");
+	}
+
+	public String orderedContainerViewGenericName() {
+		return genericName("OrderedContainerView");
 	}
 
 	public String indexedContainerGenericName() {

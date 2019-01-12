@@ -562,8 +562,8 @@ final class CommonGenerator implements ClassGenerator {
 				} else if (this.reverseIterator.hasNext()) {
 					final A next = requireNonNull(this.reverseIterator.next());
 					final Iterable<B> targetIterable = this.f.apply(next);
-					if (targetIterable instanceof Container<?>) {
-						this.targetIterator = ((Container<B>) targetIterable).reverseIterator();
+					if (targetIterable instanceof OrderedContainer<?>) {
+						this.targetIterator = ((OrderedContainer<B>) targetIterable).reverseIterator();
 					} else {
 						this.targetIterator = Array.ofAll(targetIterable).reverseIterator();
 					}
@@ -607,14 +607,14 @@ final class CommonGenerator implements ClassGenerator {
 									final «fromType.genericName» next = this.reverseIterator.«fromType.iteratorNext»();
 								«ENDIF»
 								final Iterable<«toType.genericBoxedName»> targetIterable = this.f.apply(next);
-								if (targetIterable instanceof «toType.containerWildcardName») {
-									this.targetIterator = ((«toType.containerGenericName») targetIterable).reverseIterator();
+								if (targetIterable instanceof «toType.orderedContainerWildcardName») {
+									this.targetIterator = ((«toType.orderedContainerGenericName») targetIterable).reverseIterator();
 								«IF toType != Type.OBJECT»
-									} else if (targetIterable instanceof Container<?>) {
+									} else if (targetIterable instanceof OrderedContainer<?>) {
 										«IF toType.javaUnboxedType»
-											this.targetIterator = «toType.typeName»Iterator.getIterator(((Container<«toType.genericBoxedName»>) targetIterable).reverseIterator());
+											this.targetIterator = «toType.typeName»Iterator.getIterator(((OrderedContainer<«toType.genericBoxedName»>) targetIterable).reverseIterator());
 										«ELSE»
-											this.targetIterator = ((Container<«toType.genericBoxedName»>) targetIterable).reverseIterator();
+											this.targetIterator = ((OrderedContainer<«toType.genericBoxedName»>) targetIterable).reverseIterator();
 										«ENDIF»
 								«ENDIF»
 								} else {

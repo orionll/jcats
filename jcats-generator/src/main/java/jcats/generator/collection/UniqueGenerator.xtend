@@ -284,15 +284,6 @@ final class UniqueGenerator implements ClassGenerator {
 				return isEmpty() ? Collections.emptyIterator() : new HashTableIterator<>(this.leafMap, this.treeMap, this.slots);
 			}
 
-			/**
-			 * @deprecated «shortName» has no specified order, so this method makes no sense.
-			 */
-			@Deprecated
-			@Override
-			public Iterator<A> reverseIterator() {
-				return UniqueContainer.super.reverseIterator();
-			}
-
 			@Override
 			public void foreach(final Eff<A> eff) {
 				«HashTableCommonGenerator.forEach("foreach", "eff", "apply", "Object", "A")»

@@ -24,16 +24,20 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.util.Comparator;
+		«IF type.primitive»
+			import java.util.Iterator;
+		«ENDIF»
 		import java.util.SortedSet;
 		import java.util.Spliterator;
 
 		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
 		«IF type == Type.OBJECT»
 			import static java.util.Objects.requireNonNull;
 		«ENDIF»
 
-		public interface «type.covariantName("SortedUniqueContainer")» extends «type.uniqueContainerGenericName» {
+		public interface «type.covariantName("SortedUniqueContainer")» extends «type.uniqueContainerGenericName», «type.orderedContainerGenericName» {
 
 			«type.ordGenericName» ord();
 
@@ -115,6 +119,38 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 
 				«shortName»AsSortedUniqueContainer(final «shortName» container) {
 					super(container);
+				}
+
+				@Override
+				public «type.boxedName» last() {
+					return this.container.last();
+				}
+
+				@Override
+				public Option<«type.boxedName»> lastOption() {
+					return this.container.lastOption().toOption();
+				}
+
+				@Override
+				public Option<«type.boxedName»> lastMatch(final BooleanF<«type.boxedName»> predicate) {
+					return this.container.lastMatch(predicate::apply).toOption();
+				}
+
+				@Override
+				public <A> A foldRight(final A start, final F2<«type.boxedName», A, A> f2) {
+					return this.container.foldRight(start, f2::apply);
+				}
+
+				«FOR returnType : Type.primitives»
+					@Override
+					public «returnType.javaName» foldRightTo«returnType.typeName»(final «returnType.javaName» start, final Object«returnType.typeName»«returnType.typeName»F2<«type.boxedName»> f2) {
+						return this.container.foldRightTo«returnType.typeName»(start, f2::apply);
+					}
+
+				«ENDFOR»
+				@Override
+				public Iterator<«type.genericBoxedName»> reverseIterator() {
+					return this.container.reverseIterator();
 				}
 
 				@Override

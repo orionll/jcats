@@ -74,6 +74,11 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public SortedUniqueContainerView<P<K, A>> asUniqueContainer() {
+				return this.keyValue.asUniqueContainer();
+			}
+
+			@Override
 			public TreeMap<K, A> toTreeMap() {
 				return this.keyValue.toTreeMap();
 			}
@@ -84,7 +89,7 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 		}
 
-		class SortedMapAsSortedKeyValue<K, A> extends MapAsKeyValue<K, A, SortedMap<K, A>> implements SortedKeyValueView<K, A> {
+		final class SortedMapAsSortedKeyValue<K, A> extends MapAsKeyValue<K, A, SortedMap<K, A>> implements SortedKeyValueView<K, A> {
 
 			SortedMapAsSortedKeyValue(final SortedMap<K, A> map, final boolean fixedSize) {
 				super(map, fixedSize);

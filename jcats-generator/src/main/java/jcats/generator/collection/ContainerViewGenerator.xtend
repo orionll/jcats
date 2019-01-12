@@ -25,7 +25,6 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 	def filteredContainerViewShortName() { type.shortName("FilteredContainerView") }
 	def limitedContainerViewShortName() { type.shortName("LimitedContainerView") }
 	def skippedContainerViewShortName() { type.shortName("SkippedContainerView") }
-	def reverseContainerViewShortName() { type.shortName("ReverseContainerView") }
 
 	override sourceCode() '''
 		package «Constants.COLLECTION»;
@@ -154,10 +153,6 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				}
 			}
 
-			default «genericName» reverse() {
-				return new «reverseContainerViewShortName»<>(this);
-			}
-
 			static «type.paramGenericName("ContainerView")» «type.shortName("CollectionView").firstToLowerCase»(final Collection<«type.genericBoxedName»> collection) {
 				return «type.shortName("CollectionView").firstToLowerCase»(collection, true);
 			}
@@ -210,16 +205,6 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.genericName» last() {
-				return this.container.last();
-			}
-
-			@Override
-			public «type.optionGenericName» lastOption() {
-				return this.container.lastOption();
-			}
-
-			@Override
 			public boolean contains(final «type.genericName» value) {
 				return this.container.contains(value);
 			}
@@ -227,11 +212,6 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public «type.optionGenericName» firstMatch(final «type.boolFName» predicate) {
 				return this.container.firstMatch(predicate);
-			}
-
-			@Override
-			public «type.optionGenericName» lastMatch(final «type.boolFName» predicate) {
-				return this.container.lastMatch(predicate);
 			}
 
 			@Override
@@ -270,26 +250,6 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			«ENDFOR»
 			@Override
-			«IF type.primitive»
-				public <A> A foldRight(final A start, final «type.typeName»ObjectObjectF2<A, A> f2) {
-			«ELSE»
-				public <B> B foldRight(final B start, final F2<A, B, B> f2) {
-			«ENDIF»
-				return this.container.foldRight(start, f2);
-			}
-
-			«FOR returnType : Type.primitives»
-				@Override
-				«IF type == Type.OBJECT»
-					public «returnType.javaName» foldRightTo«returnType.typeName»(final «returnType.javaName» start, final Object«returnType.typeName»«returnType.typeName»F2<A> f2) {
-				«ELSE»
-					public «returnType.javaName» foldRightTo«returnType.typeName»(final «returnType.javaName» start, final «type.typeName»«returnType.typeName»«returnType.typeName»F2 f2) {
-				«ENDIF»
-					return this.container.foldRightTo«returnType.typeName»(start, f2);
-				}
-
-			«ENDFOR»
-			@Override
 			«IF type == Type.OBJECT»
 				public «type.optionGenericName» reduceLeft(final F2<A, A, A> f2) {
 			«ELSE»
@@ -315,11 +275,6 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public «type.iteratorGenericName» iterator() {
 				return this.container.iterator();
-			}
-
-			@Override
-			public «type.iteratorGenericName» reverseIterator() {
-				return this.container.reverseIterator();
 			}
 
 			@Override
@@ -559,35 +514,12 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «mapTargetType» last() {
-				return requireNonNull(this.f.apply(this.view.last()));
-			}
-
-			@Override
-			public Option<«mapTargetType»> lastOption() {
-				return this.view.lastOption().map(this.f);
-			}
-
-			@Override
 			public Iterator<«mapTargetType»> iterator() {
 				«IF type == Type.OBJECT»
 					return new MappedIterator<>(this.view.iterator(), this.f);
 				«ELSE»
 					return new Mapped«type.typeName»ObjectIterator<>(this.view.iterator(), this.f);
 				«ENDIF»
-			}
-
-			@Override
-			public Iterator<«mapTargetType»> reverseIterator() {
-				if (this.view.hasKnownFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
-					«IF type == Type.OBJECT»
-						return new MappedIterator<>(this.view.reverseIterator(), this.f);
-					«ELSE»
-						return new Mapped«type.typeName»ObjectIterator<>(this.view.reverseIterator(), this.f);
-					«ENDIF»
-				} else {
-					return ContainerView.super.reverseIterator();
-				}
 			}
 
 			@Override
@@ -722,19 +654,6 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public «toType.iteratorGenericName» reverseIterator() {
-					if (this.view.hasKnownFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
-						«IF type == Type.OBJECT»
-							return new MappedObject«toType.typeName»Iterator<>(this.view.reverseIterator(), this.f);
-						«ELSE»
-							return new Mapped«type.typeName»«toType.typeName»Iterator(this.view.reverseIterator(), this.f);
-						«ENDIF»
-					} else {
-						return «toType.containerViewGenericName».super.reverseIterator();
-					}
-				}
-
-				@Override
 				public void foreach(final «toType.typeName»Eff eff) {
 					requireNonNull(eff);
 					this.view.foreach((final «type.genericName» value) -> {
@@ -802,13 +721,13 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 		«ENDFOR»
 		«IF type == Type.OBJECT»
-			final class FlatMappedContainerView<A, B, C extends ContainerView<A>> implements ContainerView<B> {
+			class FlatMappedContainerView<A, B, C extends ContainerView<A>> implements ContainerView<B> {
 				final C view;
 				final F<A, Iterable<B>> f;
 
 				FlatMappedContainerView(final C view, final F<A, Iterable<B>> f) {
 		«ELSE»
-			final class «type.typeName»FlatMappedContainerView<A, C extends «genericName»> implements ContainerView<A> {
+			class «type.typeName»FlatMappedContainerView<A, C extends «genericName»> implements ContainerView<A> {
 				final C view;
 				final «type.typeName»ObjectF<Iterable<A>> f;
 
@@ -826,15 +745,6 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public Iterator<«mapTargetType»> iterator() {
 				return new FlatMapped«IF type != Type.OBJECT»«type.typeName»Object«ENDIF»Iterator<>(this.view.iterator(), this.f);
-			}
-
-			@Override
-			public Iterator<«mapTargetType»> reverseIterator() {
-				if (this.view.hasKnownFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
-					return new FlatMapped«IF type != Type.OBJECT»«type.typeName»Object«ENDIF»ReverseIterator<>(this.view.reverseIterator(), this.f);
-				} else {
-					return ContainerView.super.reverseIterator();
-				}
 			}
 
 			@Override
@@ -884,13 +794,13 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 		«FOR toType : Type.primitives»
 			«IF type == Type.OBJECT»
-				final class FlatMappedTo«toType.typeName»ContainerView<A, C extends «genericName»> implements «toType.containerViewGenericName» {
+				class FlatMappedTo«toType.typeName»ContainerView<A, C extends «genericName»> implements «toType.containerViewGenericName» {
 					final C view;
 					final F<A, Iterable<«toType.genericBoxedName»>> f;
 
 					FlatMappedTo«toType.typeName»ContainerView(final C view, final F<A, Iterable<«toType.genericBoxedName»>> f) {
 			«ELSE»
-				final class «type.typeName»FlatMappedTo«toType.typeName»ContainerView<C extends «genericName»> implements «toType.containerViewGenericName» {
+				class «type.typeName»FlatMappedTo«toType.typeName»ContainerView<C extends «genericName»> implements «toType.containerViewGenericName» {
 					final C view;
 					final «type.typeName»ObjectF<Iterable<«toType.genericBoxedName»>> f;
 
@@ -912,19 +822,6 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 					«ELSE»
 						return new FlatMapped«type.typeName»«toType.typeName»Iterator(this.view.iterator(), this.f);
 					«ENDIF»
-				}
-
-				@Override
-				public «toType.iteratorGenericName» reverseIterator() {
-					if (this.view.hasKnownFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
-						«IF type == Type.OBJECT»
-							return new FlatMappedObject«toType.typeName»ReverseIterator<>(this.view.reverseIterator(), this.f);
-						«ELSE»
-							return new FlatMapped«type.typeName»«toType.typeName»ReverseIterator(this.view.reverseIterator(), this.f);
-						«ENDIF»
-					} else {
-						return «toType.containerViewGenericName».super.reverseIterator();
-					}
 				}
 
 				@Override
@@ -977,7 +874,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 		«ENDFOR»
-		final class «filteredContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> implements «genericName» {
+		class «filteredContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> implements «genericName» {
 			final C view;
 			final «type.boolFName» predicate;
 
@@ -1008,19 +905,6 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				«ELSE»
 					return new FilteredIterator<>(this.view.iterator(), this.predicate::apply);
 				«ENDIF»
-			}
-
-			@Override
-			public «type.iteratorGenericName» reverseIterator() {
-				if (this.view.hasKnownFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
-					«IF type == Type.OBJECT || type.javaUnboxedType»
-						return new «type.diamondName("FilteredIterator")»(this.view.reverseIterator(), this.predicate);
-					«ELSE»
-						return new FilteredIterator<>(this.view.reverseIterator(), this.predicate::apply);
-					«ENDIF»
-				} else {
-					return «shortName».super.reverseIterator();
-				}
 			}
 
 			@Override
@@ -1219,204 +1103,6 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«toStr(type)»
 		}
 
-		class «reverseContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «genericName»> implements «genericName» {
-			final C view;
-
-			«reverseContainerViewShortName»(final C view) {
-				this.view = view;
-			}
-
-			@Override
-			public int size() {
-				return this.view.size();
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return this.view.isEmpty();
-			}
-
-			@Override
-			public boolean isNotEmpty() {
-				return this.view.isNotEmpty();
-			}
-
-			@Override
-			public boolean hasKnownFixedSize() {
-				return this.view.hasKnownFixedSize();
-			}
-
-			@Override
-			public «type.genericName» first() {
-				return this.view.last();
-			}
-
-			@Override
-			public «type.optionGenericName» firstOption() {
-				return this.view.lastOption();
-			}
-
-			@Override
-			public «type.genericName» last() {
-				return this.view.first();
-			}
-
-			@Override
-			public «type.optionGenericName» lastOption() {
-				return this.view.firstOption();
-			}
-
-			@Override
-			public boolean contains(final «type.genericName» value) {
-				return this.view.contains(value);
-			}
-
-			@Override
-			public «type.optionGenericName» firstMatch(final «type.boolFName» predicate) {
-				return this.view.lastMatch(predicate);
-			}
-
-			@Override
-			public «type.optionGenericName» lastMatch(final «type.boolFName» predicate) {
-				return this.view.firstMatch(predicate);
-			}
-
-			@Override
-			public boolean anyMatch(final «type.boolFName» predicate) {
-				return this.view.anyMatch(predicate);
-			}
-
-			@Override
-			public boolean allMatch(final «type.boolFName» predicate) {
-				return this.view.allMatch(predicate);
-			}
-
-			@Override
-			public boolean noneMatch(final «type.boolFName» predicate) {
-				return this.view.noneMatch(predicate);
-			}
-
-			@Override
-			public «type.iteratorGenericName» iterator() {
-				return this.view.reverseIterator();
-			}
-
-			@Override
-			public «type.iteratorGenericName» reverseIterator() {
-				return this.view.iterator();
-			}
-
-			«IF type.javaUnboxedType»
-				@Override
-				public «type.javaName» sum() {
-					return this.view.sum();
-				}
-
-			«ENDIF»
-			«IF type == Type.INT»
-				@Override
-				public long sumToLong() {
-					return this.view.sumToLong();
-				}
-
-			«ENDIF»
-			«IF type == Type.OBJECT»
-				@Override
-				public «type.optionGenericName» max(final «type.ordGenericName» ord) {
-					return this.view.max(ord);
-				}
-
-				@Override
-				public «type.optionGenericName» min(final «type.ordGenericName» ord) {
-					return this.view.min(ord);
-				}
-			«ELSE»
-				@Override
-				public «type.optionGenericName» max() {
-					return this.view.max();
-				}
-
-				@Override
-				public «type.optionGenericName» min() {
-					return this.view.min();
-				}
-
-				@Override
-				public «type.optionGenericName» maxByOrd(final «type.ordGenericName» ord) {
-					return this.view.maxByOrd(ord);
-				}
-
-				@Override
-				public «type.optionGenericName» minByOrd(final «type.ordGenericName» ord) {
-					return this.view.minByOrd(ord);
-				}
-			«ENDIF»
-
-			@Override
-			«IF type == Type.OBJECT»
-				public <B extends Comparable<B>> «type.optionGenericName» maxBy(final F<A, B> f) {
-			«ELSE»
-				public <A extends Comparable<A>> «type.optionGenericName» maxBy(final «type.typeName»ObjectF<A> f) {
-			«ENDIF»
-				return this.view.maxBy(f);
-			}
-
-			«FOR to : Type.primitives»
-				@Override
-				«IF type == Type.OBJECT»
-					public «type.optionGenericName» maxBy«to.typeName»(final «to.typeName»F<A> f) {
-				«ELSE»
-					public «type.optionGenericName» maxBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
-				«ENDIF»
-					return this.view.maxBy«to.typeName»(f);
-				}
-
-			«ENDFOR»
-			@Override
-			«IF type == Type.OBJECT»
-				public <B extends Comparable<B>> «type.optionGenericName» minBy(final F<A, B> f) {
-			«ELSE»
-				public <A extends Comparable<A>> «type.optionGenericName» minBy(final «type.typeName»ObjectF<A> f) {
-			«ENDIF»
-				return this.view.minBy(f);
-			}
-
-			«FOR to : Type.primitives»
-				@Override
-				«IF type == Type.OBJECT»
-					public «type.optionGenericName» minBy«to.typeName»(final «to.typeName»F<A> f) {
-				«ELSE»
-					public «type.optionGenericName» minBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
-				«ENDIF»
-					return this.view.minBy«to.typeName»(f);
-				}
-
-			«ENDFOR»
-			@Override
-			public «genericName» reverse() {
-				return this.view;
-			}
-
-			«IF type == Type.OBJECT»
-				@Override
-				public Unique<A> toUnique() {
-					return this.view.toUnique();
-				}
-
-			«ENDIF»
-			@Override
-			public HashSet<«type.genericBoxedName»> toHashSet() {
-				return this.view.toHashSet();
-			}
-
-			@Override
-			public int spliteratorCharacteristics() {
-				return this.view.spliteratorCharacteristics();
-			}
-
-			«toStr(type)»
-		}
-
 		«IF type == Type.OBJECT»
 			class CollectionAsContainer<C extends Collection<A>, A> implements ContainerView<A>, Serializable {
 		«ELSE»
@@ -1425,11 +1111,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			final C collection;
 			private final boolean fixedSize;
 
-			«IF type == Type.OBJECT»
-				CollectionAsContainer(final C collection, final boolean fixedSize) {
-			«ELSE»
-				«type.typeName»CollectionAs«type.typeName»Container(final C collection, final boolean fixedSize) {
-			«ENDIF»
+			«type.shortName("Collection")»As«type.shortName("Container")»(final C collection, final boolean fixedSize) {
 				this.collection = collection;
 				this.fixedSize = fixedSize;
 			}
@@ -1492,40 +1174,6 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				«ELSE»
 					return this.collection.spliterator();
 				«ENDIF»
-			}
-
-			@Override
-			public «type.iteratorGenericName» reverseIterator() {
-				if (this.collection instanceof List<?> && this.collection instanceof RandomAccess) {
-					final int size = this.collection.size();
-					if (size == 0) {
-						«IF type.javaUnboxedType»
-							return «type.noneName»().iterator();
-						«ELSE»
-							return Collections.emptyIterator();
-						«ENDIF»
-					} else {
-						«IF type.javaUnboxedType»
-							return new «type.typeName»ListReverseIterator((List<«type.genericBoxedName»>) this.collection, size);
-						«ELSE»
-							return new ListReverseIterator<>((List<«type.genericBoxedName»>) this.collection, size);
-						«ENDIF»
-					}
-				} else if (this.collection instanceof Deque<?>) {
-					«IF type.javaUnboxedType»
-						return «type.typeName»Iterator.getIterator(((Deque<«type.boxedName»>) this.collection).descendingIterator());
-					«ELSE»
-						return ((Deque<«type.genericBoxedName»>) this.collection).descendingIterator();
-					«ENDIF»
-				} else if (this.collection instanceof NavigableSet<?>) {
-					«IF type.javaUnboxedType»
-						return «type.typeName»Iterator.getIterator(((NavigableSet<«type.boxedName»>) this.collection).descendingIterator());
-					«ELSE»
-						return ((NavigableSet<«type.genericBoxedName»>) this.collection).descendingIterator();
-					«ENDIF»
-				} else {
-					return «type.containerViewShortName».super.reverseIterator();
-				}
 			}
 
 			@Override

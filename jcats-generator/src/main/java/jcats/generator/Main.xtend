@@ -18,6 +18,8 @@ import jcats.generator.collection.IndexedContainerGenerator
 import jcats.generator.collection.IndexedContainerViewGenerator
 import jcats.generator.collection.KeyValueGenerator
 import jcats.generator.collection.KeyValueViewGenerator
+import jcats.generator.collection.OrderedContainerGenerator
+import jcats.generator.collection.OrderedContainerViewGenerator
 import jcats.generator.collection.PrimitiveStream2Generator
 import jcats.generator.collection.RangeGenerator
 import jcats.generator.collection.RepeatedIndexedContainerGenerator
@@ -156,6 +158,8 @@ final class Main {
 			EffNGenerators.generators,
 			ContainerGenerator.generators,
 			ContainerViewGenerator.generators,
+			OrderedContainerGenerator.generators,
+			OrderedContainerViewGenerator.generators,
 			IndexedContainerGenerator.generators,
 			IndexedContainerViewGenerator.generators,
 			UniqueContainerGenerator.generators,

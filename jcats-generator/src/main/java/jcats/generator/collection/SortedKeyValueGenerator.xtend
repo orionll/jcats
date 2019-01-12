@@ -11,6 +11,7 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.util.Comparator;
+		import java.util.Iterator;
 		import java.util.NoSuchElementException;
 		import java.util.SortedMap;
 		import java.util.Spliterator;
@@ -31,6 +32,11 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			@Override
 			default SortedUniqueContainerView<K> keys() {
 				return new SortedKeys<>(this);
+			}
+
+			@Override
+			default SortedUniqueContainerView<P<K, A>> asUniqueContainer() {
+				return new SortedKeyValueAsSortedUniqueContainer<>(this);
 			}
 
 			@Override
@@ -67,6 +73,11 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public Iterator<K> reverseIterator() {
+				return new MappedIterator<>(this.keyValue.reverseIterator(), P::get1);
+			}
+
+			@Override
 			public SortedUniqueContainerView<K> slice(final K from, final boolean fromInclusive, final K to, final boolean toInclusive) {
 				return new SortedKeys<>(this.keyValue.view().slice(from, fromInclusive, to, toInclusive));
 			}
@@ -79,6 +90,38 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public SortedUniqueContainerView<K> sliceTo(final K to, final boolean inclusive) {
 				return new SortedKeys<>(this.keyValue.view().sliceTo(to, inclusive));
+			}
+		}
+
+		final class SortedKeyValueAsSortedUniqueContainer<K, A> extends KeyValueAsUniqueContainer<K, A, SortedKeyValue<K, A>> implements SortedUniqueContainerView<P<K, A>> {
+
+			SortedKeyValueAsSortedUniqueContainer(final SortedKeyValue<K, A> keyValue) {
+				super(keyValue);
+			}
+
+			@Override
+			public Iterator<P<K, A>> reverseIterator() {
+				return this.keyValue.reverseIterator();
+			}
+
+			@Override
+			public Ord<P<K, A>> ord() {
+				return this.keyValue.ord().contraMap(P::get1);
+			}
+
+			@Override
+			public SortedUniqueContainerView<P<K, A>> slice(final P<K, A> from, final boolean fromInclusive, final P<K, A> to, final boolean toInclusive) {
+				return new SortedKeyValueAsSortedUniqueContainer<>(this.keyValue.view().slice(from.get1(), fromInclusive, to.get1(), toInclusive));
+			}
+
+			@Override
+			public SortedUniqueContainerView<P<K, A>> sliceFrom(final P<K, A> from, final boolean inclusive) {
+				return new SortedKeyValueAsSortedUniqueContainer<>(this.keyValue.view().sliceFrom(from.get1(), inclusive));
+			}
+
+			@Override
+			public SortedUniqueContainerView<P<K, A>> sliceTo(final P<K, A> to, final boolean inclusive) {
+				return new SortedKeyValueAsSortedUniqueContainer<>(this.keyValue.view().sliceTo(to.get1(), inclusive));
 			}
 		}
 
