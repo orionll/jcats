@@ -154,13 +154,13 @@ final class SortedDictGenerator implements ClassGenerator {
 			«AVLCommonGenerator.deleteAndRotateRight(genericName, diamondName, "DeleteResult<K, A>")»
 
 			@Override
-			public K firstKey() throws NoSuchElementException {
-				«AVLCommonGenerator.firstOrLast(genericName, "dict", "entry.get1()", "left")»
+			public P<K, A> first() throws NoSuchElementException {
+				«AVLCommonGenerator.firstOrLast(genericName, "dict", "left")»
 			}
 
 			@Override
-			public K lastKey() throws NoSuchElementException {
-				«AVLCommonGenerator.firstOrLast(genericName, "dict", "entry.get1()", "right")»
+			public P<K, A> last() throws NoSuchElementException {
+				«AVLCommonGenerator.firstOrLast(genericName, "dict", "right")»
 			}
 
 			public «genericName» init() throws NoSuchElementException {
@@ -501,16 +501,6 @@ final class SortedDictGenerator implements ClassGenerator {
 			@Override
 			public Ord<K> ord() {
 				return this.root.ord;
-			}
-
-			@Override
-			public K firstKey() {
-				return iterator().next().get1();
-			}
-
-			@Override
-			public K lastKey() {
-				return reverseIterator().next().get1();
 			}
 
 			«AVLCommonGenerator.slicedForEach("forEach", genericName, "dict", "entry.get1()", "Consumer<? super P<K, A>>", "accept")»

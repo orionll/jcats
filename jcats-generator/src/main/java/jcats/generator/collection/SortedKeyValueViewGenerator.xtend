@@ -20,6 +20,7 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.ORD».*;
+		import static «Constants.P».*;
 
 		public interface SortedKeyValueView<K, @Covariant A> extends KeyValueView<K, A>, SortedKeyValue<K, A> {
 
@@ -59,6 +60,16 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public P<K, A> first() {
+				return this.keyValue.first();
+			}
+
+			@Override
+			public P<K, A> last() {
+				return this.keyValue.last();
+			}
+
+			@Override
 			public K firstKey() {
 				return this.keyValue.firstKey();
 			}
@@ -71,6 +82,11 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			@Override
 			public SortedUniqueContainerView<K> keys() {
 				return this.keyValue.keys();
+			}
+
+			@Override
+			public OrderedContainerView<A> values() {
+				return this.keyValue.values();
 			}
 
 			@Override
@@ -103,6 +119,20 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 				} else {
 					return Ord.fromComparator(comparator);
 				}
+			}
+
+			@Override
+			public P<K, A> first() {
+				final K key = this.map.firstKey();
+				final A value = this.map.get(key);
+				return p(key, value);
+			}
+
+			@Override
+			public P<K, A> last() {
+				final K key = this.map.lastKey();
+				final A value = this.map.get(key);
+				return p(key, value);
 			}
 
 			@Override

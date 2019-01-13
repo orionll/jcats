@@ -171,10 +171,10 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			«cast(#["K", "A"], #[], #["A"])»
 		}
 
-		final class Values<A> implements ContainerView<A> {
-			private final KeyValue<?, A> keyValue;
+		class Values<A, KV extends KeyValue<?, A>> implements ContainerView<A> {
+			final KV keyValue;
 
-			Values(final KeyValue<?, A> keyValue) {
+			Values(final KV keyValue) {
 				this.keyValue = keyValue;
 			}
 

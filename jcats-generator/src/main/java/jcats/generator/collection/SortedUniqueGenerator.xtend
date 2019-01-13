@@ -235,12 +235,12 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			@Override
 			public «type.genericName» first() throws NoSuchElementException {
-				«AVLCommonGenerator.firstOrLast(genericName, "unique", "entry", "left")»
+				«AVLCommonGenerator.firstOrLast(genericName, "unique", "left")»
 			}
 
 			@Override
 			public «type.genericName» last() throws NoSuchElementException {
-				«AVLCommonGenerator.firstOrLast(genericName, "unique", "entry", "right")»
+				«AVLCommonGenerator.firstOrLast(genericName, "unique", "right")»
 			}
 
 			public «genericName» init() throws NoSuchElementException {
@@ -518,11 +518,6 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			@Override
 			public «type.ordGenericName» ord() {
 				return this.root.ord;
-			}
-
-			@Override
-			public «type.genericName» last() {
-				return reverseIterator().«type.iteratorNext»();
 			}
 
 			@Override

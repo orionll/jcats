@@ -25,13 +25,30 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 
 			Ord<K> ord();
 
-			K firstKey() throws NoSuchElementException;
+			default P<K, A> first() throws NoSuchElementException {
+				return iterator().next();
+			}
 
-			K lastKey() throws NoSuchElementException;
+			default P<K, A> last() throws NoSuchElementException {
+				return reverseIterator().next();
+			}
+
+			default K firstKey() throws NoSuchElementException {
+				return first().get1();
+			}
+
+			default K lastKey() throws NoSuchElementException {
+				return last().get1();
+			}
 
 			@Override
 			default SortedUniqueContainerView<K> keys() {
 				return new SortedKeys<>(this);
+			}
+
+			@Override
+			default OrderedContainerView<A> values() {
+				return new SortedValues<>(this);
 			}
 
 			@Override
@@ -61,6 +78,29 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			«cast(#["K", "A"], #[], #["A"])»
 		}
 
+
+		final class SortedValues<A> extends Values<A, SortedKeyValue<?, A>> implements OrderedContainerView<A> {
+
+			SortedValues(final SortedKeyValue<?, A> keyValue) {
+				super(keyValue);
+			}
+
+			@Override
+			public A first() {
+				return this.keyValue.first().get2();
+			}
+
+			@Override
+			public A last() {
+				return this.keyValue.last().get2();
+			}
+
+			@Override
+			public Iterator<A> reverseIterator() {
+				return new MappedIterator<>(this.keyValue.reverseIterator(), P::get2);
+			}
+		}
+
 		final class SortedKeys<K> extends Keys<K, SortedKeyValue<K, ?>> implements SortedUniqueContainerView<K> {
 
 			SortedKeys(final SortedKeyValue<K, ?> keyValue) {
@@ -70,6 +110,16 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public Ord<K> ord() {
 				return this.keyValue.ord();
+			}
+
+			@Override
+			public K first() {
+				return this.keyValue.first().get1();
+			}
+
+			@Override
+			public K last() {
+				return this.keyValue.last().get1();
 			}
 
 			@Override
@@ -107,6 +157,16 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public Ord<P<K, A>> ord() {
 				return this.keyValue.ord().contraMap(P::get1);
+			}
+
+			@Override
+			public P<K, A> first() {
+				return this.keyValue.first();
+			}
+
+			@Override
+			public P<K, A> last() {
+				return this.keyValue.last();
 			}
 
 			@Override

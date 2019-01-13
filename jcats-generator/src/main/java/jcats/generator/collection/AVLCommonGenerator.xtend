@@ -302,7 +302,7 @@ final class AVLCommonGenerator implements ClassGenerator {
 		}
 	'''
 
-	def static firstOrLast(String genericName, String name, String getKey, String leftOrRight) '''
+	def static firstOrLast(String genericName, String name, String leftOrRight) '''
 		if (isEmpty()) {
 			throw new NoSuchElementException();
 		} else {
@@ -310,7 +310,7 @@ final class AVLCommonGenerator implements ClassGenerator {
 			while («name».«leftOrRight» != null) {
 				«name» = «name».«leftOrRight»;
 			}
-			return «name».«getKey»;
+			return «name».entry;
 		}
 	'''
 
