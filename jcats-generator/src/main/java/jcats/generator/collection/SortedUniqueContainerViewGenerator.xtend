@@ -17,10 +17,11 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 
 	override className() { Constants.COLLECTION + "." + shortName }
 
-	def shortName() { type.shortName("SortedUniqueContainerView") }
-	def genericName() { type.genericName("SortedUniqueContainerView") }
-	def baseSortedUniqueContainerViewShortName() { type.shortName("BaseSortedUniqueContainerView") }
-	
+	def shortName() { type.sortedUniqueContainerViewShortName }
+	def genericName() { type.sortedUniqueContainerViewGenericName }
+	def baseShortName() { type.shortName("BaseSortedUniqueContainerView") }
+	def reverseShortName() { type.shortName("ReverseSortedUniqueContainerView") }
+
 	override sourceCode() '''
 		package «Constants.COLLECTION»;
 
@@ -51,8 +52,13 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			@Deprecated
-			default «type.sortedUniqueContainerViewGenericName» view() {
+			default «genericName» view() {
 				return this;
+			}
+
+			@Override
+			default «genericName» reverse() {
+				return new «type.diamondName("ReverseSortedUniqueContainerView")»(this);
 			}
 
 			static «type.paramGenericName("SortedUniqueContainerView")» «type.shortName("SortedSetView").firstToLowerCase»(final SortedSet<«type.genericBoxedName»> sortedSet) {
@@ -70,12 +76,12 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			abstract class «baseSortedUniqueContainerViewShortName»<A, C extends SortedUniqueContainer<A>> extends BaseUniqueContainerView<A, C> implements SortedUniqueContainerView<A> {
+			abstract class «baseShortName»<A, C extends SortedUniqueContainer<A>> extends BaseUniqueContainerView<A, C> implements SortedUniqueContainerView<A> {
 		«ELSE»
-			abstract class «baseSortedUniqueContainerViewShortName»<C extends «type.sortedUniqueContainerShortName»> extends «type.typeName»BaseUniqueContainerView<C> implements «type.sortedUniqueContainerViewShortName» {
+			abstract class «baseShortName»<C extends «type.sortedUniqueContainerShortName»> extends «type.typeName»BaseUniqueContainerView<C> implements «type.sortedUniqueContainerViewShortName» {
 		«ENDIF»
 
-			«baseSortedUniqueContainerViewShortName»(final C container) {
+			«baseShortName»(final C container) {
 				super(container);
 			}
 
@@ -135,6 +141,53 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 					return this.container.asContainer();
 				}
 			«ENDIF»
+		}
+
+		final class «type.genericName("ReverseSortedUniqueContainerView")» extends «type.shortName("ReverseOrderedContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»«genericName»> implements «genericName» {
+
+			«reverseShortName»(final «genericName» view) {
+				super(view);
+			}
+
+			@Override
+			public «type.ordGenericName» ord() {
+				return this.view.ord().reversed();
+			}
+
+			@Override
+			public «genericName» slice(final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive) {
+				return new «type.diamondName("ReverseSortedUniqueContainerView")»(this.view.slice(to, toInclusive, from, fromInclusive));
+			}
+
+			@Override
+			public «genericName» sliceFrom(final «type.genericName» from, final boolean inclusive) {
+				return new «type.diamondName("ReverseSortedUniqueContainerView")»(this.view.sliceTo(from, inclusive));
+			}
+
+			@Override
+			public «genericName» sliceTo(final «type.genericName» to, final boolean inclusive) {
+				return new «type.diamondName("ReverseSortedUniqueContainerView")»(this.view.sliceFrom(to, inclusive));
+			}
+
+			@Override
+			public «genericName» reverse() {
+				return this.view;
+			}
+
+			@Override
+			public int hashCode() {
+				return this.view.hashCode();
+			}
+
+			@Override
+			public boolean equals(final Object obj) {
+				return this.view.equals(obj);
+			}
+
+			@Override
+			public String toString() {
+				return iterableToString(this);
+			}
 		}
 
 		«IF type == Type.OBJECT»

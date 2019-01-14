@@ -12,6 +12,7 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 
 		import java.util.Collections;
 		import java.util.Comparator;
+		import java.util.Iterator;
 		import java.util.NavigableMap;
 		import java.util.SortedMap;
 		import java.util.TreeMap;
@@ -21,6 +22,7 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.ORD».*;
 		import static «Constants.P».*;
+		import static «Constants.COMMON».*;
 
 		public interface SortedKeyValueView<K, @Covariant A> extends KeyValueView<K, A>, SortedKeyValue<K, A> {
 
@@ -34,6 +36,10 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			@Deprecated
 			default SortedKeyValueView<K, A> view() {
 				return this;
+			}
+
+			default SortedKeyValueView<K, A> reverse() {
+				return new ReverseSortedKeyValueView<>(this);
 			}
 
 			static <K, A> SortedKeyValueView<K, A> sortedMapView(final SortedMap<K, A> map) {
@@ -102,6 +108,89 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			@Override
 			public SortedMap<K, A> asMap() {
 				return this.keyValue.asMap();
+			}
+		}
+
+		final class ReverseSortedKeyValueView<K, A> implements SortedKeyValueView<K, A> {
+			final SortedKeyValueView<K, A> view;
+
+			ReverseSortedKeyValueView(final SortedKeyValueView<K, A> view) {
+				this.view = view;
+			}
+
+			@Override
+			public int size() {
+				return this.view.size();
+			}
+
+			@Override
+			public A getOrNull(final K key) {
+				return this.view.getOrNull(key);
+			}
+
+			@Override
+			public Ord<K> ord() {
+				return this.view.ord().reversed();
+			}
+
+			@Override
+			public P<K, A> first() {
+				return this.view.last();
+			}
+
+			@Override
+			public P<K, A> last() {
+				return this.view.first();
+			}
+
+			@Override
+			public K firstKey() {
+				return this.view.lastKey();
+			}
+
+			@Override
+			public K lastKey() {
+				return this.view.firstKey();
+			}
+
+			@Override
+			public SortedKeyValueView<K, A> slice(final K from, final boolean fromInclusive, final K to, final boolean toInclusive) {
+				return new ReverseSortedKeyValueView<>(this.view.slice(to, toInclusive, from, fromInclusive));
+			}
+
+			@Override
+			public SortedKeyValueView<K, A> sliceFrom(final K from, final boolean inclusive) {
+				return new ReverseSortedKeyValueView<>(this.view.sliceTo(from, inclusive));
+			}
+
+			@Override
+			public SortedKeyValueView<K, A> sliceTo(final K to, final boolean inclusive) {
+				return new ReverseSortedKeyValueView<>(this.view.sliceFrom(to, inclusive));
+			}
+
+			@Override
+			public Iterator<P<K, A>> iterator() {
+				return this.view.reverseIterator();
+			}
+
+			@Override
+			public Iterator<P<K, A>> reverseIterator() {
+				return this.view.iterator();
+			}
+
+			@Override
+			public int hashCode() {
+				return this.view.hashCode();
+			}
+
+			@Override
+			public boolean equals(final Object obj) {
+				return this.view.equals(obj);
+			}
+
+			@Override
+			public String toString() {
+				return iterableToString(this);
 			}
 		}
 

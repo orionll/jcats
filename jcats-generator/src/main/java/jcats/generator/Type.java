@@ -372,7 +372,7 @@ public enum Type {
 	}
 
 	public String sortedUniqueContainerViewShortName() {
-		return genericName("SortedUniqueContainerView");
+		return shortName("SortedUniqueContainerView");
 	}
 
 	public String iteratorShortName(final String baseName) {
