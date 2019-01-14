@@ -154,6 +154,21 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public SortedUniqueContainerView<K> keys() {
+				return this.view.keys().reverse();
+			}
+
+			@Override
+			public OrderedContainerView<A> values() {
+				return this.view.values().reverse();
+			}
+
+			@Override
+			public SortedUniqueContainerView<P<K, A>> asUniqueContainer() {
+				return this.view.asUniqueContainer().reverse();
+			}
+
+			@Override
 			public SortedKeyValueView<K, A> slice(final K from, final boolean fromInclusive, final K to, final boolean toInclusive) {
 				return new ReverseSortedKeyValueView<>(this.view.slice(to, toInclusive, from, fromInclusive));
 			}
