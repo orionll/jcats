@@ -44,6 +44,9 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.JCATS».IntOption.*;
 		import static «Constants.COMMON».*;
+		«IF type.primitive»
+			import static «Constants.COLLECTION».«type.arrayShortName».*;
+		«ENDIF»
 
 		public interface «type.covariantName("IndexedContainerView")» extends «type.orderedContainerViewGenericName», «type.indexedContainerGenericName» {
 
@@ -79,8 +82,11 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			default «genericName» limit(final int limit) {
 				if (limit < 0) {
 					throw new IllegalArgumentException(Integer.toString(limit));
+				} else if (hasKnownFixedSize() && limit >= size()) {
+					return this;
+				} else {
+					return new «limitedIndexedContainerViewShortName»<>(this, limit);
 				}
-				return new «limitedIndexedContainerViewShortName»<>(this, limit);
 			}
 
 			@Override
@@ -89,6 +95,8 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					throw new IllegalArgumentException(Integer.toString(skip));
 				} else if (skip == 0) {
 					return this;
+				} else if (hasKnownFixedSize() && skip >= size()) {
+					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view(); 
 				} else {
 					return new «skippedIndexedContainerViewShortName»<>(this, skip);
 				}
@@ -390,9 +398,17 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					final int sum = this.skip + n;
 					if (sum < 0) {
 						// Overflow
-						return new «skippedIndexedContainerViewShortName»<>(this, n);
+						if (this.view.hasKnownFixedSize()) {
+							return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+						} else {
+							return new «skippedIndexedContainerViewShortName»<>(this, n);
+						}
 					} else {
-						return new «skippedIndexedContainerViewShortName»<>(this.view, sum);
+						if (this.view.hasKnownFixedSize() && sum >= this.view.size()) {
+							return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+						} else {
+							return new «skippedIndexedContainerViewShortName»<>(this.view, sum);
+						}
 					}
 				} else {
 					return this;

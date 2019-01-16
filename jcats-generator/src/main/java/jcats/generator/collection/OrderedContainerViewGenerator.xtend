@@ -41,16 +41,18 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 		import java.util.HashSet;
 		import java.util.PrimitiveIterator;
 		import java.util.RandomAccess;
-		import java.io.Serializable;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
-		import static «Constants.COMMON».*;
-		import static «Constants.FUNCTION».«type.shortName("BooleanF")».*;
 		«IF type.javaUnboxedType»
 			import static «Constants.JCATS».«type.optionShortName».*;
+		«ENDIF»
+		import static «Constants.FUNCTION».«type.shortName("BooleanF")».*;
+		import static «Constants.COMMON».*;
+		«IF type.primitive»
+			import static «Constants.COLLECTION».«type.arrayShortName».*;
 		«ENDIF»
 
 		public interface «type.covariantName("OrderedContainerView")» extends «type.containerViewGenericName», «type.orderedContainerGenericName» {
@@ -125,8 +127,11 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			default «genericName» limit(final int limit) {
 				if (limit < 0) {
 					throw new IllegalArgumentException(Integer.toString(limit));
+				} else if (hasKnownFixedSize() && limit >= size()) {
+					return this;
+				} else {
+					return new «limitedShortName»<>(this, limit);
 				}
-				return new «limitedShortName»<>(this, limit);
 			}
 
 			@Override
@@ -135,6 +140,8 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 					throw new IllegalArgumentException(Integer.toString(skip));
 				} else if (skip == 0) {
 					return this;
+				} else if (hasKnownFixedSize() && skip >= size()) {
+					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view(); 
 				} else {
 					return new «skippedShortName»<>(this, skip);
 				}
@@ -444,9 +451,17 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 					final int sum = this.skip + n;
 					if (sum < 0) {
 						// Overflow
-						return new «skippedShortName»<>(this, n);
+						if (this.view.hasKnownFixedSize()) {
+							return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+						} else {
+							return new «skippedShortName»<>(this, n);
+						}
 					} else {
-						return new «skippedShortName»<>(this.view, sum);
+						if (this.view.hasKnownFixedSize() && sum >= this.view.size()) {
+							return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+						} else {
+							return new «skippedShortName»<>(this.view, sum);
+						}
 					}
 				} else {
 					return this;
