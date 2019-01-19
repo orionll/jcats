@@ -241,15 +241,11 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public Iterator<«mapTargetType»> reverseIterator() {
-				if (this.view.hasKnownFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
-					«IF type == Type.OBJECT»
-						return new MappedIterator<>(this.view.reverseIterator(), this.f);
-					«ELSE»
-						return new Mapped«type.typeName»ObjectIterator<>(this.view.reverseIterator(), this.f);
-					«ENDIF»
-				} else {
-					return OrderedContainerView.super.reverseIterator();
-				}
+				«IF type == Type.OBJECT»
+					return new MappedIterator<>(this.view.reverseIterator(), this.f);
+				«ELSE»
+					return new Mapped«type.typeName»ObjectIterator<>(this.view.reverseIterator(), this.f);
+				«ENDIF»
 			}
 
 			@Override
@@ -305,15 +301,11 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 
 				@Override
 				public «toType.iteratorGenericName» reverseIterator() {
-					if (this.view.hasKnownFixedSize() || this.view instanceof «type.indexedContainerViewWildcardName») {
-						«IF type == Type.OBJECT»
-							return new MappedObject«toType.typeName»Iterator<>(this.view.reverseIterator(), this.f);
-						«ELSE»
-							return new Mapped«type.typeName»«toType.typeName»Iterator(this.view.reverseIterator(), this.f);
-						«ENDIF»
-					} else {
-						return «toType.orderedContainerViewGenericName».super.reverseIterator();
-					}
+					«IF type == Type.OBJECT»
+						return new MappedObject«toType.typeName»Iterator<>(this.view.reverseIterator(), this.f);
+					«ELSE»
+						return new Mapped«type.typeName»«toType.typeName»Iterator(this.view.reverseIterator(), this.f);
+					«ENDIF»
 				}
 
 				@Override
