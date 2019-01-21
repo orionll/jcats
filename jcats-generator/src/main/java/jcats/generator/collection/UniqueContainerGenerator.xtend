@@ -43,8 +43,8 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 
 			«IF type.primitive»
 				@Override
-				default UniqueContainerView<«type.boxedName»> asContainer() {
-					return new «shortName»AsUniqueContainer<>(this);
+				default UniqueContainerView<«type.boxedName»> boxed() {
+					return new «type.typeName»BoxedUniqueContainer<>(this);
 				}
 
 			«ENDIF»
@@ -71,9 +71,9 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type.primitive»
-			class «shortName»AsUniqueContainer<C extends «shortName»> extends «type.typeName»ContainerAsContainer<C> implements UniqueContainerView<«type.boxedName»> {
+			class «type.typeName»BoxedUniqueContainer<C extends «shortName»> extends «type.typeName»BoxedContainer<C> implements UniqueContainerView<«type.boxedName»> {
 
-				«shortName»AsUniqueContainer(final C container) {
+				«type.typeName»BoxedUniqueContainer(final C container) {
 					super(container);
 				}
 

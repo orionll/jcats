@@ -72,8 +72,8 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 
 			«IF type.primitive»
 				@Override
-				public UniqueContainerView<«type.boxedName»> asContainer() {
-					return this.container.asContainer();
+				public UniqueContainerView<«type.boxedName»> boxed() {
+					return this.container.boxed();
 				}
 
 			«ENDIF»

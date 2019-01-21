@@ -158,8 +158,8 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			«IF type.primitive»
 				@Override
-				public IndexedContainerView<«type.boxedName»> asContainer() {
-					return this.container.asContainer();
+				public IndexedContainerView<«type.boxedName»> boxed() {
+					return this.container.boxed();
 				}
 
 			«ENDIF»

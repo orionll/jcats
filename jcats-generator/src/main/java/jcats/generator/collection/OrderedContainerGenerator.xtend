@@ -135,8 +135,8 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 
 			«IF type.primitive»
 				@Override
-				default OrderedContainerView<«type.boxedName»> asContainer() {
-					return new «shortName»AsOrderedContainer<>(this);
+				default OrderedContainerView<«type.boxedName»> boxed() {
+					return new «type.typeName»BoxedOrderedContainer<>(this);
 				}
 			«ELSE»
 				«cast(#["A"], #[], #["A"])»
@@ -144,9 +144,9 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 		}
 		«IF type.primitive»
 
-			class «shortName»AsOrderedContainer<C extends «shortName»> extends «type.typeName»ContainerAsContainer<C> implements OrderedContainerView<«type.boxedName»> {
+			class «type.typeName»BoxedOrderedContainer<C extends «shortName»> extends «type.typeName»BoxedContainer<C> implements OrderedContainerView<«type.boxedName»> {
 
-				«shortName»AsOrderedContainer(final C container) {
+				«type.typeName»BoxedOrderedContainer(final C container) {
 					super(container);
 				}
 

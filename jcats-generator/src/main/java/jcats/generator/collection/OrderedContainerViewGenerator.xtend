@@ -217,8 +217,8 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			«IF type.primitive»
 
 				@Override
-				public OrderedContainerView<«type.boxedName»> asContainer() {
-					return this.container.asContainer();
+				public OrderedContainerView<«type.boxedName»> boxed() {
+					return this.container.boxed();
 				}
 			«ENDIF»
 		}

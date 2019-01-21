@@ -344,7 +344,7 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 			«ENDFOR»
 			«IF type.primitive»
 				@Override
-				public IndexedContainerView<«type.boxedName»> asContainer() {
+				public IndexedContainerView<«type.boxedName»> boxed() {
 					return new RepeatedIndexedContainer<>(this.size, this.value);
 				}
 

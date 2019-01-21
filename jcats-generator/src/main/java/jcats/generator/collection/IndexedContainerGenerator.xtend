@@ -206,8 +206,8 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 			«IF type.primitive»
 				@Override
-				default IndexedContainerView<«type.boxedName»> asContainer() {
-					return new «shortName»AsIndexedContainer(this);
+				default IndexedContainerView<«type.boxedName»> boxed() {
+					return new «type.typeName»BoxedIndexedContainer(this);
 				}
 
 			«ENDIF»
@@ -326,9 +326,9 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type.primitive»
-			final class «shortName»AsIndexedContainer extends «type.typeName»OrderedContainerAsOrderedContainer<«shortName»> implements IndexedContainerView<«type.boxedName»> {
+			final class «type.typeName»BoxedIndexedContainer extends «type.typeName»BoxedOrderedContainer<«shortName»> implements IndexedContainerView<«type.boxedName»> {
 
-				«shortName»AsIndexedContainer(final «shortName» container) {
+				«type.typeName»BoxedIndexedContainer(final «shortName» container) {
 					super(container);
 				}
 

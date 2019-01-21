@@ -100,8 +100,8 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 
 			«IF type.primitive»
 				@Override
-				default SortedUniqueContainerView<«type.boxedName»> asContainer() {
-					return new «shortName»AsSortedUniqueContainer(this);
+				default SortedUniqueContainerView<«type.boxedName»> boxed() {
+					return new «type.typeName»BoxedSortedUniqueContainer(this);
 				}
 
 			«ENDIF»
@@ -121,9 +121,9 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 		}
 
 		«IF type.primitive»
-			final class «shortName»AsSortedUniqueContainer extends «type.typeName»UniqueContainerAsUniqueContainer<«shortName»> implements SortedUniqueContainerView<«type.boxedName»> {
+			final class «type.typeName»BoxedSortedUniqueContainer extends «type.typeName»BoxedUniqueContainer<«shortName»> implements SortedUniqueContainerView<«type.boxedName»> {
 
-				«shortName»AsSortedUniqueContainer(final «shortName» container) {
+				«type.typeName»BoxedSortedUniqueContainer(final «shortName» container) {
 					super(container);
 				}
 
@@ -166,17 +166,17 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 
 				@Override
 				public SortedUniqueContainerView<«type.boxedName»> slice(final «type.boxedName» from, final boolean fromInclusive, final «type.boxedName» to, final boolean toInclusive) {
-					return new «shortName»AsSortedUniqueContainer(this.container.view().slice(from, fromInclusive, to, toInclusive));
+					return new «type.typeName»BoxedSortedUniqueContainer(this.container.view().slice(from, fromInclusive, to, toInclusive));
 				}
 
 				@Override
 				public SortedUniqueContainerView<«type.boxedName»> sliceFrom(final «type.boxedName» from, final boolean inclusive) {
-					return new «shortName»AsSortedUniqueContainer(this.container.view().sliceFrom(from, inclusive));
+					return new «type.typeName»BoxedSortedUniqueContainer(this.container.view().sliceFrom(from, inclusive));
 				}
 
 				@Override
 				public SortedUniqueContainerView<«type.boxedName»> sliceTo(final «type.boxedName» to, final boolean inclusive) {
-					return new «shortName»AsSortedUniqueContainer(this.container.view().sliceTo(to, inclusive));
+					return new «type.typeName»BoxedSortedUniqueContainer(this.container.view().sliceTo(to, inclusive));
 				}
 
 				@Override

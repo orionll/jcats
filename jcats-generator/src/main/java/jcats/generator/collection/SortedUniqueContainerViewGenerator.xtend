@@ -137,8 +137,8 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 			«IF type.primitive»
 
 				@Override
-				public SortedUniqueContainerView<«type.boxedName»> asContainer() {
-					return this.container.asContainer();
+				public SortedUniqueContainerView<«type.boxedName»> boxed() {
+					return this.container.boxed();
 				}
 			«ENDIF»
 		}
