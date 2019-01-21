@@ -124,6 +124,21 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public boolean isEmpty() {
+				return this.view.isEmpty();
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return this.view.isNotEmpty();
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return this.view.hasKnownFixedSize();
+			}
+
+			@Override
 			public A getOrNull(final K key) {
 				return this.view.getOrNull(key);
 			}

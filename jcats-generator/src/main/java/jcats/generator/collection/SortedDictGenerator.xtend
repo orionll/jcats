@@ -483,14 +483,7 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			@Override
 			public int size() {
-				final int[] size = { 0 };
-				forEach((final P<K, A> __) -> {
-					size[0]++;
-					if (size[0] < 0) {
-						throw new SizeOverflowException();
-					}
-				});
-				return size[0];
+				return iterableSize(this);
 			}
 
 			@Override

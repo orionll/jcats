@@ -33,6 +33,20 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 				return this;
 			}
 
+			@Override
+			default boolean isEmpty() {
+				return !iterator().hasNext();
+			}
+
+			@Override
+			default boolean isNotEmpty() {
+				return iterator().hasNext();
+			}
+
+			default KeyValueView<K, A> filterKeys(final BooleanF<K> predicate) {
+				return new FilteredKeyValueView<>(this, predicate);
+			}
+
 			static <K, A> KeyValueView<K, A> mapView(final Map<K, A> map) {
 				return mapView(map, true);
 			}
@@ -206,6 +220,64 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			public String toString() {
 				return this.keyValue.toString();
 			}
+		}
+
+		final class FilteredKeyValueView<K, A> implements KeyValueView<K, A> {
+			private final KeyValueView<K, A> view;
+			private final BooleanF<K> predicate;
+
+			FilteredKeyValueView(final KeyValueView<K, A> view, final BooleanF<K> predicate) {
+				this.view = view;
+				this.predicate = predicate;
+			}
+
+			@Override
+			public int size() {
+				return iterableSize(this);
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return false;
+			}
+
+			@Override
+			public A getOrNull(final K key) {
+				if (this.predicate.apply(key)) {
+					return this.view.getOrNull(key);
+				} else {
+					return null;
+				}
+			}
+
+			@Override
+			public Iterator<P<K, A>> iterator() {
+				return new FilteredIterator<>(this.view.iterator(), this.predicate.contraMap(P::get1));
+			}
+
+			@Override
+			public void foreach(final Eff2<K, A> eff) {
+				this.view.foreach((final K key, final A value) -> {
+					if (this.predicate.apply(key)) {
+						eff.apply(key, value);
+					}
+				});
+			}
+
+			@Override
+			public void forEach(final Consumer<? super P<K, A>> action) {
+				this.view.forEach((final P<K, A> entry) -> {
+					if (this.predicate.apply(entry.get1())) {
+						action.accept(entry);
+					}
+				});
+			}
+
+			«keyValueEquals»
+
+			«keyValueHashCode»
+
+			«toStr»
 		}
 
 		class MapAsKeyValue<K, A, M extends Map<K, A>> implements KeyValueView<K, A> {

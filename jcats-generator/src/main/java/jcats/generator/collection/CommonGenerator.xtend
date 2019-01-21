@@ -81,6 +81,17 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
+			static int iterableSize(final Iterable<?> iterable) {
+				final int[] size = {0};
+				iterable.forEach((final Object __) -> {
+					size[0]++;
+					if (size[0] < 0) {
+						throw new SizeOverflowException();
+					}
+				});
+				return size[0];
+			}
+
 			«FOR type : Type.values»
 				static boolean «type.indexedContainerShortName.firstToLowerCase»sEqual(final «type.indexedContainerWildcardName» c1, final «type.indexedContainerWildcardName» c2) {
 					if (c1.hasKnownFixedSize() && c2.hasKnownFixedSize()) {
