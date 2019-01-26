@@ -24,8 +24,9 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.util.Comparator;
+		import java.util.Iterator;
 		«IF type.primitive»
-			import java.util.Iterator;
+			import java.util.PrimitiveIterator;
 		«ENDIF»
 		import java.util.NoSuchElementException;
 		import java.util.SortedSet;
@@ -37,6 +38,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 		«IF type == Type.OBJECT»
 			import static java.util.Objects.requireNonNull;
 		«ENDIF»
+		import static «Constants.JCATS».«type.optionShortName».*;
 
 		public interface «type.covariantName("SortedUniqueContainer")» extends «type.uniqueContainerGenericName», «type.orderedContainerGenericName» {
 
@@ -45,6 +47,16 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 			@Override
 			default «type.genericName» last() throws NoSuchElementException {
 				return reverseIterator().«type.iteratorNext»();
+			}
+
+			@Override
+			default «type.optionGenericName» lastOption() {
+				final «type.iteratorGenericName» iterator = reverseIterator();
+				if (iterator.hasNext()) {
+					return «type.someName»(iterator.«type.iteratorNext»());
+				} else {
+					return «type.noneName»();
+				}
 			}
 
 			«IF type == Type.OBJECT»

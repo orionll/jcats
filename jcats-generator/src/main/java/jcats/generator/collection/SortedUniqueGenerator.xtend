@@ -41,8 +41,6 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		«IF type.primitive»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
-		import java.util.Spliterator;
-		import java.util.Spliterators;
 		import java.util.TreeSet;
 		import java.util.stream.Collector;
 		import java.util.stream.«type.streamName»;
@@ -51,11 +49,10 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
-		import static «Constants.JCATS».Order.*;
-		import static «Constants.P».p;
-		import static «Constants.COMMON».*;
 		import static «Constants.JCATS».«type.optionShortName».*;
 		import static «Constants.JCATS».«type.ordShortName».*;
+		import static «Constants.JCATS».Order.*;
+		import static «Constants.COMMON».*;
 		import static «Constants.STACK».*;
 		import static «Constants.COLLECTION».«type.sortedUniqueShortName».*;
 		import static «Constants.COLLECTION».AVLCommon.*;
@@ -518,16 +515,6 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			@Override
 			public «type.ordGenericName» ord() {
 				return this.root.ord;
-			}
-
-			@Override
-			public «type.optionGenericName» lastOption() {
-				final «type.iteratorGenericName» iterator = reverseIterator();
-				if (iterator.hasNext()) {
-					return «type.someName»(iterator.«type.iteratorNext»());
-				} else {
-					return «type.noneName»();
-				}
 			}
 
 			«AVLCommonGenerator.slicedForEach("foreach", genericName, "unique", "entry", type.effGenericName, "apply")»
