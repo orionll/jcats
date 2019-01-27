@@ -183,11 +183,6 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 			public boolean equals(final Object obj) {
 				return this.view.equals(obj);
 			}
-
-			@Override
-			public String toString() {
-				return iterableToString(this);
-			}
 		}
 
 		«IF type == Type.OBJECT»
