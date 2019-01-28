@@ -37,11 +37,26 @@ final class Stream2Generator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.ORD».*;
 
-		public final class Stream2<A> implements Stream<A>, Iterable<A> {
+		public final class Stream2<A> implements Stream<A>, Iterable<A>, Sized {
 			private final Stream<A> stream;
 
 			Stream2(final Stream<A> stream) {
 				this.stream = stream;
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return false;
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return this.stream.noneMatch(__ -> true);
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return this.stream.anyMatch(__ -> true);
 			}
 
 			public Stream<A> stream() {
@@ -195,6 +210,7 @@ final class Stream2Generator implements ClassGenerator {
 				return this.stream.count();
 			}
 
+			@Override
 			public int size() throws SizeOverflowException {
 				final long count = this.stream.count();
 				if (count == (int) count) {

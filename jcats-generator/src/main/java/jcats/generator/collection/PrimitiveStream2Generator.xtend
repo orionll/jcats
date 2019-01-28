@@ -43,11 +43,26 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.JCATS».«type.ordShortName».*;
 
-		public final class «shortName» implements «type.streamName» {
+		public final class «shortName» implements «type.streamName», Iterable<«type.boxedName»>, Sized {
 			private final «type.streamName» stream;
 
 			«shortName»(final «type.streamName» stream) {
 				this.stream = stream;
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return false;
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return this.stream.noneMatch(__ -> true);
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return this.stream.anyMatch(__ -> true);
 			}
 
 			@Override
@@ -200,6 +215,7 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 				return this.stream.count();
 			}
 
+			@Override
 			public int size() throws SizeOverflowException {
 				final long count = this.stream.count();
 				if (count == (int) count) {
