@@ -118,6 +118,35 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public «type.optionGenericName» firstMatch(final «type.boolFName» predicate) {
+				if (predicate.apply(this.value)) {
+					return «type.someName»(this.value);
+				} else {
+					return «type.noneName»();
+				}
+			}
+
+			@Override
+			public «type.optionGenericName» lastMatch(final «type.boolFName» predicate) {
+				return firstMatch(predicate);
+			}
+
+			@Override
+			public boolean anyMatch(final «type.boolFName» predicate) {
+				return predicate.apply(this.value);
+			}
+
+			@Override
+			public boolean allMatch(final «type.boolFName» predicate) {
+				return predicate.apply(this.value);
+			}
+
+			@Override
+			public boolean noneMatch(final «type.boolFName» predicate) {
+				return !predicate.apply(this.value);
+			}
+
+			@Override
 			public IntOption indexOf(final «type.genericName» value2) {
 				if (contains(value2)) {
 					return intSome(0);
