@@ -242,14 +242,14 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
-			static void sliceRangeCheck(final int fromIndex, final int toIndex, final int size) {
-				if (fromIndex < 0) {
-					throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
-				} else if (toIndex > size) {
-					throw new IndexOutOfBoundsException("toIndex = " + toIndex);
-				} else if (fromIndex > toIndex) {
+			static void sliceRangeCheck(final int fromIndexInclusive, final int toIndexExclusive, final int size) {
+				if (fromIndexInclusive < 0) {
+					throw new IndexOutOfBoundsException("fromIndex = " + fromIndexInclusive);
+				} else if (toIndexExclusive > size) {
+					throw new IndexOutOfBoundsException("toIndex (" + toIndexExclusive + ") > size (" + size + ")");
+				} else if (fromIndexInclusive > toIndexExclusive) {
 					throw new IllegalArgumentException(
-							"fromIndex (" + fromIndex + ") > toIndex (" + toIndex + ")");
+							"fromIndex (" + fromIndexInclusive + ") > toIndex (" + toIndexExclusive + ")");
 				}
 			}
 

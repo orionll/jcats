@@ -356,13 +356,15 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			public final «genericName» slice(final int fromIndex, final int toIndex) {
-				sliceRangeCheck(fromIndex, toIndex, this.array.length);
-				if (fromIndex == 0 && toIndex == this.array.length) {
+			public final «genericName» slice(final int fromIndexInclusive, final int toIndexExclusive) {
+				sliceRangeCheck(fromIndexInclusive, toIndexExclusive, this.array.length);
+				if (fromIndexInclusive == 0 && toIndexExclusive == this.array.length) {
 					return this;
+				} else if (fromIndexInclusive == toIndexExclusive) {
+					return empty«shortName»();
 				} else {
-					final «type.javaName»[] result = new «type.javaName»[toIndex - fromIndex];
-					System.arraycopy(this.array, fromIndex, result, 0, toIndex - fromIndex);
+					final «type.javaName»[] result = new «type.javaName»[toIndexExclusive - fromIndexInclusive];
+					System.arraycopy(this.array, fromIndexInclusive, result, 0, toIndexExclusive - fromIndexInclusive);
 					return new «diamondName»(result);
 				}
 			}
