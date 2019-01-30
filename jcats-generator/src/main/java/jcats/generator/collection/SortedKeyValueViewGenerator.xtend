@@ -38,8 +38,13 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 				return this;
 			}
 
+			@Override
+			default SortedKeyValue<K, A> unview() {
+				return this;
+			}
+
 			default SortedKeyValueView<K, A> reverse() {
-				return new ReverseSortedKeyValueView<>(this);
+				return new ReverseSortedKeyValueView<>(unview());
 			}
 
 			static <K, A> SortedKeyValueView<K, A> sortedMapView(final SortedMap<K, A> map) {
@@ -109,113 +114,118 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			public SortedMap<K, A> asMap() {
 				return this.keyValue.asMap();
 			}
+
+			@Override
+			public SortedKeyValue<K, A> unview() {
+				return this.keyValue;
+			}
 		}
 
 		final class ReverseSortedKeyValueView<K, A> implements SortedKeyValueView<K, A> {
-			final SortedKeyValueView<K, A> view;
+			final SortedKeyValue<K, A> keyValue;
 
-			ReverseSortedKeyValueView(final SortedKeyValueView<K, A> view) {
-				this.view = view;
+			ReverseSortedKeyValueView(final SortedKeyValue<K, A> keyValue) {
+				this.keyValue = keyValue;
 			}
 
 			@Override
 			public int size() {
-				return this.view.size();
+				return this.keyValue.size();
 			}
 
 			@Override
 			public boolean isEmpty() {
-				return this.view.isEmpty();
+				return this.keyValue.isEmpty();
 			}
 
 			@Override
 			public boolean isNotEmpty() {
-				return this.view.isNotEmpty();
+				return this.keyValue.isNotEmpty();
 			}
 
 			@Override
 			public boolean hasKnownFixedSize() {
-				return this.view.hasKnownFixedSize();
+				return this.keyValue.hasKnownFixedSize();
 			}
 
 			@Override
 			public A getOrNull(final K key) {
-				return this.view.getOrNull(key);
+				return this.keyValue.getOrNull(key);
 			}
 
 			@Override
 			public Ord<K> ord() {
-				return this.view.ord().reversed();
+				return this.keyValue.ord().reversed();
 			}
 
 			@Override
 			public P<K, A> first() {
-				return this.view.last();
+				return this.keyValue.last();
 			}
 
 			@Override
 			public P<K, A> last() {
-				return this.view.first();
+				return this.keyValue.first();
 			}
 
 			@Override
 			public K firstKey() {
-				return this.view.lastKey();
+				return this.keyValue.lastKey();
 			}
 
 			@Override
 			public K lastKey() {
-				return this.view.firstKey();
+				return this.keyValue.firstKey();
 			}
 
 			@Override
 			public SortedUniqueContainerView<K> keys() {
-				return this.view.keys().reverse();
+				return this.keyValue.keys().reverse();
 			}
 
 			@Override
 			public OrderedContainerView<A> values() {
-				return this.view.values().reverse();
+				return this.keyValue.values().reverse();
 			}
 
 			@Override
 			public SortedUniqueContainerView<P<K, A>> asUniqueContainer() {
-				return this.view.asUniqueContainer().reverse();
+				return this.keyValue.asUniqueContainer().reverse();
 			}
 
 			@Override
 			public SortedKeyValueView<K, A> slice(final K from, final boolean fromInclusive, final K to, final boolean toInclusive) {
-				return new ReverseSortedKeyValueView<>(this.view.slice(to, toInclusive, from, fromInclusive));
+				return new ReverseSortedKeyValueView<>(this.keyValue.view().slice(to, toInclusive, from, fromInclusive));
 			}
 
 			@Override
 			public SortedKeyValueView<K, A> sliceFrom(final K from, final boolean inclusive) {
-				return new ReverseSortedKeyValueView<>(this.view.sliceTo(from, inclusive));
+				return new ReverseSortedKeyValueView<>(this.keyValue.view().sliceTo(from, inclusive));
 			}
 
 			@Override
 			public SortedKeyValueView<K, A> sliceTo(final K to, final boolean inclusive) {
-				return new ReverseSortedKeyValueView<>(this.view.sliceFrom(to, inclusive));
+				return new ReverseSortedKeyValueView<>(this.keyValue.view().sliceFrom(to, inclusive));
 			}
 
 			@Override
 			public Iterator<P<K, A>> iterator() {
-				return this.view.reverseIterator();
+				return this.keyValue.reverseIterator();
 			}
 
 			@Override
 			public Iterator<P<K, A>> reverseIterator() {
-				return this.view.iterator();
+				return this.keyValue.iterator();
 			}
 
 			@Override
 			public int hashCode() {
-				return this.view.hashCode();
+				return this.keyValue.hashCode();
 			}
 
 			@Override
 			public boolean equals(final Object obj) {
-				return this.view.equals(obj);
+				return this.keyValue.equals(obj);
 			}
 
 			@Override

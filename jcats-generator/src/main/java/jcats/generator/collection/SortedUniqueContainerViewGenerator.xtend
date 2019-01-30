@@ -44,12 +44,6 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 
 		public interface «type.covariantName("SortedUniqueContainerView")» extends «type.uniqueContainerViewGenericName», «type.sortedUniqueContainerGenericName», «type.orderedContainerViewGenericName» {
 
-			«genericName» slice(«type.genericName» from, boolean fromInclusive, «type.genericName» to, boolean toInclusive);
-
-			«genericName» sliceFrom(«type.genericName» from, boolean inclusive);
-
-			«genericName» sliceTo(«type.genericName» to, boolean inclusive);
-
 			@Override
 			@Deprecated
 			default «genericName» view() {
@@ -57,8 +51,19 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			default «type.sortedUniqueContainerGenericName» unview() {
+				return this;
+			}
+
+			«genericName» slice(«type.genericName» from, boolean fromInclusive, «type.genericName» to, boolean toInclusive);
+
+			«genericName» sliceFrom(«type.genericName» from, boolean inclusive);
+
+			«genericName» sliceTo(«type.genericName» to, boolean inclusive);
+
+			@Override
 			default «genericName» reverse() {
-				return new «type.diamondName("ReverseSortedUniqueContainerView")»(this);
+				return new «type.diamondName("ReverseSortedUniqueContainerView")»(unview());
 			}
 
 			static «type.paramGenericName("SortedUniqueContainerView")» «type.shortName("SortedSetView").firstToLowerCase»(final SortedSet<«type.genericBoxedName»> sortedSet) {
@@ -134,54 +139,59 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 			public SortedSet<«type.genericBoxedName»> asCollection() {
 				return this.container.asCollection();
 			}
-			«IF type.primitive»
 
+			«IF type.primitive»
 				@Override
 				public SortedUniqueContainerView<«type.boxedName»> boxed() {
 					return this.container.boxed();
 				}
+
 			«ENDIF»
+			@Override
+			public «type.sortedUniqueContainerGenericName» unview() {
+				return this.container;
+			}
 		}
 
-		final class «type.genericName("ReverseSortedUniqueContainerView")» extends «type.shortName("ReverseOrderedContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»«genericName»> implements «genericName» {
+		final class «type.genericName("ReverseSortedUniqueContainerView")» extends «type.shortName("ReverseOrderedContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»«type.sortedUniqueContainerGenericName»> implements «genericName» {
 
-			«reverseShortName»(final «genericName» view) {
-				super(view);
+			«reverseShortName»(final «type.sortedUniqueContainerGenericName» container) {
+				super(container);
 			}
 
 			@Override
 			public «type.ordGenericName» ord() {
-				return this.view.ord().reversed();
+				return this.container.ord().reversed();
 			}
 
 			@Override
 			public «genericName» slice(final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive) {
-				return new «type.diamondName("ReverseSortedUniqueContainerView")»(this.view.slice(to, toInclusive, from, fromInclusive));
+				return new «type.diamondName("ReverseSortedUniqueContainerView")»(this.container.view().slice(to, toInclusive, from, fromInclusive));
 			}
 
 			@Override
 			public «genericName» sliceFrom(final «type.genericName» from, final boolean inclusive) {
-				return new «type.diamondName("ReverseSortedUniqueContainerView")»(this.view.sliceTo(from, inclusive));
+				return new «type.diamondName("ReverseSortedUniqueContainerView")»(this.container.view().sliceTo(from, inclusive));
 			}
 
 			@Override
 			public «genericName» sliceTo(final «type.genericName» to, final boolean inclusive) {
-				return new «type.diamondName("ReverseSortedUniqueContainerView")»(this.view.sliceFrom(to, inclusive));
+				return new «type.diamondName("ReverseSortedUniqueContainerView")»(this.container.view().sliceFrom(to, inclusive));
 			}
 
 			@Override
 			public «genericName» reverse() {
-				return this.view;
+				return this.container.view();
 			}
 
 			@Override
 			public int hashCode() {
-				return this.view.hashCode();
+				return this.container.hashCode();
 			}
 
 			@Override
 			public boolean equals(final Object obj) {
-				return this.view.equals(obj);
+				return this.container.equals(obj);
 			}
 		}
 

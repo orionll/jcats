@@ -57,13 +57,18 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			default «type.indexedContainerGenericName» unview() {
+				return this;
+			}
+
+			@Override
 			«IF type == Type.OBJECT»
 				default <B> IndexedContainerView<B> map(final F<A, B> f) {
 			«ELSE»
 				default <A> IndexedContainerView<A> map(final «type.typeName»ObjectF<A> f) {
 			«ENDIF»
 				requireNonNull(f);
-				return new «mappedIndexedContainerViewShortName»<>(this, f);
+				return new «mappedIndexedContainerViewShortName»<>(unview(), f);
 			}
 
 			«FOR toType : Type.primitives»
@@ -74,7 +79,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					default «toType.indexedContainerViewGenericName» mapTo«toType.typeName»(final «type.typeName»«toType.typeName»F f) {
 				«ENDIF»
 					requireNonNull(f);
-					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this, f);
+					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(unview(), f);
 				}
 
 			«ENDFOR»
@@ -85,7 +90,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				} else if (hasKnownFixedSize() && limit >= size()) {
 					return this;
 				} else {
-					return new «limitedIndexedContainerViewShortName»<>(this, limit);
+					return new «limitedIndexedContainerViewShortName»<>(unview(), limit);
 				}
 			}
 
@@ -98,13 +103,13 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				} else if (hasKnownFixedSize() && skip >= size()) {
 					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view(); 
 				} else {
-					return new «skippedIndexedContainerViewShortName»<>(this, skip);
+					return new «skippedIndexedContainerViewShortName»<>(unview(), skip);
 				}
 			}
 
 			@Override
 			default «genericName» reverse() {
-				return new «reverseIndexedContainerViewShortName»<>(this);
+				return new «reverseIndexedContainerViewShortName»<>(unview());
 			}
 
 			static «type.paramGenericName("IndexedContainerView")» «type.shortName("ListView").firstToLowerCase»(final List<«type.genericBoxedName»> list) {
@@ -177,17 +182,22 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			public boolean equals(final Object obj) {
 				return this.container.equals(obj);
 			}
+
+			@Override
+			public «type.indexedContainerGenericName» unview() {
+				return this.container;
+			}
 		}
 
-		final class «mappedIndexedContainerViewShortName»<A, «IF type == Type.OBJECT»B, «ENDIF»C extends «genericName»> extends «type.shortName("MappedOrderedContainerView")»<A, «IF type == Type.OBJECT»B, «ENDIF»C> implements IndexedContainerView<«mapTargetType»> {
+		final class «mappedIndexedContainerViewShortName»<A, «IF type == Type.OBJECT»B, «ENDIF»C extends «type.indexedContainerGenericName»> extends «type.shortName("MappedOrderedContainerView")»<A, «IF type == Type.OBJECT»B, «ENDIF»C> implements IndexedContainerView<«mapTargetType»> {
 
-			«mappedIndexedContainerViewShortName»(final C view, final «IF type == Type.OBJECT»F<A, B>«ELSE»«type.typeName»ObjectF<A>«ENDIF» f) {
-				super(view, f);
+			«mappedIndexedContainerViewShortName»(final C container, final «IF type == Type.OBJECT»F<A, B>«ELSE»«type.typeName»ObjectF<A>«ENDIF» f) {
+				super(container, f);
 			}
 
 			@Override
 			public «mapTargetType» get(final int index) throws IndexOutOfBoundsException {
-				return requireNonNull(this.f.apply(this.view.get(index)));
+				return requireNonNull(this.f.apply(this.container.get(index)));
 			}
 
 			@Override
@@ -196,24 +206,24 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			«ELSE»
 				public <B> IndexedContainerView<B> map(final F<A, B> g) {
 			«ENDIF»
-				return new «mappedIndexedContainerViewShortName»<>(this.view, this.f.map(g));
+				return new «mappedIndexedContainerViewShortName»<>(this.container, this.f.map(g));
 			}
 
 			«FOR t : Type.primitives»
 				@Override
 				public «t.indexedContainerViewGenericName» mapTo«t.typeName»(final «t.typeName»F<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> g) {
-					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«t.typeName»IndexedContainerView<>(this.view, this.f.mapTo«t.typeName»(g));
+					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«t.typeName»IndexedContainerView<>(this.container, this.f.mapTo«t.typeName»(g));
 				}
 
 			«ENDFOR»
 			@Override
 			public IndexedContainerView<«mapTargetType»> limit(final int n) {
-				return new «mappedIndexedContainerViewShortName»<>(this.view.limit(n), this.f);
+				return new «mappedIndexedContainerViewShortName»<>(this.container.view().limit(n), this.f);
 			}
 
 			@Override
 			public IndexedContainerView<«mapTargetType»> skip(final int n) {
-				return new «mappedIndexedContainerViewShortName»<>(this.view.skip(n), this.f);
+				return new «mappedIndexedContainerViewShortName»<>(this.container.view().skip(n), this.f);
 			}
 
 			«hashcode(Type.OBJECT)»
@@ -223,53 +233,53 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 		«FOR toType : Type.primitives»
 			«IF type == Type.OBJECT»
-				class MappedTo«toType.typeName»IndexedContainerView<A, C extends «genericName»> extends MappedTo«toType.typeName»OrderedContainerView<A, C> implements «toType.indexedContainerViewGenericName» {
+				class MappedTo«toType.typeName»IndexedContainerView<A, C extends «type.indexedContainerGenericName»> extends MappedTo«toType.typeName»OrderedContainerView<A, C> implements «toType.indexedContainerViewGenericName» {
 			«ELSE»
-				class «type.typeName»MappedTo«toType.typeName»IndexedContainerView<C extends «genericName»> extends «type.typeName»MappedTo«toType.typeName»OrderedContainerView<C> implements «toType.indexedContainerViewGenericName» {
+				class «type.typeName»MappedTo«toType.typeName»IndexedContainerView<C extends «type.indexedContainerGenericName»> extends «type.typeName»MappedTo«toType.typeName»OrderedContainerView<C> implements «toType.indexedContainerViewGenericName» {
 			«ENDIF»
 				«IF type == Type.OBJECT»
-					MappedTo«toType.typeName»IndexedContainerView(final C view, final «toType.typeName»F<A> f) {
+					MappedTo«toType.typeName»IndexedContainerView(final C container, final «toType.typeName»F<A> f) {
 				«ELSE»
-					«type.typeName»MappedTo«toType.typeName»IndexedContainerView(final C view, final «type.typeName»«toType.typeName»F f) {
+					«type.typeName»MappedTo«toType.typeName»IndexedContainerView(final C container, final «type.typeName»«toType.typeName»F f) {
 				«ENDIF»
-					super(view, f);
+					super(container, f);
 				}
 
 				@Override
 				public «toType.genericName» get(final int index) throws IndexOutOfBoundsException {
-					return this.f.apply(this.view.get(index));
+					return this.f.apply(this.container.get(index));
 				}
 
 				@Override
 				public «toType.genericName» last() {
-					return this.f.apply(this.view.last());
+					return this.f.apply(this.container.last());
 				}
 
 				@Override
 				public «toType.optionGenericName» lastOption() {
-					return this.view.lastOption().mapTo«toType.typeName»(this.f);
+					return this.container.lastOption().mapTo«toType.typeName»(this.f);
 				}
 
 				@Override
 				public <B> IndexedContainerView<B> map(final «toType.typeName»ObjectF<B> g) {
-					return new «mappedIndexedContainerViewShortName»<>(this.view, this.f.map(g));
+					return new «mappedIndexedContainerViewShortName»<>(this.container, this.f.map(g));
 				}
 
 				«FOR t : Type.primitives»
 					@Override
 					public «t.indexedContainerViewGenericName» mapTo«t.typeName»(final «toType.typeName»«t.typeName»F g) {
-						return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«t.typeName»IndexedContainerView<>(this.view, this.f.mapTo«t.typeName»(g));
+						return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«t.typeName»IndexedContainerView<>(this.container, this.f.mapTo«t.typeName»(g));
 					}
 
 				«ENDFOR»
 				@Override
 				public «toType.indexedContainerViewGenericName» limit(final int n) {
-					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this.view.limit(n), this.f);
+					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this.container.view().limit(n), this.f);
 				}
 
 				@Override
 				public «toType.indexedContainerViewGenericName» skip(final int n) {
-					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this.view.skip(n), this.f);
+					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this.container.view().skip(n), this.f);
 				}
 
 				«hashcode(toType)»
@@ -279,13 +289,13 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 		«ENDFOR»
 		«IF type == Type.OBJECT»
-			final class «limitedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends LimitedOrderedContainerView<A, C> implements IndexedContainerView<A> {
+			final class «limitedIndexedContainerViewShortName»<A, C extends «type.indexedContainerGenericName»> extends LimitedOrderedContainerView<A, C> implements IndexedContainerView<A> {
 		«ELSE»
-			final class «limitedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»LimitedOrderedContainerView<C> implements «type.indexedContainerViewGenericName» {
+			final class «limitedIndexedContainerViewShortName»<C extends «type.indexedContainerGenericName»> extends «type.typeName»LimitedOrderedContainerView<C> implements «type.indexedContainerViewGenericName» {
 		«ENDIF»
 
-			«limitedIndexedContainerViewShortName»(final C view, final int limit) {
-				super(view, limit);
+			«limitedIndexedContainerViewShortName»(final C container, final int limit) {
+				super(container, limit);
 			}
 
 			@Override
@@ -294,7 +304,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«limitedIndexedContainerViewShortName»"));
 				} else {
 					try {
-						return this.view.get(index);
+						return this.container.get(index);
 					} catch (final IndexOutOfBoundsException __) {
 						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«limitedIndexedContainerViewShortName»"));
 					}
@@ -306,7 +316,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				if (n < 0) {
 					throw new IllegalArgumentException(Integer.toString(n));
 				} else if (n < this.limit) {
-					return new «limitedIndexedContainerViewShortName»<>(this.view, n);
+					return new «limitedIndexedContainerViewShortName»<>(this.container, n);
 				} else {
 					return this;
 				}
@@ -315,10 +325,10 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
-				if (this.view.hasKnownFixedSize()) {
-					final int size = Math.min(this.limit, this.view.size());
+				if (this.container.hasKnownFixedSize()) {
+					final int size = Math.min(this.limit, this.container.size());
 					for (int i = 0; i < size; i++) {
-						eff.apply(this.view.get(i));
+						eff.apply(this.container.get(i));
 					}
 				} else {
 					super.foreach(eff);
@@ -332,10 +342,10 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				public void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
 			«ENDIF»
 				requireNonNull(eff);
-				if (this.view.hasKnownFixedSize()) {
-					final int size = Math.min(this.limit, this.view.size());
+				if (this.container.hasKnownFixedSize()) {
+					final int size = Math.min(this.limit, this.container.size());
 					for (int i = 0; i < size; i++) {
-						eff.apply(i, this.view.get(i));
+						eff.apply(i, this.container.get(i));
 					}
 				} else {
 					super.foreachWithIndex(eff);
@@ -345,10 +355,10 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public boolean foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
-				if (this.view.hasKnownFixedSize()) {
-					final int size = Math.min(this.limit, this.view.size());
+				if (this.container.hasKnownFixedSize()) {
+					final int size = Math.min(this.limit, this.container.size());
 					for (int i = 0; i < size; i++) {
-						if (!eff.apply(this.view.get(i))) {
+						if (!eff.apply(this.container.get(i))) {
 							return false;
 						}
 					}
@@ -364,13 +374,13 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			final class «skippedIndexedContainerViewShortName»<A, C extends IndexedContainerView<A>> extends SkippedOrderedContainerView<A, C> implements IndexedContainerView<A> {
+			final class «skippedIndexedContainerViewShortName»<A, C extends «type.indexedContainerGenericName»> extends SkippedOrderedContainerView<A, C> implements IndexedContainerView<A> {
 		«ELSE»
-			final class «skippedIndexedContainerViewShortName»<C extends «type.indexedContainerViewGenericName»> extends «type.typeName»SkippedOrderedContainerView<C> implements «type.indexedContainerViewGenericName» {
+			final class «skippedIndexedContainerViewShortName»<C extends «type.indexedContainerGenericName»> extends «type.typeName»SkippedOrderedContainerView<C> implements «type.indexedContainerViewGenericName» {
 		«ENDIF»
 
-			«skippedIndexedContainerViewShortName»(final C view, final int skip) {
-				super(view, skip);
+			«skippedIndexedContainerViewShortName»(final C container, final int skip) {
+				super(container, skip);
 			}
 
 			@Override
@@ -383,7 +393,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«skippedIndexedContainerViewShortName»"));
 					}
 					try {
-						return this.view.get(newIndex);
+						return this.container.get(newIndex);
 					} catch (final IndexOutOfBoundsException __) {
 						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«skippedIndexedContainerViewShortName»"));
 					}
@@ -398,16 +408,16 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					final int sum = this.skip + n;
 					if (sum < 0) {
 						// Overflow
-						if (this.view.hasKnownFixedSize()) {
+						if (this.container.hasKnownFixedSize()) {
 							return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
 						} else {
 							return new «skippedIndexedContainerViewShortName»<>(this, n);
 						}
 					} else {
-						if (this.view.hasKnownFixedSize() && sum >= this.view.size()) {
+						if (this.container.hasKnownFixedSize() && sum >= this.container.size()) {
 							return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
 						} else {
-							return new «skippedIndexedContainerViewShortName»<>(this.view, sum);
+							return new «skippedIndexedContainerViewShortName»<>(this.container, sum);
 						}
 					}
 				} else {
@@ -418,10 +428,10 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
-				if (this.view.hasKnownFixedSize()) {
-					final int size = this.view.size();
+				if (this.container.hasKnownFixedSize()) {
+					final int size = this.container.size();
 					for (int i = this.skip; i < size; i++) {
-						eff.apply(this.view.get(i));
+						eff.apply(this.container.get(i));
 					}
 				} else {
 					super.foreach(eff);
@@ -435,10 +445,10 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				public void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
 			«ENDIF»
 				requireNonNull(eff);
-				if (this.view.hasKnownFixedSize()) {
-					final int size = this.view.size();
+				if (this.container.hasKnownFixedSize()) {
+					final int size = this.container.size();
 					for (int i = this.skip; i < size; i++) {
-						eff.apply(i - this.skip, this.view.get(i));
+						eff.apply(i - this.skip, this.container.get(i));
 					}
 				} else {
 					super.foreachWithIndex(eff);
@@ -448,10 +458,10 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public boolean foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
-				if (this.view.hasKnownFixedSize()) {
-					final int size = this.view.size();
+				if (this.container.hasKnownFixedSize()) {
+					final int size = this.container.size();
 					for (int i = this.skip; i < size; i++) {
-						if (!eff.apply(this.view.get(i))) {
+						if (!eff.apply(this.container.get(i))) {
 							return false;
 						}
 					}
@@ -463,7 +473,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public «type.iteratorGenericName» iterator() {
-				if (this.view.hasKnownFixedSize()) {
+				if (this.container.hasKnownFixedSize()) {
 					return «type.indexedContainerViewShortName».super.iterator();
 				} else {
 					return super.iterator();
@@ -476,20 +486,20 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			final class «reverseIndexedContainerViewShortName»<A, C extends «genericName»> extends ReverseOrderedContainerView<A, C> implements «genericName» {
+			final class «reverseIndexedContainerViewShortName»<A, C extends «type.indexedContainerGenericName»> extends ReverseOrderedContainerView<A, C> implements «genericName» {
 		«ELSE»
-			final class «reverseIndexedContainerViewShortName»<C extends «genericName»> extends «type.typeName»ReverseOrderedContainerView<C> implements «genericName» {
+			final class «reverseIndexedContainerViewShortName»<C extends «type.indexedContainerGenericName»> extends «type.typeName»ReverseOrderedContainerView<C> implements «genericName» {
 		«ENDIF»
 
-			«reverseIndexedContainerViewShortName»(final C view) {
-				super(view);
+			«reverseIndexedContainerViewShortName»(final C container) {
+				super(container);
 			}
 
 			@Override
 			public «type.genericName» get(final int index) {
 				if (hasKnownFixedSize()) {
 					try {
-						return this.view.get(size() - index - 1);
+						return this.container.get(size() - index - 1);
 					} catch (final IndexOutOfBoundsException __) {
 						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«reverseIndexedContainerViewShortName»"));
 					}
@@ -501,9 +511,9 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
-				if (this.view.hasKnownFixedSize()) {
-					for (int i = this.view.size() - 1; i >= 0; i--) {
-						eff.apply(this.view.get(i));
+				if (this.container.hasKnownFixedSize()) {
+					for (int i = this.container.size() - 1; i >= 0; i--) {
+						eff.apply(this.container.get(i));
 					}
 				} else {
 					super.foreach(eff);
@@ -513,10 +523,10 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public void foreachWithIndex(final Int«type.typeName»Eff2«IF type == Type.OBJECT»<A>«ENDIF» eff) {
 				requireNonNull(eff);
-				if (this.view.hasKnownFixedSize()) {
-					final int size = this.view.size();
+				if (this.container.hasKnownFixedSize()) {
+					final int size = this.container.size();
 					for (int i = 0; i < size; i++) {
-						eff.apply(i, this.view.get(size - i - 1));
+						eff.apply(i, this.container.get(size - i - 1));
 					}
 				} else {
 					super.foreachWithIndex(eff);
@@ -526,9 +536,9 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public boolean foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
-				if (this.view.hasKnownFixedSize()) {
-					for (int i = this.view.size() - 1; i >= 0; i--) {
-						if (!eff.apply(this.view.get(i))) {
+				if (this.container.hasKnownFixedSize()) {
+					for (int i = this.container.size() - 1; i >= 0; i--) {
+						if (!eff.apply(this.container.get(i))) {
 							return false;
 						}
 					}
@@ -540,7 +550,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public «genericName» reverse() {
-				return this.view;
+				return this.container.view();
 			}
 
 			«hashcode(type)»

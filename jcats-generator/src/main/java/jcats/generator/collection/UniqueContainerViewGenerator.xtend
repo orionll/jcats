@@ -41,6 +41,11 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 				return this;
 			}
 
+			@Override
+			default «type.uniqueContainerGenericName» unview() {
+				return this;
+			}
+
 			static «type.paramGenericName("UniqueContainerView")» «type.shortName("SetView").firstToLowerCase»(final Set<«type.genericBoxedName»> set) {
 				return «type.shortName("SetView").firstToLowerCase»(set, true);
 			}
@@ -85,6 +90,11 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public boolean equals(final Object obj) {
 				return this.container.equals(obj);
+			}
+
+			@Override
+			public «type.uniqueContainerGenericName» unview() {
+				return this.container;
 			}
 		}
 

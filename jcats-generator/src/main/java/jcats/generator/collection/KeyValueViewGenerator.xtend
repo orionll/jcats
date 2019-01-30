@@ -33,6 +33,10 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 				return this;
 			}
 
+			default KeyValue<K, A> unview() {
+				return this;
+			}
+
 			@Override
 			default boolean isEmpty() {
 				return !iterator().hasNext();
@@ -44,7 +48,7 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			default KeyValueView<K, A> filterKeys(final BooleanF<K> predicate) {
-				return new FilteredKeyValueView<>(this, predicate);
+				return new FilteredKeyValueView<>(unview(), predicate);
 			}
 
 			static <K, A> KeyValueView<K, A> mapView(final Map<K, A> map) {
@@ -220,14 +224,19 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			public String toString() {
 				return this.keyValue.toString();
 			}
+
+			@Override
+			public KeyValue<K, A> unview() {
+				return this.keyValue;
+			}
 		}
 
 		final class FilteredKeyValueView<K, A> implements KeyValueView<K, A> {
-			private final KeyValueView<K, A> view;
+			private final KeyValue<K, A> keyValue;
 			private final BooleanF<K> predicate;
 
-			FilteredKeyValueView(final KeyValueView<K, A> view, final BooleanF<K> predicate) {
-				this.view = view;
+			FilteredKeyValueView(final KeyValue<K, A> keyValue, final BooleanF<K> predicate) {
+				this.keyValue = keyValue;
 				this.predicate = predicate;
 			}
 
@@ -244,7 +253,7 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			@Override
 			public A getOrNull(final K key) {
 				if (this.predicate.apply(key)) {
-					return this.view.getOrNull(key);
+					return this.keyValue.getOrNull(key);
 				} else {
 					return null;
 				}
@@ -252,12 +261,12 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public Iterator<P<K, A>> iterator() {
-				return new FilteredIterator<>(this.view.iterator(), this.predicate.contraMap(P::get1));
+				return new FilteredIterator<>(this.keyValue.iterator(), this.predicate.contraMap(P::get1));
 			}
 
 			@Override
 			public void foreach(final Eff2<K, A> eff) {
-				this.view.foreach((final K key, final A value) -> {
+				this.keyValue.foreach((final K key, final A value) -> {
 					if (this.predicate.apply(key)) {
 						eff.apply(key, value);
 					}
@@ -266,7 +275,7 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public void forEach(final Consumer<? super P<K, A>> action) {
-				this.view.forEach((final P<K, A> entry) -> {
+				this.keyValue.forEach((final P<K, A> entry) -> {
 					if (this.predicate.apply(entry.get1())) {
 						action.accept(entry);
 					}
