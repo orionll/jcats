@@ -257,9 +257,9 @@ class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			public final «genericName» slice(final int fromIndex, final int toIndex) {
-				sliceRangeCheck(fromIndex, toIndex, size());
-				return skip(fromIndex).limit(toIndex - fromIndex);
+			public final «genericName» slice(final int fromIndexInclusive, final int toIndexExclusive) {
+				sliceRangeCheck(fromIndexInclusive, toIndexExclusive, size());
+				return skip(fromIndexInclusive).limit(toIndexExclusive - fromIndexInclusive);
 			}
 
 			public final «genericName» reverse() {
@@ -1429,6 +1429,11 @@ class SeqGenerator implements ClassGenerator {
 
 			«shortName»View(final «genericName» seq) {
 				super(seq);
+			}
+
+			@Override
+			public «type.indexedContainerViewGenericName» slice(final int fromIndexInclusive, final int toIndexExclusive) {
+				return new «type.diamondName("SeqView")»(this.container.slice(fromIndexInclusive, toIndexExclusive));
 			}
 
 			@Override

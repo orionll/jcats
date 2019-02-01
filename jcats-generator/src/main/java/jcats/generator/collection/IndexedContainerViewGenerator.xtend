@@ -52,13 +52,25 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			@Deprecated
-			default «type.indexedContainerViewGenericName» view() {
+			default «genericName» view() {
 				return this;
 			}
 
 			@Override
 			default «type.indexedContainerGenericName» unview() {
 				return this;
+			}
+
+			default «genericName» slice(final int fromIndexInclusive, final int toIndexExclusive) throws IndexOutOfBoundsException {
+				final int size = size();
+				sliceRangeCheck(fromIndexInclusive, toIndexExclusive, size);
+				if (fromIndexInclusive == 0 && toIndexExclusive == size) {
+					return this;
+				} else if (fromIndexInclusive == toIndexExclusive) {
+					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+				} else {
+					return skip(fromIndexInclusive).limit(toIndexExclusive - fromIndexInclusive);
+				}
 			}
 
 			@Override

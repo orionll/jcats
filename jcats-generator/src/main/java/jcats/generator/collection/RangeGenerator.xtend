@@ -44,7 +44,7 @@ final class RangeGenerator implements ClassGenerator {
 
 			@Override
 			public int size() throws SizeOverflowException {
-				final long size = (long) this.high - this.low + (this.closed ? 1 : 0);
+				final long size = longSize();
 				if (size == (int) size) {
 					return (int) size;
 				} else {
@@ -64,8 +64,12 @@ final class RangeGenerator implements ClassGenerator {
 
 			@Override
 			public boolean hasKnownFixedSize() {
-				final long size = (long) this.high - this.low + (this.closed ? 1 : 0);
+				final long size = longSize();
 				return (size == (int) size);
+			}
+
+			private long longSize() {
+				return (long) this.high - this.low + (this.closed ? 1 : 0);
 			}
 
 			@Override
@@ -136,6 +140,23 @@ final class RangeGenerator implements ClassGenerator {
 			@Override
 			public IntOption lastIndexOf(final int value) {
 				return indexOf(value);
+			}
+
+			@Override
+			public IntIndexedContainerView slice(final int fromIndexInclusive, final int toIndexExclusive) {
+				final long size = longSize();
+				if (size == (int) size) {
+					sliceRangeCheck(fromIndexInclusive, toIndexExclusive, (int) size);
+				} else {
+					sliceRangeCheck(fromIndexInclusive, toIndexExclusive);
+				}
+				if (fromIndexInclusive == 0 && toIndexExclusive == size) {
+					return this;
+				} else if (fromIndexInclusive == toIndexExclusive) {
+					return emptyIntArray().view();
+				} else {
+					return new Range(fromIndexInclusive, toIndexExclusive, false);
+				}
 			}
 
 			@Override

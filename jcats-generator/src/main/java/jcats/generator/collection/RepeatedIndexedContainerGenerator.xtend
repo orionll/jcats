@@ -18,6 +18,7 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 	override className() { Constants.COLLECTION + "." + shortName }
 	def shortName() { type.shortName("RepeatedIndexedContainer") }
 	def genericName() { type.genericName("RepeatedIndexedContainer") }
+	def diamondName() { type.diamondName("RepeatedIndexedContainer") }
 	def wildcardName() { type.wildcardName("RepeatedIndexedContainer") }
 
 	override sourceCode() '''
@@ -253,19 +254,27 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public «type.indexedContainerViewGenericName» slice(final int fromIndexInclusive, final int toIndexExclusive) {
+				sliceRangeCheck(fromIndexInclusive, toIndexExclusive, this.size);
+				if (fromIndexInclusive == 0 && toIndexExclusive == this.size) {
+					return this;
+				} else if (fromIndexInclusive == toIndexExclusive) {
+					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+				} else {
+					return new «diamondName»(toIndexExclusive - fromIndexInclusive, this.value);
+				}
+			}
+
+			@Override
 			public «type.indexedContainerViewGenericName» limit(final int n) {
 				if (n < 0) {
 					throw new IndexOutOfBoundsException(Integer.toString(n));
 				} else if (n == 0) {
-					«IF type == Type.OBJECT»
-						return Array.<A>emptyArray().view();
-					«ELSE»
-						return empty«type.arrayShortName»().view();
-					«ENDIF»
+					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
 				} else if (n >= this.size) {
 					return this;
 				} else {
-					return new «type.diamondName("RepeatedIndexedContainer")»(n, this.value);
+					return new «diamondName»(n, this.value);
 				}
 			}
 
@@ -276,13 +285,9 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 				} else if (n == 0) {
 					return this;
 				} else if (n >= this.size) {
-					«IF type == Type.OBJECT»
-						return Array.<A>emptyArray().view();
-					«ELSE»
-						return empty«type.arrayShortName»().view();
-					«ENDIF»
+					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
 				} else {
-					return new «type.diamondName("RepeatedIndexedContainer")»(this.size - n, this.value);
+					return new «diamondName»(this.size - n, this.value);
 				}
 			}
 
