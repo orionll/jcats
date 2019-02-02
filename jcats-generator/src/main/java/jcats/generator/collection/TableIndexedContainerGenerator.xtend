@@ -18,6 +18,7 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 	override className() { Constants.COLLECTION + "." + shortName }
 	def shortName() { type.shortName("TableIndexedContainer") }
 	def genericName() { type.genericName("TableIndexedContainer") }
+	def diamondName() { type.diamondName("TableIndexedContainer") }
 	def wildcardName() { type.wildcardName("TableIndexedContainer") }
 
 	override sourceCode() '''
@@ -175,19 +176,30 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public «type.indexedContainerViewGenericName» slice(final int fromIndexInclusive, final int toIndexExclusive) {
+				sliceRangeCheck(fromIndexInclusive, toIndexExclusive, this.size);
+				if (fromIndexInclusive == 0 && toIndexExclusive == this.size) {
+					return this;
+				} else if (fromIndexInclusive == toIndexExclusive) {
+					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+				} else if (fromIndexInclusive == 0) {
+					return new «diamondName»(toIndexExclusive, this.f);
+				} else {
+					return new «diamondName»(toIndexExclusive - fromIndexInclusive,
+							i -> this.f.apply(fromIndexInclusive + i));
+				}
+			}
+
+			@Override
 			public «type.indexedContainerViewGenericName» limit(final int n) {
 				if (n < 0) {
 					throw new IndexOutOfBoundsException(Integer.toString(n));
 				} else if (n == 0) {
-					«IF type == Type.OBJECT»
-						return Array.<A>emptyArray().view();
-					«ELSE»
-						return empty«type.arrayShortName»().view();
-					«ENDIF»
+					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
 				} else if (n >= this.size) {
 					return this;
 				} else {
-					return new «type.diamondName("TableIndexedContainer")»(n, this.f);
+					return new «diamondName»(n, this.f);
 				}
 			}
 
@@ -198,13 +210,9 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 				} else if (n == 0) {
 					return this;
 				} else if (n >= this.size) {
-					«IF type == Type.OBJECT»
-						return Array.<A>emptyArray().view();
-					«ELSE»
-						return empty«type.arrayShortName»().view();
-					«ENDIF»
+					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
 				} else {
-					return new «type.diamondName("TableIndexedContainer")»(this.size - n, this.f);
+					return new «diamondName»(this.size - n, i -> this.f.apply(i + n));
 				}
 			}
 

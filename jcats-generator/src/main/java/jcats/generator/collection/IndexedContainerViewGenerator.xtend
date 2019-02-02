@@ -229,6 +229,11 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			«ENDFOR»
 			@Override
+			public IndexedContainerView<«mapTargetType»> slice(final int fromIndexInclusive, final int toIndexExclusive) {
+				return new «mappedIndexedContainerViewShortName»<>(this.container.view().slice(fromIndexInclusive, toIndexExclusive), this.f);
+			}
+
+			@Override
 			public IndexedContainerView<«mapTargetType»> limit(final int n) {
 				return new «mappedIndexedContainerViewShortName»<>(this.container.view().limit(n), this.f);
 			}
@@ -284,6 +289,11 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					}
 
 				«ENDFOR»
+				@Override
+				public «toType.indexedContainerViewGenericName» slice(final int fromIndexInclusive, final int toIndexExclusive) {
+					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this.container.view().slice(fromIndexInclusive, toIndexExclusive), this.f);
+				}
+
 				@Override
 				public «toType.indexedContainerViewGenericName» limit(final int n) {
 					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this.container.view().limit(n), this.f);
