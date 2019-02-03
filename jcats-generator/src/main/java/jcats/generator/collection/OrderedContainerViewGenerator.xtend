@@ -117,7 +117,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			default «genericName» filter(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
-				return new «type.diamondName("FilteredOrderedContainerView")»(unview(), predicate);
+				return new «filteredShortName»<>(unview(), predicate);
 			}
 
 			«IF type == Type.OBJECT»
@@ -388,15 +388,15 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 		«ENDFOR»
-		final class «type.genericName("FilteredOrderedContainerView")» extends «type.shortName("FilteredContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»«type.orderedContainerGenericName»> implements «genericName» {
+		class «filteredShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «type.orderedContainerGenericName»> extends «type.shortName("FilteredContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»C> implements «genericName» {
 
-			«filteredShortName»(final «type.orderedContainerGenericName» container, final «type.boolFName» predicate) {
+			«filteredShortName»(final C container, final «type.boolFName» predicate) {
 				super(container, predicate);
 			}
 
 			@Override
 			public «type.iteratorGenericName» reverseIterator() {
-				if (this.container.hasKnownFixedSize() || this.container instanceof «type.indexedContainerViewWildcardName») {
+				if (this.container.hasKnownFixedSize()) {
 					«IF type == Type.OBJECT || type.javaUnboxedType»
 						return new «type.diamondName("FilteredIterator")»(this.container.reverseIterator(), this.predicate);
 					«ELSE»
@@ -409,7 +409,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public «genericName» filter(final «type.boolFName» p) {
-				return new «type.diamondName("FilteredOrderedContainerView")»(this.container, and(this.predicate, p));
+				return new «filteredShortName»<>(this.container, and(this.predicate, p));
 			}
 		}
 
