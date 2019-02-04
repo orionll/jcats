@@ -55,7 +55,7 @@ final class StackGenerator implements ClassGenerator {
 			import static «Constants.COLLECTION».«toType.stackShortName».empty«toType.stackShortName»;
 		«ENDFOR»
 
-		public final class «type.covariantName("Stack")» implements «type.containerGenericName», Equatable<«genericName»>, Serializable {
+		public final class «type.covariantName("Stack")» implements «type.orderedContainerGenericName», Equatable<«genericName»>, Serializable {
 			private static final «wildcardName» EMPTY = new «diamondName»(«type.defaultValue», null);
 
 			final «type.genericName» head;
