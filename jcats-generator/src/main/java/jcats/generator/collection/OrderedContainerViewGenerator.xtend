@@ -117,7 +117,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			default «genericName» filter(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
-				return new «filteredShortName»<>(unview(), predicate);
+				return new «type.diamondName("FilteredOrderedContainerView")»(unview(), predicate);
 			}
 
 			«IF type == Type.OBJECT»
@@ -220,6 +220,11 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				return this.container.reverseIterator();
 			}
 
+			@Override
+			public boolean isReverseQuick() {
+				return this.container.isReverseQuick();
+			}
+
 			«IF type.primitive»
 				@Override
 				public OrderedContainerView<«type.boxedName»> boxed() {
@@ -256,6 +261,11 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				«ELSE»
 					return new Mapped«type.typeName»ObjectIterator<>(this.container.reverseIterator(), this.f);
 				«ENDIF»
+			}
+
+			@Override
+			public boolean isReverseQuick() {
+				return this.container.isReverseQuick();
 			}
 
 			@Override
@@ -319,6 +329,11 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				}
 
 				@Override
+				public boolean isReverseQuick() {
+					return this.container.isReverseQuick();
+				}
+
+				@Override
 				public <B> OrderedContainerView<B> map(final «toType.typeName»ObjectF<B> g) {
 					return new «mappedShortName»<>(this.container, this.f.map(g));
 				}
@@ -354,11 +369,16 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public Iterator<«mapTargetType»> reverseIterator() {
-				if (this.container.hasKnownFixedSize() || this.container instanceof «type.indexedContainerViewWildcardName») {
+				if (this.container.isReverseQuick()) {
 					return new FlatMapped«IF type != Type.OBJECT»«type.typeName»Object«ENDIF»ReverseIterator<>(this.container.reverseIterator(), this.f);
 				} else {
 					return OrderedContainerView.super.reverseIterator();
 				}
+			}
+
+			@Override
+			public boolean isReverseQuick() {
+				return this.container.isReverseQuick();
 			}
 		}
 
@@ -375,7 +395,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 
 				@Override
 				public «toType.iteratorGenericName» reverseIterator() {
-					if (this.container.hasKnownFixedSize() || this.container instanceof «type.indexedContainerViewWildcardName») {
+					if (this.container.isReverseQuick()) {
 						«IF type == Type.OBJECT»
 							return new FlatMappedObject«toType.typeName»ReverseIterator<>(this.container.reverseIterator(), this.f);
 						«ELSE»
@@ -385,18 +405,23 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 						return «toType.orderedContainerViewGenericName».super.reverseIterator();
 					}
 				}
+
+				@Override
+				public boolean isReverseQuick() {
+					return this.container.isReverseQuick();
+				}
 			}
 
 		«ENDFOR»
-		class «filteredShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «type.orderedContainerGenericName»> extends «type.shortName("FilteredContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»C> implements «genericName» {
+		final class «type.genericName("FilteredOrderedContainerView")» extends «type.shortName("FilteredContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»«type.orderedContainerGenericName»> implements «genericName» {
 
-			«filteredShortName»(final C container, final «type.boolFName» predicate) {
+			«filteredShortName»(final «type.orderedContainerGenericName» container, final «type.boolFName» predicate) {
 				super(container, predicate);
 			}
 
 			@Override
 			public «type.iteratorGenericName» reverseIterator() {
-				if (this.container.hasKnownFixedSize()) {
+				if (this.container.isReverseQuick()) {
 					«IF type == Type.OBJECT || type.javaUnboxedType»
 						return new «type.diamondName("FilteredIterator")»(this.container.reverseIterator(), this.predicate);
 					«ELSE»
@@ -408,8 +433,13 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public boolean isReverseQuick() {
+				return this.container.isReverseQuick();
+			}
+
+			@Override
 			public «genericName» filter(final «type.boolFName» p) {
-				return new «filteredShortName»<>(this.container, and(this.predicate, p));
+				return new «type.diamondName("FilteredOrderedContainerView")»(this.container, and(this.predicate, p));
 			}
 		}
 
@@ -556,6 +586,11 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public «type.iteratorGenericName» reverseIterator() {
 				return this.container.iterator();
+			}
+
+			@Override
+			public boolean isReverseQuick() {
+				return true;
 			}
 
 			«IF type.javaUnboxedType»
@@ -710,6 +745,13 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				} else {
 					return «type.orderedContainerViewShortName».super.reverseIterator();
 				}
+			}
+
+			@Override
+			public boolean isReverseQuick() {
+				return this.collection instanceof List<?> && this.collection instanceof RandomAccess
+					|| this.collection instanceof Deque<?>
+					|| this.collection instanceof NavigableSet<?>;
 			}
 		}
 	'''

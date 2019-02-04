@@ -99,6 +99,11 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			public Iterator<A> reverseIterator() {
 				return new MappedIterator<>(this.keyValue.reverseIterator(), P::get2);
 			}
+
+			@Override
+			public boolean isReverseQuick() {
+				return true;
+			}
 		}
 
 		final class SortedKeys<K> extends Keys<K, SortedKeyValue<K, ?>> implements SortedUniqueContainerView<K> {

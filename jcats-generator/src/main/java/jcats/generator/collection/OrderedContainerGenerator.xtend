@@ -123,6 +123,10 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 				return to«type.arrayShortName»().reverseIterator();
 			}
 
+			default boolean isReverseQuick() {
+				return false;
+			}
+
 			@Override
 			default int spliteratorCharacteristics() {
 				return Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE;
@@ -180,6 +184,11 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 				@Override
 				public Iterator<«type.genericBoxedName»> reverseIterator() {
 					return this.container.reverseIterator();
+				}
+
+				@Override
+				public boolean isReverseQuick() {
+					return this.container.isReverseQuick();
 				}
 			}
 		«ENDIF»

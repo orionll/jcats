@@ -80,6 +80,11 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			default boolean isReverseQuick() {
+				return hasKnownFixedSize();
+			}
+
+			@Override
 			default void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
 				if (hasKnownFixedSize()) {

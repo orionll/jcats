@@ -118,6 +118,11 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 
 			«ENDIF»
 			@Override
+			default boolean isReverseQuick() {
+				return true;
+			}
+
+			@Override
 			default SortedSet<«type.genericBoxedName»> asCollection() {
 				return new «type.diamondName("SortedUniqueContainerAsSortedSet")»(this);
 			}

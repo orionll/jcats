@@ -45,7 +45,6 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.JCATS».IntOption.*;
 		import static «Constants.COMMON».*;
-		import static «Constants.FUNCTION».«type.shortName("BooleanF")».*;
 		«IF type.primitive»
 			import static «Constants.COLLECTION».«type.arrayShortName».*;
 		«ENDIF»
@@ -97,11 +96,6 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				}
 
 			«ENDFOR»
-			@Override
-			default «type.orderedContainerViewGenericName» filter(final «type.boolFName» predicate) {
-				requireNonNull(predicate);
-				return new «type.diamondName("FilteredIndexedContainerView")»(unview(), predicate);
-			}
 
 			@Override
 			default «genericName» limit(final int limit) {
@@ -318,27 +312,6 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 		«ENDFOR»
-		final class «type.genericName("FilteredIndexedContainerView")» extends «type.shortName("FilteredOrderedContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»«type.indexedContainerGenericName»> {
-
-			«filteredShortName»(final «type.indexedContainerGenericName» container, final «type.boolFName» predicate) {
-				super(container, predicate);
-			}
-
-			@Override
-			public «type.iteratorGenericName» reverseIterator() {
-				«IF type == Type.OBJECT || type.javaUnboxedType»
-					return new «type.diamondName("FilteredIterator")»(this.container.reverseIterator(), this.predicate);
-				«ELSE»
-					return new FilteredIterator<>(this.container.reverseIterator(), this.predicate::apply);
-				«ENDIF»
-			}
-
-			@Override
-			public «type.orderedContainerViewGenericName» filter(final «type.boolFName» p) {
-				return new «type.diamondName("FilteredIndexedContainerView")»(this.container, and(this.predicate, p));
-			}
-		}
-
 		«IF type == Type.OBJECT»
 			final class «limitedShortName»<A, C extends «type.indexedContainerGenericName»> extends LimitedOrderedContainerView<A, C> implements IndexedContainerView<A> {
 		«ELSE»
