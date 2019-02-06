@@ -408,7 +408,7 @@ final class ArrayGenerator implements ClassGenerator {
 					if (isEmpty()) {
 						return empty«toType.typeName»Array();
 					«IF type == toType»
-					} else if (f == «type.typeName»«type.typeName»F.id()) {
+					} else if (f == «type.javaName»Id()) {
 						return this;
 					«ENDIF»
 					} else {

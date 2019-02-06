@@ -486,7 +486,7 @@ final class FGenerator implements InterfaceGenerator {
 					}
 
 				«ELSE»
-					static «shortName» id() {
+					static «shortName» «from.javaName»Id() {
 						return Fs.«from.typeName.toUpperCase»_ID;
 					}
 

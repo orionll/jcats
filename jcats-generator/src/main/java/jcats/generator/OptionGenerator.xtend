@@ -39,7 +39,7 @@ final class OptionGenerator implements ClassGenerator {
 		«IF type == Type.OBJECT»
 			import static «Constants.F».id;
 		«ELSE»
-			import static «Constants.FUNCTION».«type.typeName»«type.typeName»F.id;
+			import static «Constants.FUNCTION».«type.typeName»«type.typeName»F.*;
 		«ENDIF»
 		«IF type == Type.OBJECT»
 			import static «Constants.EITHER».*;
@@ -232,7 +232,7 @@ final class OptionGenerator implements ClassGenerator {
 						if (isEmpty()) {
 							return «returnType.noneName»();
 						«IF returnType == type»
-							} else if (f == id()) {
+							} else if (f == «returnType.javaName»Id()) {
 								return this;
 						«ENDIF»
 						} else {

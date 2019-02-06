@@ -292,7 +292,7 @@ class SeqGenerator implements ClassGenerator {
 					public final «toType.typeName»Seq mapTo«toType.typeName»(final «type.typeName»«toType.typeName»F f) {
 						requireNonNull(f);
 						«IF type == toType»
-						if (f == «type.typeName»«type.typeName»F.id()) {
+						if (f == «type.javaName»Id()) {
 							return this;
 						} else {
 						«ENDIF»

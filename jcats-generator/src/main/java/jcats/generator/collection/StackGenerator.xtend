@@ -29,7 +29,6 @@ final class StackGenerator implements ClassGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.io.Serializable;
-		import java.util.Collection;
 		import java.util.Iterator;
 		import java.util.NoSuchElementException;
 		«IF type.javaUnboxedType»
@@ -37,22 +36,25 @@ final class StackGenerator implements ClassGenerator {
 		«ENDIF»
 		import java.util.stream.Collector;
 		import java.util.stream.«type.streamName»;
-		import java.util.Spliterator;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Collections.emptyIterator;
 		import static java.util.Objects.requireNonNull;
-		import static «Constants.F».id;
 		import static «Constants.JCATS».«type.optionShortName».*;
-		import static «Constants.P».p;
+		«IF type == Type.OBJECT»
+			import static «Constants.F».id;
+		«ENDIF»
+		«IF type.primitive»
+			import static «Constants.FUNCTION».«type.typeName»«type.typeName»F.*;
+		«ENDIF»
 		import static «Constants.COMMON».*;
 		«IF type != Type.OBJECT»
 			import static «Constants.STACK».*;
 		«ENDIF»
 		«FOR toType : Type.primitives.filter[it != type]»
-			import static «Constants.COLLECTION».«toType.stackShortName».empty«toType.stackShortName»;
+			import static «Constants.COLLECTION».«toType.stackShortName».*;
 		«ENDFOR»
 
 		public final class «type.covariantName("Stack")» implements «type.orderedContainerGenericName», Equatable<«genericName»>, Serializable {
@@ -237,7 +239,7 @@ final class StackGenerator implements ClassGenerator {
 					if (isEmpty()) {
 						return empty«toType.stackShortName»();
 					«IF type == toType»
-					} else if (f == «type.typeName»«type.typeName»F.id()) {
+					} else if (f == «type.javaName»Id()) {
 						return this;
 					«ENDIF»
 					} else {
