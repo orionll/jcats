@@ -230,4 +230,26 @@ final class HashTableCommonGenerator implements ClassGenerator {
 			leafMap >>>= 1;
 		}
 	''' }
+
+	def static getFirst(String name, String entryType) '''
+		while (true) {
+			if («name».leafMap == 0) {
+				«name» = «name».treeAt(0);
+			} else {
+				int i = 0;
+				int treeMap = «name».treeMap;
+				int leafMap = «name».leafMap;
+				while (true) {
+					switch ((leafMap & 1 | (treeMap & 1) << 1)) {
+						case VOID: break;
+						case LEAF: return «name».entryAt(i);
+						case COLLISION: return («entryType») «name».collisionAt(i)[0];
+						default: i++;
+					}
+					treeMap >>>= 1;
+					leafMap >>>= 1;
+				}
+			}
+		}
+	'''
 }

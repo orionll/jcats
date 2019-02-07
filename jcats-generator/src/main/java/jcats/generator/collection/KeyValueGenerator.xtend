@@ -16,6 +16,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 		import java.util.HashMap;
 		import java.util.Map;
 		import java.util.Map.Entry;
+		import java.util.NoSuchElementException;
 		import java.util.Set;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
@@ -105,6 +106,14 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				} else {
 					ifContains.apply(value);
 				}
+			}
+
+			default P<K, A> first() throws NoSuchElementException {
+				return iterator().next();
+			}
+
+			default K firstKey() throws NoSuchElementException {
+				return first().get1();
 			}
 
 			default void foreach(final Eff2<K, A> eff) {

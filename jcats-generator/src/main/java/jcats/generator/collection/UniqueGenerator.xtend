@@ -82,6 +82,19 @@ final class UniqueGenerator implements ClassGenerator {
 				}
 			}
 
+			@Override
+			public A first() throws NoSuchElementException {
+				if (isEmpty()) {
+					throw new NoSuchElementException();
+				} else {
+					return getFirst(this);
+				}
+			}
+
+			private static <A> A getFirst(Unique<A> unique) {
+				«HashTableCommonGenerator.getFirst("unique", "A")»
+			}
+		
 			private A entryAt(final int index) {
 				return (A) this.slots[index];
 			}

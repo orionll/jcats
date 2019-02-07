@@ -25,16 +25,8 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 
 			Ord<K> ord();
 
-			default P<K, A> first() throws NoSuchElementException {
-				return iterator().next();
-			}
-
 			default P<K, A> last() throws NoSuchElementException {
 				return reverseIterator().next();
-			}
-
-			default K firstKey() throws NoSuchElementException {
-				return first().get1();
 			}
 
 			default K lastKey() throws NoSuchElementException {

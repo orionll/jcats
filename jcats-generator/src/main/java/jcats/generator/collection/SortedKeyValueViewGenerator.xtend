@@ -71,18 +71,8 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public P<K, A> first() {
-				return this.keyValue.first();
-			}
-
-			@Override
 			public P<K, A> last() {
 				return this.keyValue.last();
-			}
-
-			@Override
-			public K firstKey() {
-				return this.keyValue.firstKey();
 			}
 
 			@Override

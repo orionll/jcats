@@ -113,6 +113,19 @@ class DictGenerator implements ClassGenerator {
 				}
 			}
 
+			@Override
+			public P<K, A> first() throws NoSuchElementException {
+				if (isEmpty()) {
+					throw new NoSuchElementException();
+				} else {
+					return getFirst(this);
+				}
+			}
+
+			private static <K, A> P<K, A> getFirst(Dict<K, A> dict) {
+				«HashTableCommonGenerator.getFirst("dict", "P<K, A>")»
+			}
+
 			private P<K, A> entryAt(final int index) {
 				return (P<K, A>) this.slots[index];
 			}

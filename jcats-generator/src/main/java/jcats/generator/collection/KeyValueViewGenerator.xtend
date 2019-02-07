@@ -146,6 +146,16 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public P<K, A> first() {
+				return this.keyValue.first();
+			}
+
+			@Override
+			public K firstKey() {
+				return this.keyValue.firstKey();
+			}
+
+			@Override
 			public void foreach(final Eff2<K, A> eff) {
 				this.keyValue.foreach(eff);
 			}
@@ -337,6 +347,16 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			@Override
 			public boolean hasKnownFixedSize() {
 				return this.fixedSize;
+			}
+
+			@Override
+			public P<K, A> first() {
+				return P.fromEntry(this.map.entrySet().iterator().next());
+			}
+
+			@Override
+			public K firstKey() {
+				return requireNonNull(this.map.keySet().iterator().next());
 			}
 
 			@Override
