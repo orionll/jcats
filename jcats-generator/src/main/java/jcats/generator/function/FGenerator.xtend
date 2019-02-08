@@ -60,7 +60,7 @@ final class FGenerator implements InterfaceGenerator {
 		} else {
 			from.typeName.firstToLowerCase + to.typeName + "Always"
 		}
-	} 
+	}
 
 	def variantTypeParams() {
 		if (from == Type.OBJECT && to == Type.OBJECT) {

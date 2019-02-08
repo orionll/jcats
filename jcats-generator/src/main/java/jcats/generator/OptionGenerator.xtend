@@ -12,7 +12,7 @@ final class OptionGenerator implements ClassGenerator {
 	}
 
 	override className() { Constants.JCATS + "." + shortName }
-	
+
 	def shortName() { type.optionShortName }
 	def genericName() { type.optionGenericName }
 	def diamondName() { type.diamondName("Option") }

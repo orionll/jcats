@@ -94,7 +94,7 @@ final class UniqueGenerator implements ClassGenerator {
 			private static <A> A getFirst(Unique<A> unique) {
 				«HashTableCommonGenerator.getFirst("unique", "A")»
 			}
-		
+
 			private A entryAt(final int index) {
 				return (A) this.slots[index];
 			}

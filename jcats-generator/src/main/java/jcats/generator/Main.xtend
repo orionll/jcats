@@ -227,7 +227,7 @@ final class Main {
 			}
 			if (line.endsWith(" ") || line.endsWith("\t")) {
 				println('''WARNING: «path»:«lineNumber + 1» - trailing whitespace''')
-			} 
+			}
 		]
 	}
 }

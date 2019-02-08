@@ -6,7 +6,7 @@ import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 @FinalFieldsConstructor
 final class OrdGenerator implements InterfaceGenerator {
 	val Type type
-		
+
 	override className() { Constants.JCATS + "." + shortName }
 
 	def shortName() { type.ordShortName }

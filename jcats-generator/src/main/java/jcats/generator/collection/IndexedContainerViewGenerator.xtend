@@ -115,7 +115,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				} else if (skip == 0) {
 					return this;
 				} else if (hasKnownFixedSize() && skip >= size()) {
-					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view(); 
+					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
 				} else {
 					return new «skippedShortName»<>(unview(), skip);
 				}

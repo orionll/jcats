@@ -16,7 +16,7 @@ final class CastGenerator implements ClassGenerator {
 		import java.util.function.*;
 
 		import static java.util.Objects.requireNonNull;
-		
+
 		public final class Cast {
 
 			private Cast() {}

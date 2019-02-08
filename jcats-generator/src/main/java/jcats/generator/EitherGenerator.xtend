@@ -75,11 +75,11 @@ final class EitherGenerator implements ClassGenerator {
 	}
 
 	def leftTypeGenericName() {
-		if (leftType == Type.OBJECT) "X" else leftType.javaName	
+		if (leftType == Type.OBJECT) "X" else leftType.javaName
 	}
 
 	def leftTypeGenericBoxedName() {
-		if (leftType == Type.OBJECT) "X" else leftType.genericBoxedName	
+		if (leftType == Type.OBJECT) "X" else leftType.genericBoxedName
 	}
 
 	def leftName() {

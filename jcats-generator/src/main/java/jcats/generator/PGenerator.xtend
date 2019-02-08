@@ -256,7 +256,7 @@ class PGenerator implements ClassGenerator {
 				public <B1, B2> P<B1, B2> biMap(final «type1.typeName»ObjectF<B1> f1, final F<A, B2> f2) {
 			«ELSE»
 				public <B1, B2> P<B1, B2> biMap(final «type1.typeName»ObjectF<B1> f1, final «type2.typeName»ObjectF<B2> f2) {
-			«ENDIF»			
+			«ENDIF»
 				return p(f1.apply(this.a1), f2.apply(this.a2));
 			}
 

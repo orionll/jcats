@@ -79,7 +79,7 @@ final class Seq5Generator extends SeqGenerator {
 							}
 						}
 					}
-		
+
 					for (int i = 1; i < node5[0].length; i++) {
 						assert node5[0][i].length == 32 : "node3.length = " + node5[0][i].length;
 						for (final «type.javaName»[][] node2 : node5[0][i]) {

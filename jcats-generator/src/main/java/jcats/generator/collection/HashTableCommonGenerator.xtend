@@ -6,7 +6,7 @@ import jcats.generator.Constants
 final class HashTableCommonGenerator implements ClassGenerator {
 
 	override className() { "jcats.collection.HashTableCommon" }
-	
+
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
@@ -109,7 +109,7 @@ final class HashTableCommonGenerator implements ClassGenerator {
 			}
 		}
 	''' }
-	
+
 	def static remap(String shortName, String genericName, String diamondName) { '''
 		private «genericName» remap(final int treeMap, final int leafMap, final int size) {
 			if (this.leafMap == leafMap && this.treeMap == treeMap) {

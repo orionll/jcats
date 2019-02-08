@@ -33,7 +33,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 		«ENDIF»
 		import java.util.stream.«type.streamName»;
 
-		import «Constants.JCATS».*; 
+		import «Constants.JCATS».*;
 
 		«IF type == Type.OBJECT»
 			import static java.util.Objects.requireNonNull;

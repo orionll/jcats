@@ -79,7 +79,7 @@ final class EffNGenerators {
 					«cast((1 .. arity).map["A" + it], (1 .. arity).map["A" + it], #[])»
 				}
 
-			''' }		
+			''' }
 		}
 	}
 }

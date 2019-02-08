@@ -300,7 +300,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			KeyValueAsUniqueContainer(final KV keyValue) {
 				this.keyValue = keyValue;
 			}
-		
+
 			@Override
 			public int size() {
 				return this.keyValue.size();
@@ -326,17 +326,17 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				requireNonNull(p);
 				return p.get2().equals(this.keyValue.getOrNull(p.get1()));
 			}
-		
+
 			@Override
 			public void forEach(final Consumer<? super P<K, A>> action) {
 				this.keyValue.forEach(action);
 			}
-		
+
 			@Override
 			public void foreach(final Eff<P<K, A>> eff) {
 				this.keyValue.forEach(eff.toConsumer());
 			}
-		
+
 			@Override
 			public Iterator<P<K, A>> iterator() {
 				return this.keyValue.iterator();
@@ -365,7 +365,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			«uniqueHashCode(Type.OBJECT)»
 
 			«uniqueEquals(Type.OBJECT)»
-		
+
 			@Override
 			public String toString() {
 				return this.keyValue.toString();

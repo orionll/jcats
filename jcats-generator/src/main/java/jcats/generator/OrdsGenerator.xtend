@@ -6,7 +6,7 @@ import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 @FinalFieldsConstructor
 final class OrdsGenerator implements ClassGenerator {
 	val Type type
-		
+
 	override className() { Constants.JCATS + "." + type.shortName("Ords") }
 
 	def static List<Generator> generators() {

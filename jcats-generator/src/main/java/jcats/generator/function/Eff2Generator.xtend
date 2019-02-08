@@ -15,7 +15,7 @@ class Eff2Generator implements InterfaceGenerator {
 	val Type type2
 
 	def static List<Generator> generators() {
-		Type.values.toList.map[type1 | 
+		Type.values.toList.map[type1 |
 			Type.values.toList.map[type2 |
 				new Eff2Generator(type1, type2) as Generator
 		]].concat.toList
@@ -43,7 +43,7 @@ class Eff2Generator implements InterfaceGenerator {
 	}
 
 	def String paramGenericName() {
-		val params = 
+		val params =
 		if (type1 == Type.OBJECT && type2 == Type.OBJECT) {
 			"<A1, A2>"
 		} else if (type1 == Type.OBJECT || type2 == Type.OBJECT) {
@@ -51,7 +51,7 @@ class Eff2Generator implements InterfaceGenerator {
 		} else {
 			""
 		}
-		if (params.empty) shortName else params + " " + shortName + params 
+		if (params.empty) shortName else params + " " + shortName + params
 	}
 
 	def String variantName() {
@@ -75,7 +75,7 @@ class Eff2Generator implements InterfaceGenerator {
 		if (type1 == Type.OBJECT && type2 == Type.OBJECT) "A2"
 		else if (type2 == Type.OBJECT) "A"
 		else type2.javaName
-	}	
+	}
 
 	override sourceCode() { '''
 		package «Constants.FUNCTION»;

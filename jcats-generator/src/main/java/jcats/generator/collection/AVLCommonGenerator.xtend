@@ -7,7 +7,7 @@ import jcats.generator.Constants
 final class AVLCommonGenerator implements ClassGenerator {
 
 	override className() { "jcats.collection.AVLCommon" }
-	
+
 	override sourceCode() '''
 		package «Constants.COLLECTION»;
 

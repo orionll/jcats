@@ -6,7 +6,7 @@ import jcats.generator.Type
 
 final class FsGenerator implements ClassGenerator {
 	override className() { Constants.F + "s" }
-	
+
 	override sourceCode() { '''
 		package «Constants.FUNCTION»;
 

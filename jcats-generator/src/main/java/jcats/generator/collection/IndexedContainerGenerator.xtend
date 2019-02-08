@@ -281,7 +281,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			private int i;
 			private final «genericName» container;
 			private final int size;
-		
+
 			«type.shortName("IndexedContainerIterator")»(final «genericName» container) {
 				this.container = container;
 				this.size = container.size();
@@ -423,7 +423,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		final class «type.genericName("IndexFinder")» implements «type.boolFName» {
 			int index;
 			final «type.boolFName» predicate;
-		
+
 			«type.shortName("IndexFinder")»(final «type.boolFName» predicate) {
 				this.predicate = predicate;
 			}
@@ -444,7 +444,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			int index;
 			int lastIndex = -1;
 			final «type.boolFName» predicate;
-		
+
 			«type.shortName("LastIndexFinder")»(final «type.boolFName» predicate) {
 				this.predicate = predicate;
 			}

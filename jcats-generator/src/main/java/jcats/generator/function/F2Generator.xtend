@@ -16,7 +16,7 @@ class F2Generator implements InterfaceGenerator {
 	val Type returnType
 
 	def static List<Generator> generators() {
-		(0 ..< Type.values.size).map[i1 | 
+		(0 ..< Type.values.size).map[i1 |
 			(0 ..< Type.values.size).map[i2 |
 				Type.values.toList.map[resultType |
 					new F2Generator(Type.values.get(i1), Type.values.get(i2), resultType) as Generator
@@ -32,7 +32,7 @@ class F2Generator implements InterfaceGenerator {
 			'''«type1.typeName»«type2.typeName»«returnType.typeName»F2'''
 		}
 	}
-	
+
 	def typeParams(boolean annotations) {
 		val params =
 		if (returnType == Type.OBJECT) {
@@ -130,7 +130,7 @@ class F2Generator implements InterfaceGenerator {
 
 	override sourceCode() { '''
 		package «Constants.FUNCTION»;
-		
+
 		«IF type1 == Type.OBJECT && type2 == Type.OBJECT && returnType == Type.OBJECT»
 			import java.util.function.BiFunction;
 			import java.util.function.BinaryOperator;

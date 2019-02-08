@@ -12,7 +12,7 @@ final class IndexedGenerator implements InterfaceGenerator {
 	}
 
 	override className() { Constants.JCATS + "." + shortName }
-	
+
 	def shortName() { if (type == Type.OBJECT) "Indexed" else type.typeName + "Indexed" }
 
 	override sourceCode() { '''
