@@ -36,6 +36,7 @@ final class SortedDictGenerator implements ClassGenerator {
 		import static java.util.Collections.emptyIterator;
 		import static «Constants.JCATS».Order.*;
 		import static «Constants.JCATS».Ord.*;
+		import static «Constants.OPTION».*;
 		import static «Constants.P».p;
 		import static «Constants.COMMON».*;
 		import static «Constants.STACK».*;
@@ -155,12 +156,46 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			@Override
 			public P<K, A> first() throws NoSuchElementException {
-				«AVLCommonGenerator.firstOrLast(genericName, "dict", "left")»
+				if (isEmpty()) {
+					throw new NoSuchElementException();
+				} else {
+					return getFirst(this);
+				}
+			}
+
+			@Override
+			public Option<P<K, A>> firstOption() {
+				if (isEmpty()) {
+					return none();
+				} else {
+					return some(getFirst(this));
+				}
 			}
 
 			@Override
 			public P<K, A> last() throws NoSuchElementException {
-				«AVLCommonGenerator.firstOrLast(genericName, "dict", "right")»
+				if (isEmpty()) {
+					throw new NoSuchElementException();
+				} else {
+					return getLast(this);
+				}
+			}
+
+			@Override
+			public Option<P<K, A>> lastOption() {
+				if (isEmpty()) {
+					return none();
+				} else {
+					return some(getLast(this));
+				}
+			}
+
+			private static <K, A> P<K, A> getFirst(«genericName» dict) {
+				«AVLCommonGenerator.getFirstOrLast("dict", "left")»
+			}
+
+			private static <K, A> P<K, A> getLast(«genericName» dict) {
+				«AVLCommonGenerator.getFirstOrLast("dict", "right")»
 			}
 
 			public «genericName» init() throws NoSuchElementException {

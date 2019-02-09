@@ -30,6 +30,7 @@ final class UniqueGenerator implements ClassGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.JCATS».Order.*;
+		import static «Constants.OPTION».*;
 		import static «Constants.P».p;
 		import static «Constants.COMMON».*;
 		import static «Constants.COLLECTION».HashTableCommon.*;
@@ -91,7 +92,16 @@ final class UniqueGenerator implements ClassGenerator {
 				}
 			}
 
-			private static <A> A getFirst(Unique<A> unique) {
+			@Override
+			public Option<A> firstOption() {
+				if (isEmpty()) {
+					return none();
+				} else {
+					return some(getFirst(this));
+				}
+			}
+
+			private static <A> A getFirst(«genericName» unique) {
 				«HashTableCommonGenerator.getFirst("unique", "A")»
 			}
 

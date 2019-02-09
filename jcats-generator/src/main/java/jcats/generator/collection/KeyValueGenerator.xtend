@@ -28,8 +28,9 @@ final class KeyValueGenerator implements InterfaceGenerator {
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
-		import static «Constants.COMMON».*;
 		import static «Constants.EITHER».*;
+		import static «Constants.OPTION».*;
+		import static «Constants.COMMON».*;
 
 		public interface KeyValue<K, @Covariant A> extends Iterable<P<K, A>>, Equatable<KeyValue<K, A>>, Sized {
 
@@ -112,8 +113,21 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				return iterator().next();
 			}
 
+			default Option<P<K, A>> firstOption() {
+				final Iterator<P<K, A>> iterator = iterator();
+				if (iterator.hasNext()) {
+					return some(iterator.next());
+				} else {
+					return none();
+				}
+			}
+
 			default K firstKey() throws NoSuchElementException {
 				return first().get1();
+			}
+
+			default Option<K> firstKeyOption() {
+				return firstOption().map(P::get1);
 			}
 
 			default void foreach(final Eff2<K, A> eff) {
@@ -213,6 +227,16 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public A first() {
+				return this.keyValue.first().get2();
+			}
+
+			@Override
+			public Option<A> firstOption() {
+				return this.keyValue.firstOption().map(P::get2);
+			}
+
+			@Override
 			public void foreach(final Eff<A> eff) {
 				this.keyValue.forEach((final P<?, A> p) -> eff.apply(p.get2()));
 			}
@@ -265,6 +289,16 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public boolean contains(final K key) {
 				return this.keyValue.containsKey(key);
+			}
+
+			@Override
+			public K first() {
+				return this.keyValue.firstKey();
+			}
+
+			@Override
+			public Option<K> firstOption() {
+				return this.keyValue.firstKeyOption();
 			}
 
 			@Override
@@ -325,6 +359,16 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			public boolean contains(final P<K, A> p) {
 				requireNonNull(p);
 				return p.get2().equals(this.keyValue.getOrNull(p.get1()));
+			}
+
+			@Override
+			public P<K, A> first() {
+				return this.keyValue.first();
+			}
+
+			@Override
+			public Option<P<K, A>> firstOption() {
+				return this.keyValue.firstOption();
 			}
 
 			@Override

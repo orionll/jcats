@@ -21,7 +21,6 @@ class DictGenerator implements ClassGenerator {
 		import java.util.Collections;
 		import java.util.Iterator;
 		import java.util.Map;
-		import java.util.Map.Entry;
 		import java.util.NoSuchElementException;
 		import java.util.function.Consumer;
 		import java.util.stream.Stream;
@@ -30,8 +29,9 @@ class DictGenerator implements ClassGenerator {
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.OPTION».*;
 		import static «Constants.P».p;
-		import static jcats.collection.Common.*;
+		import static «Constants.COMMON».*;
 		import static «Constants.COLLECTION».HashTableCommon.*;
 
 		public final class «shortName»<K, @Covariant A> implements KeyValue<K, A>, Serializable {
@@ -119,6 +119,15 @@ class DictGenerator implements ClassGenerator {
 					throw new NoSuchElementException();
 				} else {
 					return getFirst(this);
+				}
+			}
+
+			@Override
+			public Option<P<K, A>> firstOption() {
+				if (isEmpty()) {
+					return none();
+				} else {
+					return some(getFirst(this));
 				}
 			}
 

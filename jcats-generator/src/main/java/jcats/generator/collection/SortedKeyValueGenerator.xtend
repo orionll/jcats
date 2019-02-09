@@ -20,6 +20,7 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 		import «Constants.JCATS».*;
 
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.OPTION».*;
 
 		public interface SortedKeyValue<K, @Covariant A> extends KeyValue<K, A> {
 
@@ -29,8 +30,21 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 				return reverseIterator().next();
 			}
 
+			default Option<P<K, A>> lastOption() {
+				final Iterator<P<K, A>> iterator = reverseIterator();
+				if (iterator.hasNext()) {
+					return some(iterator.next());
+				} else {
+					return none();
+				}
+			}
+
 			default K lastKey() throws NoSuchElementException {
 				return last().get1();
+			}
+
+			default Option<K> lastKeyOption() {
+				return lastOption().map(P::get1);
 			}
 
 			@Override
@@ -78,13 +92,13 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public A first() {
-				return this.keyValue.first().get2();
+			public A last() {
+				return this.keyValue.last().get2();
 			}
 
 			@Override
-			public A last() {
-				return this.keyValue.last().get2();
+			public Option<A> lastOption() {
+				return this.keyValue.lastOption().map(P::get2);
 			}
 
 			@Override
@@ -110,13 +124,13 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public K first() {
-				return this.keyValue.first().get1();
+			public K last() {
+				return this.keyValue.lastKey();
 			}
 
 			@Override
-			public K last() {
-				return this.keyValue.last().get1();
+			public Option<K> lastOption() {
+				return this.keyValue.lastKeyOption();
 			}
 
 			@Override
@@ -157,13 +171,13 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public P<K, A> first() {
-				return this.keyValue.first();
+			public P<K, A> last() {
+				return this.keyValue.last();
 			}
 
 			@Override
-			public P<K, A> last() {
-				return this.keyValue.last();
+			public Option<P<K, A>> lastOption() {
+				return this.keyValue.lastOption();
 			}
 
 			@Override

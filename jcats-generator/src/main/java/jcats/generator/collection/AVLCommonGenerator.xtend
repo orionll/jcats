@@ -302,16 +302,11 @@ final class AVLCommonGenerator implements ClassGenerator {
 		}
 	'''
 
-	def static firstOrLast(String genericName, String name, String leftOrRight) '''
-		if (isEmpty()) {
-			throw new NoSuchElementException();
-		} else {
-			«genericName» «name» = this;
-			while («name».«leftOrRight» != null) {
-				«name» = «name».«leftOrRight»;
-			}
-			return «name».entry;
+	def static getFirstOrLast(String name, String leftOrRight) '''
+		while («name».«leftOrRight» != null) {
+			«name» = «name».«leftOrRight»;
 		}
+		return «name».entry;
 	'''
 
 	def static initOrTail(String genericName, String shortName, String deleteResultDiamondName, String deleteMinimumOrMaximum) '''

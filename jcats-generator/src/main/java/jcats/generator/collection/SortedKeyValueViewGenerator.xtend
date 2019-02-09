@@ -21,6 +21,7 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.ORD».*;
+		import static «Constants.OPTION».*;
 		import static «Constants.P».*;
 		import static «Constants.COMMON».*;
 
@@ -76,8 +77,18 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public Option<P<K, A>> lastOption() {
+				return this.keyValue.lastOption();
+			}
+
+			@Override
 			public K lastKey() {
 				return this.keyValue.lastKey();
+			}
+
+			@Override
+			public Option<K> lastKeyOption() {
+				return this.keyValue.lastKeyOption();
 			}
 
 			@Override
@@ -154,8 +165,18 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public Option<P<K, A>> firstOption() {
+				return this.keyValue.lastOption();
+			}
+
+			@Override
 			public P<K, A> last() {
 				return this.keyValue.first();
+			}
+
+			@Override
+			public Option<P<K, A>> lastOption() {
+				return this.keyValue.firstOption();
 			}
 
 			@Override
@@ -164,8 +185,18 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public Option<K> firstKeyOption() {
+				return this.keyValue.lastKeyOption();
+			}
+
+			@Override
 			public K lastKey() {
 				return this.keyValue.firstKey();
+			}
+
+			@Override
+			public Option<K> lastKeyOption() {
+				return this.keyValue.firstKeyOption();
 			}
 
 			@Override
@@ -248,6 +279,15 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public Option<P<K, A>> firstOption() {
+				if (this.map.isEmpty()) {
+					return none();
+				} else {
+					return some(first());
+				}
+			}
+
+			@Override
 			public P<K, A> last() {
 				final K key = this.map.lastKey();
 				final A value = this.map.get(key);
@@ -255,13 +295,40 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public Option<P<K, A>> lastOption() {
+				if (this.map.isEmpty()) {
+					return none();
+				} else {
+					return some(last());
+				}
+			}
+
+			@Override
 			public K firstKey() {
-				return this.map.firstKey();
+				return requireNonNull(this.map.firstKey());
+			}
+
+			@Override
+			public Option<K> firstKeyOption() {
+				if (this.map.isEmpty()) {
+					return none();
+				} else {
+					return some(this.map.firstKey());
+				}
 			}
 
 			@Override
 			public K lastKey() {
-				return this.map.lastKey();
+				return requireNonNull(this.map.lastKey());
+			}
+
+			@Override
+			public Option<K> lastKeyOption() {
+				if (this.map.isEmpty()) {
+					return none();
+				} else {
+					return some(this.map.lastKey());
+				}
 			}
 
 			@Override

@@ -51,7 +51,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.JCATS».«type.optionShortName».*;
 		import static «Constants.JCATS».«type.ordShortName».*;
-		import static «Constants.JCATS».Order.*;
+		import static «Constants.ORDER».*;
 		import static «Constants.COMMON».*;
 		import static «Constants.STACK».*;
 		import static «Constants.COLLECTION».«type.sortedUniqueShortName».*;
@@ -232,12 +232,46 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			@Override
 			public «type.genericName» first() throws NoSuchElementException {
-				«AVLCommonGenerator.firstOrLast(genericName, "unique", "left")»
+				if (isEmpty()) {
+					throw new NoSuchElementException();
+				} else {
+					return getFirst(this);
+				}
+			}
+
+			@Override
+			public «type.optionGenericName» firstOption() {
+				if (isEmpty()) {
+					return «type.noneName»();
+				} else {
+					return «type.someName»(getFirst(this));
+				}
 			}
 
 			@Override
 			public «type.genericName» last() throws NoSuchElementException {
-				«AVLCommonGenerator.firstOrLast(genericName, "unique", "right")»
+				if (isEmpty()) {
+					throw new NoSuchElementException();
+				} else {
+					return getLast(this);
+				}
+			}
+
+			@Override
+			public «type.optionGenericName» lastOption() {
+				if (isEmpty()) {
+					return «type.noneName»();
+				} else {
+					return «type.someName»(getLast(this));
+				}
+			}
+
+			private static «IF type == Type.OBJECT»<A> «ENDIF»«type.genericName» getFirst(«genericName» unique) {
+				«AVLCommonGenerator.getFirstOrLast("unique", "left")»
+			}
+
+			private static «IF type == Type.OBJECT»<A> «ENDIF»«type.genericName» getLast(«genericName» unique) {
+				«AVLCommonGenerator.getFirstOrLast("unique", "right")»
 			}
 
 			public «genericName» init() throws NoSuchElementException {

@@ -22,6 +22,7 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
+		import static «Constants.OPTION».*;
 		import static «Constants.P».*;
 		import static «Constants.COMMON».*;
 
@@ -151,8 +152,18 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public Option<P<K, A>> firstOption() {
+				return this.keyValue.firstOption();
+			}
+
+			@Override
 			public K firstKey() {
 				return this.keyValue.firstKey();
+			}
+
+			@Override
+			public Option<K> firstKeyOption() {
+				return this.keyValue.firstKeyOption();
 			}
 
 			@Override
@@ -355,8 +366,28 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public Option<P<K, A>> firstOption() {
+				final Iterator<Entry<K, A>> iterator = this.map.entrySet().iterator();
+				if (iterator.hasNext()) {
+					return some(P.fromEntry(iterator.next()));
+				} else {
+					return none();
+				}
+			}
+
+			@Override
 			public K firstKey() {
 				return requireNonNull(this.map.keySet().iterator().next());
+			}
+
+			@Override
+			public Option<K> firstKeyOption() {
+				final Iterator<K> iterator = this.map.keySet().iterator();
+				if (iterator.hasNext()) {
+					return some(iterator.next());
+				} else {
+					return none();
+				}
 			}
 
 			@Override
