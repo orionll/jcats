@@ -206,6 +206,16 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public «type.genericName» first() {
+				return this.collection.first();
+			}
+
+			@Override
+			public «type.genericName» last() {
+				return this.collection.last();
+			}
+
+			@Override
 			public «type.ordGenericName» ord() {
 				final Comparator<«type.genericBoxedName»> comparator = (Comparator<«type.genericBoxedName»>) this.collection.comparator();
 				if (comparator == null) {
