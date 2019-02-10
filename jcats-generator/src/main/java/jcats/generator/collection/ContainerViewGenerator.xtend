@@ -1226,6 +1226,16 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«ENDIF»
 
 			@Override
+			public ArrayList<«type.genericBoxedName»> toArrayList() {
+				return new ArrayList<>(this.collection);
+			}
+
+			@Override
+			public HashSet<«type.genericBoxedName»> toHashSet() {
+				return new HashSet<>(this.collection);
+			}
+
+			@Override
 			public Collection<«type.genericBoxedName»> asCollection() {
 				return Collections.unmodifiableCollection(this.collection);
 			}
