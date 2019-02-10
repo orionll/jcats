@@ -312,7 +312,7 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 
 		class MapAsKeyValue<K, A, M extends Map<K, A>> implements KeyValueView<K, A> {
 			final M map;
-			private final boolean fixedSize;
+			final boolean fixedSize;
 
 			MapAsKeyValue(final M map, final boolean fixedSize) {
 				this.map = map;
@@ -410,6 +410,16 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			@Override
 			public void foreach(final Eff2<K, A> eff) {
 				this.map.forEach(eff::apply);
+			}
+
+			@Override
+			public UniqueContainerView<K> keys() {
+				return new SetAsUniqueContainer<>(requireNonNull(this.map.keySet()), this.fixedSize);
+			}
+
+			@Override
+			public ContainerView<A> values() {
+				return new CollectionAsContainer<>(requireNonNull(this.map.values()), this.fixedSize);
 			}
 
 			@Override

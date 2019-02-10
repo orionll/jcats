@@ -14,7 +14,9 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 		import java.util.Comparator;
 		import java.util.Iterator;
 		import java.util.NavigableMap;
+		import java.util.Set;
 		import java.util.SortedMap;
+		import java.util.SortedSet;
 		import java.util.TreeMap;
 
 		import «Constants.JCATS».*;
@@ -329,6 +331,21 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 				} else {
 					return some(this.map.lastKey());
 				}
+			}
+
+			@Override
+			public SortedUniqueContainerView<K> keys() {
+				final Set<K> keySet = requireNonNull(this.map.keySet());
+				if (keySet instanceof SortedSet<?>) {
+					return new SortedSetAsSortedUniqueContainer<>((SortedSet<K>) keySet, this.fixedSize);
+				} else {
+					return SortedKeyValueView.super.keys();
+				}
+			}
+
+			@Override
+			public OrderedContainerView<A> values() {
+				return new CollectionAsOrderedContainer<>(requireNonNull(this.map.values()), this.fixedSize);
 			}
 
 			@Override
