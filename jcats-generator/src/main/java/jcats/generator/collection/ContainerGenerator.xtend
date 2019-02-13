@@ -296,7 +296,27 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			«IF type.javaUnboxedType»
 				default «type.javaName» sum() {
-					return foldLeftTo«type.typeName»(0, Common.SUM_«type.typeName.toUpperCase»);
+					«IF type.floatingPoint»
+						// Kahan summation
+						final «type.javaName»[] summation = new «type.javaName»[3];
+						foreach((final «type.javaName» value) -> {
+							final «type.javaName» y = value - summation[1];
+							final «type.javaName» sum = summation[0];
+							final «type.javaName» t = sum + y;
+							summation[0] = t;
+							summation[1] = (t - sum) - y;
+							summation[2] += value;
+						});
+						final «type.javaName» sum = summation[0] + summation[1];
+						final «type.javaName» simpleSum = summation[2];
+						if («type.boxedName».isNaN(sum) && «type.boxedName».isInfinite(simpleSum)) {
+							return simpleSum;
+						} else {
+							return sum;
+						}
+					«ELSE»
+						return foldLeftTo«type.typeName»(0, Common.SUM_«type.typeName.toUpperCase»);
+					«ENDIF»
 				}
 
 			«ENDIF»
