@@ -20,6 +20,7 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 		import java.util.TreeMap;
 
 		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.ORD».*;
@@ -125,7 +126,7 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 		}
 
 		final class ReverseSortedKeyValueView<K, A> implements SortedKeyValueView<K, A> {
-			final SortedKeyValue<K, A> keyValue;
+			private final SortedKeyValue<K, A> keyValue;
 
 			ReverseSortedKeyValueView(final SortedKeyValue<K, A> keyValue) {
 				this.keyValue = keyValue;
@@ -152,8 +153,58 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public Option<A> get(final K key) {
+				return this.keyValue.get(key);
+			}
+
+			@Override
+			public A getOr(final K key, final A other) {
+				return this.keyValue.getOr(key, other);
+			}
+
+			@Override
+			public A getOrElse(final K key, final F0<A> other) {
+				return this.keyValue.getOrElse(key, other);
+			}
+
+			@Override
+			public <X> Either<X, A> getOrError(final K key, final F0<X> error) {
+				return this.keyValue.getOrError(key, error);
+			}
+
+			@Override
+			public <X extends Throwable> A getOrThrow(final K key, final F0<X> f) throws X {
+				return this.keyValue.getOrThrow(key, f);
+			}
+
+			@Override
 			public A getOrNull(final K key) {
 				return this.keyValue.getOrNull(key);
+			}
+
+			@Override
+			public boolean containsKey(final K key) {
+				return this.keyValue.containsKey(key);
+			}
+
+			@Override
+			public boolean containsValue(final A value) {
+				return this.keyValue.containsValue(value);
+			}
+
+			@Override
+			public void ifContainsKey(final K key, final Eff<A> eff) {
+				this.keyValue.ifContainsKey(key, eff);
+			}
+
+			@Override
+			public void ifNotContainsKey(final K key, final Eff0 eff) {
+				this.keyValue.ifNotContainsKey(key, eff);
+			}
+
+			@Override
+			public void ifContainsKeyOrElse(final K key, final Eff<A> ifContains, final Eff0 ifNotContains) {
+				this.keyValue.ifContainsKeyOrElse(key, ifContains, ifNotContains);
 			}
 
 			@Override
