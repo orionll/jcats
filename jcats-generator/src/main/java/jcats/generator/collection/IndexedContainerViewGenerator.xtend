@@ -610,6 +610,11 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public «genericName» slice(final int fromIndexInclusive, final int toIndexExclusive) {
+				return new «type.shortName("List")»As«type.diamondName("IndexedContainer")»(this.collection.subList(fromIndexInclusive, toIndexExclusive), this.fixedSize);
+			}
+
+			@Override
 			public List<«type.genericBoxedName»> asCollection() {
 				return Collections.unmodifiableList(this.collection);
 			}

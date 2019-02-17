@@ -363,6 +363,11 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
+				public IndexedContainerView<«type.boxedName»> slice(final int fromIndexInclusive, final int toIndexExclusive) {
+					return new «type.typeName»BoxedIndexedContainer(this.container.view().slice(fromIndexInclusive, toIndexExclusive));
+				}
+
+				@Override
 				public List<«type.boxedName»> asCollection() {
 					return this.container.asCollection();
 				}

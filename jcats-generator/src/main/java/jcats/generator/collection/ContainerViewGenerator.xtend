@@ -1131,7 +1131,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			class «type.typeName»CollectionAs«type.typeName»Container<C extends Collection<«type.boxedName»>> implements «type.containerViewGenericName», Serializable {
 		«ENDIF»
 			final C collection;
-			private final boolean fixedSize;
+			final boolean fixedSize;
 
 			«type.shortName("Collection")»As«type.shortName("Container")»(final C collection, final boolean fixedSize) {
 				this.collection = collection;
