@@ -362,6 +362,9 @@ final class OptionGenerator implements ClassGenerator {
 					}
 
 				«ENDFOR»
+				«join»
+
+				«cast(#["A"], #[], #["A"])»
 			«ELSE»
 				public static <A, B> Option<B> map2(final «shortName» option1, final Option<A> option2, final «type.typeName»ObjectObjectF2<A, B> f) {
 					requireNonNull(option1);
@@ -373,12 +376,6 @@ final class OptionGenerator implements ClassGenerator {
 						return some(f.apply(option1.value, option2.value));
 					}
 				}
-			«ENDIF»
-			«IF type == Type.OBJECT»
-
-				«join»
-
-				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
 		}
 	''' }
