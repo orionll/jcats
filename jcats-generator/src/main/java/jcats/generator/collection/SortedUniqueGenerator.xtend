@@ -282,6 +282,25 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				«AVLCommonGenerator.initOrTail(genericName, shortName, deleteResultDiamondName, "deleteMinimum")»
 			}
 
+			public «genericName» slice(final «type.genericName» from, final boolean fromInclusive, final «type.genericName» to, final boolean toInclusive) {
+				«IF type.primitive»«slicedSortedUniqueViewShortName».«ENDIF»checkRange(this.ord, from, to);
+				final «type.sortedUniqueBuilderGenericName» builder = new «type.sortedUniqueBuilderDiamondName»(this.ord);
+				new «slicedSortedUniqueViewDiamondName»(this, from, true, fromInclusive, to, true, toInclusive).foreach(builder::put);
+				return builder.build();
+			}
+
+			public «genericName» sliceFrom(final «type.genericName» from, final boolean inclusive) {
+				final «type.sortedUniqueBuilderGenericName» builder = new «type.sortedUniqueBuilderDiamondName»(this.ord);
+				new «slicedSortedUniqueViewDiamondName»(this, from, true, inclusive, «type.defaultValue», false, false).foreach(builder::put);
+				return builder.build();
+			}
+
+			public «genericName» sliceTo(final «type.genericName» to, final boolean inclusive) {
+				final «type.sortedUniqueBuilderGenericName» builder = new «type.sortedUniqueBuilderDiamondName»(this.ord);
+				new «slicedSortedUniqueViewDiamondName»(this, «type.defaultValue», false, false, to, true, inclusive).foreach(builder::put);
+				return builder.build();
+			}
+
 			public «genericName» reverse() {
 				final «type.sortedUniqueBuilderGenericName» builder = new «type.sortedUniqueBuilderDiamondName»(this.ord.reversed());
 				builder.putAll(this);
