@@ -424,7 +424,7 @@ class SeqGenerator implements ClassGenerator {
 					if (size <= 1) {
 						return this;
 					} else {
-						final int countFalse = foldLeftToInt(0, (int i, boolean value) -> value ? i : i + 1);
+						final int countFalse = foldToInt(0, (int i, boolean value) -> value ? i : i + 1);
 						return tabulate(size, i -> i >= countFalse);
 					}
 				}
@@ -434,7 +434,7 @@ class SeqGenerator implements ClassGenerator {
 					if (size <= 1) {
 						return this;
 					} else {
-						final int countTrue = foldLeftToInt(0, (int i, boolean value) -> value ? i + 1 : i);
+						final int countTrue = foldToInt(0, (int i, boolean value) -> value ? i + 1 : i);
 						return tabulate(size, i -> i < countTrue);
 					}
 				}

@@ -236,7 +236,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			«IF type.primitive»
-				default <A> A foldLeft(final A start, final Object«type.typeName»ObjectF2<A, A> f2) {
+				default <A> A fold(final A start, final Object«type.typeName»ObjectF2<A, A> f2) {
 					requireNonNull(start);
 					requireNonNull(f2);
 					final «type.typeName»Folder<A> folder = new «type.typeName»Folder<>(start, f2);
@@ -244,7 +244,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 					return folder.acc;
 				}
 			«ELSE»
-				default <B> B foldLeft(final B start, final F2<B, A, B> f2) {
+				default <B> B fold(final B start, final F2<B, A, B> f2) {
 					requireNonNull(start);
 					requireNonNull(f2);
 					final Folder<A, B> folder = new Folder<>(start, f2);
@@ -255,7 +255,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			«IF type.primitive»
 				«FOR returnType : Type.primitives»
-					default «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»«type.typeName»«returnType.typeName»F2 f2) {
+					default «returnType.javaName» foldTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»«type.typeName»«returnType.typeName»F2 f2) {
 						requireNonNull(f2);
 						final «type.typeName»FolderTo«returnType.typeName» folder = new «type.typeName»FolderTo«returnType.typeName»(start, f2);
 						foreach(folder);
@@ -265,7 +265,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 				«ENDFOR»
 			«ELSE»
 				«FOR returnType : Type.primitives»
-					default «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»Object«returnType.typeName»F2<A> f2) {
+					default «returnType.javaName» foldTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»Object«returnType.typeName»F2<A> f2) {
 						requireNonNull(f2);
 						final FolderTo«returnType.typeName»<A> folder = new FolderTo«returnType.typeName»<>(start, f2);
 						foreach(folder);
@@ -275,14 +275,14 @@ final class ContainerGenerator implements InterfaceGenerator {
 				«ENDFOR»
 			«ENDIF»
 			«IF type == Type.OBJECT»
-				default Option<A> reduceLeft(final F2<A, A, A> f2) {
+				default Option<A> reduce(final F2<A, A, A> f2) {
 					requireNonNull(f2);
 					final Reducer<A> reducer = new Reducer<>(f2);
 					foreach(reducer);
 					return Option.fromNullable(reducer.acc);
 				}
 			«ELSE»
-				default «type.optionGenericName» reduceLeft(final «type.typeName»«type.typeName»«type.typeName»F2 f2) {
+				default «type.optionGenericName» reduce(final «type.typeName»«type.typeName»«type.typeName»F2 f2) {
 					requireNonNull(f2);
 					final «type.typeName»Reducer reducer = new «type.typeName»Reducer(f2);
 					foreach(reducer);
@@ -315,14 +315,14 @@ final class ContainerGenerator implements InterfaceGenerator {
 							return sum;
 						}
 					«ELSE»
-						return foldLeftTo«type.typeName»(0, Common.SUM_«type.typeName.toUpperCase»);
+						return foldTo«type.typeName»(0, Common.SUM_«type.typeName.toUpperCase»);
 					«ENDIF»
 				}
 
 			«ENDIF»
 			«IF type == Type.INT»
 				default long sumToLong() {
-					return foldLeftToLong(0L, (final long sum, final int i) -> sum + i);
+					return foldToLong(0L, (final long sum, final int i) -> sum + i);
 				}
 
 			«ENDIF»
@@ -418,27 +418,27 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			«IF type == Type.OBJECT»
 				default «type.optionGenericName» max(final «type.ordGenericName» ord) {
-					return reduceLeft(ord::max);
+					return reduce(ord::max);
 				}
 
 				default «type.optionGenericName» min(final «type.ordGenericName» ord) {
-					return reduceLeft(ord::min);
+					return reduce(ord::min);
 				}
 			«ELSE»
 				default «type.optionGenericName» max() {
-					return reduceLeft(«type.asc»()::max);
+					return reduce(«type.asc»()::max);
 				}
 
 				default «type.optionGenericName» min() {
-					return reduceLeft(«type.asc»()::min);
+					return reduce(«type.asc»()::min);
 				}
 
 				default «type.optionGenericName» maxByOrd(final «type.ordGenericName» ord) {
-					return reduceLeft(ord::max);
+					return reduce(ord::max);
 				}
 
 				default «type.optionGenericName» minByOrd(final «type.ordGenericName» ord) {
-					return reduceLeft(ord::min);
+					return reduce(ord::min);
 				}
 			«ENDIF»
 
@@ -632,20 +632,20 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public <A> A foldLeft(final A start, final F2<A, «type.boxedName», A> f2) {
-					return this.container.foldLeft(start, f2::apply);
+				public <A> A fold(final A start, final F2<A, «type.boxedName», A> f2) {
+					return this.container.fold(start, f2::apply);
 				}
 
 				«FOR returnType : Type.primitives»
 					@Override
-					public «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»Object«returnType.typeName»F2<«type.boxedName»> f2) {
-						return this.container.foldLeftTo«returnType.typeName»(start, f2::apply);
+					public «returnType.javaName» foldTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»Object«returnType.typeName»F2<«type.boxedName»> f2) {
+						return this.container.foldTo«returnType.typeName»(start, f2::apply);
 					}
 
 				«ENDFOR»
 				@Override
-				public Option<«type.boxedName»> reduceLeft(final F2<«type.boxedName», «type.boxedName», «type.boxedName»> f2) {
-					return this.container.reduceLeft(f2::apply).toOption();
+				public Option<«type.boxedName»> reduce(final F2<«type.boxedName», «type.boxedName», «type.boxedName»> f2) {
+					return this.container.reduce(f2::apply).toOption();
 				}
 
 				@Override

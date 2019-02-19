@@ -223,22 +223,22 @@ final class CommonGenerator implements ClassGenerator {
 
 			«ENDFOR»
 			static <A> int containerHashCode(final Container<A> container) {
-				return container.foldLeftToInt(1, (hashCode, value) -> 31 * hashCode + value.hashCode());
+				return container.foldToInt(1, (hashCode, value) -> 31 * hashCode + value.hashCode());
 			}
 
 			«FOR type : Type.primitives»
 				static int «type.containerShortName.firstToLowerCase»HashCode(final «type.containerWildcardName» container) {
-					return container.foldLeftToInt(1, (hashCode, value) -> 31 * hashCode + «type.genericBoxedName».hashCode(value));
+					return container.foldToInt(1, (hashCode, value) -> 31 * hashCode + «type.genericBoxedName».hashCode(value));
 				}
 
 			«ENDFOR»
 			static <A> int uniqueContainerHashCode(final UniqueContainer<A> container) {
-				return container.foldLeftToInt(0, (hashCode, value) -> hashCode + value.hashCode());
+				return container.foldToInt(0, (hashCode, value) -> hashCode + value.hashCode());
 			}
 
 			«FOR type : Type.primitives.filter[it != Type.BOOLEAN]»
 				static int «type.uniqueContainerShortName.firstToLowerCase»HashCode(final «type.containerWildcardName» container) {
-					return container.foldLeftToInt(0, (hashCode, value) -> hashCode + «type.genericBoxedName».hashCode(value));
+					return container.foldToInt(0, (hashCode, value) -> hashCode + «type.genericBoxedName».hashCode(value));
 				}
 
 			«ENDFOR»

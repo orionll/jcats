@@ -75,7 +75,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			default int size() throws SizeOverflowException {
-				return foldLeftToInt(0, (final int size, final «type.genericName» __) -> {
+				return foldToInt(0, (final int size, final «type.genericName» __) -> {
 					final int newSize = size + 1;
 					if (newSize < 0) {
 						throw new SizeOverflowException();
@@ -240,31 +240,31 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 			@Override
 			«IF type.primitive»
-				public <A> A foldLeft(final A start, final Object«type.typeName»ObjectF2<A, A> f2) {
+				public <A> A fold(final A start, final Object«type.typeName»ObjectF2<A, A> f2) {
 			«ELSE»
-				public <B> B foldLeft(final B start, final F2<B, A, B> f2) {
+				public <B> B fold(final B start, final F2<B, A, B> f2) {
 			«ENDIF»
-				return this.container.foldLeft(start, f2);
+				return this.container.fold(start, f2);
 			}
 
 			«FOR returnType : Type.primitives»
 				@Override
 				«IF type.primitive»
-					public «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»«type.typeName»«returnType.typeName»F2 f2) {
+					public «returnType.javaName» foldTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»«type.typeName»«returnType.typeName»F2 f2) {
 				«ELSE»
-					public «returnType.javaName» foldLeftTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»Object«returnType.typeName»F2<A> f2) {
+					public «returnType.javaName» foldTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»Object«returnType.typeName»F2<A> f2) {
 				«ENDIF»
-					return this.container.foldLeftTo«returnType.typeName»(start, f2);
+					return this.container.foldTo«returnType.typeName»(start, f2);
 				}
 
 			«ENDFOR»
 			@Override
 			«IF type == Type.OBJECT»
-				public «type.optionGenericName» reduceLeft(final F2<A, A, A> f2) {
+				public «type.optionGenericName» reduce(final F2<A, A, A> f2) {
 			«ELSE»
-				public «type.optionGenericName» reduceLeft(final «type.typeName»«type.typeName»«type.typeName»F2 f2) {
+				public «type.optionGenericName» reduce(final «type.typeName»«type.typeName»«type.typeName»F2 f2) {
 			«ENDIF»
-				return this.container.reduceLeft(f2);
+				return this.container.reduce(f2);
 			}
 
 			«IF type.javaUnboxedType»
