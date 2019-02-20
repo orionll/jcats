@@ -380,7 +380,7 @@ final class StackGenerator implements ClassGenerator {
 				«ENDIF»
 			}
 
-			«hashcode(type)»
+			«orderedHashCode(type)»
 
 			@Override
 			public boolean equals(final Object obj) {

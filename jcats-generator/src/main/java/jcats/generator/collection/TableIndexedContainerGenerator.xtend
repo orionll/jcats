@@ -216,7 +216,7 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 				}
 			}
 
-			«hashcode(type)»
+			«orderedHashCode(type)»
 
 			«indexedEquals(type)»
 

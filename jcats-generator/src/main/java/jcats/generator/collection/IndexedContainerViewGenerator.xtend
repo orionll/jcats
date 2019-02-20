@@ -245,7 +245,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				return new «mappedShortName»<>(this.container.view().skip(n), this.f);
 			}
 
-			«hashcode(Type.OBJECT)»
+			«orderedHashCode(Type.OBJECT)»
 
 			«indexedEquals(Type.OBJECT)»
 		}
@@ -306,7 +306,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this.container.view().skip(n), this.f);
 				}
 
-				«hashcode(toType)»
+				«orderedHashCode(toType)»
 
 				«indexedEquals(toType)»
 			}
@@ -392,7 +392,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				}
 			}
 
-			«hashcode(type)»
+			«orderedHashCode(type)»
 
 			«indexedEquals(type)»
 		}
@@ -504,7 +504,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				}
 			}
 
-			«hashcode(type)»
+			«orderedHashCode(type)»
 
 			«indexedEquals(type)»
 		}
@@ -577,7 +577,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				return this.container.view();
 			}
 
-			«hashcode(type)»
+			«orderedHashCode(type)»
 
 			«indexedEquals(type)»
 		}
@@ -619,7 +619,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				return Collections.unmodifiableList(this.collection);
 			}
 
-			«hashcode(type)»
+			«orderedHashCode(type)»
 
 			«equals(type, type.indexedContainerWildcardName, false)»
 		}

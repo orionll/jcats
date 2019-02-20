@@ -51,18 +51,18 @@ interface Generator {
 		}
 	'''}
 
-	def static hashcode(Type type) { return hashcode(type, false) }
+	def static orderedHashCode(Type type) { orderedHashCode(type, false) }
 
-	def static hashcode(Type type, boolean isFinal) { '''
+	def static orderedHashCode(Type type, boolean isFinal) '''
 		@Override
 		public «IF isFinal»final «ENDIF»int hashCode() {
 			«IF type.primitive»
-				return «type.containerShortName.firstToLowerCase»HashCode(this);
+				return «type.orderedContainerShortName.firstToLowerCase»HashCode(this);
 			«ELSE»
-				return containerHashCode(this);
+				return orderedContainerHashCode(this);
 			«ENDIF»
 		}
-	'''}
+	'''
 
 	def static uniqueHashCode(Type type) { '''
 		@Override

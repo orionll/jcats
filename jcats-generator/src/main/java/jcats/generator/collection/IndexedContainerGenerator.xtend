@@ -372,7 +372,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 					return this.container.asCollection();
 				}
 
-				«hashcode(Type.OBJECT)»
+				«orderedHashCode(Type.OBJECT)»
 
 				«equals(Type.OBJECT, Type.OBJECT.indexedContainerWildcardName, false)»
 			}

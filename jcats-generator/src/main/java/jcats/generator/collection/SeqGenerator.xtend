@@ -1295,7 +1295,7 @@ class SeqGenerator implements ClassGenerator {
 				return new «type.diamondName("SeqView")»(this);
 			}
 
-			«hashcode(type, true)»
+			«orderedHashCode(type, true)»
 
 			«equals(type, type.indexedContainerWildcardName, true)»
 

@@ -222,12 +222,12 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
-			static <A> int containerHashCode(final Container<A> container) {
+			static <A> int orderedContainerHashCode(final OrderedContainer<A> container) {
 				return container.foldToInt(1, (hashCode, value) -> 31 * hashCode + value.hashCode());
 			}
 
 			«FOR type : Type.primitives»
-				static int «type.containerShortName.firstToLowerCase»HashCode(final «type.containerWildcardName» container) {
+				static int «type.orderedContainerShortName.firstToLowerCase»HashCode(final «type.orderedContainerWildcardName» container) {
 					return container.foldToInt(1, (hashCode, value) -> 31 * hashCode + «type.genericBoxedName».hashCode(value));
 				}
 

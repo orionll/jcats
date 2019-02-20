@@ -294,7 +294,7 @@ final class RangeGenerator implements ClassGenerator {
 				return stream().spliterator();
 			}
 
-			«hashcode(Type.INT)»
+			«orderedHashCode(Type.INT)»
 
 			@Override
 			public boolean equals(final Object obj) {
