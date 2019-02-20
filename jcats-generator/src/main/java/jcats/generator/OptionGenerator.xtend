@@ -362,7 +362,7 @@ final class OptionGenerator implements ClassGenerator {
 					}
 
 				«ENDFOR»
-				«join»
+				«flatten»
 
 				«cast(#["A"], #[], #["A"])»
 			«ELSE»

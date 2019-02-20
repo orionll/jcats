@@ -948,7 +948,7 @@ final class ArrayGenerator implements ClassGenerator {
 
 				«ENDFOR»
 			«ENDIF»
-			«joinCollection(type, "Array")»
+			«flattenCollection(type, "Array")»
 
 			public static «IF type == Type.OBJECT»<A> «ENDIF»«arrayBuilderName» builder() {
 				return new «arrayBuilderDiamondName»(«type.emptyArrayName», 0);

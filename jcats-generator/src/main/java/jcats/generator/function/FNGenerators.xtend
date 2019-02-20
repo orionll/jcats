@@ -132,7 +132,7 @@ final class FNGenerators {
 						return requireNonNull(f);
 					}
 
-					«joinMultiple((1 .. arity).map["A" + it], "B")»
+					«flatten((1 .. arity).map["A" + it], "B")»
 
 					«cast(Iterables.concat((1 .. arity).map["A" + it], #["B"]), (1 .. arity).map["A" + it], #["B"])»
 				}

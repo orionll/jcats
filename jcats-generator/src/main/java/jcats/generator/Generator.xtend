@@ -179,25 +179,25 @@ interface Generator {
 		}
 	''' }
 
-	def joinCollection(Type type, String boxedShortName) { '''
+	def flattenCollection(Type type, String boxedShortName) { '''
 		«IF type == Type.OBJECT»
-			public static <A, C extends Iterable<A>> «name»<A> join(final Iterable<C> iterable) {
-				return «boxedShortName».ofAll(iterable).flatMap((F) id());
+			public static <A, C extends Iterable<A>> «name»<A> flatten(final Iterable<C> iterable) {
+				return ofAll(iterable).flatMap((F) id());
 			}
 		«ELSE»
-			public static <C extends Iterable<«type.boxedName»>> «name» join(final Iterable<C> iterable) {
+			public static <C extends Iterable<«type.boxedName»>> «name» flatten(final Iterable<C> iterable) {
 				return «boxedShortName».ofAll(iterable).flatMapTo«type.typeName»((F) F.id());
 			}
 		«ENDIF»
 	'''}
 
-	def join() { joinMultiple(#[], "A") }
+	def flatten() { flatten(#[], "A") }
 
-	def joinMultiple(Iterable<String> typeParams, String typeParam) { '''
-		«staticModifier» <«typeParams.map[it + ", "].join»«typeParam»> «name»<«typeParams.map[it + ", "].join»«typeParam»> join(final «name»<«typeParams.map[it + ", "].join»«name»<«typeParams.map[it + ", "].join»«typeParam»>> «name.firstToLowerCase») {
+	def flatten(Iterable<String> typeParams, String typeParam) '''
+		«staticModifier» <«typeParams.map[it + ", "].join»«typeParam»> «name»<«typeParams.map[it + ", "].join»«typeParam»> flatten(final «name»<«typeParams.map[it + ", "].join»«name»<«typeParams.map[it + ", "].join»«typeParam»>> «name.firstToLowerCase») {
 			return «name.firstToLowerCase».flatMap(id());
 		}
-	'''}
+	'''
 
 	def static firstToLowerCase(String str) {
 		if (str.empty) {

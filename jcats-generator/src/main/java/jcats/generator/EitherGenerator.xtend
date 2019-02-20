@@ -573,10 +573,10 @@ final class EitherGenerator implements ClassGenerator {
 			«ENDIF»
 			«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
 
-				«joinMultiple(#["X"], "A")»
+				«flatten(#["X"], "A")»
 			«ELSEIF leftType != Type.OBJECT && rightType == Type.OBJECT»
 
-				«join»
+				«flatten»
 			«ENDIF»
 			«IF leftType == Type.OBJECT && rightType == Type.OBJECT»
 

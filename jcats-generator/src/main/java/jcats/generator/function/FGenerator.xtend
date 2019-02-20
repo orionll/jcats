@@ -665,11 +665,11 @@ final class FGenerator implements InterfaceGenerator {
 			}
 
 			«IF from == Type.OBJECT && to == Type.OBJECT»
-				«joinMultiple(#["A"], "B")»
+				«flatten(#["A"], "B")»
 			«ELSEIF to == Type.OBJECT»
-				«join»
+				«flatten»
 			«ELSEIF from == Type.OBJECT»
-				static <A> «shortName»<A> join(final F<A, «shortName»<A>> f) {
+				static <A> «shortName»<A> flatten(final F<A, «shortName»<A>> f) {
 					requireNonNull(f);
 					return (final A a) -> {
 						requireNonNull(a);
@@ -677,7 +677,7 @@ final class FGenerator implements InterfaceGenerator {
 					};
 				}
 			«ELSE»
-				static «shortName» join(final «from.typeName»ObjectF<«shortName»> f) {
+				static «shortName» flatten(final «from.typeName»ObjectF<«shortName»> f) {
 					requireNonNull(f);
 					return (final «from.javaName» value) -> f.apply(value).apply(value);
 				}

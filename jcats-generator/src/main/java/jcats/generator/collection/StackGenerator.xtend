@@ -475,7 +475,7 @@ final class StackGenerator implements ClassGenerator {
 				return new «type.diamondName("StackBuilder")»();
 			}
 
-			«joinCollection(type, "Stack")»
+			«flattenCollection(type, "Stack")»
 
 			public static «IF type == Type.OBJECT»<A> «ENDIF»Collector<«type.genericBoxedName», ?, «genericName»> collector() {
 				«IF type == Type.OBJECT»
