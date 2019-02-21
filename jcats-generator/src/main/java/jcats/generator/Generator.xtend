@@ -51,6 +51,15 @@ interface Generator {
 		}
 	'''}
 
+	def static keyValueToString() { keyValueToString("this") }
+
+	def static keyValueToString(String obj) '''
+		@Override
+		public String toString() {
+			return keyValueToString(«obj»);
+		}
+	'''
+
 	def static orderedHashCode(Type type) { orderedHashCode(type, false) }
 
 	def static orderedHashCode(Type type, boolean isFinal) '''

@@ -307,7 +307,7 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 
 			«keyValueHashCode»
 
-			«toStr»
+			«keyValueToString»
 		}
 
 		class MapAsKeyValue<K, A, M extends Map<K, A>> implements KeyValueView<K, A> {

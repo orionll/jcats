@@ -307,7 +307,7 @@ class DictGenerator implements ClassGenerator {
 
 			«keyValueHashCode»
 
-			«toStr»
+			«keyValueToString»
 
 			public static «paramGenericName» empty«shortName»() {
 				return («genericName») EMPTY;

@@ -353,7 +353,7 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			«keyValueHashCode»
 
-			«toStr»
+			«keyValueToString»
 
 			public static <K extends Comparable<K>, A> SortedDict<K, A> emptySortedDict() {
 				return (SortedDict<K, A>) EMPTY;
@@ -581,7 +581,7 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			«keyValueHashCode»
 
-			«toStr»
+			«keyValueToString»
 		}
 
 		final class SlicedSortedDictIterator<K, A> implements Iterator<P<K, A>> {

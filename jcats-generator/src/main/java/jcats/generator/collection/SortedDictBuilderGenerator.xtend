@@ -2,7 +2,6 @@ package jcats.generator.collection
 
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
-import jcats.generator.Type
 
 final class SortedDictBuilderGenerator implements ClassGenerator {
 
@@ -91,7 +90,7 @@ final class SortedDictBuilderGenerator implements ClassGenerator {
 				return this.dict;
 			}
 
-			«toStr(Type.OBJECT, "this.dict")»
+			«keyValueToString("this.dict")»
 		}
 	''' }
 }

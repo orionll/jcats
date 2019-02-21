@@ -2,7 +2,6 @@ package jcats.generator.collection
 
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
-import jcats.generator.Type
 
 final class DictBuilderGenerator implements ClassGenerator {
 
@@ -93,7 +92,7 @@ final class DictBuilderGenerator implements ClassGenerator {
 				return this.dict;
 			}
 
-			«toStr(Type.OBJECT, "this.dict")»
+			«keyValueToString("this.dict")»
 		}
 	''' }
 }

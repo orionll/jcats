@@ -222,6 +222,37 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
+			static <K, A> String keyValueToString(final KeyValue<K, A> keyValue) {
+				final Iterator<P<K, A>> iterator = keyValue.iterator();
+				if (iterator.hasNext()) {
+					final StringBuilder builder = new StringBuilder();
+					builder.append("{");
+					while (true) {
+						final P<K, A> next = iterator.next();
+						final K key = next.get1();
+						final A value = next.get2();
+						if (key == keyValue) {
+							builder.append("(this KeyValue)");
+						} else {
+							builder.append(key);
+						}
+						builder.append('=');
+						if (value == keyValue) {
+							builder.append("(this KeyValue)");
+						} else {
+							builder.append(value);
+						}
+						if (!iterator.hasNext()) {
+							builder.append("}");
+							return builder.toString();
+						}
+						builder.append(", ");
+					}
+				} else {
+					return "{}";
+				}
+			}
+
 			static <A> int orderedContainerHashCode(final OrderedContainer<A> container) {
 				return container.foldToInt(1, (hashCode, value) -> 31 * hashCode + value.hashCode());
 			}
