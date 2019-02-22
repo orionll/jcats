@@ -40,8 +40,9 @@ final class SortedDictBuilderGenerator implements ClassGenerator {
 				return this;
 			}
 
-			public SortedDictBuilder<K, A> putEntry(final  P<K, A> entry) {
-				return put(entry.get1(), entry.get2());
+			public SortedDictBuilder<K, A> putEntry(final P<K, A> entry) {
+				this.dict = this.dict.putEntry(entry);
+				return this;
 			}
 
 			@SafeVarargs

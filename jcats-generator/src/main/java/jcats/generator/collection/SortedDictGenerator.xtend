@@ -115,13 +115,23 @@ final class SortedDictGenerator implements ClassGenerator {
 				if (this.entry == null) {
 					return new SortedDict<>(p(key, value), null, null, this.ord, 0);
 				} else {
-					return update(key, value, new InsertResult());
+					return update(key, value, null, new InsertResult());
 				}
 			}
 
-			private «genericName» update(final K key, final A value, final InsertResult result) {
-				«AVLCommonGenerator.update(genericName, diamondName, "key", "entry.get1()", "p(key, value)",
-					"key == this.entry.get1() && value == this.entry.get2()", "key, value")»
+			public SortedDict<K, A> putEntry(final P<K, A> entry) {
+				requireNonNull(entry);
+
+				if (this.entry == null) {
+					return new SortedDict<>(entry, null, null, this.ord, 0);
+				} else {
+					return update(entry.get1(), entry.get2(), entry, new InsertResult());
+				}
+			}
+
+			private «genericName» update(final K key, final A value, final P<K, A> entry, final InsertResult result) {
+				«AVLCommonGenerator.update(genericName, diamondName, "key", "entry.get1()", "(entry == null) ? p(key, value) : entry",
+					"key == this.entry.get1() && value == this.entry.get2()", "key, value, entry")»
 			}
 
 			«AVLCommonGenerator.insertAndRotateRight(genericName, diamondName)»
@@ -204,6 +214,25 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			public «genericName» tail() throws NoSuchElementException {
 				«AVLCommonGenerator.initOrTail(genericName, shortName, "DeleteResult<>", "deleteMinimum")»
+			}
+
+			public SortedDict<K, A> slice(final K from, final boolean fromInclusive, final K to, final boolean toInclusive) {
+				checkRange(this.ord, from, to);
+				final SortedDictBuilder<K, A> builder = new SortedDictBuilder<>(this.ord);
+				new SlicedSortedDictView<>(this, from, true, fromInclusive, to, true, toInclusive).forEach(builder::putEntry);
+				return builder.build();
+			}
+
+			public SortedDict<K, A> sliceFrom(final K from, final boolean inclusive) {
+				final SortedDictBuilder<K, A> builder = new SortedDictBuilder<>(this.ord);
+				new SlicedSortedDictView<>(this, from, true, inclusive, null, false, false).forEach(builder::putEntry);
+				return builder.build();
+			}
+
+			public SortedDict<K, A> sliceTo(final K to, final boolean inclusive) {
+				final SortedDictBuilder<K, A> builder = new SortedDictBuilder<>(this.ord);
+				new SlicedSortedDictView<>(this, null, false, false, to, true, inclusive).forEach(builder::putEntry);
+				return builder.build();
 			}
 
 			@Override
