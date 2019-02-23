@@ -42,8 +42,9 @@ final class DictBuilderGenerator implements ClassGenerator {
 				return this;
 			}
 
-			public DictBuilder<K, A> putEntry(final  P<K, A> entry) {
-				return put(entry.get1(), entry.get2());
+			public DictBuilder<K, A> putEntry(final P<K, A> entry) {
+				this.dict = this.dict.putEntry(entry);
+				return this;
 			}
 
 			@SafeVarargs

@@ -61,7 +61,12 @@ class DictGenerator implements ClassGenerator {
 
 			public «genericName» put(final K key, final A value) {
 				requireNonNull(value);
-				return update(key, key.hashCode(), value, 0);
+				return update(key, key.hashCode(), value, null, 0);
+			}
+
+			public «genericName» putEntry(final P<K, A> entry) {
+				requireNonNull(entry);
+				return update(entry.get1(), entry.get1().hashCode(), entry.get2(), entry, 0);
 			}
 
 			public «genericName» update(final K key, final F<A, A> f) {
@@ -72,7 +77,7 @@ class DictGenerator implements ClassGenerator {
 					return this;
 				} else {
 					final A newValue = requireNonNull(f.apply(value));
-					return update(key, keyHash, newValue, 0);
+					return update(key, keyHash, newValue, null, 0);
 				}
 			}
 
@@ -82,10 +87,10 @@ class DictGenerator implements ClassGenerator {
 				final int keyHash = key.hashCode();
 				final A value = get(key, keyHash, 0);
 				if (value == null) {
-					return update(key, keyHash, defaultValue, 0);
+					return update(key, keyHash, defaultValue, null, 0);
 				} else {
 					final A newValue = requireNonNull(f.apply(value));
-					return update(key, keyHash, newValue, 0);
+					return update(key, keyHash, newValue, null, 0);
 				}
 			}
 
@@ -184,12 +189,12 @@ class DictGenerator implements ClassGenerator {
 
 			«HashTableCommonGenerator.remap(shortName, genericName, diamondName)»
 
-			private «genericName» update(final K key, final int keyHash, final A value, final int shift) {
+			private «genericName» update(final K key, final int keyHash, final A value, final P<K, A> entry, final int shift) {
 				final int branch = branch(keyHash, shift);
 
 				switch (slotType(branch, this.treeMap, this.leafMap)) {
 					case VOID:
-						return remap(this.treeMap, this.leafMap | branch, this.size + 1).setEntry(branch, p(key, value));
+						return remap(this.treeMap, this.leafMap | branch, this.size + 1).setEntry(branch, (entry == null) ? p(key, value) : entry);
 
 					case LEAF:
 						final P<K, A> leaf = getEntry(branch);
@@ -200,21 +205,20 @@ class DictGenerator implements ClassGenerator {
 								if (value == leaf.get2()) {
 									return this;
 								} else {
-									return remap(this.treeMap, this.leafMap, this.size).setEntry(branch, p(key, value));
+									return remap(this.treeMap, this.leafMap, this.size).setEntry(branch, (entry == null) ? p(key, value) : entry);
 								}
 							} else {
-								final P[] collision = { p(key, value), leaf };
+								final P[] collision = { (entry == null) ? p(key, value) : entry, leaf };
 								return remap(this.treeMap | branch, this.leafMap, this.size + 1).setCollision(branch, collision);
 							}
 						} else {
-							final P<K, A> entry = p(key, value);
-							final «genericName» tree = merge(leaf, leafKeyHash, entry, keyHash, shift + 5);
+							final «genericName» tree = merge(leaf, leafKeyHash, (entry == null) ? p(key, value) : entry, keyHash, shift + 5);
 							return remap(this.treeMap | branch, this.leafMap ^ branch, this.size + 1).setTree(branch, tree);
 						}
 
 					case TREE:
 						final «genericName» oldTree = getTree(branch);
-						final «genericName» newTree = oldTree.update(key, keyHash, value, shift + 5);
+						final «genericName» newTree = oldTree.update(key, keyHash, value, entry, shift + 5);
 						if (newTree == oldTree) {
 							return this;
 						} else {
@@ -223,7 +227,7 @@ class DictGenerator implements ClassGenerator {
 
 					case COLLISION:
 						final P[] oldCollision = getCollision(branch);
-						final P[] newCollision = updateCollision(oldCollision, key, value);
+						final P[] newCollision = updateCollision(oldCollision, key, value, entry);
 						if (newCollision == oldCollision) {
 							return this;
 						} else if (newCollision.length > oldCollision.length) {
@@ -250,16 +254,15 @@ class DictGenerator implements ClassGenerator {
 				return null;
 			}
 
-			private P[] updateCollision(final P[] collision, final K key, final A value) {
+			private P[] updateCollision(final P[] collision, final K key, final A value, final P<K, A> entry) {
 				for (int i = 0; i < collision.length; i++) {
-					final P<K, A> entry = collision[i];
-					if (entry.get1().equals(key)) {
-						if (entry.get2() == value) {
+					if (collision[i].get1().equals(key)) {
+						if (collision[i].get2() == value) {
 							return collision;
 						} else {
 							final P[] newCollision = new P[collision.length];
 							System.arraycopy(collision, 0, newCollision, 0, collision.length);
-							newCollision[i] = p(key, value);
+							newCollision[i] = (entry == null) ? p(key, value) : entry;
 							return newCollision;
 						}
 					}
@@ -267,7 +270,7 @@ class DictGenerator implements ClassGenerator {
 
 				final P[] newCollision = new P[collision.length + 1];
 				System.arraycopy(collision, 0, newCollision, 1, collision.length);
-				newCollision[0] = p(key, value);
+				newCollision[0] = (entry == null) ? p(key, value) : entry;
 				return newCollision;
 			}
 
