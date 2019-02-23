@@ -192,6 +192,11 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public Dict<K, A> toDict() {
+				return this.keyValue.toDict();
+			}
+
+			@Override
 			public Map<K, A> asMap() {
 				return this.keyValue.asMap();
 			}

@@ -288,6 +288,12 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			@Override
+			@Deprecated
+			public Dict<K, A> toDict() {
+				return this;
+			}
+
+			@Override
 			public Iterator<P<K, A>> iterator() {
 				return isEmpty() ? Collections.emptyIterator() : new HashTableIterator<>(this.leafMap, this.treeMap, this.slots);
 			}

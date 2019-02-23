@@ -147,6 +147,12 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				return new KeyValueAsUniqueContainer<>(this);
 			}
 
+			default Dict<K, A> toDict() {
+				final DictBuilder<K, A> builder = Dict.builder();
+				forEach(builder::putEntry);
+				return builder.build();
+			}
+
 			default Map<K, A> asMap() {
 				return new KeyValueAsMap<>(this);
 			}
