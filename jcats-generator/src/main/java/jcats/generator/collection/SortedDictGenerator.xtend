@@ -236,6 +236,12 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			@Override
+			@Deprecated
+			public SortedDict<K, A> toSortedDict() {
+				return this;
+			}
+
+			@Override
 			public Iterator<P<K, A>> iterator() {
 				return (this.entry == null) ? Collections.emptyIterator() : new SortedDictIterator<>(this);
 			}

@@ -65,6 +65,12 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			@Override
 			SortedKeyValueView<K, A> view();
 
+			default SortedDict<K, A> toSortedDict() {
+				final SortedDictBuilder<K, A> builder = SortedDict.builderBy(ord());
+				forEach(builder::putEntry);
+				return builder.build();
+			}
+
 			default TreeMap<K, A> toTreeMap() {
 				final TreeMap<K, A> map = new TreeMap<>(ord());
 				foreach(map::put);

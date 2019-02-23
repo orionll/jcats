@@ -110,6 +110,11 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public SortedDict<K, A> toSortedDict() {
+				return this.keyValue.toSortedDict();
+			}
+
+			@Override
 			public TreeMap<K, A> toTreeMap() {
 				return this.keyValue.toTreeMap();
 			}
