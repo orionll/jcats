@@ -274,6 +274,14 @@ final class UniqueGenerator implements ClassGenerator {
 				}
 			}
 
+			public «genericName» putValues(final A... values) {
+				«genericName» unique = this;
+				for (final A value : values) {
+					unique = unique.put(value);
+				}
+				return unique;
+			}
+
 			@Override
 			public Array<A> toArray() {
 				if (isEmpty()) {

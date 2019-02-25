@@ -230,6 +230,14 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				}
 			}
 
+			public «genericName» putValues(final «type.genericName»... values) {
+				«genericName» unique = this;
+				for (final «type.genericName» value : values) {
+					unique = unique.put(value);
+				}
+				return unique;
+			}
+
 			@Override
 			public «type.genericName» first() throws NoSuchElementException {
 				if (isEmpty()) {
