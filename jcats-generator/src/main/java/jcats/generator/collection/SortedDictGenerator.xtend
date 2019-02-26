@@ -216,22 +216,28 @@ final class SortedDictGenerator implements ClassGenerator {
 				«AVLCommonGenerator.initOrTail(genericName, shortName, "DeleteResult<>", "deleteMinimum")»
 			}
 
-			public SortedDict<K, A> slice(final K from, final boolean fromInclusive, final K to, final boolean toInclusive) {
+			public «genericName» slice(final K from, final boolean fromInclusive, final K to, final boolean toInclusive) {
 				checkRange(this.ord, from, to);
 				final SortedDictBuilder<K, A> builder = new SortedDictBuilder<>(this.ord);
 				new SlicedSortedDictView<>(this, from, true, fromInclusive, to, true, toInclusive).forEach(builder::putEntry);
 				return builder.build();
 			}
 
-			public SortedDict<K, A> sliceFrom(final K from, final boolean inclusive) {
+			public «genericName» sliceFrom(final K from, final boolean inclusive) {
 				final SortedDictBuilder<K, A> builder = new SortedDictBuilder<>(this.ord);
 				new SlicedSortedDictView<>(this, from, true, inclusive, null, false, false).forEach(builder::putEntry);
 				return builder.build();
 			}
 
-			public SortedDict<K, A> sliceTo(final K to, final boolean inclusive) {
+			public «genericName» sliceTo(final K to, final boolean inclusive) {
 				final SortedDictBuilder<K, A> builder = new SortedDictBuilder<>(this.ord);
 				new SlicedSortedDictView<>(this, null, false, false, to, true, inclusive).forEach(builder::putEntry);
+				return builder.build();
+			}
+
+			public «genericName» reverse() {
+				final SortedDictBuilder<K, A> builder = new SortedDictBuilder<>(this.ord.reversed());
+				builder.putAll(this);
 				return builder.build();
 			}
 
