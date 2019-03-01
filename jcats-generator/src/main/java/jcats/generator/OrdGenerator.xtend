@@ -17,6 +17,96 @@ final class OrdGenerator implements InterfaceGenerator {
 		Type.values.toList.map[new OrdGenerator(it) as Generator]
 	}
 
+	def minOrMaxBy2(boolean min) {
+		val minOrMax = if (min) "min" else "max"
+		val order = if (min) "GT" else "LT"
+		'''
+		«IF type == Type.OBJECT»
+			default <B> B «minOrMax»By(final F<B, A> f, final B value1, final B value2) {
+		«ELSE»
+			default <A> A «minOrMax»By(final «type.typeName»F<A> f, final A value1, final A value2) {
+		«ENDIF»
+			requireNonNull(value1);
+			requireNonNull(value2);
+			final «type.genericName» result1 = «type.requireNonNull("f.apply(value1)")»;
+			final «type.genericName» result2 = «type.requireNonNull("f.apply(value2)")»;
+			if (order(result1, result2).equals(«order»)) {
+				return value2;
+			} else {
+				return value1;
+			}
+		}
+	''' }
+
+	def minOrMaxByN(int i, boolean min) {
+		val minOrMax = if (min) "min" else "max"
+		val order = if (min) "GT" else "LT"
+		'''
+		«IF type == Type.OBJECT»
+			default <B> B «minOrMax»By(final F<B, A> f, «(1..i).map['''final B value«it»'''].join(", ")») {
+		«ELSE»
+			default <A> A «minOrMax»By(final «type.typeName»F<A> f, «(1..i).map['''final A value«it»'''].join(", ")») {
+		«ENDIF»
+			«FOR j : 1 .. i»
+				requireNonNull(value«j»);
+			«ENDFOR»
+			«IF type == Type.OBJECT»
+				B «minOrMax»By = value1;
+				A «minOrMax» = requireNonNull(f.apply(value1));
+			«ELSE»
+				A «minOrMax»By = value1;
+				«type.genericName» «minOrMax» = f.apply(value1);
+			«ENDIF»
+			«FOR j : 2 .. i»
+				«IF j == 2»«type.genericName» «ENDIF»result = «type.requireNonNull('''f.apply(value«j»)''')»;
+				if (order(«minOrMax», result).equals(«order»)) {
+					«minOrMax»By = value«j»;
+					«IF j != i»
+						«minOrMax» = result;
+					«ENDIF»
+				}
+			«ENDFOR»
+			return «minOrMax»By;
+		}
+	''' }
+
+	def minOrMaxByMany(boolean min) {
+		val minOrMax = if (min) "min" else "max"
+		val order = if (min) "GT" else "LT"
+		'''
+			«IF type == Type.OBJECT»
+				default <B> B «minOrMax»By(final F<B, A> f, «(1..Constants.MAX_ARITY+1).map['''final B value«it»'''].join(", ")», final B... values) {
+			«ELSE»
+				default <A> A «minOrMax»By(final «type.typeName»F<A> f, «(1..Constants.MAX_ARITY+1).map['''final A value«it»'''].join(", ")», final A... values) {
+			«ENDIF»
+				«FOR j : 1 .. Constants.MAX_ARITY+1»
+					requireNonNull(value«j»);
+				«ENDFOR»
+				«IF type == Type.OBJECT»
+					B «minOrMax»By = value1;
+					A «minOrMax» = requireNonNull(f.apply(value1));
+				«ELSE»
+					A «minOrMax»By = value1;
+					«type.genericName» «minOrMax» = f.apply(value1);
+				«ENDIF»
+				«FOR j : 2 .. Constants.MAX_ARITY+1»
+					«IF j == 2»«type.genericName» «ENDIF»result = «type.requireNonNull('''f.apply(value«j»)''')»;
+					if (order(«minOrMax», result).equals(«order»)) {
+						«minOrMax»By = value«j»;
+						«minOrMax» = result;
+					}
+				«ENDFOR»
+				for (final «IF type == Type.OBJECT»B«ELSE»A«ENDIF» value : values) {
+					result = «type.requireNonNull("f.apply(value)")»;
+					if (order(«minOrMax», result).equals(«order»)) {
+						«minOrMax»By = value;
+						«minOrMax» = result;
+					}
+				}
+				return «minOrMax»By;
+			}
+	''' }
+
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
@@ -123,6 +213,14 @@ final class OrdGenerator implements InterfaceGenerator {
 				return min;
 			}
 
+			«minOrMaxBy2(true)»
+
+			«FOR i : 3 .. Constants.MAX_ARITY»
+				«minOrMaxByN(i, true)»
+
+			«ENDFOR»
+			«minOrMaxByMany(true)»
+
 			default «type.optionGenericName» arrayMin(final «type.genericName»[] values) {
 				if (values.length == 0) {
 					return «type.noneName»();
@@ -186,6 +284,14 @@ final class OrdGenerator implements InterfaceGenerator {
 				}
 				return max;
 			}
+
+			«minOrMaxBy2(false)»
+
+			«FOR i : 3 .. Constants.MAX_ARITY»
+				«minOrMaxByN(i, false)»
+
+			«ENDFOR»
+			«minOrMaxByMany(false)»
 
 			default «type.optionGenericName» arrayMax(final «type.genericName»[] values) {
 				if (values.length == 0) {
