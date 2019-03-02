@@ -17,6 +17,50 @@ final class OrdGenerator implements InterfaceGenerator {
 		Type.values.toList.map[new OrdGenerator(it) as Generator]
 	}
 
+	def minOrMax(boolean min) {
+		val minOrMax = if (min) "min" else "max"
+		val order = if (min) "GT" else "LT"
+		'''
+		default «type.genericName» «minOrMax»(final «type.genericName» value1, final «type.genericName» value2) {
+			«IF type == Type.OBJECT»
+				requireNonNull(value1);
+				requireNonNull(value2);
+			«ENDIF»
+			if (order(value1, value2).equals(«order»)) {
+				return value2;
+			} else {
+				return value1;
+			}
+		}
+	''' }
+
+	def minOrMaxN(int i, boolean min) {
+		val minOrMax = if (min) "min" else "max"
+		'''
+		default «type.genericName» «minOrMax»(«(1..i).map['''final «type.genericName» value«it»'''].join(", ")») {
+			«type.genericName» «minOrMax» = «minOrMax»(value1, value2);
+			«FOR j : 3 .. i»
+				«minOrMax» = «minOrMax»(«minOrMax», value«j»);
+			«ENDFOR»
+			return «minOrMax»;
+		}
+	''' }
+
+	def minOrMaxMany(boolean min) {
+		val minOrMax = if (min) "min" else "max"
+		'''
+		default «type.genericName» «minOrMax»(«(1..Constants.MAX_ARITY+1).map['''final «type.genericName» value«it»'''].join(", ")», final «type.genericName»... values) {
+			«type.genericName» «minOrMax» = «minOrMax»(value1, value2);
+			«FOR j : 3 .. Constants.MAX_ARITY+1»
+				«minOrMax» = «minOrMax»(«minOrMax», value«j»);
+			«ENDFOR»
+			for (final «type.genericName» value : values) {
+				«minOrMax» = «minOrMax»(«minOrMax», value);
+			}
+			return «minOrMax»;
+		}
+	''' }
+
 	def minOrMaxBy2(boolean min) {
 		val minOrMax = if (min) "min" else "max"
 		val order = if (min) "GT" else "LT"
@@ -107,6 +151,92 @@ final class OrdGenerator implements InterfaceGenerator {
 			}
 	''' }
 
+	def arrayMinOrMax(boolean min) {
+		val minOrMax = if (min) "min" else "max"
+		'''
+		default «type.optionGenericName» array«IF min»Min«ELSE»Max«ENDIF»(final «type.genericName»[] values) {
+			if (values.length == 0) {
+				return «type.noneName»();
+			} else {
+				«type.genericName» «minOrMax» = «type.requireNonNull("values[0]")»;
+				for (int i = 1; i < values.length; i++) {
+					final «type.genericName» value = «type.requireNonNull("values[i]")»;
+					«minOrMax» = «type.requireNonNull('''«minOrMax»(«minOrMax», value)''')»;
+				}
+				return «type.someName»(«minOrMax»);
+			}
+		}
+	''' }
+
+	def allMinOrMax(boolean min) {
+		val minOrMax = if (min) "min" else "max"
+		'''
+		default «type.optionGenericName» all«IF min»Min«ELSE»Max«ENDIF»(final Iterable<«type.genericBoxedName»> iterable) {
+			if (iterable instanceof «type.containerWildcardName») {
+				return ((«type.containerGenericName») iterable).«minOrMax»«IF type.primitive»ByOrd«ENDIF»(this);
+			} else {
+				final «type.genericName((if (min) "Min" else "Max") + "Collector")» collector = new «type.diamondName((if (min) "Min" else "Max") + "Collector")»(this);
+				iterable.forEach(collector);
+				«IF type == Type.OBJECT»
+					return Option.fromNullable(collector.«minOrMax»);
+				«ELSE»
+					if (collector.nonEmpty) {
+						return «type.someName»(collector.«minOrMax»);
+					} else {
+						return «type.noneName»();
+					}
+				«ENDIF»
+			}
+		}
+	''' }
+
+	def minOrMaxCollector(boolean min) {
+		val minOrMax = if (min) "min" else "max"
+		'''
+		final class «IF min»Min«ELSE»Max«ENDIF»Collector<A> implements Consumer<A> {
+			A «minOrMax»;
+			private final Ord<A> ord;
+
+			«IF min»Min«ELSE»Max«ENDIF»Collector(final Ord<A> ord) {
+				this.ord = ord;
+			}
+
+			@Override
+			public void accept(final A value) {
+				requireNonNull(value);
+				if (this.«minOrMax» == null) {
+					this.«minOrMax» = value;
+				} else {
+					this.«minOrMax» = requireNonNull(this.ord.«minOrMax»(this.«minOrMax», value));
+				}
+			}
+		}
+	''' }
+
+	def primitiveMinOrMaxCollector(boolean min) {
+		val minOrMax = if (min) "min" else "max"
+		'''
+		final class «type.typeName»«IF min»Min«ELSE»Max«ENDIF»Collector implements Consumer<«type.boxedName»> {
+			«type.javaName» «minOrMax»;
+			boolean nonEmpty;
+			private final «genericName» ord;
+
+			«type.typeName»«IF min»Min«ELSE»Max«ENDIF»Collector(final «genericName» ord) {
+				this.ord = ord;
+			}
+
+			@Override
+			public void accept(final «type.boxedName» value) {
+				if (this.nonEmpty) {
+					this.«minOrMax» = this.ord.«minOrMax»(this.«minOrMax», value);
+				} else {
+					this.«minOrMax» = value;
+					this.nonEmpty = true;
+				}
+			}
+		}
+	''' }
+
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
@@ -180,38 +310,13 @@ final class OrdGenerator implements InterfaceGenerator {
 				return order(x, y).equals(EQ);
 			}
 
-			default «type.genericName» min(final «type.genericName» value1, final «type.genericName» value2) {
-				«IF type == Type.OBJECT»
-					requireNonNull(value1);
-					requireNonNull(value2);
-				«ENDIF»
-				if (order(value1, value2).equals(GT)) {
-					return value2;
-				} else {
-					return value1;
-				}
-			}
+			«minOrMax(true)»
 
 			«FOR i : 3 .. Constants.MAX_ARITY»
-				default «type.genericName» min(«(1..i).map['''final «type.genericName» value«it»'''].join(", ")») {
-					«type.genericName» min = min(value1, value2);
-					«FOR j : 3 .. i»
-						min = min(min, value«j»);
-					«ENDFOR»
-					return min;
-				}
+				«minOrMaxN(i, true)»
 
 			«ENDFOR»
-			default «type.genericName» min(«(1..Constants.MAX_ARITY+1).map['''final «type.genericName» value«it»'''].join(", ")», final «type.genericName»... values) {
-				«type.genericName» min = min(value1, value2);
-				«FOR j : 3 .. Constants.MAX_ARITY+1»
-					min = min(min, value«j»);
-				«ENDFOR»
-				for (final «type.genericName» value : values) {
-					min = min(min, value);
-				}
-				return min;
-			}
+			«minOrMaxMany(true)»
 
 			«minOrMaxBy2(true)»
 
@@ -221,69 +326,17 @@ final class OrdGenerator implements InterfaceGenerator {
 			«ENDFOR»
 			«minOrMaxByMany(true)»
 
-			default «type.optionGenericName» arrayMin(final «type.genericName»[] values) {
-				if (values.length == 0) {
-					return «type.noneName»();
-				} else {
-					«type.genericName» min = «type.requireNonNull("values[0]")»;
-					for (int i = 1; i < values.length; i++) {
-						final «type.genericName» value = «type.requireNonNull("values[i]")»;
-						min = «type.requireNonNull("min(min, value)")»;
-					}
-					return «type.someName»(min);
-				}
-			}
+			«arrayMinOrMax(true)»
 
-			default «type.optionGenericName» allMin(final Iterable<«type.genericBoxedName»> iterable) {
-				if (iterable instanceof «type.containerWildcardName») {
-					return ((«type.containerGenericName») iterable).min«IF type.primitive»ByOrd«ENDIF»(this);
-				} else {
-					final «type.genericName("MinCollector")» collector = new «type.diamondName("MinCollector")»(this);
-					iterable.forEach(collector);
-					«IF type == Type.OBJECT»
-						return Option.fromNullable(collector.min);
-					«ELSE»
-						if (collector.nonEmpty) {
-							return «type.someName»(collector.min);
-						} else {
-							return «type.noneName»();
-						}
-					«ENDIF»
-				}
-			}
+			«allMinOrMax(true)»
 
-			default «type.genericName» max(final «type.genericName» value1, final «type.genericName» value2) {
-				«IF type == Type.OBJECT»
-					requireNonNull(value1);
-					requireNonNull(value2);
-				«ENDIF»
-				if (order(value1, value2).equals(LT)) {
-					return value2;
-				} else {
-					return value1;
-				}
-			}
+			«minOrMax(false)»
 
 			«FOR i : 3 .. Constants.MAX_ARITY»
-				default «type.genericName» max(«(1..i).map['''final «type.genericName» value«it»'''].join(", ")») {
-					«type.genericName» max = max(value1, value2);
-					«FOR j : 3 .. i»
-						max = max(max, value«j»);
-					«ENDFOR»
-					return max;
-				}
+				«minOrMaxN(i, false)»
 
 			«ENDFOR»
-			default «type.genericName» max(«(1..Constants.MAX_ARITY+1).map['''final «type.genericName» value«it»'''].join(", ")», final «type.genericName»... values) {
-				«type.genericName» max = max(value1, value2);
-				«FOR j : 3 .. Constants.MAX_ARITY+1»
-					max = max(max, value«j»);
-				«ENDFOR»
-				for (final «type.genericName» value : values) {
-					max = max(max, value);
-				}
-				return max;
-			}
+			«minOrMaxMany(false)»
 
 			«minOrMaxBy2(false)»
 
@@ -293,36 +346,9 @@ final class OrdGenerator implements InterfaceGenerator {
 			«ENDFOR»
 			«minOrMaxByMany(false)»
 
-			default «type.optionGenericName» arrayMax(final «type.genericName»[] values) {
-				if (values.length == 0) {
-					return «type.noneName»();
-				} else {
-					«type.genericName» max = «type.requireNonNull("values[0]")»;
-					for (int i = 1; i < values.length; i++) {
-						final «type.genericName» value = «type.requireNonNull("values[i]")»;
-						max = «type.requireNonNull("max(max, value)")»;
-					}
-					return «type.someName»(max);
-				}
-			}
+			«arrayMinOrMax(false)»
 
-			default «type.optionGenericName» allMax(final Iterable<«type.genericBoxedName»> iterable) {
-				if (iterable instanceof «type.containerWildcardName») {
-					return ((«type.containerGenericName») iterable).max«IF type.primitive»ByOrd«ENDIF»(this);
-				} else {
-					final «type.genericName("MaxCollector")» collector = new «type.diamondName("MaxCollector")»(this);
-					iterable.forEach(collector);
-					«IF type == Type.OBJECT»
-						return Option.fromNullable(collector.max);
-					«ELSE»
-						if (collector.nonEmpty) {
-							return «type.someName»(collector.max);
-						} else {
-							return «type.noneName»();
-						}
-					«ENDIF»
-				}
-			}
+			«allMinOrMax(false)»
 
 			@Override
 			default «genericName» reversed() {
@@ -778,83 +804,13 @@ final class OrdGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			final class MinCollector<A> implements Consumer<A> {
-				A min;
-				private final Ord<A> ord;
+			«minOrMaxCollector(true)»
 
-				MinCollector(final Ord<A> ord) {
-					this.ord = ord;
-				}
-
-				@Override
-				public void accept(final A value) {
-					requireNonNull(value);
-					if (this.min == null) {
-						this.min = value;
-					} else {
-						this.min = requireNonNull(this.ord.min(this.min, value));
-					}
-				}
-			}
-
-			final class MaxCollector<A> implements Consumer<A> {
-				A max;
-				private final Ord<A> ord;
-
-				MaxCollector(final Ord<A> ord) {
-					this.ord = ord;
-				}
-
-				@Override
-				public void accept(final A value) {
-					requireNonNull(value);
-					if (this.max == null) {
-						this.max = value;
-					} else {
-						this.max = requireNonNull(this.ord.max(this.max, value));
-					}
-				}
-			}
+			«minOrMaxCollector(false)»
 		«ELSE»
-			final class «type.typeName»MinCollector implements Consumer<«type.boxedName»> {
-				«type.javaName» min;
-				boolean nonEmpty;
-				private final «genericName» ord;
+			«primitiveMinOrMaxCollector(true)»
 
-				«type.typeName»MinCollector(final «genericName» ord) {
-					this.ord = ord;
-				}
-
-				@Override
-				public void accept(final «type.boxedName» value) {
-					if (this.nonEmpty) {
-						this.min = this.ord.min(this.min, value);
-					} else {
-						this.min = value;
-						this.nonEmpty = true;
-					}
-				}
-			}
-
-			final class «type.typeName»MaxCollector implements Consumer<«type.boxedName»> {
-				«type.javaName» max;
-				boolean nonEmpty;
-				private final «genericName» ord;
-
-				«type.typeName»MaxCollector(final «genericName» ord) {
-					this.ord = ord;
-				}
-
-				@Override
-				public void accept(final «type.boxedName» value) {
-					if (this.nonEmpty) {
-						this.max = this.ord.max(this.max, value);
-					} else {
-						this.max = value;
-						this.nonEmpty = true;
-					}
-				}
-			}
+			«primitiveMinOrMaxCollector(false)»
 		«ENDIF»
 	''' }
 }
