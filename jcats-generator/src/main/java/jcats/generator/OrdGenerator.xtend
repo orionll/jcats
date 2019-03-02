@@ -168,6 +168,37 @@ final class OrdGenerator implements InterfaceGenerator {
 		}
 	''' }
 
+	def arrayMinOrMaxBy(boolean min) {
+		val minOrMax = if (min) "min" else "max"
+		val order = if (min) "GT" else "LT"
+		'''
+		«IF type == Type.OBJECT»
+			default <B> Option<B> array«IF min»Min«ELSE»Max«ENDIF»By(final F<B, A> f, final B[] values) {
+		«ELSE»
+			default <A> Option<A> array«IF min»Min«ELSE»Max«ENDIF»By(final «type.typeName»F<A> f, final A[] values) {
+		«ENDIF»
+			if (values.length == 0) {
+				return none();
+			} else {
+				«IF type == Type.OBJECT»
+					B «minOrMax»By = values[0];
+					A «minOrMax» = requireNonNull(f.apply(«minOrMax»By));
+				«ELSE»
+					A «minOrMax»By = values[0];
+					«type.genericName» «minOrMax» = f.apply(«minOrMax»By);
+				«ENDIF»
+				for (int i = 1; i < values.length; i++) {
+					final «type.genericName» result = «type.requireNonNull("f.apply(values[i])")»;
+					if (order(«minOrMax», result).equals(«order»)) {
+						«minOrMax»By = values[i];
+						«minOrMax» = result;
+					}
+				}
+				return some(«minOrMax»By);
+			}
+		}
+	''' }
+
 	def allMinOrMax(boolean min) {
 		val minOrMax = if (min) "min" else "max"
 		'''
@@ -186,6 +217,40 @@ final class OrdGenerator implements InterfaceGenerator {
 						return «type.noneName»();
 					}
 				«ENDIF»
+			}
+		}
+	''' }
+
+	def allMinOrMaxBy(boolean min) {
+		val minOrMax = if (min) "min" else "max"
+		val order = if (min) "GT" else "LT"
+		'''
+		«IF type == Type.OBJECT»
+			default <B> Option<B> all«IF min»Min«ELSE»Max«ENDIF»By(final F<B, A> f, final Iterable<B> iterable) {
+		«ELSE»
+			default <A> Option<A> all«IF min»Min«ELSE»Max«ENDIF»By(final «type.typeName»F<A> f, final Iterable<A> iterable) {
+		«ENDIF»
+			requireNonNull(f);
+			final Iterator<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> iterator = iterable.iterator();
+			if (iterator.hasNext()) {
+				«IF type == Type.OBJECT»
+					B «minOrMax»By = iterator.next();
+					A «minOrMax» = requireNonNull(f.apply(«minOrMax»By));
+				«ELSE»
+					A «minOrMax»By = iterator.next();
+					«type.genericName» «minOrMax» = f.apply(«minOrMax»By);
+				«ENDIF»
+				while (iterator.hasNext()) {
+					final «IF type == Type.OBJECT»B«ELSE»A«ENDIF» next = iterator.next();
+					final «type.genericName» result = «type.requireNonNull("f.apply(next)")»;
+					if (order(«minOrMax», result).equals(«order»)) {
+						«minOrMax»By = next;
+						«minOrMax» = result;
+					}
+				}
+				return some(«minOrMax»By);
+			} else {
+				return none();
 			}
 		}
 	''' }
@@ -242,6 +307,7 @@ final class OrdGenerator implements InterfaceGenerator {
 
 		import java.io.Serializable;
 		import java.util.Comparator;
+		import java.util.Iterator;
 		import java.util.function.Consumer;
 
 		import «Constants.COLLECTION».*;
@@ -251,6 +317,9 @@ final class OrdGenerator implements InterfaceGenerator {
 		import static «Constants.ORD».*;
 		import static «Constants.ORDER».*;
 		import static «Constants.JCATS».«type.optionShortName».*;
+		«IF type.primitive»
+			import static «Constants.OPTION».*;
+		«ENDIF»
 
 		@FunctionalInterface
 		public interface «type.contravariantName("Ord")» extends Comparator<«type.genericBoxedName»> {
@@ -328,7 +397,11 @@ final class OrdGenerator implements InterfaceGenerator {
 
 			«arrayMinOrMax(true)»
 
+			«arrayMinOrMaxBy(true)»
+
 			«allMinOrMax(true)»
+
+			«allMinOrMaxBy(true)»
 
 			«minOrMax(false)»
 
@@ -348,7 +421,11 @@ final class OrdGenerator implements InterfaceGenerator {
 
 			«arrayMinOrMax(false)»
 
+			«arrayMinOrMaxBy(false)»
+
 			«allMinOrMax(false)»
+
+			«allMinOrMaxBy(false)»
 
 			@Override
 			default «genericName» reversed() {
