@@ -30,10 +30,12 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.util.ArrayList;
+		import java.util.Arrays;
 		import java.util.Collection;
 		import java.util.Collections;
 		import java.util.Iterator;
 		import java.util.HashSet;
+		import java.util.List;
 		import java.util.NoSuchElementException;
 		import java.util.PrimitiveIterator;
 		import java.util.Spliterator;
@@ -45,11 +47,10 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.JCATS».«type.optionShortName».*;
+		import static «Constants.JCATS».«type.ordShortName».*;
 		import static «Constants.FUNCTION».«type.shortName("BooleanF")».*;
 		import static «Constants.COMMON».*;
-		«IF type.primitive»
-			import static «Constants.COLLECTION».«type.arrayShortName».*;
-		«ENDIF»
+		import static «Constants.COLLECTION».«type.arrayShortName».*;
 
 		public interface «type.covariantName("ContainerView")» extends «type.containerGenericName» {
 
@@ -161,6 +162,21 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 					return new «skippedContainerViewShortName»<>(unview(), skip);
 				}
 			}
+
+			«IF type == Type.OBJECT»
+				default «type.indexedContainerViewGenericName» sort(final Ord<A> ord) {
+					requireNonNull(ord);
+					return new SortedContainerView<>(this, ord);
+				}
+			«ELSE»
+				default «type.indexedContainerViewGenericName» sortAsc() {
+					return new «type.shortName("SortedContainerView")»(this, true);
+				}
+
+				default «type.indexedContainerViewGenericName» sortDesc() {
+					return new «type.shortName("SortedContainerView")»(this, false);
+				}
+			«ENDIF»
 
 			static «type.paramGenericName("ContainerView")» «type.shortName("CollectionView").firstToLowerCase»(final Collection<«type.genericBoxedName»> collection) {
 				return «type.shortName("CollectionView").firstToLowerCase»(collection, true);
@@ -1123,6 +1139,462 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			«toStr(type)»
+		}
+
+		final class «type.genericName("SortedContainerView")» implements «type.indexedContainerViewGenericName» {
+			final «type.containerGenericName» container;
+			«IF type == Type.OBJECT»
+				final Ord<A> ord;
+			«ELSE»
+				final boolean asc;
+			«ENDIF»
+			final F0<«type.arrayGenericName»> sorted;
+
+			«type.shortName("SortedContainerView")»(final «type.containerGenericName» container, final «IF type == Type.OBJECT»Ord<A> ord«ELSE»boolean asc«ENDIF») {
+				this.container = container;
+				«IF type == Type.OBJECT»
+					this.ord = ord;
+				«ELSE»
+					this.asc = asc;
+				«ENDIF»
+				this.sorted = F0.lazy(() -> {
+					«IF type == Type.OBJECT»
+						final Object[] array = this.container.toObjectArray();
+						if (array.length == 0) {
+							return emptyArray();
+						} else {
+							Arrays.sort(array, (Ord<Object>) this.ord);
+							return new Array<>(array);
+						}
+					«ELSE»
+						final «type.javaName»[] array = this.container.toPrimitiveArray();
+						if (array.length == 0) {
+							return empty«type.arrayShortName»();
+						} else {
+							«IF type == Type.BOOLEAN»
+								if (this.asc) {
+									Common.sortBooleanArrayAsc(array);
+								} else {
+									Common.sortBooleanArrayDesc(array);
+								}
+							«ELSE»
+								Arrays.sort(array);
+								if (!this.asc) {
+									Common.reverse«type.arrayShortName»(array);
+								}
+							«ENDIF»
+							return new «type.arrayShortName»(array);
+						}
+					«ENDIF»
+				});
+			}
+
+			@Override
+			public int size() {
+				if (this.container.hasKnownFixedSize()) {
+					return this.container.size();
+				} else {
+					return this.sorted.apply().size();
+				}
+			}
+
+			@Override
+			public boolean isEmpty() {
+				if (this.container.hasKnownFixedSize()) {
+					return this.container.isEmpty();
+				} else {
+					return this.sorted.apply().isEmpty();
+				}
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				if (this.container.hasKnownFixedSize()) {
+					return this.container.isNotEmpty();
+				} else {
+					return this.sorted.apply().isNotEmpty();
+				}
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return true;
+			}
+
+			@Override
+			public «type.genericName» get(final int index) {
+				return this.sorted.apply().get(index);
+			}
+
+			@Override
+			public «type.genericName» first() {
+				return this.sorted.apply().first();
+			}
+
+			@Override
+			public «type.optionGenericName» firstOption() {
+				return this.sorted.apply().firstOption();
+			}
+
+			@Override
+			public «type.genericName» last() {
+				return this.sorted.apply().last();
+			}
+
+			@Override
+			public «type.optionGenericName» lastOption() {
+				return this.sorted.apply().lastOption();
+			}
+
+			@Override
+			public boolean contains(final «type.genericName» value) {
+				return this.container.contains(value);
+			}
+
+			@Override
+			public «type.optionGenericName» firstMatch(final «type.boolFName» predicate) {
+				return this.sorted.apply().firstMatch(predicate);
+			}
+
+			@Override
+			public boolean anyMatch(final «type.boolFName» predicate) {
+				return this.container.anyMatch(predicate);
+			}
+
+			@Override
+			public boolean allMatch(final «type.boolFName» predicate) {
+				return this.container.allMatch(predicate);
+			}
+
+			@Override
+			public boolean noneMatch(final «type.boolFName» predicate) {
+				return this.container.noneMatch(predicate);
+			}
+
+			@Override
+			public IntOption indexOf(final «type.genericName» value) {
+				return this.sorted.apply().indexOf(value);
+			}
+
+			@Override
+			public IntOption indexWhere(final «type.boolFName» predicate) {
+				return this.sorted.apply().indexWhere(predicate);
+			}
+
+			@Override
+			public IntOption lastIndexOf(final «type.genericName» value) {
+				return this.sorted.apply().lastIndexOf(value);
+			}
+
+			@Override
+			public IntOption lastIndexWhere(final «type.boolFName» predicate) {
+				return this.sorted.apply().lastIndexWhere(predicate);
+			}
+
+			@Override
+			«IF type.primitive»
+				public <A> A fold(final A start, final Object«type.typeName»ObjectF2<A, A> f2) {
+			«ELSE»
+				public <B> B fold(final B start, final F2<B, A, B> f2) {
+			«ENDIF»
+				return this.sorted.apply().fold(start, f2);
+			}
+
+			«FOR returnType : Type.primitives»
+				@Override
+				«IF type.primitive»
+					public «returnType.javaName» foldTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»«type.typeName»«returnType.typeName»F2 f2) {
+				«ELSE»
+					public «returnType.javaName» foldTo«returnType.typeName»(final «returnType.javaName» start, final «returnType.typeName»Object«returnType.typeName»F2<A> f2) {
+				«ENDIF»
+					return this.sorted.apply().foldTo«returnType.typeName»(start, f2);
+				}
+
+			«ENDFOR»
+			@Override
+			«IF type == Type.OBJECT»
+				public «type.optionGenericName» reduce(final F2<A, A, A> f2) {
+			«ELSE»
+				public «type.optionGenericName» reduce(final «type.typeName»«type.typeName»«type.typeName»F2 f2) {
+			«ENDIF»
+				return this.sorted.apply().reduce(f2);
+			}
+
+			@Override
+			«IF type.primitive»
+				public <A> A foldRight(final A start, final «type.typeName»ObjectObjectF2<A, A> f2) {
+			«ELSE»
+				public <B> B foldRight(final B start, final F2<A, B, B> f2) {
+			«ENDIF»
+				return this.sorted.apply().foldRight(start, f2);
+			}
+
+			«FOR returnType : Type.primitives»
+				@Override
+				«IF type == Type.OBJECT»
+					public «returnType.javaName» foldRightTo«returnType.typeName»(final «returnType.javaName» start, final Object«returnType.typeName»«returnType.typeName»F2<A> f2) {
+				«ELSE»
+					public «returnType.javaName» foldRightTo«returnType.typeName»(final «returnType.javaName» start, final «type.typeName»«returnType.typeName»«returnType.typeName»F2 f2) {
+				«ENDIF»
+					return this.sorted.apply().foldRightTo«returnType.typeName»(start, f2);
+				}
+
+			«ENDFOR»
+			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				return this.sorted.apply().reverseIterator();
+			}
+
+			@Override
+			public boolean isReverseQuick() {
+				return true;
+			}
+
+			«IF type.javaUnboxedType»
+				@Override
+				public «type.javaName» sum() {
+					return this.sorted.apply().sum();
+				}
+
+			«ENDIF»
+			«IF type == Type.INT»
+				@Override
+				public long sumToLong() {
+					return this.sorted.apply().sumToLong();
+				}
+
+			«ENDIF»
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				this.sorted.apply().foreach(eff);
+			}
+
+			@Override
+			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
+				this.sorted.apply().forEach(action);
+			}
+
+			@Override
+			«IF type == Type.OBJECT»
+				public void foreachWithIndex(final IntObjectEff2<A> eff) {
+			«ELSE»
+				public void foreachWithIndex(final Int«type.typeName»Eff2 eff) {
+			«ENDIF»
+				this.sorted.apply().foreachWithIndex(eff);
+			}
+
+			@Override
+			public boolean foreachUntil(final «type.boolFName» eff) {
+				return this.sorted.apply().foreachUntil(eff);
+			}
+
+			@Override
+			public void printAll() {
+				this.sorted.apply().printAll();
+			}
+
+			@Override
+			public String joinToString() {
+				return this.sorted.apply().joinToString();
+			}
+
+			@Override
+			public String joinToString(final String separator) {
+				return this.sorted.apply().joinToString(separator);
+			}
+
+			@Override
+			public String joinToString(final String separator, final String prefix, final String suffix) {
+				return this.sorted.apply().joinToString(separator, prefix, suffix);
+			}
+
+			«IF type == Type.OBJECT»
+				@Override
+				public «type.optionGenericName» min(final «type.ordGenericName» ord) {
+					if (this.ord == ord) {
+						return this.sorted.apply().firstOption();
+					} else {
+						return this.sorted.apply().min(ord);
+					}
+				}
+
+				@Override
+				public «type.optionGenericName» max(final «type.ordGenericName» ord) {
+					if (this.ord == ord) {
+						return this.sorted.apply().lastOption();
+					} else {
+						return this.sorted.apply().max(ord);
+					}
+				}
+			«ELSE»
+				@Override
+				public «type.optionGenericName» min() {
+					if (this.asc) {
+						return this.sorted.apply().firstOption();
+					} else {
+						return this.sorted.apply().lastOption();
+					}
+				}
+
+				@Override
+				public «type.optionGenericName» max() {
+					if (this.asc) {
+						return this.sorted.apply().lastOption();
+					} else {
+						return this.sorted.apply().firstOption();
+					}
+				}
+
+				@Override
+				public «type.optionGenericName» minByOrd(final «type.ordGenericName» ord) {
+					if (ord == «type.asc»()) {
+						return min();
+					} else if (ord == «type.desc»()) {
+						return max();
+					} else {
+						return this.sorted.apply().minByOrd(ord);
+					}
+				}
+
+				@Override
+				public «type.optionGenericName» maxByOrd(final «type.ordGenericName» ord) {
+					if (ord == «type.asc»()) {
+						return max();
+					} else if (ord == «type.desc»()) {
+						return min();
+					} else {
+						return this.sorted.apply().maxByOrd(ord);
+					}
+				}
+			«ENDIF»
+
+			@Override
+			«IF type == Type.OBJECT»
+				public <B extends Comparable<B>> «type.optionGenericName» minBy(final F<A, B> f) {
+			«ELSE»
+				public <A extends Comparable<A>> «type.optionGenericName» minBy(final «type.typeName»ObjectF<A> f) {
+			«ENDIF»
+				return this.sorted.apply().minBy(f);
+			}
+
+			«FOR to : Type.primitives»
+				@Override
+				«IF type == Type.OBJECT»
+					public «type.optionGenericName» minBy«to.typeName»(final «to.typeName»F<A> f) {
+				«ELSE»
+					public «type.optionGenericName» minBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
+				«ENDIF»
+					return this.sorted.apply().minBy«to.typeName»(f);
+				}
+
+			«ENDFOR»
+			@Override
+			«IF type == Type.OBJECT»
+				public <B extends Comparable<B>> «type.optionGenericName» maxBy(final F<A, B> f) {
+			«ELSE»
+				public <A extends Comparable<A>> «type.optionGenericName» maxBy(final «type.typeName»ObjectF<A> f) {
+			«ENDIF»
+				return this.sorted.apply().maxBy(f);
+			}
+
+			«FOR to : Type.primitives»
+				@Override
+				«IF type == Type.OBJECT»
+					public «type.optionGenericName» maxBy«to.typeName»(final «to.typeName»F<A> f) {
+				«ELSE»
+					public «type.optionGenericName» maxBy«to.typeName»(final «type.typeName»«to.typeName»F f) {
+				«ENDIF»
+					return this.sorted.apply().maxBy«to.typeName»(f);
+				}
+
+			«ENDFOR»
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				return this.sorted.apply().iterator();
+			}
+
+			@Override
+			public «type.spliteratorGenericName» spliterator() {
+				return this.sorted.apply().spliterator();
+			}
+
+			@Override
+			public int spliteratorCharacteristics() {
+				return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE;
+			}
+
+			@Override
+			public «type.arrayGenericName» to«type.arrayShortName»() {
+				return this.sorted.apply();
+			}
+
+			@Override
+			public «type.seqGenericName» to«type.seqShortName»() {
+				return this.sorted.apply().to«type.seqShortName»();
+			}
+
+			«IF type == Type.OBJECT»
+				@Override
+				public Unique<A> toUnique() {
+					return this.container.toUnique();
+				}
+
+			«ENDIF»
+			@Override
+			public «type.javaName»[] «type.toArrayName»() {
+				return this.sorted.apply().«type.toArrayName»();
+			}
+
+			«IF type == Type.OBJECT»
+				@Override
+				public A[] toPreciseArray(final IntObjectF<A[]> supplier) {
+					return this.sorted.apply().toPreciseArray(supplier);
+				}
+
+			«ENDIF»
+			«IF type.primitive»
+				@Override
+				public IndexedContainerView<«type.boxedName»> boxed() {
+					return this.sorted.apply().boxed();
+				}
+
+			«ENDIF»
+			@Override
+			public List<«type.genericBoxedName»> asCollection() {
+				return this.sorted.apply().asCollection();
+			}
+
+			@Override
+			public ArrayList<«type.genericBoxedName»> toArrayList() {
+				return this.sorted.apply().toArrayList();
+			}
+
+			@Override
+			public HashSet<«type.genericBoxedName»> toHashSet() {
+				return this.container.toHashSet();
+			}
+
+			@Override
+			public «type.stream2GenericName» stream() {
+				return this.sorted.apply().stream();
+			}
+
+			@Override
+			public «type.stream2GenericName» parallelStream() {
+				return this.sorted.apply().parallelStream();
+			}
+
+			@Override
+			public int hashCode() {
+				return this.sorted.apply().hashCode();
+			}
+
+			@Override
+			public boolean equals(final Object obj) {
+				return this.sorted.apply().equals(obj);
+			}
+
+			«toStr(type, "this.sorted.apply()")»
 		}
 
 		«IF type == Type.OBJECT»

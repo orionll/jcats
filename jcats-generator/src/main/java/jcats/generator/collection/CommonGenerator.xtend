@@ -16,6 +16,7 @@ final class CommonGenerator implements ClassGenerator {
 		import java.util.AbstractList;
 		import java.util.AbstractMap;
 		import java.util.AbstractSet;
+		import java.util.Arrays;
 		import java.util.Collection;
 		import java.util.Comparator;
 		import java.util.Iterator;
@@ -70,6 +71,32 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 			«ENDFOR»
+			static void sortBooleanArrayAsc(final boolean[] array) {
+				if (array.length > 1) {
+					int countFalse = 0;
+					for (final boolean value : array) {
+						if (!value) {
+							countFalse++;
+						}
+					}
+					Arrays.fill(array, 0, countFalse, false);
+					Arrays.fill(array, countFalse, array.length, true);
+				}
+			}
+
+			static void sortBooleanArrayDesc(final boolean[] array) {
+				if (array.length > 1) {
+					int countTrue = 0;
+					for (final boolean value : array) {
+						if (value) {
+							countTrue++;
+						}
+					}
+					Arrays.fill(array, 0, countTrue, true);
+					Arrays.fill(array, countTrue, array.length, false);
+				}
+			}
+
 			«FOR type : Type.values»
 				static «type.javaName»[] update«type.shortName("Array")»(final «type.javaName»[] array, final int index, final «type.updateFunction.replaceAll("<A, A>", "")» f) {
 					final «type.javaName»[] result = new «type.javaName»[array.length];
