@@ -55,6 +55,24 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 				return this;
 			}
 
+			«IF type == Type.OBJECT»
+				@Override
+				default «type.indexedContainerViewGenericName» sort(final Ord<A> ord) {
+					requireNonNull(ord);
+					return new SortedContainerView<>(this, ord, ord() == ord);
+				}
+			«ELSE»
+				@Override
+				default «type.indexedContainerViewGenericName» sortAsc() {
+					return new «type.shortName("SortedContainerView")»(this, true, ord() == «type.asc»());
+				}
+
+				@Override
+				default «type.indexedContainerViewGenericName» sortDesc() {
+					return new «type.shortName("SortedContainerView")»(this, false, ord() == «type.desc»());
+				}
+			«ENDIF»
+
 			«genericName» slice(«type.genericName» from, boolean fromInclusive, «type.genericName» to, boolean toInclusive);
 
 			«genericName» sliceFrom(«type.genericName» from, boolean inclusive);

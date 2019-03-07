@@ -701,6 +701,23 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				return this.container.spliteratorCharacteristics();
 			}
 
+			«IF type == Type.OBJECT»
+				@Override
+				public «type.indexedContainerViewGenericName» sort(final Ord<A> ord) {
+					return this.container.view().sort(ord);
+				}
+			«ELSE»
+				@Override
+				public «type.indexedContainerViewGenericName» sortAsc() {
+					return this.container.view().sortAsc();
+				}
+
+				@Override
+				public «type.indexedContainerViewGenericName» sortDesc() {
+					return this.container.view().sortDesc();
+				}
+			«ENDIF»
+
 			«toStr(type)»
 		}
 

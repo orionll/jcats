@@ -388,6 +388,24 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 				return Collections.nCopies(this.size, this.value);
 			}
 
+			«IF type == Type.OBJECT»
+				@Override
+				public «type.indexedContainerViewGenericName» sort(final Ord<A> ord) {
+					requireNonNull(ord);
+					return this;
+				}
+			«ELSE»
+				@Override
+				public «type.indexedContainerViewGenericName» sortAsc() {
+					return this;
+				}
+
+				@Override
+				public «type.indexedContainerViewGenericName» sortDesc() {
+					return this;
+				}
+			«ENDIF»
+
 			@Override
 			public int hashCode() {
 				int pow = 31;

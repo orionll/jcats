@@ -166,15 +166,15 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«IF type == Type.OBJECT»
 				default «type.indexedContainerViewGenericName» sort(final Ord<A> ord) {
 					requireNonNull(ord);
-					return new SortedContainerView<>(this, ord);
+					return new SortedContainerView<>(this, ord, false);
 				}
 			«ELSE»
 				default «type.indexedContainerViewGenericName» sortAsc() {
-					return new «type.shortName("SortedContainerView")»(this, true);
+					return new «type.shortName("SortedContainerView")»(this, true, false);
 				}
 
 				default «type.indexedContainerViewGenericName» sortDesc() {
-					return new «type.shortName("SortedContainerView")»(this, false);
+					return new «type.shortName("SortedContainerView")»(this, false, false);
 				}
 			«ENDIF»
 
@@ -1150,7 +1150,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«ENDIF»
 			final F0<«type.arrayGenericName»> sorted;
 
-			«type.shortName("SortedContainerView")»(final «type.containerGenericName» container, final «IF type == Type.OBJECT»Ord<A> ord«ELSE»boolean asc«ENDIF») {
+			«type.shortName("SortedContainerView")»(final «type.containerGenericName» container, final «IF type == Type.OBJECT»Ord<A> ord«ELSE»boolean asc«ENDIF», final boolean alreadySorted) {
 				this.container = container;
 				«IF type == Type.OBJECT»
 					this.ord = ord;
@@ -1163,7 +1163,9 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 						if (array.length == 0) {
 							return emptyArray();
 						} else {
-							Arrays.sort(array, (Ord<Object>) this.ord);
+							if (!alreadySorted) {
+								Arrays.sort(array, (Ord<Object>) this.ord);
+							}
 							return new Array<>(array);
 						}
 					«ELSE»
@@ -1171,18 +1173,20 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 						if (array.length == 0) {
 							return empty«type.arrayShortName»();
 						} else {
-							«IF type == Type.BOOLEAN»
-								if (this.asc) {
-									Common.sortBooleanArrayAsc(array);
-								} else {
-									Common.sortBooleanArrayDesc(array);
-								}
-							«ELSE»
-								Arrays.sort(array);
-								if (!this.asc) {
-									Common.reverse«type.arrayShortName»(array);
-								}
-							«ENDIF»
+							if (!alreadySorted) {
+								«IF type == Type.BOOLEAN»
+									if (this.asc) {
+										Common.sortBooleanArrayAsc(array);
+									} else {
+										Common.sortBooleanArrayDesc(array);
+									}
+								«ELSE»
+									Arrays.sort(array);
+									if (!this.asc) {
+										Common.reverse«type.arrayShortName»(array);
+									}
+								«ENDIF»
+							}
 							return new «type.arrayShortName»(array);
 						}
 					«ENDIF»
@@ -1583,6 +1587,36 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			public «type.stream2GenericName» parallelStream() {
 				return this.sorted.apply().parallelStream();
 			}
+
+			«IF type == Type.OBJECT»
+				@Override
+				public «type.indexedContainerViewGenericName» sort(final Ord<A> ord) {
+					requireNonNull(ord);
+					if (this.ord == ord) {
+						return this;
+					} else {
+						return new SortedContainerView<>(this.container, ord, false);
+					}
+				}
+			«ELSE»
+				@Override
+				public «type.indexedContainerViewGenericName» sortAsc() {
+					if (this.asc) {
+						return this;
+					} else {
+						return new «type.shortName("SortedContainerView")»(this.container, true, false);
+					}
+				}
+
+				@Override
+				public «type.indexedContainerViewGenericName» sortDesc() {
+					if (this.asc) {
+						return new «type.shortName("SortedContainerView")»(this.container, false, false);
+					} else {
+						return this;
+					}
+				}
+			«ENDIF»
 
 			@Override
 			public int hashCode() {

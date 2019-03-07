@@ -294,6 +294,16 @@ final class RangeGenerator implements ClassGenerator {
 				return stream().spliterator();
 			}
 
+			@Override
+			public IntIndexedContainerView sortAsc() {
+				return this;
+			}
+
+			@Override
+			public IntIndexedContainerView sortDesc() {
+				return reverse();
+			}
+
 			«orderedHashCode(Type.INT)»
 
 			@Override
