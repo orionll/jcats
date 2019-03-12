@@ -40,6 +40,7 @@ final class ArrayGenerator implements ClassGenerator {
 		import java.util.RandomAccess;
 		import java.util.Spliterator;
 		import java.util.Spliterators;
+		import java.util.function.Consumer;
 		import java.util.stream.Collector;
 		import java.util.stream.«type.streamName»;
 		«IF type.javaUnboxedType»
@@ -516,6 +517,14 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			«takeWhile(false, type)»
+
+			@Override
+			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
+				requireNonNull(action);
+				for (final «type.javaName» value : this.array) {
+					action.accept(«type.genericCast»value);
+				}
+			}
 
 			@Override
 			public void foreach(final «type.effGenericName» eff) {
