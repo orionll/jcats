@@ -288,6 +288,11 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public SortedKeyValueView<K, A> reverse() {
+				return this.keyValue.view();
+			}
+
+			@Override
 			public Iterator<P<K, A>> iterator() {
 				return this.keyValue.reverseIterator();
 			}
