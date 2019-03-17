@@ -16,7 +16,7 @@ final class SizedGenerator implements InterfaceGenerator {
 			 * @return The number of elements in this container.
 			 *
 			 * @throws SizeOverflowException
-			 *         If the number of elements is more than {@link Integer#MAX_VALUE} elements.
+			 *         If the number of elements is greater than {@link Integer#MAX_VALUE} elements.
 			 */
 			int size() throws SizeOverflowException;
 
