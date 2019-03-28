@@ -1,69 +1,98 @@
 package jcats.generator.collection
 
+import java.util.List
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
+import jcats.generator.Generator
 import jcats.generator.Type
+import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 
+@FinalFieldsConstructor
 final class UniqueBuilderGenerator implements ClassGenerator {
+	val Type type
 
-	override className() { Constants.COLLECTION + ".UniqueBuilder" }
+	def static List<Generator> generators() {
+		Type.values.filter[it != Type.BOOLEAN].map[new UniqueBuilderGenerator(it) as Generator].toList
+	}
+
+	override className() { Constants.COLLECTION + "." + shortName }
+	def shortName() { type.uniqueBuilderShortName }
+	def genericName() { type.uniqueBuilderGenericName }
 
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
 		import java.util.Iterator;
-		import java.util.stream.Stream;
+		«IF type.javaUnboxedType»
+			import java.util.PrimitiveIterator;
+			import java.util.function.«type.typeName»Consumer;
+		«ENDIF»
+		import java.util.stream.«type.streamName»;
 
 		import «Constants.SIZED»;
 
-		import static «Constants.COLLECTION».Unique.emptyUnique;
+		import static «Constants.COLLECTION».«type.uniqueShortName».empty«type.uniqueShortName»;
 		import static «Constants.COMMON».*;
 
-		public final class UniqueBuilder<A> implements Sized {
+		public final class «genericName» implements Sized {
 
-			private Unique<A> unique;
+			private «type.uniqueGenericName» unique;
 
-			UniqueBuilder() {
-				this.unique = emptyUnique();
+			«shortName»() {
+				this.unique = empty«type.uniqueShortName»();
 			}
 
-			UniqueBuilder(final Unique<A> unique) {
+			«shortName»(final «type.uniqueGenericName» unique) {
 				this.unique = unique;
 			}
 
-			public UniqueBuilder<A> put(final A value) {
+			public «genericName» put(final «type.genericName» value) {
 				this.unique = this.unique.put(value);
 				return this;
 			}
 
-			@SafeVarargs
-			public final UniqueBuilder<A> putValues(final A... values) {
-				for (final A value : values) {
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			public final «genericName» putValues(final «type.genericName»... values) {
+				for (final «type.genericName» value : values) {
 					put(value);
 				}
 				return this;
 			}
 
-			public UniqueBuilder<A> putAll(final Iterable<A> iterable) {
-				if (iterable instanceof Container<?>) {
-					((Container<A>) iterable).foreach(this::put);
-				} else {
-					iterable.forEach(this::put);
-				}
+			public «genericName» putAll(final Iterable<«type.genericBoxedName»> iterable) {
+				«IF type.javaUnboxedType»
+					if (iterable instanceof «type.containerShortName») {
+						((«type.containerShortName») iterable).foreach(this::put);
+					} else {
+						putIterator(iterable.iterator());
+					}
+				«ELSE»
+					if (iterable instanceof «type.containerWildcardName») {
+						((«type.containerGenericName») iterable).foreach(this::put);
+					} else {
+						iterable.forEach(this::put);
+					}
+				«ENDIF»
 				return this;
 			}
 
-			public UniqueBuilder<A> putIterator(final Iterator<A> iterator) {
-				iterator.forEachRemaining(this::put);
+			public «genericName» putIterator(final Iterator<«type.genericBoxedName»> iterator) {
+				«IF type.javaUnboxedType»
+					«type.typeName»Iterator.getIterator(iterator).forEachRemaining((«type.typeName»Consumer) this::put);
+				«ELSE»
+					iterator.forEachRemaining(this::put);
+				«ENDIF»
 				return this;
 			}
 
-			public UniqueBuilder<A> putStream(final Stream<A> stream) {
-				«streamForEach("A", "put", false)»
+			public «genericName» put«type.streamName»(final «type.streamGenericName» stream) {
+				«streamForEach(type.genericJavaUnboxedName, "put", false)»
 				return this;
 			}
 
-			UniqueBuilder<A> merge(final UniqueBuilder<A> other) {
+			«genericName» merge(final «genericName» other) {
 				this.unique = this.unique.merge(other.unique);
 				return this;
 			}
@@ -78,11 +107,11 @@ final class UniqueBuilderGenerator implements ClassGenerator {
 				return false;
 			}
 
-			public Unique<A> build() {
+			public «type.uniqueGenericName» build() {
 				return this.unique;
 			}
 
-			«toStr(Type.OBJECT, "this.unique")»
+			«toStr(type, "this.unique")»
 		}
 	''' }
 }

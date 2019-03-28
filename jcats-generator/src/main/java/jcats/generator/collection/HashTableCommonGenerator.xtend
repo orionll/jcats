@@ -2,6 +2,7 @@ package jcats.generator.collection
 
 import jcats.generator.ClassGenerator
 import jcats.generator.Constants
+import jcats.generator.Type
 
 final class HashTableCommonGenerator implements ClassGenerator {
 
@@ -36,78 +37,7 @@ final class HashTableCommonGenerator implements ClassGenerator {
 			}
 		}
 
-		final class HashTableIterator<A> implements Iterator<A> {
-			private int leafMap;
-			private int treeMap;
-			private final Object[] slots;
-			private int i;
-			private Iterator<A> childIterator;
-
-			HashTableIterator(final int leafMap, final int treeMap, final Object[] slots) {
-				this.leafMap = leafMap;
-				this.treeMap = treeMap;
-				this.slots = slots;
-			}
-
-			@Override
-			public boolean hasNext() {
-				return ((this.treeMap | this.leafMap) != 0) || (this.childIterator != null && this.childIterator.hasNext());
-			}
-
-			@Override
-			public A next() {
-				if (this.childIterator == null || !this.childIterator.hasNext()) {
-					if (this.childIterator != null) {
-						this.childIterator = null;
-					}
-					if ((this.treeMap | this.leafMap) == 0) {
-						throw new NoSuchElementException();
-					}
-
-					int slotType;
-					while ((slotType = (this.leafMap & 1) | (this.treeMap & 1) << 1) == HashTableCommon.VOID) {
-						this.treeMap >>>= 1;
-						this.leafMap >>>= 1;
-					}
-
-					A next = null;
-					switch (slotType) {
-						case HashTableCommon.LEAF:
-							next = entryAt(this.i++);
-							break;
-
-						case HashTableCommon.TREE:
-							this.childIterator = treeAt(this.i++).iterator();
-							next = this.childIterator.next();
-							break;
-
-						case HashTableCommon.COLLISION:
-							this.childIterator = new ArrayIterator<>(collisionAt(this.i++));
-							next = this.childIterator.next();
-							break;
-					}
-
-					this.treeMap >>>= 1;
-					this.leafMap >>>= 1;
-
-					return next;
-				} else {
-					return this.childIterator.next();
-				}
-			}
-
-			private A entryAt(final int index) {
-				return (A) this.slots[index];
-			}
-
-			private Iterable<A> treeAt(final int index) {
-				return (Iterable<A>) this.slots[index];
-			}
-
-			private Object[] collisionAt(final int index) {
-				return (Object[]) this.slots[index];
-			}
-		}
+		«iterator(Type.OBJECT)»
 	''' }
 
 	def static remap(String shortName, String genericName, String diamondName) { '''
@@ -187,7 +117,7 @@ final class HashTableCommonGenerator implements ClassGenerator {
 		}
 	''' }
 
-	def static merge(String paramGenericName, String entryName, String diamondName) { '''
+	def static merge(Type type, String paramGenericName, String entryName, String diamondName) { '''
 		private static «paramGenericName» merge(final «entryName» entry0, final int hash0, final «entryName» entry1, final int hash1, final int shift) {
 			// assume(hash0 != hash1)
 			final int branch0 = branch(hash0, shift);
@@ -195,9 +125,9 @@ final class HashTableCommonGenerator implements ClassGenerator {
 			final int slotMap = branch0 | branch1;
 			if (branch0 == branch1) {
 				final Object[] slots = { merge(entry0, hash0, entry1, hash1, shift + 5) };
-				return new «diamondName»(slotMap, 0, slots, 2);
+				return new «diamondName»(slotMap, 0, slots, «IF type.primitive»null, «ENDIF» 2);
 			} else {
-				final Object[] slots = new Object[2];
+				final «type.javaName»[] slots = new «type.javaName»[2];
 				if (((branch0 - 1) & branch1) == 0) {
 					slots[0] = entry0;
 					slots[1] = entry1;
@@ -205,7 +135,7 @@ final class HashTableCommonGenerator implements ClassGenerator {
 					slots[0] = entry1;
 					slots[1] = entry0;
 				}
-				return new «diamondName»(0, slotMap, slots, 2);
+				return new «diamondName»(0, slotMap, «IF type.primitive»null, «ENDIF»slots, 2);
 			}
 		}
 	''' }
@@ -249,6 +179,87 @@ final class HashTableCommonGenerator implements ClassGenerator {
 					treeMap >>>= 1;
 					leafMap >>>= 1;
 				}
+			}
+		}
+	'''
+
+	def static iterator(Type type) '''
+		final class «type.iteratorGenericName("HashTable")» implements «type.iteratorGenericName» {
+			private int leafMap;
+			private int treeMap;
+			private final Object[] slots;
+			private int i;
+			private «type.iteratorGenericName» childIterator;
+
+			«type.iteratorShortName("HashTable")»(final int leafMap, final int treeMap, final Object[] slots) {
+				this.leafMap = leafMap;
+				this.treeMap = treeMap;
+				this.slots = slots;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return ((this.treeMap | this.leafMap) != 0) || (this.childIterator != null && this.childIterator.hasNext());
+			}
+
+			@Override
+			public «type.genericName» «type.iteratorNext»() {
+				if (this.childIterator == null || !this.childIterator.hasNext()) {
+					if (this.childIterator != null) {
+						this.childIterator = null;
+					}
+					if ((this.treeMap | this.leafMap) == 0) {
+						throw new NoSuchElementException();
+					}
+
+					int slotType;
+					while ((slotType = (this.leafMap & 1) | (this.treeMap & 1) << 1) == HashTableCommon.VOID) {
+						this.treeMap >>>= 1;
+						this.leafMap >>>= 1;
+					}
+
+					«type.genericName» next = «type.defaultValue»;
+					switch (slotType) {
+						case HashTableCommon.LEAF:
+							next = entryAt(this.i++);
+							break;
+
+						case HashTableCommon.TREE:
+							this.childIterator = treeAt(this.i++).iterator();
+							next = this.childIterator.«type.iteratorNext»();
+							break;
+
+						case HashTableCommon.COLLISION:
+							this.childIterator = new «type.diamondName("ArrayIterator")»(collisionAt(this.i++));
+							next = this.childIterator.«type.iteratorNext»();
+							break;
+					}
+
+					this.treeMap >>>= 1;
+					this.leafMap >>>= 1;
+
+					return next;
+				} else {
+					return this.childIterator.«type.iteratorNext»();
+				}
+			}
+
+			private «type.genericName» entryAt(final int index) {
+				return («type.genericName») this.slots[index];
+			}
+
+			«IF type == Type.OBJECT»
+				private Iterable<A> treeAt(final int index) {
+					return (Iterable<A>) this.slots[index];
+				}
+			«ELSE»
+				private «type.uniqueShortName» treeAt(final int index) {
+					return («type.uniqueShortName») this.slots[index];
+				}
+			«ENDIF»
+
+			private «type.javaName»[] collisionAt(final int index) {
+				return («type.javaName»[]) this.slots[index];
 			}
 		}
 	'''

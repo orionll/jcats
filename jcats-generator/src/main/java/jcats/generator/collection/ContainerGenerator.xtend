@@ -481,13 +481,15 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
-			«IF type == Type.OBJECT»
-				default Unique<A> toUnique() {
-					final UniqueBuilder<A> builder = Unique.builder();
+			«IF type != Type.BOOLEAN»
+				default «type.uniqueGenericName» to«type.uniqueShortName»() {
+					final «type.uniqueBuilderGenericName» builder = «type.uniqueShortName».builder();
 					foreach(builder::put);
 					return builder.build();
 				}
 
+			«ENDIF»
+			«IF type == Type.OBJECT»
 				default <K> Dict<K, Seq<A>> groupBy(final F<A, K> f) {
 					final DictBuilder<K, Seq<A>> builder = Dict.builder();
 					foreach((final A value) ->

@@ -83,6 +83,10 @@ public enum Type {
 		return (this == OBJECT) ? clazz + "<@Contravariant A>" : typeName() + clazz;
 	}
 
+	public String paramGenericName() {
+		return (this == OBJECT) ? "<A> A" : javaName();
+	}
+
 	public String paramGenericName(final String clazz) {
 		return (this == OBJECT) ? "<A> " + clazz + "<A>" : typeName() + clazz;
 	}
@@ -217,6 +221,26 @@ public enum Type {
 
 	public String seqBuilderDiamondName() {
 		return diamondName("SeqBuilder");
+	}
+
+	public String uniqueShortName() {
+		return shortName("Unique");
+	}
+
+	public String uniqueGenericName() {
+		return genericName("Unique");
+	}
+
+	public String uniqueBuilderShortName() {
+		return shortName("UniqueBuilder");
+	}
+
+	public String uniqueBuilderGenericName() {
+		return genericName("UniqueBuilder");
+	}
+
+	public String uniqueBuilderDiamondName() {
+		return diamondName("UniqueBuilder");
 	}
 
 	public String sortedUniqueShortName() {

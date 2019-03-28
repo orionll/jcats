@@ -243,7 +243,7 @@ class DictGenerator implements ClassGenerator {
 
 			«HashTableCommonGenerator.remove(genericName, "K", "key", "P<K, A>", "entry.get1().equals(key)", "P")»
 
-			«HashTableCommonGenerator.merge(paramGenericName, "P<K, A>", diamondName)»
+			«HashTableCommonGenerator.merge(Type.OBJECT, paramGenericName, "P<K, A>", diamondName)»
 
 			private A getFromCollision(final P[] collision, final K key) {
 				for (final P<K, A> entry : collision) {
