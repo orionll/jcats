@@ -137,7 +137,7 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			private static <K, A> P<K, A> getFirst(Dict<K, A> dict) {
-				«HashTableCommonGenerator.getFirst("dict", "P<K, A>")»
+				«HashTableCommonGenerator.getFirst("dict", "P<K, A>", false)»
 			}
 
 			private P<K, A> entryAt(final int index) {
@@ -241,7 +241,7 @@ class DictGenerator implements ClassGenerator {
 				}
 			}
 
-			«HashTableCommonGenerator.remove(genericName, "K", "key", "P<K, A>", "entry.get1().equals(key)", "P")»
+			«HashTableCommonGenerator.remove(genericName, "K", "key", "P<K, A>", "entry.get1().equals(key)", "P", false)»
 
 			«HashTableCommonGenerator.merge(Type.OBJECT, paramGenericName, "P<K, A>", diamondName)»
 

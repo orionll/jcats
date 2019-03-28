@@ -123,7 +123,7 @@ final class UniqueGenerator implements ClassGenerator {
 			}
 
 			private static «type.paramGenericName» getFirst(«genericName» unique) {
-				«HashTableCommonGenerator.getFirst("unique", type.genericName)»
+				«HashTableCommonGenerator.getFirst("unique", type.genericName, type.primitive)»
 			}
 
 			private «type.genericName» entryAt(final int index) {
@@ -294,7 +294,7 @@ final class UniqueGenerator implements ClassGenerator {
 				}
 			}
 
-			«HashTableCommonGenerator.remove(genericName, type.genericName, "value", type.genericName, equals("entry", "value"), type.javaName)»
+			«HashTableCommonGenerator.remove(genericName, type.genericName, "value", type.genericName, equals("entry", "value"), type.javaName, type.primitive)»
 
 			«HashTableCommonGenerator.merge(type, paramGenericName, type.genericName, diamondName)»
 

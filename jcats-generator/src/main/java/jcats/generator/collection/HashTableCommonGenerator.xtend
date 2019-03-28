@@ -71,7 +71,7 @@ final class HashTableCommonGenerator implements ClassGenerator {
 		}
 	''' }
 
-	def static remove(String genericName, String keyType, String key, String entryType, String keyTest, String rawType) { '''
+	def static remove(String genericName, String keyType, String key, String entryType, String keyTest, String rawType, boolean primitive) { '''
 		private «genericName» remove(final «keyType» «key», final int «key»Hash, final int shift) {
 			final int branch = branch(«key»Hash, shift);
 
@@ -106,7 +106,7 @@ final class HashTableCommonGenerator implements ClassGenerator {
 					if (newCollision == oldCollision) {
 						return this;
 					} else if (newCollision.length == 1) {
-						return remap(this.treeMap ^ branch, this.leafMap | branch, this.size - 1).setEntry(branch, («entryType») newCollision[0]);
+						return remap(this.treeMap ^ branch, this.leafMap | branch, this.size - 1).setEntry(branch, «IF !primitive»(«entryType») «ENDIF»newCollision[0]);
 					} else {
 						return remap(this.treeMap, this.leafMap, this.size - 1).setCollision(branch, newCollision);
 					}
@@ -161,7 +161,7 @@ final class HashTableCommonGenerator implements ClassGenerator {
 		}
 	''' }
 
-	def static getFirst(String name, String entryType) '''
+	def static getFirst(String name, String entryType, boolean primitive) '''
 		while (true) {
 			if («name».leafMap == 0) {
 				«name» = «name».treeAt(0);
@@ -173,7 +173,7 @@ final class HashTableCommonGenerator implements ClassGenerator {
 					switch ((leafMap & 1 | (treeMap & 1) << 1)) {
 						case VOID: break;
 						case LEAF: return «name».entryAt(i);
-						case COLLISION: return («entryType») «name».collisionAt(i)[0];
+						case COLLISION: return «IF !primitive»(«entryType») «ENDIF»«name».collisionAt(i)[0];
 						default: i++;
 					}
 					treeMap >>>= 1;
