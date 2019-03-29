@@ -193,6 +193,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			@SuppressWarnings("deprecation")
 			public boolean equals(final Object obj) {
 				return this.container.equals(obj);
 			}
