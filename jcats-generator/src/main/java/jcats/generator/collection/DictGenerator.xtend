@@ -309,7 +309,7 @@ class DictGenerator implements ClassGenerator {
 
 			@Override
 			public void forEach(final Consumer<? super P<K, A>> action) {
-				«HashTableCommonGenerator.forEach("forEach", "action", "accept", "P", "P<K, A>")»
+				«HashTableCommonGenerator.forEach("forEach", "action", "accept", "Object", "P<K, A>", false)»
 			}
 
 			«keyValueEquals»

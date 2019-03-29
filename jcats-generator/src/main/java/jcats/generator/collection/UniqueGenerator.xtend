@@ -418,7 +418,7 @@ final class UniqueGenerator implements ClassGenerator {
 
 			@Override
 			public void foreach(final «type.effGenericName» eff) {
-				«HashTableCommonGenerator.forEach("foreach", "eff", "apply", "Object", type.genericName)»
+				«HashTableCommonGenerator.forEach("foreach", "eff", "apply", type.javaName, type.genericName, type.primitive)»
 			}
 
 			«uniqueEquals(type)»

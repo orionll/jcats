@@ -140,24 +140,30 @@ final class HashTableCommonGenerator implements ClassGenerator {
 		}
 	''' }
 
-	def static forEach(String name, String actionName, String actionFunc, String rawType, String entryType) { '''
+	def static forEach(String name, String actionName, String actionFunc, String rawType, String entryType, boolean primitive) { '''
 		requireNonNull(«actionName»);
-		int i = 0;
-		int treeMap = this.treeMap;
-		int leafMap = this.leafMap;
-		while ((treeMap | leafMap) != 0) {
-			switch ((leafMap & 1 | (treeMap & 1) << 1)) {
-				case VOID: break;
-				case LEAF: «actionName».«actionFunc»(entryAt(i++)); break;
-				case TREE: treeAt(i++).«name»(«actionName»); break;
-				case COLLISION:
-					for (final «rawType» entry : collisionAt(i++)) {
-						«actionName».«actionFunc»((«entryType») entry);
-					}
-					break;
+		if (this.treeMap == 0) {
+			for (final «rawType» entry : this.«IF primitive»«entryType»Slots«ELSE»slots«ENDIF») {
+				«actionName».«actionFunc»(«IF !primitive»(«entryType») «ENDIF»entry);
 			}
-			treeMap >>>= 1;
-			leafMap >>>= 1;
+		} else {
+			int i = 0;
+			int tempTreeMap = this.treeMap;
+			int tempLeafMap = this.leafMap;
+			while ((tempTreeMap | tempLeafMap) != 0) {
+				switch ((tempLeafMap & 1 | (tempTreeMap & 1) << 1)) {
+					case VOID: break;
+					case LEAF: «actionName».«actionFunc»(entryAt(i++)); break;
+					case TREE: treeAt(i++).«name»(«actionName»); break;
+					case COLLISION:
+						for (final «rawType» entry : collisionAt(i++)) {
+							«actionName».«actionFunc»(«IF !primitive»(«entryType») «ENDIF»entry);
+						}
+						break;
+				}
+				tempTreeMap >>>= 1;
+				tempLeafMap >>>= 1;
+			}
 		}
 	''' }
 
