@@ -391,6 +391,10 @@ public enum Type {
 		return diamondName("SortedUniqueContainer");
 	}
 
+	public String sortedUniqueContainerWildcardName() {
+		return wildcardName("SortedUniqueContainer");
+	}
+
 	public String sortedUniqueContainerViewGenericName() {
 		return genericName("SortedUniqueContainerView");
 	}

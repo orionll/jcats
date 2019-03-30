@@ -454,8 +454,8 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			public static «paramComparableGenericName» ofAll(final Iterable<«type.genericBoxedName»> iterable) {
 				requireNonNull(iterable);
-				if (iterable instanceof «wildcardName») {
-					return («genericName») iterable;
+				if (iterable instanceof «type.sortedUniqueContainerWildcardName») {
+					return ((«type.sortedUniqueContainerGenericName») iterable).to«shortName»();
 				} else {
 					final «type.sortedUniqueBuilderGenericName» builder = builder();
 					builder.putAll(iterable);
