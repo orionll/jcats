@@ -1624,6 +1624,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			@SuppressWarnings("deprecation")
 			public boolean equals(final Object obj) {
 				return this.sorted.apply().equals(obj);
 			}
