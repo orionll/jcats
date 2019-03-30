@@ -41,7 +41,6 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		«IF type.primitive»
 			import java.util.PrimitiveIterator;
 		«ENDIF»
-		import java.util.TreeSet;
 		import java.util.stream.Collector;
 		import java.util.stream.«type.streamName»;
 
@@ -373,10 +372,10 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				return this.size;
 			}
 
-			public TreeSet<«type.genericBoxedName»> toTreeSet() {
-				final TreeSet<«type.genericBoxedName»> set = new TreeSet<>(this.ord);
-				foreach(set::add);
-				return set;
+			@Override
+			@Deprecated
+			public «type.sortedUniqueGenericName» to«type.sortedUniqueShortName»() {
+				return this;
 			}
 
 			@Override

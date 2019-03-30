@@ -31,6 +31,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 		import java.util.NoSuchElementException;
 		import java.util.SortedSet;
 		import java.util.Spliterator;
+		import java.util.TreeSet;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -120,6 +121,18 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 			@Override
 			default boolean isReverseQuick() {
 				return true;
+			}
+
+			default «type.sortedUniqueGenericName» to«type.sortedUniqueShortName»() {
+				final «type.sortedUniqueBuilderGenericName» builder = «type.sortedUniqueShortName».builderBy(ord());
+				foreach(builder::put);
+				return builder.build();
+			}
+
+			default TreeSet<«type.genericBoxedName»> toTreeSet() {
+				final TreeSet<«type.genericBoxedName»> set = new TreeSet<>(ord());
+				foreach(set::add);
+				return set;
 			}
 
 			@Override

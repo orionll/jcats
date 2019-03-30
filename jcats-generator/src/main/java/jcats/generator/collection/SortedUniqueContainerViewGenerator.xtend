@@ -34,6 +34,7 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 		«ENDIF»
 		import java.util.NavigableSet;
 		import java.util.SortedSet;
+		import java.util.TreeSet;
 
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
@@ -151,6 +152,16 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public «type.iteratorGenericName» reverseIterator() {
 				return this.container.reverseIterator();
+			}
+
+			@Override
+			public «type.sortedUniqueGenericName» to«type.sortedUniqueShortName»() {
+				return this.container.to«type.sortedUniqueShortName»();
+			}
+
+			@Override
+			public TreeSet<«type.genericBoxedName»> toTreeSet() {
+				return this.container.toTreeSet();
 			}
 
 			@Override
