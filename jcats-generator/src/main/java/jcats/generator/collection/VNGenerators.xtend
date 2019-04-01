@@ -135,13 +135,23 @@ final class VNGenerators {
 						}
 					}
 
+					public <«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> V«arity»<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> map(final «type.fGenericName» f) {
+						return v«arity»(«(1 .. arity).map["f.apply(this.a" + it + ")"].join(", ")»);
+					}
+
+					«FOR toType : Type.primitives»
+						public «toType.shortName("V" + arity)» mapTo«toType.typeName»(final «type.genericName(toType.typeName + "F")» f) {
+							return new «toType.typeName»V«arity»(«(1 .. arity).map["f.apply(this.a" + it + ")"].join(", ")»);
+						}
+
+					«ENDFOR»
 					«IF type == Type.OBJECT»
 						public <B> B match(final F«arity»<«(1 .. arity).map["A, "].join»B> f) {
 							final B b = f.apply(«(1 .. arity).map["this.a" + it].join(", ")»);
 							return requireNonNull(b);
 						}
-						«IF arity == 2»
 
+						«IF arity == 2»
 							«FOR to : Type.primitives»
 								public «to.genericName» matchTo«to.typeName»(final «to.typeName»F2<A, A> f) {
 									return f.apply(this.a1, this.a2);
@@ -149,9 +159,6 @@ final class VNGenerators {
 
 							«ENDFOR»
 						«ENDIF»
-						public <B> V«arity»<B> map(final F<A, B> f) {
-							return v«arity»(«(1 .. arity).map["f.apply(this.a" + it + ")"].join(", ")»);
-						}
 					«ELSE»
 						«IF arity == 2»
 							public <A> A match(final «type.typeName»«type.typeName»ObjectF2<A> f) {
@@ -172,11 +179,7 @@ final class VNGenerators {
 							}
 
 						«ENDIF»
-						public <A> V«arity»<A> map(final «type.typeName»ObjectF<A> f) {
-							return v«arity»(«(1 .. arity).map["f.apply(a" + it + ")"].join(", ")»);
-						}
 					«ENDIF»
-
 					public «genericName» reverse() {
 						return new «diamondName»(«(arity .. 1).map["this.a" + it].join(", ")»);
 					}

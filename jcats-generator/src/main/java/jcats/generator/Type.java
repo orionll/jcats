@@ -119,6 +119,10 @@ public enum Type {
 		return (this == OBJECT) ? "(A) " : "";
 	}
 
+	public String fGenericName() {
+		return (this == OBJECT) ? "F<A, B>" : typeName() + "ObjectF<A>";
+	}
+
 	public String f0GenericName() {
 		return genericName("F0");
 	}
