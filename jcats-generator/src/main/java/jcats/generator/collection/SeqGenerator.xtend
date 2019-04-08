@@ -1325,14 +1325,14 @@ class SeqGenerator implements ClassGenerator {
 						final int size = Math.min(size(), cont.size());
 						final «type.iteratorGenericName» iterator1 = iterator();
 						final Iterator<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> iterator2 = cont.iterator();
-						return Seq.fill(size, () -> f.apply(iterator1.next(), iterator2.next()));
+						return Seq.fill(size, () -> f.apply(iterator1.«type.iteratorNext»(), iterator2.next()));
 					}
 				} else {
 					final SeqBuilder<«IF type == Type.OBJECT»C«ELSE»B«ENDIF»> builder = Seq.builder();
 					final «type.iteratorGenericName» iterator1 = iterator();
 					final Iterator<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> iterator2 = that.iterator();
 					while (iterator1.hasNext() && iterator2.hasNext()) {
-						final «type.genericName» a = iterator1.next();
+						final «type.genericName» a = iterator1.«type.iteratorNext»();
 						final «IF type == Type.OBJECT»B«ELSE»A«ENDIF» b = requireNonNull(iterator2.next());
 						builder.append(f.apply(a, b));
 					}
@@ -1349,7 +1349,7 @@ class SeqGenerator implements ClassGenerator {
 					return emptySeq();
 				} else {
 					final «type.iteratorGenericName» iterator = iterator();
-					return Seq.tabulate(size(), (final int i) -> f.apply(i, iterator.next()));
+					return Seq.tabulate(size(), (final int i) -> f.apply(i, iterator.«type.iteratorNext»()));
 				}
 			}
 
