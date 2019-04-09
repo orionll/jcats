@@ -206,7 +206,11 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			default «type.indexedContainerViewGenericName» view() {
-				return new «type.shortName("BaseIndexedContainerView")»<>(this);
+				if (hasKnownFixedSize() && isEmpty()) {
+					return «IF type == Type.OBJECT»(«type.indexedContainerViewGenericName») «ENDIF»«type.shortName("BaseIndexedContainerView")».EMPTY;
+				} else {
+					return new «type.shortName("BaseIndexedContainerView")»<>(this);
+				}
 			}
 
 			«IF type.primitive»

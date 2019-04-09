@@ -38,7 +38,11 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			default «type.uniqueContainerViewGenericName» view() {
-				return new «type.shortName("BaseUniqueContainerView")»<>(this);
+				if (hasKnownFixedSize() && isEmpty()) {
+					return «IF type == Type.OBJECT»(«type.uniqueContainerViewGenericName») «ENDIF»«type.shortName("BaseUniqueContainerView")».EMPTY;
+				} else {
+					return new «type.shortName("BaseUniqueContainerView")»<>(this);
+				}
 			}
 
 			«IF type.primitive»

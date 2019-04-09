@@ -193,6 +193,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		class «baseContainerViewShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «type.containerGenericName»> implements «genericName» {
+			static final «baseContainerViewShortName»<«IF type == Type.OBJECT»?, «ENDIF»?> EMPTY = new «baseContainerViewShortName»<>(«type.arrayShortName».EMPTY);
+
 			final C container;
 
 			«baseContainerViewShortName»(final C container) {

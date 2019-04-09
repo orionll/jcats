@@ -554,7 +554,11 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			default «type.containerViewGenericName» view() {
-				return new «type.shortName("BaseContainerView")»<>(this);
+				if (hasKnownFixedSize() && isEmpty()) {
+					return «IF type == Type.OBJECT»(«type.containerViewGenericName») «ENDIF»«type.shortName("BaseContainerView")».EMPTY;
+				} else {
+					return new «type.shortName("BaseContainerView")»<>(this);
+				}
 			}
 
 			default «type.stream2GenericName» stream() {

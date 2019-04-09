@@ -134,7 +134,11 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			default «type.orderedContainerViewGenericName» view() {
-				return new «type.shortName("BaseOrderedContainerView")»<>(this);
+				if (hasKnownFixedSize() && isEmpty()) {
+					return «IF type == Type.OBJECT»(«type.orderedContainerViewGenericName») «ENDIF»«type.shortName("BaseOrderedContainerView")».EMPTY;
+				} else {
+					return new «type.shortName("BaseOrderedContainerView")»<>(this);
+				}
 			}
 
 			«IF type.primitive»

@@ -145,6 +145,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		«ELSE»
 			class «baseShortName»<C extends «type.indexedContainerShortName»> extends «type.typeName»BaseOrderedContainerView<C> implements «type.indexedContainerViewShortName» {
 		«ENDIF»
+			static final «baseShortName»<«IF type == Type.OBJECT»?, «ENDIF»?> EMPTY = new «baseShortName»<>(«type.arrayShortName».EMPTY);
 
 			«baseShortName»(final C container) {
 				super(container);

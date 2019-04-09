@@ -380,7 +380,11 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			@Override
 			public «type.sortedUniqueContainerViewGenericName» view() {
-				return new «type.diamondName("SortedUniqueView")»(this);
+				if (isEmpty()) {
+					return «IF type == Type.OBJECT»(«type.sortedUniqueContainerViewGenericName») «ENDIF»«type.shortName("SortedUniqueView")».EMPTY;
+				} else {
+					return new «type.diamondName("SortedUniqueView")»(this);
+				}
 			}
 
 			int checkHeight() {
@@ -523,6 +527,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 		}
 
 		final class «type.genericName("SortedUniqueView")» extends «type.shortName("BaseSortedUniqueContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»«genericName»> {
+			static final «type.wildcardName("SortedUniqueView")» EMPTY = new «type.diamondName("SortedUniqueView")»(«type.sortedUniqueShortName».EMPTY);
 
 			«shortName»View(final «genericName» container) {
 				super(container);

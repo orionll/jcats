@@ -1292,7 +1292,11 @@ class SeqGenerator implements ClassGenerator {
 			«ENDIF»
 			@Override
 			public «type.indexedContainerViewGenericName» view() {
-				return new «type.diamondName("SeqView")»(this);
+				if (isEmpty()) {
+					return «IF type == Type.OBJECT»(«type.indexedContainerViewGenericName») «ENDIF»«type.shortName("BaseIndexedContainerView")».EMPTY;
+				} else {
+					return new «type.diamondName("SeqView")»(this);
+				}
 			}
 
 			«orderedHashCode(type, true)»

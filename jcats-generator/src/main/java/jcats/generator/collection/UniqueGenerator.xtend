@@ -51,7 +51,7 @@ final class UniqueGenerator implements ClassGenerator {
 		import static «Constants.COLLECTION».«type.seqShortName».*;
 
 		public final class «type.covariantName("Unique")» implements «type.uniqueContainerGenericName», Serializable {
-			private static final «wildcardName» EMPTY = new «diamondName»(0, 0, Common.«Type.OBJECT.emptyArrayName», «IF type.primitive»null, «ENDIF»0);
+			static final «wildcardName» EMPTY = new «diamondName»(0, 0, Common.«Type.OBJECT.emptyArrayName», «IF type.primitive»null, «ENDIF»0);
 
 			private final int treeMap;
 			private final int leafMap;

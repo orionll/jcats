@@ -65,6 +65,7 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 		«ELSE»
 			class «baseUniqueContainerViewShortName»<C extends «type.uniqueContainerShortName»> extends «type.typeName»BaseContainerView<C> implements «type.uniqueContainerViewShortName» {
 		«ENDIF»
+			static final «baseUniqueContainerViewShortName»<«IF type == Type.OBJECT»?, «ENDIF»?> EMPTY = new «baseUniqueContainerViewShortName»<>(«type.uniqueShortName».EMPTY);
 
 			«baseUniqueContainerViewShortName»(final C container) {
 				super(container);
