@@ -65,6 +65,8 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 		}
 
 		class BaseKeyValueView<K, A, KV extends KeyValue<K, A>> implements KeyValueView<K, A> {
+			static final BaseKeyValueView<?, ?, ?> EMPTY = new BaseKeyValueView<>(Dict.EMPTY);
+
 			final KV keyValue;
 
 			BaseKeyValueView(final KV keyValue) {

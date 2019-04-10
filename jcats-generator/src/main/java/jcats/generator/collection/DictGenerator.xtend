@@ -35,7 +35,7 @@ class DictGenerator implements ClassGenerator {
 		import static «Constants.COLLECTION».HashTableCommon.*;
 
 		public final class «shortName»<K, @Covariant A> implements KeyValue<K, A>, Serializable {
-			private static final «wildcardName» EMPTY = new «shortName»(0, 0, Common.«Type.OBJECT.emptyArrayName», 0);
+			static final «wildcardName» EMPTY = new «shortName»(0, 0, Common.«Type.OBJECT.emptyArrayName», 0);
 
 			private final int treeMap;
 			private final int leafMap;

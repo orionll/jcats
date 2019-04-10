@@ -178,8 +178,12 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				}
 			}
 
-			default KeyValue<K, A> view() {
-				return new BaseKeyValueView<>(this);
+			default KeyValueView<K, A> view() {
+				if (hasKnownFixedSize() && isEmpty()) {
+					return (KeyValueView<K, A>) BaseKeyValueView.EMPTY;
+				} else {
+					return new BaseKeyValueView<>(this);
+				}
 			}
 
 			default Stream2<P<K, A>> stream() {

@@ -44,7 +44,7 @@ final class SortedDictGenerator implements ClassGenerator {
 		import static «Constants.COLLECTION».AVLCommon.*;
 
 		public final class SortedDict<K, @Covariant A> implements SortedKeyValue<K, A>, Serializable {
-			private static final SortedDict<?, ?> EMPTY =
+			static final SortedDict<?, ?> EMPTY =
 					new SortedDict<>(null, null, null, Ord.<Integer>asc(), 0);
 			private static final SortedDict<?, ?> EMPTY_REVERSED =
 					new SortedDict<>(null, null, null, Ord.<Integer>desc(), 0);
@@ -286,7 +286,11 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			@Override
 			public SortedKeyValueView<K, A> view() {
-				return new SortedDictView<>(this);
+				if (hasKnownFixedSize() && isEmpty()) {
+					return (SortedKeyValueView<K, A>) SortedDictView.EMPTY;
+				} else {
+					return new SortedDictView<>(this);
+				}
 			}
 
 			int checkHeight() {
@@ -513,6 +517,7 @@ final class SortedDictGenerator implements ClassGenerator {
 		}
 
 		final class SortedDictView<K, A> extends BaseSortedKeyValueView<K, A, SortedDict<K, A>> {
+			static final SortedDictView<?, ?> EMPTY = new SortedDictView<>(SortedDict.EMPTY);
 
 			SortedDictView(final SortedDict<K, A> keyValue) {
 				super(keyValue);
