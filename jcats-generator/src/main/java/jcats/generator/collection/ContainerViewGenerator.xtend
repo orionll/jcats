@@ -19,6 +19,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 
 	def shortName() { type.containerViewShortName }
 	def genericName() { type.containerViewGenericName }
+	def paramGenericName() { type.paramGenericName("ContainerView") }
 	def baseContainerViewShortName() { type.shortName("BaseContainerView") }
 	def mappedContainerViewShortName() { type.shortName("MappedContainerView") }
 	def mapTargetType() { if (type == Type.OBJECT) "B" else "A" }
@@ -178,11 +179,15 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				}
 			«ENDIF»
 
-			static «type.paramGenericName("ContainerView")» «type.shortName("CollectionView").firstToLowerCase»(final Collection<«type.genericBoxedName»> collection) {
+			static «paramGenericName» empty«shortName»() {
+				return «IF type == Type.OBJECT»(«type.containerViewGenericName») «ENDIF»«baseContainerViewShortName».EMPTY;
+			}
+
+			static «paramGenericName» «type.shortName("CollectionView").firstToLowerCase»(final Collection<«type.genericBoxedName»> collection) {
 				return «type.shortName("CollectionView").firstToLowerCase»(collection, true);
 			}
 
-			static «type.paramGenericName("ContainerView")» «type.shortName("CollectionView").firstToLowerCase»(final Collection<«type.genericBoxedName»> collection, final boolean hasKnownFixedSize) {
+			static «paramGenericName» «type.shortName("CollectionView").firstToLowerCase»(final Collection<«type.genericBoxedName»> collection, final boolean hasKnownFixedSize) {
 				requireNonNull(collection);
 				return new «type.shortName("Collection")»As«type.containerShortName»<>(collection, hasKnownFixedSize);
 			}

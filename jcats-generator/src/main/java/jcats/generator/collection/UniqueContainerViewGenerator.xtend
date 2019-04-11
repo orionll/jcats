@@ -19,7 +19,8 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 
 	def shortName() { type.uniqueContainerViewShortName }
 	def genericName() { type.uniqueContainerViewGenericName }
-	def baseUniqueContainerViewShortName() { type.shortName("BaseUniqueContainerView") }
+	def paramGenericName() { type.paramGenericName("UniqueContainerView") }
+	def baseShortName() { type.shortName("BaseUniqueContainerView") }
 	def reverseShortName() { type.shortName("ReverseUniqueContainerView") }
 
 	override sourceCode() '''
@@ -46,11 +47,15 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 				return this;
 			}
 
-			static «type.paramGenericName("UniqueContainerView")» «type.shortName("SetView").firstToLowerCase»(final Set<«type.genericBoxedName»> set) {
+			static «paramGenericName» empty«shortName»() {
+				return «IF type == Type.OBJECT»(«type.uniqueContainerViewGenericName») «ENDIF»«baseShortName».EMPTY;
+			}
+
+			static «paramGenericName» «type.shortName("SetView").firstToLowerCase»(final Set<«type.genericBoxedName»> set) {
 				return «type.shortName("SetView").firstToLowerCase»(set, true);
 			}
 
-			static «type.paramGenericName("UniqueContainerView")» «type.shortName("SetView").firstToLowerCase»(final Set<«type.genericBoxedName»> set, final boolean hasKnownFixedSize) {
+			static «paramGenericName» «type.shortName("SetView").firstToLowerCase»(final Set<«type.genericBoxedName»> set, final boolean hasKnownFixedSize) {
 				requireNonNull(set);
 				return new «type.shortName("Set")»As«type.uniqueContainerShortName»<>(set, hasKnownFixedSize);
 			}
@@ -61,13 +66,13 @@ final class UniqueContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		«IF type == Type.OBJECT»
-			class «baseUniqueContainerViewShortName»<A, C extends UniqueContainer<A>> extends BaseContainerView<A, C> implements UniqueContainerView<A> {
+			class «baseShortName»<A, C extends UniqueContainer<A>> extends BaseContainerView<A, C> implements UniqueContainerView<A> {
 		«ELSE»
-			class «baseUniqueContainerViewShortName»<C extends «type.uniqueContainerShortName»> extends «type.typeName»BaseContainerView<C> implements «type.uniqueContainerViewShortName» {
+			class «baseShortName»<C extends «type.uniqueContainerShortName»> extends «type.typeName»BaseContainerView<C> implements «type.uniqueContainerViewShortName» {
 		«ENDIF»
-			static final «baseUniqueContainerViewShortName»<«IF type == Type.OBJECT»?, «ENDIF»?> EMPTY = new «baseUniqueContainerViewShortName»<>(«type.uniqueShortName».EMPTY);
+			static final «baseShortName»<«IF type == Type.OBJECT»?, «ENDIF»?> EMPTY = new «baseShortName»<>(«type.uniqueShortName».EMPTY);
 
-			«baseUniqueContainerViewShortName»(final C container) {
+			«baseShortName»(final C container) {
 				super(container);
 			}
 

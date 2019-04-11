@@ -46,7 +46,7 @@ final class SortedDictGenerator implements ClassGenerator {
 		public final class SortedDict<K, @Covariant A> implements SortedKeyValue<K, A>, Serializable {
 			static final SortedDict<?, ?> EMPTY =
 					new SortedDict<>(null, null, null, Ord.<Integer>asc(), 0);
-			private static final SortedDict<?, ?> EMPTY_REVERSED =
+			static final SortedDict<?, ?> EMPTY_REVERSED =
 					new SortedDict<>(null, null, null, Ord.<Integer>desc(), 0);
 
 			final P<K, A> entry;
@@ -286,11 +286,14 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			@Override
 			public SortedKeyValueView<K, A> view() {
-				if (hasKnownFixedSize() && isEmpty()) {
-					return (SortedKeyValueView<K, A>) SortedDictView.EMPTY;
-				} else {
-					return new SortedDictView<>(this);
+				if (isEmpty()) {
+					if (this.ord == asc()) {
+						return (SortedKeyValueView<K, A>) SortedDictView.EMPTY;
+					} else if (this.ord == desc()) {
+						return (SortedKeyValueView<K, A>) SortedDictView.EMPTY_REVERSED;
+					}
 				}
+				return new SortedDictView<>(this);
 			}
 
 			int checkHeight() {
@@ -518,6 +521,7 @@ final class SortedDictGenerator implements ClassGenerator {
 
 		final class SortedDictView<K, A> extends BaseSortedKeyValueView<K, A, SortedDict<K, A>> {
 			static final SortedDictView<?, ?> EMPTY = new SortedDictView<>(SortedDict.EMPTY);
+			static final SortedDictView<?, ?> EMPTY_REVERSED = new SortedDictView<>(SortedDict.EMPTY_REVERSED);
 
 			SortedDictView(final SortedDict<K, A> keyValue) {
 				super(keyValue);

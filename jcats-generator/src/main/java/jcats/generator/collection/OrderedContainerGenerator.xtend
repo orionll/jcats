@@ -35,6 +35,7 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.JCATS».«type.optionShortName».*;
+		import static «Constants.COLLECTION».«type.orderedContainerViewShortName».*;
 
 		public interface «type.covariantName("OrderedContainer")» extends «type.containerGenericName» {
 
@@ -135,7 +136,7 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 			@Override
 			default «type.orderedContainerViewGenericName» view() {
 				if (hasKnownFixedSize() && isEmpty()) {
-					return «IF type == Type.OBJECT»(«type.orderedContainerViewGenericName») «ENDIF»«type.shortName("BaseOrderedContainerView")».EMPTY;
+					return empty«type.orderedContainerViewShortName»();
 				} else {
 					return new «type.shortName("BaseOrderedContainerView")»<>(this);
 				}

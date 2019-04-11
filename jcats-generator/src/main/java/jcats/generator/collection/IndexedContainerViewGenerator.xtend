@@ -19,6 +19,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 	def shortName() { type.shortName("IndexedContainerView") }
 	def genericName() { type.genericName("IndexedContainerView") }
+	def paramGenericName() { type.paramGenericName("IndexedContainerView") }
 	def baseShortName() { type.shortName("BaseIndexedContainerView") }
 	def mappedShortName() { type.shortName("MappedIndexedContainerView") }
 	def mapTargetType() { if (type == Type.OBJECT) "B" else "A" }
@@ -126,11 +127,15 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				return new «reverseShortName»<>(unview());
 			}
 
-			static «type.paramGenericName("IndexedContainerView")» «type.shortName("ListView").firstToLowerCase»(final List<«type.genericBoxedName»> list) {
+			static «paramGenericName» empty«shortName»() {
+				return «IF type == Type.OBJECT»(«type.indexedContainerViewGenericName») «ENDIF»«baseShortName».EMPTY;
+			}
+
+			static «paramGenericName» «type.shortName("ListView").firstToLowerCase»(final List<«type.genericBoxedName»> list) {
 				return «type.shortName("ListView").firstToLowerCase»(list, true);
 			}
 
-			static «type.paramGenericName("IndexedContainerView")» «type.shortName("ListView").firstToLowerCase»(final List<«type.genericBoxedName»> list, final boolean hasKnownFixedSize) {
+			static «paramGenericName» «type.shortName("ListView").firstToLowerCase»(final List<«type.genericBoxedName»> list, final boolean hasKnownFixedSize) {
 				requireNonNull(list);
 				return new «type.shortName("List")»As«type.indexedContainerDiamondName»(list, hasKnownFixedSize);
 			}

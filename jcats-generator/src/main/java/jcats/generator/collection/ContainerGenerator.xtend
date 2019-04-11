@@ -162,6 +162,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			import static «Constants.JCATS».«type.optionShortName».*;
 		«ENDIF»
 		import static «Constants.COLLECTION».Common.*;
+		import static «Constants.COLLECTION».«type.containerViewShortName».*;
 		import static «Constants.SEQ».*;
 		import static «Constants.JCATS».«type.ordShortName».*;
 		«IF type.primitive»
@@ -555,7 +556,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			default «type.containerViewGenericName» view() {
 				if (hasKnownFixedSize() && isEmpty()) {
-					return «IF type == Type.OBJECT»(«type.containerViewGenericName») «ENDIF»«type.shortName("BaseContainerView")».EMPTY;
+					return empty«type.containerViewShortName»();
 				} else {
 					return new «type.shortName("BaseContainerView")»<>(this);
 				}

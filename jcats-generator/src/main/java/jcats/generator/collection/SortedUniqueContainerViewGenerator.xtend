@@ -19,6 +19,7 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 
 	def shortName() { type.sortedUniqueContainerViewShortName }
 	def genericName() { type.sortedUniqueContainerViewGenericName }
+	def paramComparableGenericName() { type.paramComparableGenericName("SortedUniqueContainerView") }
 	def baseShortName() { type.shortName("BaseSortedUniqueContainerView") }
 	def reverseShortName() { type.shortName("ReverseSortedUniqueContainerView") }
 
@@ -83,6 +84,10 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			default «genericName» reverse() {
 				return new «type.diamondName("ReverseSortedUniqueContainerView")»(unview());
+			}
+
+			static «paramComparableGenericName» empty«shortName»() {
+				return «IF type == Type.OBJECT»(«type.sortedUniqueContainerViewGenericName») «ENDIF»«type.shortName("SortedUniqueView")».EMPTY;
 			}
 
 			static «type.paramGenericName("SortedUniqueContainerView")» «type.shortName("SortedSetView").firstToLowerCase»(final SortedSet<«type.genericBoxedName»> sortedSet) {

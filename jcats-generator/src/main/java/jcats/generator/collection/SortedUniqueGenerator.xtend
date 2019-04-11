@@ -25,7 +25,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 	def deleteResultGenericName() { "DeleteResult" + (if (type == Type.OBJECT) "<A>" else "") }
 	def deleteResultDiamondName() { "DeleteResult" + (if (type == Type.OBJECT) "<>" else "") }
 	def paramGenericName() { type.paramGenericName(baseName) }
-	def paramComparableGenericName() { if (type == Type.OBJECT) "<A extends Comparable<A>> " + genericName else genericName }
+	def paramComparableGenericName() { type.paramComparableGenericName("SortedUnique") }
 	def slicedSortedUniqueViewShortName() { type.shortName("SlicedSortedUniqueView") }
 	def slicedSortedUniqueViewDiamondName() { type.diamondName("SlicedSortedUniqueView") }
 
@@ -381,10 +381,13 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			@Override
 			public «type.sortedUniqueContainerViewGenericName» view() {
 				if (isEmpty()) {
-					return «IF type == Type.OBJECT»(«type.sortedUniqueContainerViewGenericName») «ENDIF»«type.shortName("SortedUniqueView")».EMPTY;
-				} else {
-					return new «type.diamondName("SortedUniqueView")»(this);
+					if (this.ord == «type.asc»()) {
+						return «IF type == Type.OBJECT»(«type.sortedUniqueContainerViewGenericName») «ENDIF»«type.sortedUniqueViewShortName».EMPTY;
+					} else if (this.ord == «type.desc»()) {
+						return «IF type == Type.OBJECT»(«type.sortedUniqueContainerViewGenericName») «ENDIF»«type.sortedUniqueViewShortName».EMPTY_REVERSED;
+					}
 				}
+				return new «type.diamondName("SortedUniqueView")»(this);
 			}
 
 			int checkHeight() {
@@ -528,6 +531,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 		final class «type.genericName("SortedUniqueView")» extends «type.shortName("BaseSortedUniqueContainerView")»<«IF type == Type.OBJECT»A, «ENDIF»«genericName»> {
 			static final «type.wildcardName("SortedUniqueView")» EMPTY = new «type.diamondName("SortedUniqueView")»(«type.sortedUniqueShortName».EMPTY);
+			static final «type.wildcardName("SortedUniqueView")» EMPTY_REVERSED = new «type.diamondName("SortedUniqueView")»(«type.sortedUniqueShortName».EMPTY_REVERSED);
 
 			«shortName»View(final «genericName» container) {
 				super(container);

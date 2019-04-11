@@ -51,6 +51,10 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 				return new ReverseSortedKeyValueView<>(unview());
 			}
 
+			static <K extends Comparable<K>, A> SortedKeyValueView<K, A> emptySortedKeyValueView() {
+				return (SortedKeyValueView<K, A>) SortedDictView.EMPTY;
+			}
+
 			static <K, A> SortedKeyValueView<K, A> sortedMapView(final SortedMap<K, A> map) {
 				return sortedMapView(map, true);
 			}

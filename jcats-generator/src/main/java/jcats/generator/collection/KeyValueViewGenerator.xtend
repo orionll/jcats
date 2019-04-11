@@ -52,6 +52,10 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 				return new FilteredKeyValueView<>(unview(), predicate);
 			}
 
+			static <K, A> KeyValueView<K, A> emptyKeyValueView() {
+				return (KeyValueView<K, A>) BaseKeyValueView.EMPTY;
+			}
+
 			static <K, A> KeyValueView<K, A> mapView(final Map<K, A> map) {
 				return mapView(map, true);
 			}

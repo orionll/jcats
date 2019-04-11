@@ -33,13 +33,14 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.COMMON».*;
+		import static «Constants.COLLECTION».«type.uniqueContainerViewShortName».*;
 
 		public interface «type.covariantName("UniqueContainer")» extends «type.containerGenericName», Equatable<«genericName»> {
 
 			@Override
 			default «type.uniqueContainerViewGenericName» view() {
 				if (hasKnownFixedSize() && isEmpty()) {
-					return «IF type == Type.OBJECT»(«type.uniqueContainerViewGenericName») «ENDIF»«type.shortName("BaseUniqueContainerView")».EMPTY;
+					return empty«type.uniqueContainerViewShortName»();
 				} else {
 					return new «type.shortName("BaseUniqueContainerView")»<>(this);
 				}

@@ -50,6 +50,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			import static «Constants.COMMON».*;
 		«ENDIF»
 		import static «Constants.COLLECTION».«type.arrayShortName».*;
+		import static «Constants.COLLECTION».«type.indexedContainerViewShortName».*;
 
 		public interface «type.covariantName("IndexedContainer")» extends «type.orderedContainerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
 
@@ -207,7 +208,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			@Override
 			default «type.indexedContainerViewGenericName» view() {
 				if (hasKnownFixedSize() && isEmpty()) {
-					return «IF type == Type.OBJECT»(«type.indexedContainerViewGenericName») «ENDIF»«type.shortName("BaseIndexedContainerView")».EMPTY;
+					return empty«type.indexedContainerViewShortName»();
 				} else {
 					return new «type.shortName("BaseIndexedContainerView")»<>(this);
 				}

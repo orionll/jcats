@@ -31,6 +31,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 		import static «Constants.EITHER».*;
 		import static «Constants.OPTION».*;
 		import static «Constants.COMMON».*;
+		import static «Constants.COLLECTION».KeyValueView.*;
 
 		public interface KeyValue<K, @Covariant A> extends Iterable<P<K, A>>, Equatable<KeyValue<K, A>>, Sized {
 
@@ -180,7 +181,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			default KeyValueView<K, A> view() {
 				if (hasKnownFixedSize() && isEmpty()) {
-					return (KeyValueView<K, A>) BaseKeyValueView.EMPTY;
+					return emptyKeyValueView();
 				} else {
 					return new BaseKeyValueView<>(this);
 				}

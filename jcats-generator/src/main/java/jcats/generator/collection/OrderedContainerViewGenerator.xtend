@@ -19,6 +19,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 
 	def shortName() { type.orderedContainerViewShortName }
 	def genericName() { type.orderedContainerViewGenericName }
+	def paramGenericName() { type.paramGenericName("OrderedContainerView") }
 	def baseShortName() { type.shortName("BaseOrderedContainerView") }
 	def mappedShortName() { type.shortName("MappedOrderedContainerView") }
 	def mapTargetType() { if (type == Type.OBJECT) "B" else "A" }
@@ -156,11 +157,15 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				return new «reverseShortName»<>(unview());
 			}
 
-			static «type.paramGenericName("OrderedContainerView")» «type.shortName("CollectionView").firstToLowerCase»(final Collection<«type.genericBoxedName»> collection) {
+			static «paramGenericName» empty«shortName»() {
+				return «IF type == Type.OBJECT»(«type.orderedContainerViewGenericName») «ENDIF»«baseShortName».EMPTY;
+			}
+
+			static «paramGenericName» «type.shortName("CollectionView").firstToLowerCase»(final Collection<«type.genericBoxedName»> collection) {
 				return «type.shortName("CollectionView").firstToLowerCase»(collection, true);
 			}
 
-			static «type.paramGenericName("OrderedContainerView")» «type.shortName("CollectionView").firstToLowerCase»(final Collection<«type.genericBoxedName»> collection, final boolean hasKnownFixedSize) {
+			static «paramGenericName» «type.shortName("CollectionView").firstToLowerCase»(final Collection<«type.genericBoxedName»> collection, final boolean hasKnownFixedSize) {
 				requireNonNull(collection);
 				return new «type.shortName("Collection")»As«type.orderedContainerShortName»<>(collection, hasKnownFixedSize);
 			}

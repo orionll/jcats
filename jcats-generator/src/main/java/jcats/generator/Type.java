@@ -91,6 +91,10 @@ public enum Type {
 		return (this == OBJECT) ? "<A> " + clazz + "<A>" : typeName() + clazz;
 	}
 
+	public String paramComparableGenericName(final String clazz) {
+		return (this == OBJECT) ? "<A extends Comparable<A>> " + clazz + "<A>" : typeName() + clazz;
+	}
+
 	public String shortName(final String clazz) {
 		return (this == OBJECT) ? clazz : typeName() + clazz;
 	}
