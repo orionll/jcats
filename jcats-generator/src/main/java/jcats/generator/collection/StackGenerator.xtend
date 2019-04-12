@@ -102,7 +102,7 @@ final class StackGenerator implements ClassGenerator {
 
 			@Override
 			public boolean hasKnownFixedSize() {
-				return false;
+				return (this == EMPTY);
 			}
 
 			/**
