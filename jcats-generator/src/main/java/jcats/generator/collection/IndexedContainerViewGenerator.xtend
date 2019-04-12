@@ -49,6 +49,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		«IF type.primitive»
 			import static «Constants.COLLECTION».«type.arrayShortName».*;
 		«ENDIF»
+		import static «Constants.COLLECTION».«shortName».*;
 
 		public interface «type.covariantName("IndexedContainerView")» extends «type.orderedContainerViewGenericName», «type.indexedContainerGenericName» {
 
@@ -69,7 +70,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				if (fromIndexInclusive == 0 && toIndexExclusive == size) {
 					return this;
 				} else if (fromIndexInclusive == toIndexExclusive) {
-					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+					return empty«shortName»();
 				} else {
 					return skip(fromIndexInclusive).limit(toIndexExclusive - fromIndexInclusive);
 				}
@@ -102,6 +103,8 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			default «genericName» limit(final int limit) {
 				if (limit < 0) {
 					throw new IllegalArgumentException(Integer.toString(limit));
+				} else if (limit == 0) {
+					return empty«shortName»();
 				} else if (hasKnownFixedSize() && limit >= size()) {
 					return this;
 				} else {
@@ -116,7 +119,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				} else if (skip == 0) {
 					return this;
 				} else if (hasKnownFixedSize() && skip >= size()) {
-					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+					return empty«shortName»();
 				} else {
 					return new «skippedShortName»<>(unview(), skip);
 				}
@@ -346,6 +349,8 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			public «type.indexedContainerViewGenericName» limit(final int n) {
 				if (n < 0) {
 					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (n == 0) {
+					return empty«shortName»();
 				} else if (n < this.limit) {
 					return new «limitedShortName»<>(this.container, n);
 				} else {
@@ -440,13 +445,13 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					if (sum < 0) {
 						// Overflow
 						if (this.container.hasKnownFixedSize()) {
-							return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+							return empty«shortName»();
 						} else {
 							return new «skippedShortName»<>(this, n);
 						}
 					} else {
 						if (this.container.hasKnownFixedSize() && sum >= this.container.size()) {
-							return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+							return empty«shortName»();
 						} else {
 							return new «skippedShortName»<>(this.container, sum);
 						}

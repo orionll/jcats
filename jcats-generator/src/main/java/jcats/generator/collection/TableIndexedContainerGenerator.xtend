@@ -31,7 +31,6 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 			import java.util.Iterator;
 		«ENDIF»
 		import java.util.Spliterator;
-		import java.util.function.«IF type.javaUnboxedType»«type.typeName»«ENDIF»Consumer;
 		import java.util.stream.IntStream;
 
 		import «Constants.JCATS».*;
@@ -40,9 +39,7 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.COMMON».*;
 		import static «Constants.JCATS».«type.optionShortName».*;
-		«IF type.primitive»
-			import static «Constants.COLLECTION».«type.arrayShortName».*;
-		«ENDIF»
+		import static «Constants.COLLECTION».«type.indexedContainerViewShortName».*;
 
 		final class «genericName» implements «type.indexedContainerViewGenericName», Serializable {
 			private final int size;
@@ -181,7 +178,7 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 				if (fromIndexInclusive == 0 && toIndexExclusive == this.size) {
 					return this;
 				} else if (fromIndexInclusive == toIndexExclusive) {
-					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+					return empty«type.indexedContainerViewShortName»();
 				} else if (fromIndexInclusive == 0) {
 					return new «diamondName»(toIndexExclusive, this.f);
 				} else {
@@ -193,9 +190,9 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 			@Override
 			public «type.indexedContainerViewGenericName» limit(final int n) {
 				if (n < 0) {
-					throw new IndexOutOfBoundsException(Integer.toString(n));
+					throw new IllegalArgumentException(Integer.toString(n));
 				} else if (n == 0) {
-					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+					return empty«type.indexedContainerViewShortName»();
 				} else if (n >= this.size) {
 					return this;
 				} else {
@@ -210,7 +207,7 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 				} else if (n == 0) {
 					return this;
 				} else if (n >= this.size) {
-					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+					return empty«type.indexedContainerViewShortName»();
 				} else {
 					return new «diamondName»(this.size - n, i -> this.f.apply(i + n));
 				}

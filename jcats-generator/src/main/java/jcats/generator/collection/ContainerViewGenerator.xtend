@@ -52,6 +52,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 		import static «Constants.FUNCTION».«type.shortName("BooleanF")».*;
 		import static «Constants.COMMON».*;
 		import static «Constants.COLLECTION».«type.arrayShortName».*;
+		import static «Constants.COLLECTION».«shortName».*;
 
 		public interface «type.covariantName("ContainerView")» extends «type.containerGenericName» {
 
@@ -145,6 +146,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			default «genericName» limit(final int limit) {
 				if (limit < 0) {
 					throw new IllegalArgumentException(Integer.toString(limit));
+				} else if (limit == 0) {
+					return empty«shortName»();
 				} else if (hasKnownFixedSize() && limit >= size()) {
 					return this;
 				} else {
@@ -158,7 +161,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				} else if (skip == 0) {
 					return this;
 				} else if (hasKnownFixedSize() && skip >= size()) {
-					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+					return empty«shortName»();
 				} else {
 					return new «skippedContainerViewShortName»<>(unview(), skip);
 				}
@@ -1041,6 +1044,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			public «genericName» limit(final int n) {
 				if (n < 0) {
 					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (n == 0) {
+					return empty«shortName»();
 				} else if (n < this.limit) {
 					return new «type.shortName("LimitedContainerView")»<>(this.container, n);
 				} else {
@@ -1115,13 +1120,13 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 					if (sum < 0) {
 						// Overflow
 						if (this.container.hasKnownFixedSize()) {
-							return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+							return empty«shortName»();
 						} else {
 							return new «type.shortName("SkippedContainerView")»<>(this, n);
 						}
 					} else {
 						if (this.container.hasKnownFixedSize() && sum >= this.container.size()) {
-							return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+							return empty«shortName»();
 						} else {
 							return new «type.shortName("SkippedContainerView")»<>(this.container, sum);
 						}

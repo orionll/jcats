@@ -29,6 +29,7 @@ final class RangeGenerator implements ClassGenerator {
 		import static «Constants.JCATS».IntOption.*;
 		import static «Constants.COMMON».*;
 		import static «Constants.COLLECTION».IntArray.*;
+		import static «Constants.COLLECTION».IntIndexedContainerView.*;
 
 		final class Range implements IntIndexedContainerView, Serializable {
 
@@ -164,7 +165,7 @@ final class RangeGenerator implements ClassGenerator {
 				if (n < 0) {
 					throw new IllegalArgumentException(Integer.toString(n));
 				} else if (n == 0) {
-					return emptyIntArray().view();
+					return emptyIntIndexedContainerView();
 				} else {
 					final long upTo = (long) this.low + n;
 					if (upTo != (int) upTo ||

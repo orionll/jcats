@@ -133,6 +133,8 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			default «genericName» limit(final int limit) {
 				if (limit < 0) {
 					throw new IllegalArgumentException(Integer.toString(limit));
+				} else if (limit == 0) {
+					return empty«shortName»();
 				} else if (hasKnownFixedSize() && limit >= size()) {
 					return this;
 				} else {
@@ -147,7 +149,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				} else if (skip == 0) {
 					return this;
 				} else if (hasKnownFixedSize() && skip >= size()) {
-					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+					return empty«shortName»();
 				} else {
 					return new «skippedShortName»<>(unview(), skip);
 				}
@@ -463,6 +465,8 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			public «type.orderedContainerViewGenericName» limit(final int n) {
 				if (n < 0) {
 					throw new IllegalArgumentException(Integer.toString(n));
+				} else if (n == 0) {
+					return «shortName».empty«shortName»();
 				} else if (n < this.limit) {
 					return new «limitedShortName»<>(this.container, n);
 				} else {
@@ -490,13 +494,13 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 					if (sum < 0) {
 						// Overflow
 						if (this.container.hasKnownFixedSize()) {
-							return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+							return «shortName».empty«shortName»();
 						} else {
 							return new «skippedShortName»<>(this, n);
 						}
 					} else {
 						if (this.container.hasKnownFixedSize() && sum >= this.container.size()) {
-							return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+							return «shortName».empty«shortName»();
 						} else {
 							return new «skippedShortName»<>(this.container, sum);
 						}

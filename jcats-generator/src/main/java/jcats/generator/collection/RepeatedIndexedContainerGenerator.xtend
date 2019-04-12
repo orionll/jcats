@@ -48,12 +48,10 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 		«IF type != Type.INT»
 			import static «Constants.JCATS».«type.optionShortName».*;
 		«ENDIF»
-		«IF type.primitive»
-			import static «Constants.COLLECTION».«type.arrayShortName».*;
-		«ENDIF»
 		«IF type == Type.OBJECT»
 			import static «Constants.COLLECTION».Unique.*;
 		«ENDIF»
+		import static «Constants.COLLECTION».«type.indexedContainerViewShortName».*;
 
 		final class «genericName» implements «type.indexedContainerViewGenericName», Serializable {
 			private final int size;
@@ -259,7 +257,7 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 				if (fromIndexInclusive == 0 && toIndexExclusive == this.size) {
 					return this;
 				} else if (fromIndexInclusive == toIndexExclusive) {
-					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+					return empty«type.indexedContainerViewShortName»();
 				} else {
 					return new «diamondName»(toIndexExclusive - fromIndexInclusive, this.value);
 				}
@@ -270,7 +268,7 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 				if (n < 0) {
 					throw new IndexOutOfBoundsException(Integer.toString(n));
 				} else if (n == 0) {
-					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+					return empty«type.indexedContainerViewShortName»();
 				} else if (n >= this.size) {
 					return this;
 				} else {
@@ -285,7 +283,7 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 				} else if (n == 0) {
 					return this;
 				} else if (n >= this.size) {
-					return «IF type == Type.OBJECT»Array.<A> «ENDIF»empty«type.arrayShortName»().view();
+					return empty«type.indexedContainerViewShortName»();
 				} else {
 					return new «diamondName»(this.size - n, this.value);
 				}
