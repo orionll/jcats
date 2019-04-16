@@ -49,7 +49,6 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 		«IF type.primitive»
 			import static «Constants.COMMON».*;
 		«ENDIF»
-		import static «Constants.COLLECTION».«type.arrayShortName».*;
 		import static «Constants.COLLECTION».«type.indexedContainerViewShortName».*;
 
 		public interface «type.covariantName("IndexedContainer")» extends «type.orderedContainerGenericName», «type.indexedGenericName», Equatable<«genericName»> {

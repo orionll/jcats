@@ -386,6 +386,18 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 				return Collections.nCopies(this.size, this.value);
 			}
 
+			@Override
+			public <«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> IndexedContainerView<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> map(final «type.fGenericName» f) {
+				return new RepeatedIndexedContainer<>(this.size, f.apply(this.value));
+			}
+
+			«FOR toType : Type.primitives»
+				@Override
+				public «toType.indexedContainerViewGenericName» mapTo«toType.typeName»(final «IF type.primitive»«type.typeName»«ENDIF»«toType.typeName»F«IF type == Type.OBJECT»<A>«ENDIF» f) {
+					return new «toType.diamondName("RepeatedIndexedContainer")»(this.size, f.apply(this.value));
+				}
+
+			«ENDFOR»
 			«IF type == Type.OBJECT»
 				@Override
 				public «type.indexedContainerViewGenericName» sort(final Ord<A> ord) {

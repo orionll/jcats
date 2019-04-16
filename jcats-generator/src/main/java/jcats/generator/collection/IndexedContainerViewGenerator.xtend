@@ -98,7 +98,6 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				}
 
 			«ENDFOR»
-
 			@Override
 			default «genericName» limit(final int limit) {
 				if (limit < 0) {

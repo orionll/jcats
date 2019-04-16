@@ -213,6 +213,18 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 				}
 			}
 
+			@Override
+			public <«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> IndexedContainerView<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> map(final «type.fGenericName» g) {
+				return new TableIndexedContainer<>(this.size, this.f.map(g));
+			}
+
+			«FOR toType : Type.primitives»
+				@Override
+				public «toType.indexedContainerViewGenericName» mapTo«toType.typeName»(final «IF type.primitive»«type.typeName»«ENDIF»«toType.typeName»F«IF type == Type.OBJECT»<A>«ENDIF» g) {
+					return new «toType.diamondName("TableIndexedContainer")»(this.size, this.f.mapTo«toType.typeName»(g));
+				}
+
+			«ENDFOR»
 			«orderedHashCode(type)»
 
 			«indexedEquals(type)»
