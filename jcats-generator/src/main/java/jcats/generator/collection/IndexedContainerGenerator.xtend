@@ -236,7 +236,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			«IF type == Type.INT»
 				static IntIndexedContainer range(final int lowInclusive, final int highExclusive) {
 					if (lowInclusive >= highExclusive) {
-						return emptyIntArray();
+						return emptyIntIndexedContainerView();
 					} else {
 						return new Range(lowInclusive, highExclusive, false);
 					}
@@ -244,7 +244,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 				static IntIndexedContainer rangeClosed(final int lowInclusive, final int highInclusive) {
 					if (lowInclusive > highInclusive) {
-						return emptyIntArray();
+						return emptyIntIndexedContainerView();
 					} else {
 						return new Range(lowInclusive, highInclusive, true);
 					}
@@ -258,7 +258,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				if (size < 0) {
 					throw new IllegalArgumentException(Integer.toString(size));
 				} else if (size == 0) {
-					return empty«type.arrayShortName»();
+					return empty«type.indexedContainerViewShortName»();
 				} else {
 					return new «type.diamondName("RepeatedIndexedContainer")»(size, value);
 				}
@@ -271,7 +271,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				if (size < 0) {
 					throw new IllegalArgumentException(Integer.toString(size));
 				} else if (size == 0) {
-					return empty«type.arrayShortName»();
+					return empty«type.indexedContainerViewShortName»();
 				} else {
 					return new «type.diamondName("TableIndexedContainer")»(size, f);
 				}
