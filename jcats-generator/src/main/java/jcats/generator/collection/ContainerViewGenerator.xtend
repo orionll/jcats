@@ -170,15 +170,15 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«IF type == Type.OBJECT»
 				default «type.indexedContainerViewGenericName» sort(final Ord<A> ord) {
 					requireNonNull(ord);
-					return new SortedContainerView<>(this, ord, false);
+					return new SortedContainerView<>(unview(), ord, false);
 				}
 			«ELSE»
 				default «type.indexedContainerViewGenericName» sortAsc() {
-					return new «type.shortName("SortedContainerView")»(this, true, false);
+					return new «type.shortName("SortedContainerView")»(unview(), true, false);
 				}
 
 				default «type.indexedContainerViewGenericName» sortDesc() {
-					return new «type.shortName("SortedContainerView")»(this, false, false);
+					return new «type.shortName("SortedContainerView")»(unview(), false, false);
 				}
 			«ENDIF»
 
