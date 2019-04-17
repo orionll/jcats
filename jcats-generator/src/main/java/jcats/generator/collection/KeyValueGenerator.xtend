@@ -534,7 +534,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			@Override
 			public Spliterator<Entry<K, A>> spliterator() {
-				return Spliterators.spliterator(this, Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.IMMUTABLE);
+				return Spliterators.spliterator(this, this.keyValue.spliteratorCharacteristics());
 			}
 
 			@Override
