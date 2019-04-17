@@ -258,11 +258,6 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public int spliteratorCharacteristics() {
-				return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE;
-			}
-
-			@Override
 			public void forEach(final Consumer<? super P<K, A>> action) {
 				if (this.entry != null) {
 					traverse(action);
