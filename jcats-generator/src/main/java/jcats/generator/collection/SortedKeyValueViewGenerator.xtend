@@ -318,7 +318,7 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 
 			@Override
 			public String toString() {
-				return iterableToString(this);
+				return keyValueToString(this);
 			}
 		}
 
