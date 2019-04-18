@@ -90,7 +90,6 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			«cast(#["K", "A"], #[], #["A"])»
 		}
 
-
 		final class SortedValues<A> extends Values<A, SortedKeyValue<?, A>> implements OrderedContainerView<A> {
 
 			SortedValues(final SortedKeyValue<?, A> keyValue) {
@@ -115,6 +114,11 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public boolean isReverseQuick() {
 				return true;
+			}
+
+			@Override
+			public OrderedContainerView<A> reverse() {
+				return new SortedValues<>(this.keyValue.view().reverse());
 			}
 		}
 
@@ -142,6 +146,11 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public Iterator<K> reverseIterator() {
 				return new MappedIterator<>(this.keyValue.reverseIterator(), P::get1);
+			}
+
+			@Override
+			public SortedUniqueContainerView<K> reverse() {
+				return new SortedKeys<>(this.keyValue.view().reverse());
 			}
 
 			@Override
@@ -199,6 +208,11 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			@Override
 			public SortedUniqueContainerView<P<K, A>> sliceTo(final P<K, A> to, final boolean inclusive) {
 				return new SortedKeyValueAsSortedUniqueContainer<>(this.keyValue.view().sliceTo(to.get1(), inclusive));
+			}
+
+			@Override
+			public SortedUniqueContainerView<P<K, A>> reverse() {
+				return new SortedKeyValueAsSortedUniqueContainer<>(this.keyValue.view().reverse());
 			}
 		}
 
