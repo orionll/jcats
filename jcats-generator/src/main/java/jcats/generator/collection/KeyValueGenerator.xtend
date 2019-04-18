@@ -421,10 +421,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 
 			«uniqueEquals(Type.OBJECT)»
 
-			@Override
-			public String toString() {
-				return this.keyValue.toString();
-			}
+			«toStr»
 		}
 
 		class KeyValueAsMap<K, A, KV extends KeyValue<K, A>> extends AbstractImmutableMap<K, A> {
