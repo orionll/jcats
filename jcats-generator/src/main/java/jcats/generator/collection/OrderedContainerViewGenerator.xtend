@@ -301,6 +301,11 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			public OrderedContainerView<«mapTargetType»> skip(final int n) {
 				return new «mappedShortName»<>(this.container.view().skip(n), this.f);
 			}
+
+			@Override
+			public OrderedContainerView<«mapTargetType»> reverse() {
+				return new «mappedShortName»<>(this.container.view().reverse(), this.f);
+			}
 		}
 
 		«FOR toType : Type.primitives»
@@ -361,6 +366,11 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				@Override
 				public «toType.orderedContainerViewGenericName» skip(final int n) {
 					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»OrderedContainerView<>(this.container.view().skip(n), this.f);
+				}
+
+				@Override
+				public «toType.orderedContainerViewGenericName» reverse() {
+					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»OrderedContainerView<>(this.container.view().reverse(), this.f);
 				}
 			}
 
@@ -448,6 +458,15 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public «genericName» filter(final «type.boolFName» p) {
 				return new «type.diamondName("FilteredOrderedContainerView")»(this.container, and(this.predicate, p));
+			}
+
+			@Override
+			public «genericName» reverse() {
+				if (this.container.isReverseQuick()) {
+					return new «type.diamondName("FilteredOrderedContainerView")»(this.container.view().reverse().unview(), this.predicate);
+				} else {
+					return «shortName».super.reverse();
+				}
 			}
 		}
 

@@ -254,6 +254,11 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				return new «mappedShortName»<>(this.container.view().skip(n), this.f);
 			}
 
+			@Override
+			public IndexedContainerView<«mapTargetType»> reverse() {
+				return new «mappedShortName»<>(this.container.view().reverse(), this.f);
+			}
+
 			«orderedHashCode(Type.OBJECT)»
 
 			«indexedEquals(Type.OBJECT)»
@@ -313,6 +318,11 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				@Override
 				public «toType.indexedContainerViewGenericName» skip(final int n) {
 					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this.container.view().skip(n), this.f);
+				}
+
+				@Override
+				public «toType.indexedContainerViewGenericName» reverse() {
+					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this.container.view().reverse(), this.f);
 				}
 
 				«orderedHashCode(toType)»
