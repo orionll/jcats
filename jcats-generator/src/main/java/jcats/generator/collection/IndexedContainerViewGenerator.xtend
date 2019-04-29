@@ -183,6 +183,11 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				return this.container.lastIndexWhere(predicate);
 			}
 
+			@Override
+			public IntIndexedContainer indices() {
+				return this.container.indices();
+			}
+
 			«IF type.primitive»
 				@Override
 				public IndexedContainerView<«type.boxedName»> boxed() {

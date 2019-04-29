@@ -50,6 +50,9 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			import static «Constants.COMMON».*;
 		«ENDIF»
 		import static «Constants.COLLECTION».«type.indexedContainerViewShortName».*;
+		«IF type != Type.INT»
+			import static «Constants.COLLECTION».IntIndexedContainer.*;
+		«ENDIF»
 
 		public interface «type.covariantName("IndexedContainer")» extends «type.orderedContainerGenericName», «type.indexedGenericName», Equatable<«genericName»> {
 
@@ -202,6 +205,10 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 						return intSome(finder.lastIndex);
 					}
 				}
+			}
+
+			default IntIndexedContainer indices() throws SizeOverflowException {
+				return range(0, size());
 			}
 
 			@Override
