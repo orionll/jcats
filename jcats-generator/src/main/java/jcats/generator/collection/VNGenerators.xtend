@@ -310,34 +310,6 @@ final class VNGenerators {
 							Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.IMMUTABLE);
 					}
 
-					«IF type == Type.OBJECT»
-						public <B> V«arity»<P<A, B>> zip(final V«arity»<B> that) {
-							return zipWith(that, P::p);
-						}
-
-						public <B, C> V«arity»<C> zipWith(final V«arity»<B> that, final F2<A, B, C> f) {
-							requireNonNull(f);
-							return new V«arity»<>(«(1 .. arity).map['''f.apply(this.a«it», that.a«it»)'''].join(", ")»);
-						}
-
-						public V«arity»<IntObjectP<A>> zipWithIndex() {
-							return new V«arity»<>(«(1 .. arity).map['''intObjectP(«it-1», this.a«it»)'''].join(", ")»);
-						}
-					«ELSE»
-						public <A> V«arity»<«type.typeName»ObjectP<A>> zip(final V«arity»<A> that) {
-							return zipWith(that, «type.typeName»ObjectP::«type.typeName.firstToLowerCase»ObjectP);
-						}
-
-						public <A, B> V«arity»<B> zipWith(final V«arity»<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
-							requireNonNull(f);
-							return new V«arity»<>(«(1 .. arity).map['''f.apply(this.a«it», that.a«it»)'''].join(", ")»);
-						}
-
-						public final V«arity»<Int«type.typeName»P> zipWithIndex() {
-							return new V«arity»<>(«(1 .. arity).map['''int«type.typeName»P(«it-1», this.a«it»)'''].join(", ")»);
-						}
-					«ENDIF»
-
 					@Override
 					public String toString() {
 						return "[" + «(1 .. arity).map["this.a" + it].join(''' + ", " + ''')» + "]";

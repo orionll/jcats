@@ -1314,50 +1314,6 @@ class SeqGenerator implements ClassGenerator {
 			«toStr(type)»
 
 			«IF type == Type.OBJECT»
-				public final <B, C> Seq<C> zip(final Iterable<B> that, final F2<A, B, C> f) {
-			«ELSE»
-				public final <A, B> Seq<B> zip(final Iterable<A> that, final «type.typeName»ObjectObjectF2<A, B> f) {
-			«ENDIF»
-				requireNonNull(f);
-				if (isEmpty()) {
-					return emptySeq();
-				} else if (that instanceof Container<?> && ((Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»>) that).hasKnownFixedSize()) {
-					final Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> cont = (Container<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»>) that;
-					if (cont.isEmpty()) {
-						return emptySeq();
-					} else {
-						final int size = Math.min(size(), cont.size());
-						final «type.iteratorGenericName» iterator1 = iterator();
-						final Iterator<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> iterator2 = cont.iterator();
-						return Seq.fill(size, () -> f.apply(iterator1.«type.iteratorNext»(), iterator2.next()));
-					}
-				} else {
-					final SeqBuilder<«IF type == Type.OBJECT»C«ELSE»B«ENDIF»> builder = Seq.builder();
-					final «type.iteratorGenericName» iterator1 = iterator();
-					final Iterator<«IF type == Type.OBJECT»B«ELSE»A«ENDIF»> iterator2 = that.iterator();
-					while (iterator1.hasNext() && iterator2.hasNext()) {
-						final «type.genericName» a = iterator1.«type.iteratorNext»();
-						final «IF type == Type.OBJECT»B«ELSE»A«ENDIF» b = requireNonNull(iterator2.next());
-						builder.append(f.apply(a, b));
-					}
-					return builder.build();
-				}
-			}
-
-			«IF type == Type.OBJECT»
-				public final <B> Seq<B> zipWithIndex(final IntObjectObjectF2<A, B> f) {
-			«ELSE»
-				public final <A> Seq<A> zipWithIndex(final Int«type.typeName»ObjectF2<A> f) {
-			«ENDIF»
-				if (isEmpty()) {
-					return emptySeq();
-				} else {
-					final «type.iteratorGenericName» iterator = iterator();
-					return Seq.tabulate(size(), (final int i) -> f.apply(i, iterator.«type.iteratorNext»()));
-				}
-			}
-
-			«IF type == Type.OBJECT»
 				static int index1(final int index) {
 					return (index & 0x1F);
 				}
