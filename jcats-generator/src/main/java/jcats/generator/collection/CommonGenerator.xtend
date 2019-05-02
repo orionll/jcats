@@ -536,7 +536,88 @@ final class CommonGenerator implements ClassGenerator {
 				«ENDIF»
 			«ENDFOR»
 		«ENDFOR»
+		final class MappedWithIndexIterator<A, B> implements Iterator<B> {
+			private final Iterator<A> iterator;
+			private final IntObjectObjectF2<A, B> f;
+			private int i;
+		
+			MappedWithIndexIterator(final Iterator<A> iterator, final IntObjectObjectF2<A, B> f) {
+				this.iterator = iterator;
+				this.f = f;
+			}
+		
+			@Override
+			public boolean hasNext() {
+				checkOverflow();
+				return this.iterator.hasNext();
+			}
+		
+			@Override
+			public B next() {
+				checkOverflow();
+				final A next = requireNonNull(this.iterator.next());
+				return requireNonNull(this.f.apply(this.i++, next));
+			}
+		
+			@Override
+			public void forEachRemaining(final Consumer<? super B> action) {
+				requireNonNull(action);
+				this.iterator.forEachRemaining((final A value) -> {
+					checkOverflow();
+					final B mapped = requireNonNull(this.f.apply(this.i++, value));
+					action.accept(mapped);
+				});
+			}
 
+			private void checkOverflow() {
+				if (this.i < 0) {
+					throw new SizeOverflowException();
+				}
+			}
+		}
+
+		«FOR type : Type.primitives»
+			final class «type.typeName»MappedWithIndexIterator<A> implements Iterator<A> {
+				private final «type.iteratorGenericName» iterator;
+				private final Int«type.typeName»ObjectF2<A> f;
+				private int i;
+			
+				«type.typeName»MappedWithIndexIterator(final «type.iteratorGenericName» iterator, final Int«type.typeName»ObjectF2<A> f) {
+					this.iterator = iterator;
+					this.f = f;
+				}
+			
+				@Override
+				public boolean hasNext() {
+					checkOverflow();
+					return this.iterator.hasNext();
+				}
+			
+				@Override
+				public A next() {
+					checkOverflow();
+					final «type.genericName» next = this.iterator.«type.iteratorNext»();
+					return requireNonNull(this.f.apply(this.i++, next));
+				}
+			
+				@Override
+				public void forEachRemaining(final Consumer<? super A> action) {
+					requireNonNull(action);
+					this.iterator.forEachRemaining((final «type.iteratorReturnType» value) -> {
+						checkOverflow();
+						final A mapped = requireNonNull(this.f.apply(this.i++, value));
+						action.accept(mapped);
+					});
+				}
+
+				private void checkOverflow() {
+					if (this.i < 0) {
+						throw new SizeOverflowException();
+					}
+				}
+			}
+
+		«ENDFOR»
 		final class FlatMappedIterator<A, B> implements Iterator<B> {
 			private final Iterator<A> iterator;
 			private final F<A, Iterable<B>> f;

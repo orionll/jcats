@@ -22,6 +22,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 	def paramGenericName() { type.paramGenericName("IndexedContainerView") }
 	def baseShortName() { type.shortName("BaseIndexedContainerView") }
 	def mappedShortName() { type.shortName("MappedIndexedContainerView") }
+	def mappedWithIndexShortName() { type.shortName("MappedWithIndexIndexedContainerView") }
 	def mapTargetType() { if (type == Type.OBJECT) "B" else "A" }
 	def limitedShortName() { type.shortName("LimitedIndexedContainerView") }
 	def filteredShortName() { type.shortName("FilteredIndexedContainerView") }
@@ -32,9 +33,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		package «Constants.COLLECTION»;
 
 		import java.util.Collections;
-		«IF !type.javaUnboxedType»
-			import java.util.Iterator;
-		«ENDIF»
+		import java.util.Iterator;
 		import java.util.List;
 		«IF type.javaUnboxedType»
 			import java.util.PrimitiveIterator;
@@ -98,6 +97,15 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				}
 
 			«ENDFOR»
+			«IF type == Type.OBJECT»
+				default <B> IndexedContainerView<B> mapWithIndex(final IntObjectObjectF2<A, B> f) {
+			«ELSE»
+				default <A> IndexedContainerView<A> mapWithIndex(final Int«type.typeName»ObjectF2<A> f) {
+			«ENDIF»
+				requireNonNull(f);
+				return new «mappedWithIndexShortName»<>(unview(), f);
+			}
+
 			@Override
 			default «genericName» limit(final int limit) {
 				if (limit < 0) {
@@ -245,6 +253,15 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 			«ENDFOR»
 			@Override
+			«IF type == Type.OBJECT»
+				public <D> IndexedContainerView<D> mapWithIndex(final IntObjectObjectF2<B, D> g) {
+			«ELSE»
+				public <B> IndexedContainerView<B> mapWithIndex(final IntObjectObjectF2<A, B> g) {
+			«ENDIF»
+				return new «mappedWithIndexShortName»<>(this.container, g.contraMap«IF type.primitive»From«type.typeName»«ENDIF»2(this.f));
+			}
+
+			@Override
 			public IndexedContainerView<«mapTargetType»> slice(final int fromIndexInclusive, final int toIndexExclusive) {
 				return new «mappedShortName»<>(this.container.view().slice(fromIndexInclusive, toIndexExclusive), this.f);
 			}
@@ -336,6 +353,126 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 		«ENDFOR»
+		final class «mappedWithIndexShortName»<A«IF type == Type.OBJECT», B«ENDIF»> implements IndexedContainerView<«mapTargetType»> {
+			private final «type.indexedContainerGenericName» container;
+			private final «IF type == Type.OBJECT»IntObjectObjectF2<A, B>«ELSE»Int«type.typeName»ObjectF2<A>«ENDIF» f;
+		
+			«mappedWithIndexShortName»(final «type.indexedContainerGenericName» container, final «IF type == Type.OBJECT»IntObjectObjectF2<A, B>«ELSE»Int«type.typeName»ObjectF2<A>«ENDIF» f) {
+				this.container = container;
+				this.f = f;
+			}
+
+			@Override
+			public int size() {
+				return this.container.size();
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return this.container.isEmpty();
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return this.container.isNotEmpty();
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return this.container.hasKnownFixedSize();
+			}
+
+			@Override
+			public «mapTargetType» first() {
+				return requireNonNull(this.f.apply(0, this.container.first()));
+			}
+
+			@Override
+			public Option<«mapTargetType»> firstOption() {
+				return this.container.firstOption().map(value -> this.f.apply(0, value));
+			}
+
+			@Override
+			public Iterator<«mapTargetType»> iterator() {
+				«IF type == Type.OBJECT»
+					return new MappedWithIndexIterator<>(this.container.iterator(), this.f);
+				«ELSE»
+					return new «type.typeName»MappedWithIndexIterator<>(this.container.iterator(), this.f);
+				«ENDIF»
+			}
+
+			@Override
+			public void foreach(final Eff<«mapTargetType»> eff) {
+				requireNonNull(eff);
+				this.container.foreachWithIndex((final int index, final «type.genericName» value) -> {
+					«IF type == Type.OBJECT»
+						requireNonNull(value);
+					«ENDIF»
+					final «mapTargetType» result = requireNonNull(this.f.apply(index, value));
+					eff.apply(result);
+				});
+			}
+
+			@Override
+			public void foreachWithIndex(final IntObjectEff2<«mapTargetType»> eff) {
+				requireNonNull(eff);
+				this.container.foreachWithIndex((final int index, final «type.genericName» value) -> {
+					«IF type == Type.OBJECT»
+						requireNonNull(value);
+					«ENDIF»
+					final «mapTargetType» result = requireNonNull(this.f.apply(index, value));
+					eff.apply(index, result);
+				});
+			}
+
+			@Override
+			public «mapTargetType» get(final int index) {
+				return this.f.apply(index, this.container.get(index));
+			}
+		
+			@Override
+			«IF type == Type.OBJECT»
+				public <C> IndexedContainerView<C> map(final F<B, C> g) {
+			«ELSE»
+				public <B> IndexedContainerView<B> map(final F<A, B> g) {
+			«ENDIF»
+				return new «mappedWithIndexShortName»<>(this.container, this.f.map(g));
+			}
+
+			@Override
+			«IF type == Type.OBJECT»
+				public <C> IndexedContainerView<C> mapWithIndex(final IntObjectObjectF2<B, C> g) {
+			«ELSE»
+				public <B> IndexedContainerView<B> mapWithIndex(final IntObjectObjectF2<A, B> g) {
+			«ENDIF»
+				return new «mappedWithIndexShortName»<>(this.container, (final int i, final «type.genericName» value) -> {
+					final «mapTargetType» result = requireNonNull(this.f.apply(i, value));
+					return g.apply(i, result);
+				});
+			}
+
+			@Override
+			public IndexedContainerView<«mapTargetType»> limit(final int n) {
+				return new «mappedWithIndexShortName»<>(this.container.view().limit(n), this.f);
+			}
+
+			@Override
+			public IndexedContainerView<«mapTargetType»> skip(final int n) {
+				return new «mappedWithIndexShortName»<>(this.container.view().skip(n), this.f);
+			}
+
+			@Override
+			public boolean isReverseQuick() {
+				return this.container.isReverseQuick();
+			}
+
+			«orderedHashCode(Type.OBJECT)»
+
+			«indexedEquals(Type.OBJECT)»
+
+			«toStr(Type.OBJECT)»
+		}
+
 		«IF type == Type.OBJECT»
 			final class «limitedShortName»<A, C extends «type.indexedContainerGenericName»> extends LimitedOrderedContainerView<A, C> implements IndexedContainerView<A> {
 		«ELSE»
