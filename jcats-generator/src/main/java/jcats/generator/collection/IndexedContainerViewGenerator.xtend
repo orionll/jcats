@@ -457,11 +457,6 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public IndexedContainerView<«mapTargetType»> skip(final int n) {
-				return new «mappedWithIndexShortName»<>(this.container.view().skip(n), this.f);
-			}
-
-			@Override
 			public boolean isReverseQuick() {
 				return this.container.isReverseQuick();
 			}
