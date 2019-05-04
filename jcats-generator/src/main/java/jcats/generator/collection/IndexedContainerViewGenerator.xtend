@@ -328,6 +328,15 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 
 				«ENDFOR»
 				@Override
+				«IF type == Type.OBJECT»
+					public <B> IndexedContainerView<B> mapWithIndex(final Int«toType.typeName»ObjectF2<B> g) {
+				«ELSE»
+					public <A> IndexedContainerView<A> mapWithIndex(final Int«toType.typeName»ObjectF2<A> g) {
+				«ENDIF»
+					return new «mappedWithIndexShortName»<>(this.container, g.contraMap«IF type.primitive»From«type.typeName»«ENDIF»2(this.f));
+				}
+
+				@Override
 				public «toType.indexedContainerViewGenericName» slice(final int fromIndexInclusive, final int toIndexExclusive) {
 					return new «IF type.primitive»«type.typeName»«ENDIF»MappedTo«toType.typeName»IndexedContainerView<>(this.container.view().slice(fromIndexInclusive, toIndexExclusive), this.f);
 				}

@@ -305,6 +305,19 @@ class SeqGenerator implements ClassGenerator {
 
 			«ENDFOR»
 			«IF type == Type.OBJECT»
+				public final <B> Seq<B> mapWithIndex(final IntObjectObjectF2<A, B> f) {
+			«ELSE»
+				public final <A> Seq<A> mapWithIndex(final Int«type.typeName»ObjectF2<A> f) {
+			«ENDIF»
+				if (isEmpty()) {
+					return emptySeq();
+				} else {
+					final «type.iteratorGenericName» iterator = iterator();
+					return Seq.tabulate(size(), (final int i) -> f.apply(i, iterator.«type.iteratorNext»()));
+				}
+			}
+
+			«IF type == Type.OBJECT»
 				public final <B> Seq<B> flatMap(final F<A, Iterable<B>> f) {
 			«ELSE»
 				public final <A> Seq<A> flatMap(final «type.typeName»ObjectF<Iterable<A>> f) {

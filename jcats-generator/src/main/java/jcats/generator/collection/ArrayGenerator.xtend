@@ -423,6 +423,22 @@ final class ArrayGenerator implements ClassGenerator {
 
 			«ENDFOR»
 			«IF type == Type.OBJECT»
+				public <B> Array<B> mapWithIndex(final IntObjectObjectF2<A, B> f) {
+			«ELSE»
+				public <A> Array<A> mapWithIndex(final Int«type.typeName»ObjectF2<A> f) {
+			«ENDIF»
+				if (isEmpty()) {
+					return emptyArray();
+				} else {
+					final Object[] result = new Object[this.array.length];
+					for (int i = 0; i < this.array.length; i++) {
+						result[i] = requireNonNull(f.apply(i, «IF type == Type.OBJECT»(A) «ENDIF»this.array[i]));
+					}
+					return new Array<>(result);
+				}
+			}
+
+			«IF type == Type.OBJECT»
 				public <B> Array<B> flatMap(final F<A, Iterable<B>> f) {
 			«ELSE»
 				public <A> Array<A> flatMap(final «type.typeName»ObjectF<Iterable<A>> f) {
