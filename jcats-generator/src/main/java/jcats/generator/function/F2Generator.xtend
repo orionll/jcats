@@ -169,7 +169,43 @@ class F2Generator implements InterfaceGenerator {
 				};
 			}
 
-			«IF returnType == Type.OBJECT»
+			«FOR primitive : Type.primitives»
+				«IF returnType == Type.OBJECT»
+					«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+						default «primitive.typeName»F2<A1, A2> mapTo«primitive.typeName»(final «primitive.typeName»F<B> f) {
+					«ELSEIF type1 == Type.OBJECT || type2 == Type.OBJECT»
+						default «type1.typeName»«type2.typeName»«primitive.typeName»F2<A> mapTo«primitive.typeName»(final «primitive.typeName»F<B> f) {
+					«ELSE»
+						default «type1.typeName»«type2.typeName»«primitive.typeName»F2 mapTo«primitive.typeName»(final «primitive.typeName»F<A> f) {
+					«ENDIF»
+				«ELSE»
+					«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+						default «primitive.typeName»F2<A1, A2> mapTo«primitive.typeName»(final «returnType.typeName»«primitive.typeName»F f) {
+					«ELSEIF type1 == Type.OBJECT || type2 == Type.OBJECT»
+						default «type1.typeName»«type2.typeName»«primitive.typeName»F2<A> mapTo«primitive.typeName»(final «returnType.typeName»«primitive.typeName»F f) {
+					«ELSE»
+						default «type1.typeName»«type2.typeName»«primitive.typeName»F2 mapTo«primitive.typeName»(final «returnType.typeName»«primitive.typeName»F f) {
+					«ENDIF»
+				«ENDIF»
+					requireNonNull(f);
+					return (final «type1GenericName» value1, final «type2GenericName» value2) -> {
+						«IF type1 == Type.OBJECT»
+							requireNonNull(value1);
+						«ENDIF»
+						«IF type2 == Type.OBJECT»
+							requireNonNull(value2);
+						«ENDIF»
+						«IF returnType == Type.OBJECT»
+							final «returnTypeGenericName» value = requireNonNull(apply(value1, value2));
+						«ELSE»
+							final «returnTypeGenericName» value = apply(value1, value2);
+						«ENDIF»
+						return f.apply(value);
+					};
+				}
+
+			«ENDFOR»
+			«IF returnType == Type.OBJECT» 
 				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 					default <C> F2<C, A2, B> contraMap1(final F<C, A1> f) {
 						requireNonNull(f);
