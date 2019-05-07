@@ -19,6 +19,9 @@ final class F0XGenerator implements InterfaceGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.F».id;
 
+		/**
+		 * Represents a function () -> A which can throw a checked exception
+		 */
 		@FunctionalInterface
 		public interface F0X<@Covariant A, @Covariant X extends Throwable> {
 

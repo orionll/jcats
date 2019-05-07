@@ -146,6 +146,9 @@ class F2Generator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 
+		/**
+		 * Represents a function («type1GenericName», «type2GenericName») -> «returnTypeGenericName»
+		 */
 		@FunctionalInterface
 		public interface «variantName» {
 

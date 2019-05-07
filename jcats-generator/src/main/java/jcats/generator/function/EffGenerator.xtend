@@ -38,6 +38,9 @@ final class EffGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 
+		/**
+		 * Represents a side-effect of one «IF type.primitive»«type.genericName» «ENDIF»argument 
+		 */
 		@FunctionalInterface
 		public interface «contravariantName» {
 

@@ -13,6 +13,9 @@ final class Eff0XGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 
+		/**
+		 * Represents a side-effect of zero arguments which can throw a checked exception
+		 */
 		@FunctionalInterface
 		public interface Eff0X<@Covariant X extends Throwable> {
 

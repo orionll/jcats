@@ -30,6 +30,9 @@ final class FNGenerators {
 				import static java.util.Objects.requireNonNull;
 				import static «Constants.F».id;
 
+				/**
+				 * Represents a function («(1 .. arity).map["A" + it].join(", ")») -> B
+				 */
 				@FunctionalInterface
 				public interface F«arity»<«(1 .. arity).map["@Contravariant A" + it + ", "].join»@Covariant B> {
 

@@ -89,6 +89,9 @@ class Eff2Generator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 
+		/**
+		 * Represents a side-effect of two arguments («type1GenericName» and «type2GenericName»)
+		 */
 		@FunctionalInterface
 		public interface «variantName» {
 

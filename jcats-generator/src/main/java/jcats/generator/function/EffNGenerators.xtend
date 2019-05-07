@@ -23,6 +23,9 @@ final class EffNGenerators {
 
 				import static java.util.Objects.requireNonNull;
 
+				/**
+				 * Represents a side-effect of «arity» arguments («(1 .. arity).map["A" + it].join(", ")»)
+				 */
 				@FunctionalInterface
 				public interface Eff«arity»<«(1 .. arity).map["@Contravariant A" + it].join(", ")»> {
 

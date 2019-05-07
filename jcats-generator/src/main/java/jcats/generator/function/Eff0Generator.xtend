@@ -12,6 +12,9 @@ final class Eff0Generator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 
+		/**
+		 * Represents a side-effect of zero arguments
+		 */
 		@FunctionalInterface
 		public interface Eff0 {
 			void apply();

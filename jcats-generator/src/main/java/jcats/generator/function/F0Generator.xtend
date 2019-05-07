@@ -39,6 +39,9 @@ final class F0Generator implements InterfaceGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.F».id;
 
+		/**
+		 * Represents a function () -> «type.genericName»
+		 */
 		@FunctionalInterface
 		public interface «type.covariantName("F0")» {
 

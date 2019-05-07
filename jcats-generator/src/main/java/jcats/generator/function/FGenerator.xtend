@@ -119,6 +119,9 @@ final class FGenerator implements InterfaceGenerator {
 		import static java.util.Objects.requireNonNull;
 		import static «Constants.F».id;
 
+		/**
+		 * Represents a function «fromName» -> «toName»
+		 */
 		@FunctionalInterface
 		public interface «shortName»«variantTypeParams» {
 

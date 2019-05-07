@@ -18,6 +18,9 @@ final class FXGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 
+		/**
+		 * Represents a function A -> B which can throw a checked exception
+		 */
 		@FunctionalInterface
 		public interface FX<@Contravariant A, @Covariant B, @Covariant X extends Throwable> {
 

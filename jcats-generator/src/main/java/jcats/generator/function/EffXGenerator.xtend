@@ -19,6 +19,9 @@ final class EffXGenerator implements InterfaceGenerator {
 
 		import static java.util.Objects.requireNonNull;
 
+		/**
+		 * Represents a side-effect of one argument which can throw a checked exception
+		 */
 		@FunctionalInterface
 		public interface EffX<@Contravariant A, @Covariant X extends Throwable> {
 
