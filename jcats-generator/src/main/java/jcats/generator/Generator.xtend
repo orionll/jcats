@@ -188,17 +188,17 @@ interface Generator {
 		}
 	''' }
 
-	def flattenCollection(Type type, String boxedShortName) { '''
-		«IF type == Type.OBJECT»
-			public static <A, C extends Iterable<A>> «name»<A> flatten(final Iterable<C> iterable) {
-				return ofAll(iterable).flatMap((F) id());
+	def flattenCollection(Type type, String genericName, String builderGenericName) '''
+		public static <«IF type == Type.OBJECT»A, «ENDIF»C extends Iterable<«type.genericBoxedName»>> «genericName» flatten(final Iterable<C> iterable) {
+			final «builderGenericName» builder = builder();
+			if (iterable instanceof Container<?>) {
+				((Container<C>) iterable).foreach(builder::appendAll);
+			} else {
+				iterable.forEach(builder::appendAll);
 			}
-		«ELSE»
-			public static <C extends Iterable<«type.boxedName»>> «name» flatten(final Iterable<C> iterable) {
-				return «boxedShortName».ofAll(iterable).flatMapTo«type.typeName»((F) F.id());
-			}
-		«ENDIF»
-	'''}
+			return builder.build();
+		}
+	'''
 
 	def flatten() { flatten(#[], "A") }
 

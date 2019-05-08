@@ -923,7 +923,7 @@ final class ArrayGenerator implements ClassGenerator {
 
 				«ENDFOR»
 			«ENDIF»
-			«flattenCollection(type, "Array")»
+			«flattenCollection(type, genericName, type.arrayBuilderGenericName)»
 
 			public static «IF type == Type.OBJECT»<A> «ENDIF»«arrayBuilderName» builder() {
 				return new «arrayBuilderDiamondName»(«type.emptyArrayName», 0);

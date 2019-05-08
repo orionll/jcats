@@ -1296,7 +1296,7 @@ class SeqGenerator implements ClassGenerator {
 
 			abstract void initSeqBuilder(«seqBuilderName» builder);
 
-			«flattenCollection(type, "Seq")»
+			«flattenCollection(type, genericName, type.seqBuilderGenericName)»
 
 			«IF type.javaUnboxedType»
 				@Override
