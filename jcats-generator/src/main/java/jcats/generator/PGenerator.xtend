@@ -153,6 +153,18 @@ class PGenerator implements ClassGenerator {
 				«ENDIF»
 			}
 
+			«FOR to : Type.primitives»
+				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+					public «to.typeName»ObjectP<A2> set1To«to.typeName»(final «to.genericName» value) {
+				«ELSEIF type2 == Type.OBJECT»
+					public «to.typeName»ObjectP<A> set1To«to.typeName»(final «to.genericName» value) {
+				«ELSE»
+					public «to.typeName»«type2.typeName»P set1To«to.typeName»(final «to.genericName» value) {
+				«ENDIF»
+					return new «to.typeName»«type2.typeName»P«IF type2 == Type.OBJECT»<>«ENDIF»(value, this.a2);
+				}
+
+			«ENDFOR»
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 				public <B> P<A1, B> set2(final B value) {
 			«ELSEIF type1 == Type.OBJECT»
@@ -167,6 +179,18 @@ class PGenerator implements ClassGenerator {
 				«ENDIF»
 			}
 
+			«FOR to : Type.primitives»
+				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+					public Object«to.typeName»P<A1> set2To«to.typeName»(final «to.genericName» value) {
+				«ELSEIF type1 == Type.OBJECT»
+					public Object«to.typeName»P<A> set2To«to.typeName»(final «to.genericName» value) {
+				«ELSE»
+					public «type1.typeName»«to.typeName»P set2To«to.typeName»(final «to.genericName» value) {
+				«ENDIF»
+					return new «type1.typeName»«to.typeName»P«IF type1 == Type.OBJECT»<>«ENDIF»(this.a1, value);
+				}
+
+			«ENDFOR»
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 				public <B> B match(final F2<A1, A2, B>  f) {
 					final B b = f.apply(this.a1, this.a2);
@@ -219,6 +243,21 @@ class PGenerator implements ClassGenerator {
 				«ENDIF»
 			}
 
+			«FOR to : Type.primitives»
+				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+					public «to.typeName»ObjectP<A2> map1To«to.typeName»(final «to.typeName»F<A1> f) {
+				«ELSEIF type2 == Type.OBJECT»
+					public «to.typeName»ObjectP<A> map1To«to.typeName»(final «type1.typeName»«to.typeName»F f) {
+				«ELSEIF type1 == Type.OBJECT»
+					public «to.typeName»«type2.typeName»P map1To«to.typeName»(final «to.typeName»F<A> f) {
+				«ELSE»
+					public «to.typeName»«type2.typeName»P map1To«to.typeName»(final «type1.typeName»«to.typeName»F f) {
+				«ENDIF»
+					final «to.genericName» value = f.apply(this.a1);
+					return new «to.typeName»«type2.typeName»P«IF type2 == Type.OBJECT»<>«ENDIF»(value, this.a2);
+				}
+
+			«ENDFOR»
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 				public <B> P<A1, B> map2(final F<A2, B> f) {
 			«ELSEIF type1 == Type.OBJECT»
@@ -236,6 +275,21 @@ class PGenerator implements ClassGenerator {
 				«ENDIF»
 			}
 
+			«FOR to : Type.primitives»
+				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
+					public Object«to.typeName»P<A1> map2To«to.typeName»(final «to.typeName»F<A2> f) {
+				«ELSEIF type1 == Type.OBJECT»
+					public Object«to.typeName»P<A> map2To«to.typeName»(final «type2.typeName»«to.typeName»F f) {
+				«ELSEIF type2 == Type.OBJECT»
+					public «type1.typeName»«to.typeName»P map2To«to.typeName»(final «to.typeName»F<A> f) {
+				«ELSE»
+					public «type1.typeName»«to.typeName»P map2To«to.typeName»(final «type2.typeName»«to.typeName»F f) {
+				«ENDIF»
+					final «to.genericName» value = f.apply(this.a2);
+					return new «type1.typeName»«to.typeName»P«IF type1 == Type.OBJECT»<>«ENDIF»(this.a1, value);
+				}
+
+			«ENDFOR»
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
 				public P<A2, A1> reverse() {
 					return new P<>(this.a2, this.a1);
