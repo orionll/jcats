@@ -58,7 +58,9 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 			private final «type.genericName» value;
 
 			«shortName»(final int size, final «type.genericName» value) {
-				assert (size > 0);
+				«IF ea»
+					assert (size > 0);
+				«ENDIF»
 				this.size = size;
 				this.value = value;
 			}

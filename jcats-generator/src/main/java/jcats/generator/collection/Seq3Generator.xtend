@@ -47,48 +47,50 @@ final class Seq3Generator extends SeqGenerator {
 				this.tail = tail;
 				this.startIndex = startIndex;
 				this.size = size;
+				«IF ea»
 
-				boolean ea = false;
-				assert ea = true;
-				if (ea) {
-					final «type.javaName»[][] lastNode2 = node3[node3.length - 1];
+					boolean ea = false;
+					assert ea = true;
+					if (ea) {
+						final «type.javaName»[][] lastNode2 = node3[node3.length - 1];
 
-					assert node3.length >= 2 && node3.length <= 32 : "node3.length = " + node3.length;
-					assert init.length >= 1 && init.length <= 32 : "init.length = " + init.length;
-					assert tail.length >= 1 && tail.length <= 32 : "tail.length = " + tail.length;
-					assert size >= 31*32 + 2 && size <= (1 << 15) : "size = " + size;
+						assert node3.length >= 2 && node3.length <= 32 : "node3.length = " + node3.length;
+						assert init.length >= 1 && init.length <= 32 : "init.length = " + init.length;
+						assert tail.length >= 1 && tail.length <= 32 : "tail.length = " + tail.length;
+						assert size >= 31*32 + 2 && size <= (1 << 15) : "size = " + size;
 
-					assert node3[0].length <= 31 : "node2.length = " + node3[0].length;
-					assert lastNode2.length <= 31 : "node2.length = " + lastNode2.length;
-					assert node3[0].length != 0 || node3[0] == EMPTY_NODE2;
-					assert lastNode2.length != 0 || lastNode2 == EMPTY_NODE2;
+						assert node3[0].length <= 31 : "node2.length = " + node3[0].length;
+						assert lastNode2.length <= 31 : "node2.length = " + lastNode2.length;
+						assert node3[0].length != 0 || node3[0] == EMPTY_NODE2;
+						assert lastNode2.length != 0 || lastNode2 == EMPTY_NODE2;
 
-					for (int i = 1; i < node3.length - 1; i++) {
-						assert node3[i].length == 32 : "node2.length = " + node3[i].length;
-					}
-					for (final «type.javaName»[][] node2 : node3) {
-						for (final «type.javaName»[] node1 : node2) {
-							assert node1.length == 32 : "node1.length = " + node1.length;
-							for (final Object value : node1) {
-								assert value != null;
+						for (int i = 1; i < node3.length - 1; i++) {
+							assert node3[i].length == 32 : "node2.length = " + node3[i].length;
+						}
+						for (final «type.javaName»[][] node2 : node3) {
+							for (final «type.javaName»[] node1 : node2) {
+								assert node1.length == 32 : "node1.length = " + node1.length;
+								for (final Object value : node1) {
+									assert value != null;
+								}
 							}
 						}
-					}
-					for (final Object value : init) {
-						assert value != null;
-					}
-					for (final Object value : tail) {
-						assert value != null;
-					}
+						for (final Object value : init) {
+							assert value != null;
+						}
+						for (final Object value : tail) {
+							assert value != null;
+						}
 
-					if (node3.length == 2) {
-						assert node3[0].length + node3[1].length >= 31;
-					}
+						if (node3.length == 2) {
+							assert node3[0].length + node3[1].length >= 31;
+						}
 
-					assert 32*node3[0].length + 32*lastNode2.length + 32*32*(node3.length - 2) +
-							init.length + tail.length == size : "size = " + size;
-					assert startIndex == calculateSeq3StartIndex(node3, init) : "startIndex = " + startIndex;
-				}
+						assert 32*node3[0].length + 32*lastNode2.length + 32*32*(node3.length - 2) +
+								init.length + tail.length == size : "size = " + size;
+						assert startIndex == calculateSeq3StartIndex(node3, init) : "startIndex = " + startIndex;
+					}
+				«ENDIF»
 			}
 
 			@Override

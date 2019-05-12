@@ -39,7 +39,9 @@ final class Seq1Generator extends SeqGenerator {
 
 			«shortName»1(final «type.javaName»[] node1) {
 				this.node1 = node1;
-				assert node1.length >= 1 && node1.length <= 32 : "node1.length = " + node1.length;
+				«IF ea»
+					assert node1.length >= 1 && node1.length <= 32 : "node1.length = " + node1.length;
+				«ENDIF»
 			}
 
 			@Override

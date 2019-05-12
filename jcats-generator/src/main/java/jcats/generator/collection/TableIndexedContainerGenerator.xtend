@@ -46,7 +46,9 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 			private final «type.intFGenericName» f;
 
 			«shortName»(final int size, final «type.intFGenericName» f) {
-				assert (size > 0);
+				«IF ea»
+					assert (size > 0);
+				«ENDIF»
 				this.size = size;
 				this.f = f;
 			}

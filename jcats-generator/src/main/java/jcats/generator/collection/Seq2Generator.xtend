@@ -45,29 +45,31 @@ class Seq2Generator extends SeqGenerator {
 				this.init = init;
 				this.tail = tail;
 				this.size = size;
+				«IF ea»
 
-				boolean ea = false;
-				assert ea = true;
-				if (ea) {
-					assert node2.length <= 30 : "node2.length = " + node2.length;
-					assert node2.length > 0 || node2 == EMPTY_NODE2;
-					assert init.length >= 1 && init.length <= 32 : "init.length = " + init.length;
-					assert tail.length >= 1 && tail.length <= 32 : "tail.length = " + tail.length;
-					assert size >= 33 && size <= (1 << 10) : "size = " + size;
-					for (final «type.javaName»[] node1 : node2) {
-						assert node1.length == 32 : "node1.length = " + node1.length;
-						for (final Object value : node1) {
+					boolean ea = false;
+					assert ea = true;
+					if (ea) {
+						assert node2.length <= 30 : "node2.length = " + node2.length;
+						assert node2.length > 0 || node2 == EMPTY_NODE2;
+						assert init.length >= 1 && init.length <= 32 : "init.length = " + init.length;
+						assert tail.length >= 1 && tail.length <= 32 : "tail.length = " + tail.length;
+						assert size >= 33 && size <= (1 << 10) : "size = " + size;
+						for (final «type.javaName»[] node1 : node2) {
+							assert node1.length == 32 : "node1.length = " + node1.length;
+							for (final Object value : node1) {
+								assert value != null;
+							}
+						}
+						for (final Object value : init) {
 							assert value != null;
 						}
+						for (final Object value : tail) {
+							assert value != null;
+						}
+						assert 32*node2.length + init.length + tail.length == size;
 					}
-					for (final Object value : init) {
-						assert value != null;
-					}
-					for (final Object value : tail) {
-						assert value != null;
-					}
-					assert 32*node2.length + init.length + tail.length == size;
-				}
+				«ENDIF»
 			}
 
 			@Override

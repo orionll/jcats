@@ -47,85 +47,87 @@ final class Seq5Generator extends SeqGenerator {
 				this.tail = tail;
 				this.startIndex = startIndex;
 				this.size = size;
+				«IF ea»
 
-				boolean ea = false;
-				assert ea = true;
-				if (ea) {
-					final «type.javaName»[][][][] lastNode4 = node5[node5.length - 1];
-					final «type.javaName»[][][] lastNode3 = lastNode4[lastNode4.length - 1];
-					final «type.javaName»[][] lastNode2 = lastNode3[lastNode3.length - 1];
+					boolean ea = false;
+					assert ea = true;
+					if (ea) {
+						final «type.javaName»[][][][] lastNode4 = node5[node5.length - 1];
+						final «type.javaName»[][][] lastNode3 = lastNode4[lastNode4.length - 1];
+						final «type.javaName»[][] lastNode2 = lastNode3[lastNode3.length - 1];
 
-					assert node5.length >= 2 && node5.length <= 32 : "node5.length = " + node5.length;
-					assert init.length >= 1 && init.length <= 32 : "init.length = " + init.length;
-					assert tail.length >= 1 && tail.length <= 32 : "tail.length = " + tail.length;
-					assert size >= 31*32*32*32 + 2 && size <= (1 << 25) : "size = " + size;
+						assert node5.length >= 2 && node5.length <= 32 : "node5.length = " + node5.length;
+						assert init.length >= 1 && init.length <= 32 : "init.length = " + init.length;
+						assert tail.length >= 1 && tail.length <= 32 : "tail.length = " + tail.length;
+						assert size >= 31*32*32*32 + 2 && size <= (1 << 25) : "size = " + size;
 
-					assert node5[0].length >= 1 && node5[0].length <= 32 : "node4.length = " + node5[0].length;
-					assert lastNode4.length >= 1 && lastNode4.length <= 32 : "node4.length = " + lastNode4.length;
-					assert node5[0][0].length >= 1 && node5[0][0].length <= 32 : "node3.length = " + node5[0][0].length;
-					assert lastNode3.length >= 1 && lastNode3.length <= 32 : "node3.length = " + lastNode3.length;
+						assert node5[0].length >= 1 && node5[0].length <= 32 : "node4.length = " + node5[0].length;
+						assert lastNode4.length >= 1 && lastNode4.length <= 32 : "node4.length = " + lastNode4.length;
+						assert node5[0][0].length >= 1 && node5[0][0].length <= 32 : "node3.length = " + node5[0][0].length;
+						assert lastNode3.length >= 1 && lastNode3.length <= 32 : "node3.length = " + lastNode3.length;
 
-					assert node5[0][0][0].length <= 31 : "node2.length = " + node5[0][0][0].length;
-					assert lastNode2.length <= 31 : "node2.length = " + lastNode2.length;
-					assert node5[0][0][0].length != 0 || node5[0][0][0] == EMPTY_NODE2;
-					assert lastNode2.length != 0 || lastNode2 == EMPTY_NODE2;
+						assert node5[0][0][0].length <= 31 : "node2.length = " + node5[0][0][0].length;
+						assert lastNode2.length <= 31 : "node2.length = " + lastNode2.length;
+						assert node5[0][0][0].length != 0 || node5[0][0][0] == EMPTY_NODE2;
+						assert lastNode2.length != 0 || lastNode2 == EMPTY_NODE2;
 
-					for (int i = 1; i < node5.length - 1; i++) {
-						assert node5[i].length == 32 : "node4.length = " + node5[i].length;
-						for (final «type.javaName»[][][] node3 : node5[i]) {
-							assert node3.length == 32 : "node3.length = " + node3.length;
-							for (final «type.javaName»[][] node2 : node3) {
+						for (int i = 1; i < node5.length - 1; i++) {
+							assert node5[i].length == 32 : "node4.length = " + node5[i].length;
+							for (final «type.javaName»[][][] node3 : node5[i]) {
+								assert node3.length == 32 : "node3.length = " + node3.length;
+								for (final «type.javaName»[][] node2 : node3) {
+									assert node2.length == 32 : "node2.length = " + node2.length;
+								}
+							}
+						}
+
+						for (int i = 1; i < node5[0].length; i++) {
+							assert node5[0][i].length == 32 : "node3.length = " + node5[0][i].length;
+							for (final «type.javaName»[][] node2 : node5[0][i]) {
 								assert node2.length == 32 : "node2.length = " + node2.length;
 							}
 						}
-					}
-
-					for (int i = 1; i < node5[0].length; i++) {
-						assert node5[0][i].length == 32 : "node3.length = " + node5[0][i].length;
-						for (final «type.javaName»[][] node2 : node5[0][i]) {
-							assert node2.length == 32 : "node2.length = " + node2.length;
+						for (int i = 0; i < lastNode4.length - 1; i++) {
+							assert lastNode4[i].length == 32 : "node3.length = " + lastNode4[i].length;
+							for (final «type.javaName»[][] node2 : lastNode4[i]) {
+								assert node2.length == 32 : "node2.length = " + node2.length;
+							}
 						}
-					}
-					for (int i = 0; i < lastNode4.length - 1; i++) {
-						assert lastNode4[i].length == 32 : "node3.length = " + lastNode4[i].length;
-						for (final «type.javaName»[][] node2 : lastNode4[i]) {
-							assert node2.length == 32 : "node2.length = " + node2.length;
+						for (int i = 1; i < node5[0][0].length; i++) {
+							assert node5[0][0][i].length == 32 : "node2.length = " + node5[0][0][i].length;
 						}
-					}
-					for (int i = 1; i < node5[0][0].length; i++) {
-						assert node5[0][0][i].length == 32 : "node2.length = " + node5[0][0][i].length;
-					}
-					for (int i = 0; i < lastNode3.length - 1; i++) {
-						assert lastNode3[i].length == 32 : "node2.length = " + lastNode3[i].length;
-					}
-					for (final «type.javaName»[][][][] node4 : node5) {
-						for (final «type.javaName»[][][] node3 : node4) {
-							for (final «type.javaName»[][] node2 : node3) {
-								for (final «type.javaName»[] node1 : node2) {
-									assert node1.length == 32 : "node1.length = " + node1.length;
-									for (final Object value : node1) {
-										assert value != null;
+						for (int i = 0; i < lastNode3.length - 1; i++) {
+							assert lastNode3[i].length == 32 : "node2.length = " + lastNode3[i].length;
+						}
+						for (final «type.javaName»[][][][] node4 : node5) {
+							for (final «type.javaName»[][][] node3 : node4) {
+								for (final «type.javaName»[][] node2 : node3) {
+									for (final «type.javaName»[] node1 : node2) {
+										assert node1.length == 32 : "node1.length = " + node1.length;
+										for (final Object value : node1) {
+											assert value != null;
+										}
 									}
 								}
 							}
 						}
-					}
-					for (final Object value : init) {
-						assert value != null;
-					}
-					for (final Object value : tail) {
-						assert value != null;
-					}
+						for (final Object value : init) {
+							assert value != null;
+						}
+						for (final Object value : tail) {
+							assert value != null;
+						}
 
-					if (node5.length == 2) {
-						assert node5[0].length + node5[1].length >= 33;
-					}
+						if (node5.length == 2) {
+							assert node5[0].length + node5[1].length >= 33;
+						}
 
-					assert 32*node5[0][0][0].length + 32*32*(node5[0][0].length - 1) + 32*32*32*(node5[0].length - 1) +
-							32*lastNode2.length + 32*32*(lastNode3.length - 1) + 32*32*32*(lastNode4.length - 1) +
-							32*32*32*32*(node5.length - 2) + init.length + tail.length == size : "size = " + size;
-					assert startIndex == calculateSeq5StartIndex(node5, init) : "startIndex = " + startIndex;
-				}
+						assert 32*node5[0][0][0].length + 32*32*(node5[0][0].length - 1) + 32*32*32*(node5[0].length - 1) +
+								32*lastNode2.length + 32*32*(lastNode3.length - 1) + 32*32*32*(lastNode4.length - 1) +
+								32*32*32*32*(node5.length - 2) + init.length + tail.length == size : "size = " + size;
+						assert startIndex == calculateSeq5StartIndex(node5, init) : "startIndex = " + startIndex;
+					}
+				«ENDIF»
 			}
 
 			@Override

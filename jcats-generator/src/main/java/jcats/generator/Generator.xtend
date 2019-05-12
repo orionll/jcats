@@ -13,14 +13,7 @@ interface Generator {
 
 	def String sourceCode()
 
-	def static boxedName(String primitive) {
-		if (primitive == "int") "Integer"
-		else Character.toUpperCase(primitive.toCharArray.head) + primitive.toCharArray.tail.join
-	}
-
-	def static shortName(String primitive) {
-		if (primitive == "boolean") "bool" else primitive
-	}
+	def ea() { false }
 
 	def String takeWhile(boolean isFinal, Type type) { '''
 		public «if (isFinal) "final " else ""»«name»«IF type == Type.OBJECT»<A>«ENDIF» takeWhile(final «type.boolFName» predicate) {
