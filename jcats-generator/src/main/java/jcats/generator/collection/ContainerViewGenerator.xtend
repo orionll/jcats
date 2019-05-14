@@ -26,6 +26,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 	def filteredContainerViewShortName() { type.shortName("FilteredContainerView") }
 	def limitedContainerViewShortName() { type.shortName("LimitedContainerView") }
 	def skippedContainerViewShortName() { type.shortName("SkippedContainerView") }
+	def concatenatedShortName() { type.shortName("ConcatenatedContainerView") }
 
 	override sourceCode() '''
 		package «Constants.COLLECTION»;
@@ -41,6 +42,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 		import java.util.PrimitiveIterator;
 		import java.util.Spliterator;
 		import java.util.function.Consumer;
+		import java.util.stream.«type.streamName»;
 		import java.io.Serializable;
 
 		import «Constants.JCATS».*;
@@ -1642,6 +1644,223 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			«toStr(type, "this.sorted.apply()")»
+		}
+
+		class «concatenatedShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «type.containerGenericName»> implements «genericName» {
+			final C prefix;
+			final C suffix;
+
+			«concatenatedShortName»(final C prefix, final C suffix) {
+				this.prefix = prefix;
+				this.suffix = suffix;
+			}
+
+			@Override
+			public int size() {
+				final int size = this.prefix.size() + this.suffix.size();
+				if (size < 0) {
+					throw new SizeOverflowException();
+				} else {
+					return size;
+				}
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return this.prefix.hasKnownFixedSize()
+						&& this.suffix.hasKnownFixedSize()
+						&& this.prefix.size() + this.suffix.size() >= 0;
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return this.prefix.isEmpty() && this.suffix.isEmpty();
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return this.prefix.isNotEmpty() || this.suffix.isNotEmpty();
+			}
+
+			@Override
+			public «type.genericName» first() {
+				if (this.prefix.hasKnownFixedSize()) {
+					if (this.prefix.isEmpty()) {
+						return this.suffix.first();
+					} else {
+						return this.prefix.first();
+					}
+				} else {
+					return «shortName».super.first();
+				}
+			}
+
+			@Override
+			public «type.optionGenericName» firstOption() {
+				final «type.optionGenericName» first = this.prefix.firstOption();
+				if (first.isEmpty()) {
+					return this.suffix.firstOption();
+				} else {
+					return first;
+				}
+			}
+
+			@Override
+			public boolean contains(final «type.genericName» value) {
+				«IF type == Type.OBJECT»
+					requireNonNull(value);
+				«ENDIF»
+				return this.prefix.contains(value) || this.suffix.contains(value);
+			}
+
+			@Override
+			public «type.optionGenericName» firstMatch(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				final «type.optionGenericName» first = this.prefix.firstMatch(predicate);
+				if (first.isEmpty()) {
+					return this.suffix.firstMatch(predicate);
+				} else {
+					return first;
+				}
+			}
+		
+			@Override
+			public boolean anyMatch(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				return this.prefix.anyMatch(predicate) || this.suffix.anyMatch(predicate);
+			}
+		
+			@Override
+			public boolean allMatch(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				return this.prefix.allMatch(predicate) && this.suffix.allMatch(predicate);
+			}
+		
+			@Override
+			public boolean noneMatch(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				return this.prefix.noneMatch(predicate) && this.suffix.noneMatch(predicate);
+			}
+
+			«IF type.javaUnboxedType»
+				@Override
+				public «type.javaName» sum() {
+					return this.prefix.sum() + this.suffix.sum();
+				}
+
+			«ENDIF»
+			«IF type == Type.INT»
+				@Override
+				public long sumToLong() {
+					return this.prefix.sumToLong() + this.suffix.sumToLong();
+				}
+
+			«ENDIF»
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				«IF type.javaUnboxedType»
+					return new «type.iteratorDiamondName("Concatenated")»(this.prefix.iterator(), this.suffix.iterator());
+				«ELSE»
+					return new ConcatenatedIterator<>(this.prefix.iterator(), this.suffix.iterator());
+				«ENDIF»
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				requireNonNull(eff);
+				this.prefix.foreach(eff);
+				this.suffix.foreach(eff);
+			}
+
+			@Override
+			public boolean foreachUntil(final «type.boolFName» eff) {
+				requireNonNull(eff);
+				return this.prefix.foreachUntil(eff) && this.suffix.foreachUntil(eff);
+			}
+
+			@Override
+			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
+				requireNonNull(action);
+				this.prefix.forEach(action);
+				this.suffix.forEach(action);
+			}
+
+			@Override
+			public void printAll() {
+				this.prefix.printAll();
+				this.suffix.printAll();
+			}
+
+			@Override
+			public «type.arrayGenericName» to«type.arrayShortName»() {
+				if (this.prefix.hasKnownFixedSize() && this.prefix.isEmpty()) {
+					return this.suffix.to«type.arrayShortName»();
+				} else if (this.suffix.hasKnownFixedSize() && this.suffix.isEmpty()) {
+					return this.prefix.to«type.arrayShortName»();
+				} else {
+					return «shortName».super.to«type.arrayShortName»();
+				}
+			}
+
+			@Override
+			public «type.seqGenericName» to«type.seqShortName»() {
+				if (this.prefix.hasKnownFixedSize() && this.prefix.isEmpty()) {
+					return this.suffix.to«type.seqShortName»();
+				} else if (this.suffix.hasKnownFixedSize() && this.suffix.isEmpty()) {
+					return this.prefix.to«type.seqShortName»();
+				} else {
+					return «shortName».super.to«type.seqShortName»();
+				}
+			}
+
+			«IF type != Type.BOOLEAN»
+				@Override
+				public «type.uniqueGenericName» to«type.uniqueShortName»() {
+					if (this.prefix.hasKnownFixedSize() && this.prefix.isEmpty()) {
+						return this.suffix.to«type.uniqueShortName»();
+					} else if (this.suffix.hasKnownFixedSize() && this.suffix.isEmpty()) {
+						return this.prefix.to«type.uniqueShortName»();
+					} else {
+						return «shortName».super.to«type.uniqueShortName»();
+					}
+				}
+
+			«ENDIF»
+			@Override
+			public «type.stream2GenericName» stream() {
+				return new «type.stream2DiamondName»(«type.streamName».concat(this.prefix.stream(), this.suffix.stream()));
+			}
+
+			@Override
+			public «type.stream2GenericName» parallelStream() {
+				return new «type.stream2DiamondName»(«type.streamName».concat(this.prefix.parallelStream(), this.suffix.parallelStream()));
+			}
+
+			@Override
+			public <«mapTargetType»> ContainerView<«mapTargetType»> map(final «type.fGenericName» f) {
+				requireNonNull(f);
+				return new ConcatenatedContainerView<>(this.prefix.view().map(f), this.suffix.view().map(f));
+			}
+
+			«FOR toType : Type.primitives»
+				@Override
+				«IF type == Type.OBJECT»
+					public «toType.containerViewGenericName» mapTo«toType.typeName»(final «toType.typeName»F<A> f) {
+				«ELSE»
+					public «toType.containerViewGenericName» mapTo«toType.typeName»(final «type.typeName»«toType.typeName»F f) {
+				«ENDIF»
+					requireNonNull(f);
+					return new «toType.shortName("ConcatenatedContainerView")»<>(this.prefix.view().mapTo«toType.typeName»(f), this.suffix.view().mapTo«toType.typeName»(f));
+				}
+
+			«ENDFOR»
+			@Override
+			public «genericName» filter(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				return new «concatenatedShortName»<>(this.prefix.view().filter(predicate), this.suffix.view().filter(predicate));
+			}
+
+			«toStr(type)»
 		}
 
 		«IF type == Type.OBJECT»

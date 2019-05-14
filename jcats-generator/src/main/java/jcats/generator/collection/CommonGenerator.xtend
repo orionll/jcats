@@ -393,7 +393,9 @@ final class CommonGenerator implements ClassGenerator {
 				private final «type.javaName»[] array;
 
 				«IF type != Type.OBJECT»«type.typeName»«ENDIF»ArrayReverseIterator(final «type.javaName»[] array) {
-					assert array.length > 0;
+					«IF ea»
+						assert array.length > 0;
+					«ENDIF»
 					this.array = array;
 					this.i = array.length - 1;
 				}
@@ -1028,6 +1030,70 @@ final class CommonGenerator implements ClassGenerator {
 					} else {
 						return new «type.typeName»Iterator(iterator);
 					}
+				}
+			}
+
+		«ENDFOR»
+		final class ConcatenatedIterator<A> implements Iterator<A> {
+			final Iterator<A> prefix;
+			final Iterator<A> suffix;
+
+			ConcatenatedIterator(final Iterator<A> prefix, final Iterator<A> suffix) {
+				this.prefix = prefix;
+				this.suffix = suffix;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return this.prefix.hasNext() || this.suffix.hasNext();
+			}
+
+			@Override
+			public A next() {
+				if (this.prefix.hasNext()) {
+					return requireNonNull(this.prefix.next());
+				} else {
+					return requireNonNull(this.suffix.next());
+				}
+			}
+
+			@Override
+			public void forEachRemaining(final Consumer<? super A> action) {
+				requireNonNull(action);
+				this.prefix.forEachRemaining(action);
+				this.suffix.forEachRemaining(action);
+			}
+		}
+
+		«FOR type : Type.javaUnboxedTypes»
+			final class «type.typeName»ConcatenatedIterator implements «type.iteratorGenericName» {
+				final «type.iteratorGenericName» prefix;
+				final «type.iteratorGenericName» suffix;
+
+				«type.typeName»ConcatenatedIterator(final «type.iteratorGenericName» prefix, final «type.iteratorGenericName» suffix) {
+					this.prefix = prefix;
+					this.suffix = suffix;
+				}
+
+				@Override
+				public boolean hasNext() {
+					return this.prefix.hasNext() || this.suffix.hasNext();
+				}
+
+				@Override
+				public «type.iteratorReturnType» «type.iteratorNext»() {
+					if (this.prefix.hasNext()) {
+						return this.prefix.«type.iteratorNext»();
+					} else {
+						return this.suffix.«type.iteratorNext»();
+					}
+				}
+
+				@Override
+				public void forEachRemaining(final Consumer<? super «type.genericBoxedName»> action) {
+					requireNonNull(action);
+					this.prefix.forEachRemaining(action);
+					this.suffix.forEachRemaining(action);
 				}
 			}
 

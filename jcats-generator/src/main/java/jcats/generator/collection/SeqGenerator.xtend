@@ -190,27 +190,7 @@ class SeqGenerator implements ClassGenerator {
 			private «genericName» remove(final int index) {
 				final «genericName» prefix = limit(index);
 				final «genericName» suffix = skip(index + 1);
-				return prefix.concat(suffix);
-			}
-
-			/**
-			 * O(min(this.size, suffix.size))
-			 */
-			public final «genericName» concat(final «genericName» suffix) {
-				requireNonNull(suffix);
-				if (isEmpty()) {
-					return suffix;
-				} else if (suffix.isEmpty()) {
-					return this;
-				} else {
-					final int prefixSize = size();
-					final int suffixSize = suffix.size();
-					if (prefixSize >= suffixSize) {
-						return appendSized(suffix.iterator(), suffixSize);
-					} else {
-						return suffix.prependSized(iterator(), prefixSize);
-					}
-				}
+				return concat(prefix, suffix);
 			}
 
 			// Assume suffixSize > 0
@@ -223,7 +203,7 @@ class SeqGenerator implements ClassGenerator {
 				if (isEmpty()) {
 					return ofAll(suffix);
 				} else if (suffix instanceof «shortName») {
-					return concat((«genericName») suffix);
+					return concat(this, («genericName») suffix);
 				} else if (suffix instanceof Sized && ((Sized) suffix).hasKnownFixedSize()) {
 					final int suffixSize = ((Sized) suffix).size();
 					if (suffixSize == 0) {
@@ -242,7 +222,7 @@ class SeqGenerator implements ClassGenerator {
 				if (isEmpty()) {
 					return ofAll(prefix);
 				} else if (prefix instanceof «shortName») {
-					return ((«genericName») prefix).concat(this);
+					return concat((«genericName») prefix, this);
 				} else if (prefix instanceof Sized && ((Sized) prefix).hasKnownFixedSize()) {
 					final int prefixSize = ((Sized) prefix).size();
 					if (prefixSize == 0) {
@@ -253,7 +233,7 @@ class SeqGenerator implements ClassGenerator {
 				} else {
 					final «seqBuilderName» builder = new «seqBuilderDiamondName»();
 					prefix.forEach(builder::append);
-					return builder.build().concat(this);
+					return concat(builder.build(), this);
 				}
 			}
 
@@ -1297,6 +1277,27 @@ class SeqGenerator implements ClassGenerator {
 			abstract void initSeqBuilder(«seqBuilderName» builder);
 
 			«flattenCollection(type, genericName, type.seqBuilderGenericName)»
+
+			/**
+			 * O(min(prefix.size, suffix.size))
+			 */
+			public static «paramGenericName» concat(final «genericName» prefix, final «genericName» suffix) {
+				requireNonNull(prefix);
+				requireNonNull(suffix);
+				if (prefix.isEmpty()) {
+					return suffix;
+				} else if (suffix.isEmpty()) {
+					return prefix;
+				} else {
+					final int prefixSize = prefix.size();
+					final int suffixSize = suffix.size();
+					if (prefixSize >= suffixSize) {
+						return prefix.appendSized(suffix.iterator(), suffixSize);
+					} else {
+						return suffix.prependSized(prefix.iterator(), prefixSize);
+					}
+				}
+			}
 
 			«IF type.javaUnboxedType»
 				@Override

@@ -3,7 +3,7 @@ package jcats.collection;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static jcats.collection.Seq.seq;
+import static jcats.collection.Seq.*;
 import static org.junit.Assert.assertEquals;
 
 public final class TestSeqBuilder {
@@ -31,7 +31,7 @@ public final class TestSeqBuilder {
 		final SeqBuilder<Integer> builder2 = Seq.<Integer>builder().appendAll(seq2);
 		final Seq<Integer> seq = builder1.appendSeqBuilder(builder2).build();
 		assertEquals(251, seq.size());
-		assertEquals(seq(0).concat(seq2), seq);
+		assertEquals(concat(seq(0), seq2), seq);
 	}
 
 	@Test
@@ -41,7 +41,7 @@ public final class TestSeqBuilder {
 		final SeqBuilder<Integer> builder2 = Seq.<Integer>builder().appendAll(seq3);
 		final Seq<Integer> seq = builder1.appendSeqBuilder(builder2).build();
 		assertEquals(2501, seq.size());
-		assertEquals(seq(0).concat(seq3), seq);
+		assertEquals(concat(seq(0), seq3), seq);
 	}
 
 	@Test
@@ -51,7 +51,7 @@ public final class TestSeqBuilder {
 		final SeqBuilder<Integer> builder2 = Seq.<Integer>builder().appendAll(seq4);
 		final Seq<Integer> seq = builder1.appendSeqBuilder(builder2).build();
 		assertEquals(35001, seq.size());
-		assertEquals(seq(0).concat(seq4), seq);
+		assertEquals(concat(seq(0), seq4), seq);
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public final class TestSeqBuilder {
 		final SeqBuilder<Integer> builder2 = Seq.<Integer>builder().appendAll(seq5);
 		final Seq<Integer> seq = builder1.appendSeqBuilder(builder2).build();
 		assertEquals(1500001, seq.size());
-		assertEquals(seq(0).concat(seq5), seq);
+		assertEquals(concat(seq(0), seq5), seq);
 	}
 
 	@Ignore
@@ -72,6 +72,6 @@ public final class TestSeqBuilder {
 		final SeqBuilder<Integer> builder2 = Seq.<Integer>builder().appendAll(seq6);
 		final Seq<Integer> seq = builder1.appendSeqBuilder(builder2).build();
 		assertEquals(35_000_001, seq.size());
-		assertEquals(seq(0).concat(seq6), seq);
+		assertEquals(concat(seq(0), seq6), seq);
 	}
 }

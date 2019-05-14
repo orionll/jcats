@@ -28,6 +28,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 	def filteredShortName() { type.shortName("FilteredIndexedContainerView") }
 	def skippedShortName() { type.shortName("SkippedIndexedContainerView") }
 	def reverseShortName() { type.shortName("ReverseIndexedContainerView") }
+	def concatenatedShortName() { type.shortName("ConcatenatedIndexedContainerView") }
 
 	override sourceCode() '''
 		package «Constants.COLLECTION»;
@@ -742,6 +743,53 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public «genericName» reverse() {
 				return this.container.view();
+			}
+
+			«orderedHashCode(type)»
+
+			«indexedEquals(type)»
+		}
+
+		«IF type == Type.OBJECT»
+			final class «concatenatedShortName»<A> extends ConcatenatedOrderedContainerView<A, IndexedContainer<A>> implements IndexedContainerView<A> {
+		«ELSE»
+			final class «concatenatedShortName» extends «type.typeName»ConcatenatedOrderedContainerView<«type.indexedContainerGenericName»> implements «type.indexedContainerViewGenericName» {
+		«ENDIF»
+			«concatenatedShortName»(final «type.indexedContainerGenericName» prefix, final «type.indexedContainerGenericName» suffix) {
+				super(prefix, suffix);
+			}
+
+			@Override
+			public «type.genericName» get(final int index)  {
+				final int prefixSize = this.prefix.size();
+				if (index < prefixSize) {
+					return this.prefix.get(index);
+				} else {
+					return this.suffix.get(index - prefixSize);
+				}
+			}
+
+			@Override
+			public <«mapTargetType»> IndexedContainerView<«mapTargetType»> map(final «type.fGenericName» f) {
+				requireNonNull(f);
+				return new ConcatenatedIndexedContainerView<>(this.prefix.view().map(f), this.suffix.view().map(f));
+			}
+
+			«FOR toType : Type.primitives»
+				@Override
+				«IF type == Type.OBJECT»
+					public «toType.indexedContainerViewGenericName» mapTo«toType.typeName»(final «toType.typeName»F<A> f) {
+				«ELSE»
+					public «toType.indexedContainerViewGenericName» mapTo«toType.typeName»(final «type.typeName»«toType.typeName»F f) {
+				«ENDIF»
+					requireNonNull(f);
+					return new «toType.diamondName("ConcatenatedIndexedContainerView")»(this.prefix.view().mapTo«toType.typeName»(f), this.suffix.view().mapTo«toType.typeName»(f));
+				}
+
+			«ENDFOR»
+			@Override
+			public «genericName» reverse() {
+				return new «type.diamondName("ConcatenatedIndexedContainerView")»(this.suffix.view().reverse().unview(), this.prefix.view().reverse().unview());
 			}
 
 			«orderedHashCode(type)»

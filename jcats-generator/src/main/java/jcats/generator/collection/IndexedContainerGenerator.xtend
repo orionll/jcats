@@ -282,6 +282,12 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 					return new «type.diamondName("TableIndexedContainer")»(size, f);
 				}
 			}
+
+			static «type.paramGenericName("IndexedContainerView")» concat(final «genericName» prefix, final «genericName» suffix) {
+				requireNonNull(prefix);
+				requireNonNull(suffix);
+				return new «type.diamondName("ConcatenatedIndexedContainerView")»(prefix, suffix);
+			}
 			«IF type == Type.OBJECT»
 
 				«cast(#["A"], #[], #["A"])»

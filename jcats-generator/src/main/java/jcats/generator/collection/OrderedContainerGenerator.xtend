@@ -147,7 +147,15 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 				default OrderedContainerView<«type.boxedName»> boxed() {
 					return new «type.typeName»BoxedOrderedContainer<>(this);
 				}
-			«ELSE»
+
+			«ENDIF»
+			static «type.paramGenericName("OrderedContainerView")» concat(final «genericName» prefix, final «genericName» suffix) {
+				requireNonNull(prefix);
+				requireNonNull(suffix);
+				return new «type.shortName("ConcatenatedOrderedContainerView")»<>(prefix, suffix);
+			}
+			«IF type == Type.OBJECT»
+
 				«cast(#["A"], #[], #["A"])»
 			«ENDIF»
 		}

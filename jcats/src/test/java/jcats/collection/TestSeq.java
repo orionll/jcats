@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static jcats.collection.Seq.emptySeq;
+import static jcats.collection.Seq.*;
 import static org.junit.Assert.*;
 
 public class TestSeq {
@@ -367,7 +367,7 @@ public class TestSeq {
 	@Test
 	public void testInitTailRandom() {
 		final Random random = new Random();
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 1; i++) {
 			// Seq.EA = false;
 			Seq<Integer> seq = randomSeq(random, 1 << 25, 1 << 27);
 			System.out.println("size = " + seq.size());
@@ -396,11 +396,11 @@ public class TestSeq {
 			}
 			if (isTestIndex(i + 31)) {
 				Seq<Integer> seq2 = Seq.seq(-1);
-				Seq<Integer> concat = seq.concat(seq2);
+				Seq<Integer> concat = concat(seq, seq2);
 				assertSeqsDeepEqual("Concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq.append(-1), concat);
 				assertSeqsDeepEqual("Init of concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq, concat.init());
 				seq2 = Seq.seq(-1, -2);
-				concat = seq.concat(seq2);
+				concat = concat(seq, seq2);
 				assertTrue("Concatenated seq is not equal to expected seq (size = " + seq.size() + ")",
 						Iterables.elementsEqual(Iterables.concat(seq, seq2), concat));
 				assertSeqsDeepEqual("Init of concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq, concat.init().init());
@@ -411,10 +411,10 @@ public class TestSeq {
 		seq = emptySeq();
 		for (int i = 0; i < MAX; i++) {
 			if (isTestIndex(i)) {
-				Seq<Integer> concat = seq.concat(Seq.seq(-1));
+				Seq<Integer> concat = concat(seq, Seq.seq(-1));
 				assertSeqsDeepEqual("Concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq.append(-1), concat);
 				assertSeqsDeepEqual("Init of concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq, concat.init());
-				concat = seq.concat(Seq.seq(-1, -2));
+				concat = concat(seq, Seq.seq(-1, -2));
 				assertTrue("Concatenated seq is not equal to expected seq (size = " + seq.size() + ")", Iterables.elementsEqual(seq.append(-1).append(-2), concat));
 				assertSeqsDeepEqual("Init of concatenated seq is not equal to expected seq (size = " + seq.size() + ")", seq, concat.init().init());
 			}
@@ -428,7 +428,7 @@ public class TestSeq {
 		for (int i = 0; i < 100; i++) {
 			final Seq<Integer> seq1 = randomSeq(random, 0, MAX);
 			final Seq<Integer> seq2 = randomSeq(random, 0, MAX);
-			final Seq<Integer> concat = seq1.concat(seq2);
+			final Seq<Integer> concat = concat(seq1, seq2);
 			assertEquals(seq1.size() + seq2.size(), concat.size());
 			if (seq1.isNotEmpty()) {
 				assertEquals(seq1.first(), concat.first());
