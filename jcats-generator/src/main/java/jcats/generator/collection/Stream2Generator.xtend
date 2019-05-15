@@ -346,10 +346,10 @@ final class Stream2Generator implements ClassGenerator {
 			}
 
 			public static <A> Stream2<A> ofAll(final Iterable<A> iterable) {
-				if (iterable instanceof Collection) {
+				if (iterable instanceof Collection<?>) {
 					return new Stream2<>(((Collection<A>) iterable).stream());
-				} else if (iterable instanceof Stream) {
-					return (iterable instanceof Stream2) ? (Stream2<A>) iterable : new Stream2<>((Stream<A>) iterable);
+				} else if (iterable instanceof Stream<?>) {
+					return (iterable instanceof Stream2<?>) ? (Stream2<A>) iterable : new Stream2<>((Stream<A>) iterable);
 				} else {
 					return fromSpliterator(iterable.spliterator());
 				}
@@ -361,6 +361,10 @@ final class Stream2Generator implements ClassGenerator {
 
 			public static <A> Stream2<A> fromSpliterator(final Spliterator<A> spliterator) {
 				return new Stream2<>(StreamSupport.stream(spliterator, false));
+			}
+
+			public static <A> Stream2<A> concat(final Stream<A> prefix, final Stream<A> suffix) {
+				return new Stream2<>(Stream.concat(prefix, suffix));
 			}
 		}
 	''' }

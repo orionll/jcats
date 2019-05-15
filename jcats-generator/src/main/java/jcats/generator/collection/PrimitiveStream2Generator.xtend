@@ -382,6 +382,10 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 			public static «shortName» fromStream(final Stream<«type.boxedName»> stream) {
 				return new «shortName»(stream.mapTo«type.typeName»(«type.boxedName»::«type.javaName»Value));
 			}
+
+			public static «shortName» concat(final «type.typeName»Stream prefix, final «type.typeName»Stream suffix) {
+				return new «shortName»(«type.typeName»Stream.concat(prefix, suffix));
+			}
 			«IF type.integral»
 
 				public static «shortName» range(final «type.javaName» startInclusive, final «type.javaName» endExclusive) {
