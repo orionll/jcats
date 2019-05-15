@@ -1291,7 +1291,14 @@ class SeqGenerator implements ClassGenerator {
 				} else {
 					final int prefixSize = prefix.size();
 					final int suffixSize = suffix.size();
-					if (prefixSize >= suffixSize) {
+					if (prefixSize + suffixSize <= 32) {
+						final «type.javaName»[] prefixArray = ((«genericName(1)») prefix).node1;
+						final «type.javaName»[] suffixArray = ((«genericName(1)») suffix).node1;
+						final «type.javaName»[] array = new «type.javaName»[prefixSize + suffixSize];
+						System.arraycopy(prefixArray, 0, array, 0, prefixSize);
+						System.arraycopy(suffixArray, 0, array, prefixSize, suffixSize);
+						return new «diamondName(1)»(array);
+					} else if (prefixSize >= suffixSize) {
 						return prefix.appendSized(suffix.iterator(), suffixSize);
 					} else {
 						return suffix.prependSized(prefix.iterator(), prefixSize);
