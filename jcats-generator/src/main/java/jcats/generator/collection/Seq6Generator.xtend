@@ -836,7 +836,7 @@ final class Seq6Generator extends SeqGenerator {
 							if (node4.length == 32) {
 								if (node5.length == 32) {
 									if (node6.length == 32) {
-										throw new IndexOutOfBoundsException("Seq size limit exceeded");
+										throw new SizeOverflowException();
 									} else {
 										final «type.javaName»[] newInit = { value };
 										final «type.javaName»[][] newNode2 = new «type.javaName»[32][];
@@ -946,7 +946,7 @@ final class Seq6Generator extends SeqGenerator {
 							if (node4.length == 32) {
 								if (node5.length == 32) {
 									if (node6.length == 32) {
-										throw new IndexOutOfBoundsException("Seq size limit exceeded");
+										throw new SizeOverflowException();
 									} else {
 										final «type.javaName»[] newTail = { value };
 										final «type.javaName»[][] newNode2 = new «type.javaName»[32][];
@@ -1042,7 +1042,7 @@ final class Seq6Generator extends SeqGenerator {
 			«genericName» appendSized(final «type.iteratorGenericName» suffix, final int suffixSize) {
 				if (tail.length + suffixSize < 0) {
 					// Overflow
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				} else if (tail.length + suffixSize <= 32) {
 					final «type.javaName»[] newTail = new «type.javaName»[tail.length + suffixSize];
 					System.arraycopy(tail, 0, newTail, 0, tail.length);
@@ -1055,7 +1055,7 @@ final class Seq6Generator extends SeqGenerator {
 				if (maxSize >= 0 && maxSize <= (1 << 30)) {
 					return appendSizedToSeq6(suffix, suffixSize, maxSize);
 				} else {
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				}
 			}
 
@@ -1148,7 +1148,7 @@ final class Seq6Generator extends SeqGenerator {
 			«genericName» prependSized(final «type.iteratorGenericName» prefix, final int prefixSize) {
 				if (init.length + prefixSize < 0) {
 					// Overflow
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				} else if (init.length + prefixSize <= 32) {
 					final «type.javaName»[] newInit = new «type.javaName»[init.length + prefixSize];
 					System.arraycopy(init, 0, newInit, prefixSize, init.length);
@@ -1165,7 +1165,7 @@ final class Seq6Generator extends SeqGenerator {
 				if (maxSize >= 0 && maxSize <= (1 << 30)) {
 					return prependSizedToSeq6(prefix, prefixSize, maxSize);
 				} else {
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				}
 			}
 

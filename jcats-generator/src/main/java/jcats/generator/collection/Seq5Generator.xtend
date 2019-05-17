@@ -860,7 +860,7 @@ final class Seq5Generator extends SeqGenerator {
 			«genericName» appendSized(final «type.iteratorGenericName» suffix, final int suffixSize) {
 				if (tail.length + suffixSize < 0) {
 					// Overflow
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				} else if (tail.length + suffixSize <= 32) {
 					final «type.javaName»[] newTail = new «type.javaName»[tail.length + suffixSize];
 					System.arraycopy(tail, 0, newTail, 0, tail.length);
@@ -872,13 +872,13 @@ final class Seq5Generator extends SeqGenerator {
 						- (1 << 15)*(node5[0].length - 1) + (1 << 20) + suffixSize;
 				if (maxSize < 0) {
 					// Overflow
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				} else if (maxSize <= (1 << 25)) {
 					return appendSizedToSeq5(suffix, suffixSize, maxSize);
 				} else if (maxSize <= (1 << 30)) {
 					return appendSizedToSeq6(suffix, suffixSize, maxSize);
 				} else {
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				}
 			}
 
@@ -992,7 +992,7 @@ final class Seq5Generator extends SeqGenerator {
 			«genericName» prependSized(final «type.iteratorGenericName» prefix, final int prefixSize) {
 				if (init.length + prefixSize < 0) {
 					// Overflow
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				} else if (init.length + prefixSize <= 32) {
 					final «type.javaName»[] newInit = new «type.javaName»[init.length + prefixSize];
 					System.arraycopy(init, 0, newInit, prefixSize, init.length);
@@ -1007,13 +1007,13 @@ final class Seq5Generator extends SeqGenerator {
 						- (1 << 15)*(node4.length - 1) + (1 << 20) + prefixSize;
 				if (maxSize < 0) {
 					// Overflow
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				} else if (maxSize <= (1 << 25)) {
 					return prependSizedToSeq5(prefix, prefixSize, maxSize);
 				} else if (maxSize <= (1 << 30)) {
 					return prependSizedToSeq6(prefix, prefixSize, maxSize);
 				} else {
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				}
 			}
 

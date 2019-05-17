@@ -345,7 +345,7 @@ class Seq2Generator extends SeqGenerator {
 			«genericName» appendSized(final «type.iteratorGenericName» suffix, final int suffixSize) {
 				if (tail.length + suffixSize < 0) {
 					// Overflow
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				} else if (tail.length + suffixSize <= 32) {
 					final «type.javaName»[] newTail = new «type.javaName»[tail.length + suffixSize];
 					System.arraycopy(tail, 0, newTail, 0, tail.length);
@@ -356,7 +356,7 @@ class Seq2Generator extends SeqGenerator {
 				final int maxSize = size - init.length + 32 + suffixSize;
 				if (maxSize < 0) {
 					// Overflow
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				} else if (maxSize <= (1 << 10)) {
 					return appendSizedToSeq2(suffix, suffixSize, maxSize);
 				} else if (maxSize <= (1 << 15)) {
@@ -368,7 +368,7 @@ class Seq2Generator extends SeqGenerator {
 				} else if (maxSize <= (1 << 30)) {
 					return appendSizedToSeq6(suffix, suffixSize, maxSize);
 				} else {
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				}
 			}
 
@@ -515,7 +515,7 @@ class Seq2Generator extends SeqGenerator {
 			«genericName» prependSized(final «type.iteratorGenericName» prefix, final int prefixSize) {
 				if (init.length + prefixSize < 0) {
 					// Overflow
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				} else if (init.length + prefixSize <= 32) {
 					final «type.javaName»[] newInit = new «type.javaName»[init.length + prefixSize];
 					System.arraycopy(init, 0, newInit, prefixSize, init.length);
@@ -526,7 +526,7 @@ class Seq2Generator extends SeqGenerator {
 				final int maxSize = size - tail.length + 32 + prefixSize;
 				if (maxSize < 0) {
 					// Overflow
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				} else if (maxSize <= (1 << 10)) {
 					return prependSizedToSeq2(prefix, prefixSize, maxSize);
 				} else if (maxSize <= (1 << 15)) {
@@ -538,7 +538,7 @@ class Seq2Generator extends SeqGenerator {
 				} else if (maxSize <= (1 << 30)) {
 					return prependSizedToSeq6(prefix, prefixSize, maxSize);
 				} else {
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				}
 			}
 

@@ -1378,7 +1378,7 @@ class SeqGenerator implements ClassGenerator {
 							«FOR i : 2 .. arity»
 								final long size«i» = size«i-1» * seq«i».size();
 								if (size«i» != (int) size«i») {
-									throw new IndexOutOfBoundsException("Size overflow");
+									throw new SizeOverflowException();
 								}
 							«ENDFOR»
 							return sizedToSeq(new Product«arity»Iterator<>(«(1 .. arity).map['''seq«it»'''].join(", ")», f), (int) size«arity»);

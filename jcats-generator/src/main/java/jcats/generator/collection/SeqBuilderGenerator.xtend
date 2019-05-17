@@ -156,7 +156,7 @@ final class SeqBuilderGenerator implements ClassGenerator {
 					this.index2 = 1;
 					this.index1 = 1;
 				} else {
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				}
 				this.size++;
 				return this;

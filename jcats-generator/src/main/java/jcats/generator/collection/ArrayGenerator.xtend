@@ -916,7 +916,7 @@ final class ArrayGenerator implements ClassGenerator {
 							«FOR i : 2 .. arity»
 								final long size«i» = size«i-1» * arr«i».length;
 								if (size«i» != (int) size«i») {
-									throw new IndexOutOfBoundsException("Size overflow");
+									throw new SizeOverflowException();
 								}
 							«ENDFOR»
 							final Object[] array = new Object[(int) size«arity»];
