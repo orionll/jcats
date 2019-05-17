@@ -221,10 +221,15 @@ final class ArrayGenerator implements ClassGenerator {
 			}
 
 			private static «type.javaName»[] concatArrays(final «type.javaName»[] prefix, final «type.javaName»[] suffix) {
-				final «type.javaName»[] result = new «type.javaName»[prefix.length + suffix.length];
-				System.arraycopy(prefix, 0, result, 0, prefix.length);
-				System.arraycopy(suffix, 0, result, prefix.length, suffix.length);
-				return result;
+				final int length = prefix.length + suffix.length;
+				if (length >= 0) {
+					final «type.javaName»[] result = new «type.javaName»[length];
+					System.arraycopy(prefix, 0, result, 0, prefix.length);
+					System.arraycopy(suffix, 0, result, prefix.length, suffix.length);
+					return result;
+				} else {
+					throw new SizeOverflowException();
+				}
 			}
 
 			private static «IF type == Type.OBJECT»<A> «ENDIF»void fillArray(final «type.javaName»[] array, final int startIndex, final Iterable<«type.genericBoxedName»> iterable) {
@@ -249,19 +254,24 @@ final class ArrayGenerator implements ClassGenerator {
 				if (suffixSize == 0) {
 					return this;
 				} else {
-					final «type.javaName»[] result = new «type.javaName»[this.array.length + suffixSize];
-					System.arraycopy(this.array, 0, result, 0, this.array.length);
-					«IF type == Type.OBJECT»
-						fillArray(result, this.array.length, suffix);
-					«ELSE»
-						if (suffix instanceof Container<?>) {
-							((Container<«type.boxedName»>) suffix).foreachWithIndex((final int index, final «type.boxedName» value) ->
-									result[this.array.length + index] = value);
-						} else {
+					final int length = this.array.length + suffixSize;
+					if (length >= 0) {
+						final «type.javaName»[] result = new «type.javaName»[length];
+						System.arraycopy(this.array, 0, result, 0, this.array.length);
+						«IF type == Type.OBJECT»
 							fillArray(result, this.array.length, suffix);
-						}
-					«ENDIF»
-					return new «diamondName»(result);
+						«ELSE»
+							if (suffix instanceof Container<?>) {
+								((Container<«type.boxedName»>) suffix).foreachWithIndex((final int index, final «type.boxedName» value) ->
+										result[this.array.length + index] = value);
+							} else {
+								fillArray(result, this.array.length, suffix);
+							}
+						«ENDIF»
+						return new «diamondName»(result);
+					} else {
+						throw new SizeOverflowException();
+					}
 				}
 			}
 
@@ -269,26 +279,31 @@ final class ArrayGenerator implements ClassGenerator {
 				if (prefixSize == 0) {
 					return this;
 				} else {
-					final «type.javaName»[] result = new «type.javaName»[prefixSize + this.array.length];
-					«IF type == Type.OBJECT»
-						fillArray(result, 0, prefix);
-					«ELSE»
-						if (prefix instanceof Container<?>) {
-							((Container<«type.boxedName»>) prefix).foreachWithIndex((final int index, final «type.boxedName» value) ->
-									result[index] = value);
-						} else {
+					final int length = prefixSize + this.array.length;
+					if (length >= 0) {
+						final «type.javaName»[] result = new «type.javaName»[length];
+						«IF type == Type.OBJECT»
 							fillArray(result, 0, prefix);
-						}
-					«ENDIF»
-					System.arraycopy(this.array, 0, result, prefixSize, this.array.length);
-					return new «diamondName»(result);
+						«ELSE»
+							if (prefix instanceof Container<?>) {
+								((Container<«type.boxedName»>) prefix).foreachWithIndex((final int index, final «type.boxedName» value) ->
+										result[index] = value);
+							} else {
+								fillArray(result, 0, prefix);
+							}
+						«ENDIF»
+						System.arraycopy(this.array, 0, result, prefixSize, this.array.length);
+						return new «diamondName»(result);
+					} else {
+						throw new SizeOverflowException();
+					}
 				}
 			}
 
 			/**
 			 * O(this.size + suffix.size)
 			 */
-			public «genericName» appendAll(final Iterable<«type.genericBoxedName»> suffix) {
+			public «genericName» appendAll(final Iterable<«type.genericBoxedName»> suffix) throws SizeOverflowException {
 				if (this.array.length == 0) {
 					return ofAll(suffix);
 				} else if (suffix instanceof «shortName») {
@@ -303,8 +318,13 @@ final class ArrayGenerator implements ClassGenerator {
 							return this;
 						} else {
 							final int suffixSize = col.size();
-							builder = builderWithCapacity(this.array.length + suffixSize);
-							builder.appendArray(this.array);
+							final int size = this.array.length + suffixSize;
+							if (size < 0) {
+								throw new SizeOverflowException();
+							} else {
+								builder = builderWithCapacity(size);
+								builder.appendArray(this.array);
+							}
 						}
 					} else {
 						builder = new «arrayBuilderDiamondName»(this.array, this.array.length);
@@ -317,7 +337,7 @@ final class ArrayGenerator implements ClassGenerator {
 			/**
 			 * O(prefix.size + this.size)
 			 */
-			public «genericName» prependAll(final Iterable<«type.genericBoxedName»> prefix) {
+			public «genericName» prependAll(final Iterable<«type.genericBoxedName»> prefix) throws SizeOverflowException {
 				if (this.array.length == 0) {
 					return ofAll(prefix);
 				} else if (prefix instanceof «shortName») {
@@ -332,7 +352,12 @@ final class ArrayGenerator implements ClassGenerator {
 							return this;
 						} else {
 							final int prefixSize = col.size();
-							builder = builderWithCapacity(prefixSize + this.array.length);
+							final int size = prefixSize + this.array.length;
+							if (size < 0) {
+								throw new SizeOverflowException();
+							} else {
+								builder = builderWithCapacity(size);
+							}
 						}
 					} else {
 						builder = builder();
@@ -914,7 +939,7 @@ final class ArrayGenerator implements ClassGenerator {
 			/**
 			 * O(prefix.size + suffix.size)
 			 */
-			public static «paramGenericName» concat(final «genericName» prefix, final «genericName» suffix) {
+			public static «paramGenericName» concat(final «genericName» prefix, final «genericName» suffix) throws SizeOverflowException {
 				requireNonNull(prefix);
 				requireNonNull(suffix);
 				if (prefix.isEmpty()) {

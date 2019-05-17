@@ -219,6 +219,10 @@ public enum Type {
 		return genericName("Seq");
 	}
 
+	public String seqWildcardName() {
+		return wildcardName("Seq");
+	}
+
 	public String seqBuilderShortName() {
 		return shortName("SeqBuilder");
 	}

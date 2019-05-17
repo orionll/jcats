@@ -199,15 +199,17 @@ class SeqGenerator implements ClassGenerator {
 			// Assume prefixSize > 0
 			abstract «genericName» prependSized(«type.iteratorGenericName» prefix, int prefixSize);
 
-			public final «genericName» appendAll(final Iterable<«type.genericBoxedName»> suffix) {
+			public final «genericName» appendAll(final Iterable<«type.genericBoxedName»> suffix) throws SizeOverflowException {
 				if (isEmpty()) {
 					return ofAll(suffix);
-				} else if (suffix instanceof «shortName») {
+				} else if (suffix instanceof «type.seqWildcardName») {
 					return concat(this, («genericName») suffix);
 				} else if (suffix instanceof Sized && ((Sized) suffix).hasKnownFixedSize()) {
 					final int suffixSize = ((Sized) suffix).size();
 					if (suffixSize == 0) {
 						return this;
+					} else if (size() + suffixSize < 0) {
+						throw new SizeOverflowException();
 					} else {
 						return appendSized(«type.getIterator("suffix.iterator()")», suffixSize);
 					}
@@ -218,15 +220,17 @@ class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			public final «genericName» prependAll(final Iterable<«type.genericBoxedName»> prefix) {
+			public final «genericName» prependAll(final Iterable<«type.genericBoxedName»> prefix) throws SizeOverflowException {
 				if (isEmpty()) {
 					return ofAll(prefix);
-				} else if (prefix instanceof «shortName») {
+				} else if (prefix instanceof «type.seqWildcardName») {
 					return concat((«genericName») prefix, this);
 				} else if (prefix instanceof Sized && ((Sized) prefix).hasKnownFixedSize()) {
 					final int prefixSize = ((Sized) prefix).size();
 					if (prefixSize == 0) {
 						return this;
+					} else if (prefixSize + size() < 0) {
+						throw new SizeOverflowException();
 					} else {
 						return prependSized(«type.getIterator("prefix.iterator()")», prefixSize);
 					}
@@ -721,7 +725,7 @@ class SeqGenerator implements ClassGenerator {
 				} else if (values.length <= (1 << 30)) {
 					return seq6FromArray(values);
 				} else {
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				}
 			}
 
@@ -877,7 +881,7 @@ class SeqGenerator implements ClassGenerator {
 				} else if (size <= (1 << 30)) {
 					return sizedToSeq6(iterator, size);
 				} else {
-					throw new IndexOutOfBoundsException("Seq size limit exceeded");
+					throw new SizeOverflowException();
 				}
 			}
 
@@ -1281,7 +1285,7 @@ class SeqGenerator implements ClassGenerator {
 			/**
 			 * O(min(prefix.size, suffix.size))
 			 */
-			public static «paramGenericName» concat(final «genericName» prefix, final «genericName» suffix) {
+			public static «paramGenericName» concat(final «genericName» prefix, final «genericName» suffix) throws SizeOverflowException {
 				requireNonNull(prefix);
 				requireNonNull(suffix);
 				if (prefix.isEmpty()) {
@@ -1291,10 +1295,13 @@ class SeqGenerator implements ClassGenerator {
 				} else {
 					final int prefixSize = prefix.size();
 					final int suffixSize = suffix.size();
-					if (prefixSize + suffixSize <= 32) {
+					final int size = prefixSize + suffixSize;
+					if (size < 0) {
+						throw new SizeOverflowException();
+					} else if (size <= 32) {
 						final «type.javaName»[] prefixArray = ((«genericName(1)») prefix).node1;
 						final «type.javaName»[] suffixArray = ((«genericName(1)») suffix).node1;
-						final «type.javaName»[] array = new «type.javaName»[prefixSize + suffixSize];
+						final «type.javaName»[] array = new «type.javaName»[size];
 						System.arraycopy(prefixArray, 0, array, 0, prefixSize);
 						System.arraycopy(suffixArray, 0, array, prefixSize, suffixSize);
 						return new «diamondName(1)»(array);
