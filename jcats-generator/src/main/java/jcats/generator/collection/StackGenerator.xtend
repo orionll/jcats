@@ -350,6 +350,24 @@ final class StackGenerator implements ClassGenerator {
 				}
 			}
 
+			public «genericName» takeWhile(final «type.boolFName» predicate) {
+				final «builderGenericName» builder = new «builderDiamondName»();
+				«genericName» stack = this;
+				while (stack.isNotEmpty() && predicate.apply(stack.head)) {
+					builder.append(stack.head);
+					stack = stack.tail;
+				}
+				return builder.build();
+			}
+
+			public «genericName» dropWhile(final «type.boolFName» predicate) {
+				«genericName» stack = this;
+				while (stack.isNotEmpty() && predicate.apply(stack.head)) {
+					stack = stack.tail;
+				}
+				return stack;
+			}
+
 			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				«genericName» stack = this;

@@ -845,11 +845,7 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 				@Override
-				«IF type == Type.OBJECT»
-					public void forEachRemaining(final Consumer<? super A> action) {
-				«ELSE»
-					public void forEachRemaining(final «type.typeName»Consumer action) {
-				«ENDIF»
+				public void forEachRemaining(final «type.forEachRemainingGenericActionName» action) {
 					if (this.valueReady) {
 						this.valueReady = false;
 						«IF type.primitive»
@@ -930,6 +926,143 @@ final class CommonGenerator implements ClassGenerator {
 
 		«ENDFOR»
 		«FOR type : Iterables.concat(#[Type.OBJECT], Type.javaUnboxedTypes)»
+			final class «type.genericName("TakenWhileIterator")» implements «type.iteratorGenericName» {
+				private final «type.iteratorGenericName» iterator;
+				private final «type.boolFName» predicate;
+				private boolean valueReady;
+				private boolean endOfData;
+				private «type.genericName» next;
+
+				«type.shortName("TakenWhileIterator")»(final «type.iteratorGenericName» iterator, final «type.boolFName» predicate) {
+					this.iterator = iterator;
+					this.predicate = predicate;
+				}
+
+				@Override
+				public boolean hasNext() {
+					getNext();
+					return this.valueReady;
+				}
+
+				@Override
+				public «type.iteratorReturnType» «type.iteratorNext»() {
+					getNext();
+					if (this.valueReady) {
+						this.valueReady = false;
+						return this.next;
+					} else {
+						throw new NoSuchElementException();
+					}
+				}
+
+				private void getNext() {
+					if (!this.valueReady && !this.endOfData && this.iterator.hasNext()) {
+						final «type.genericName» value = «type.requireNonNull('''this.iterator.«type.iteratorNext»()''')»;
+						if (this.predicate.apply(value)) {
+							this.next = value;
+							this.valueReady = true;
+						} else {
+							«IF type == Type.OBJECT»
+								this.next = null;
+							«ENDIF»
+							this.valueReady = false;
+							this.endOfData = true;
+						}
+					}
+				}
+
+				@Override
+				public void forEachRemaining(final «type.forEachRemainingGenericActionName» action) {
+					requireNonNull(action);
+					if (this.valueReady) {
+						this.valueReady = false;
+						final «type.genericName» value = this.next;
+						«IF type == Type.OBJECT»
+							this.next = null;
+						«ENDIF»
+						action.accept(value);
+					}
+					if (!this.endOfData) {
+						while (this.iterator.hasNext()) {
+							final «type.genericName» value = «type.requireNonNull('''this.iterator.«type.iteratorNext»()''')»;
+							if (this.predicate.apply(value)) {
+								action.accept(value);
+							} else {
+								this.endOfData = true;
+								return;
+							}
+						}
+					}
+				}
+			}
+
+		«ENDFOR»
+		«FOR type : Iterables.concat(#[Type.OBJECT], Type.javaUnboxedTypes)»
+			class «type.genericName("DroppedWhileIterator")» implements «type.iteratorGenericName» {
+				private final «type.iteratorGenericName» iterator;
+				private final «type.boolFName» predicate;
+				private boolean advanced;
+				private boolean firstReady;
+				private «type.genericName» first;
+			
+				«type.shortName("DroppedWhileIterator")»(final «type.iteratorGenericName» iterator, final «type.boolFName» predicate) {
+					this.iterator = iterator;
+					this.predicate = predicate;
+				}
+			
+				@Override
+				public boolean hasNext() {
+					advance();
+					return this.firstReady || this.iterator.hasNext();
+				}
+			
+				@Override
+				public «type.iteratorReturnType» «type.iteratorNext»() {
+					advance();
+					if (this.firstReady) {
+						final «type.genericName» value = this.first;
+						this.firstReady = false;
+						«IF type == Type.OBJECT»
+							this.first = null;
+						«ENDIF»
+						return value;
+					} else {
+						return this.iterator.«type.iteratorNext»();
+					}
+				}
+			
+				private void advance() {
+					if (!this.advanced) {
+						while (this.iterator.hasNext()) {
+							final «type.genericName» value = «type.requireNonNull('''this.iterator.«type.iteratorNext»()''')»;
+							if (!this.predicate.apply(value)) {
+								this.firstReady = true;
+								this.first = value;
+								break;
+							}
+						}
+						this.advanced = true;
+					}
+				}
+			
+				@Override
+				public void forEachRemaining(final «type.forEachRemainingGenericActionName» action) {
+					requireNonNull(action);
+					advance();
+					if (this.firstReady) {
+						final «type.genericName» value = this.first;
+						this.firstReady = false;
+						«IF type == Type.OBJECT»
+							this.first = null;
+						«ENDIF»
+						action.accept(value);
+					}
+					this.iterator.forEachRemaining(action);
+				}
+			}
+
+		«ENDFOR»
+		«FOR type : Iterables.concat(#[Type.OBJECT], Type.javaUnboxedTypes)»
 			final class «type.genericName("TableIterator")» implements «type.iteratorGenericName» {
 				private final int size;
 				private final «type.intFGenericName» f;
@@ -955,11 +1088,7 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 				@Override
-				«IF type.javaUnboxedType»
-					public void forEachRemaining(final «type.typeName»Consumer action) {
-				«ELSE»
-					public void forEachRemaining(final Consumer<? super «type.genericBoxedName»> action) {
-				«ENDIF»
+				public void forEachRemaining(final «type.forEachRemainingGenericActionName» action) {
 					requireNonNull(action);
 					while (this.i < this.size) {
 						action.accept(«type.requireNonNull("this.f.apply(this.i++)")»);
@@ -993,11 +1122,7 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 				@Override
-				«IF type.javaUnboxedType»
-					public void forEachRemaining(final «type.typeName»Consumer action) {
-				«ELSE»
-					public void forEachRemaining(final Consumer<? super «type.genericBoxedName»> action) {
-				«ENDIF»
+				public void forEachRemaining(final «type.forEachRemainingGenericActionName» action) {
 					requireNonNull(action);
 					while (this.i >= 0) {
 						action.accept(«type.requireNonNull("this.f.apply(this.i--)")»);
@@ -1090,7 +1215,7 @@ final class CommonGenerator implements ClassGenerator {
 				}
 
 				@Override
-				public void forEachRemaining(final Consumer<? super «type.genericBoxedName»> action) {
+				public void forEachRemaining(final «type.forEachRemainingGenericActionName» action) {
 					requireNonNull(action);
 					this.prefix.forEachRemaining(action);
 					this.suffix.forEachRemaining(action);

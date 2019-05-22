@@ -555,6 +555,10 @@ public enum Type {
 		return (this == Type.OBJECT) ? "BooleanF<A>" : typeName() + "BooleanF";
 	}
 
+	public String forEachRemainingGenericActionName() {
+		return isJavaUnboxedType() ? typeName() + "Consumer" : "Consumer<? super " + genericBoxedName() + ">";
+	}
+
 	public static ImmutableList<Type> javaUnboxedTypes() {
 		return ImmutableList.of(Type.INT, Type.LONG, Type.DOUBLE);
 	}

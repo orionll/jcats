@@ -41,6 +41,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 		import java.util.List;
 		import java.util.NavigableSet;
 		import java.util.HashSet;
+		import java.util.NoSuchElementException;
 		import java.util.PrimitiveIterator;
 		import java.util.RandomAccess;
 
@@ -154,6 +155,16 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				} else {
 					return new «skippedShortName»<>(unview(), skip);
 				}
+			}
+
+			default «genericName» takeWhile(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				return new «type.diamondName("TakenWhileOrderedContainerView")»(unview(), predicate);
+			}
+
+			default «genericName» dropWhile(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
+				return new «type.diamondName("DroppedWhileOrderedContainerView")»(unview(), predicate);
 			}
 
 			default «genericName» reverse() {
@@ -529,6 +540,99 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 					return this;
 				}
 			}
+		}
+
+		final class «type.genericName("TakenWhileOrderedContainerView")» implements «genericName» {
+			final «type.orderedContainerGenericName» container;
+			final «type.boolFName» predicate;
+
+			«type.shortName("TakenWhileOrderedContainerView")»(final «type.orderedContainerGenericName» container, final «type.boolFName» predicate) {
+				this.container = container;
+				this.predicate = predicate;
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return false;
+			}
+
+			@Override
+			public «type.genericName» first() {
+				final «type.genericName» value = this.container.first();
+				if (this.predicate.apply(value)) {
+					return value;
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+
+			@Override
+			public «type.optionGenericName» firstOption() {
+				return this.container.firstOption().filter(this.predicate);
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				requireNonNull(eff);
+				this.container.foreachUntil((final «type.genericName» value) -> {
+					if (this.predicate.apply(value)) {
+						eff.apply(value);
+						return true;
+					} else {
+						return false;
+					}
+				});
+			}
+
+			@Override
+			public boolean foreachUntil(final «type.boolFName» eff) {
+				requireNonNull(eff);
+				return this.container.foreachUntil((final «type.genericName» value) ->
+						!this.predicate.apply(value) || eff.apply(value));
+			}
+
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				«IF type == Type.OBJECT || type.javaUnboxedType»
+					return new «type.iteratorDiamondName("TakenWhile")»(this.container.iterator(), this.predicate);
+				«ELSE»
+					return new TakenWhileIterator<>(this.container.iterator(), this.predicate::apply);
+				«ENDIF»
+			}
+
+			@Override
+			public «genericName» takeWhile(final «type.boolFName» predicate2) {
+				requireNonNull(predicate2);
+				return new «type.diamondName("TakenWhileOrderedContainerView")»(this.container, and(this.predicate, predicate2));
+			}
+
+			«toStr(type)»
+		}
+
+		final class «type.genericName("DroppedWhileOrderedContainerView")» implements «genericName» {
+			final «type.orderedContainerGenericName» container;
+			final «type.boolFName» predicate;
+
+			«type.shortName("DroppedWhileOrderedContainerView")»(final «type.orderedContainerGenericName» container, final «type.boolFName» predicate) {
+				this.container = container;
+				this.predicate = predicate;
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return false;
+			}
+
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				«IF type == Type.OBJECT || type.javaUnboxedType»
+					return new «type.iteratorDiamondName("DroppedWhile")»(this.container.iterator(), this.predicate);
+				«ELSE»
+					return new DroppedWhileIterator<>(this.container.iterator(), this.predicate::apply);
+				«ENDIF»
+			}
+
+			«toStr(type)»
 		}
 
 		class «reverseShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «type.orderedContainerGenericName»> implements «genericName» {

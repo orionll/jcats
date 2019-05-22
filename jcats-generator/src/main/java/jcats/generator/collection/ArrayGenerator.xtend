@@ -543,7 +543,29 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			«takeWhile(false, type)»
+			public «genericName» takeWhile(final «type.boolFName» predicate) {
+				int n = 0;
+				for (final «type.javaName» value : this.array) {
+					if (predicate.apply(«type.genericCast»value)) {
+						n++;
+					} else {
+						break;
+					}
+				}
+				return limit(n);
+			}
+
+			public «genericName» dropWhile(final «type.boolFName» predicate) {
+				int n = 0;
+				for (final «type.javaName» value : this.array) {
+					if (predicate.apply(«type.genericCast»value)) {
+						n++;
+					} else {
+						break;
+					}
+				}
+				return skip(n);
+			}
 
 			@Override
 			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {

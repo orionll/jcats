@@ -15,20 +15,6 @@ interface Generator {
 
 	def ea() { false }
 
-	def String takeWhile(boolean isFinal, Type type) { '''
-		public «if (isFinal) "final " else ""»«name»«IF type == Type.OBJECT»<A>«ENDIF» takeWhile(final «type.boolFName» predicate) {
-			int n = 0;
-			for (final «type.genericName» value : this) {
-				if (predicate.apply(value)) {
-					n++;
-				} else {
-					break;
-				}
-			}
-			return limit(n);
-		}
-	''' }
-
 	def toStr() { toStr(Type.OBJECT) }
 
 	def toStr(Type type) { toStr(type, "this") }

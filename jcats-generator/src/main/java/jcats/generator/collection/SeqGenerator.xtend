@@ -132,7 +132,51 @@ class SeqGenerator implements ClassGenerator {
 
 			public abstract «genericName» skip(int n);
 
-			«takeWhile(true, type)»
+			public final «genericName» takeWhile(final «type.boolFName» predicate) {
+				int n = 0;
+				«IF type.javaUnboxedType»
+					final «type.iteratorGenericName» iterator = iterator();
+					while (iterator.hasNext()) {
+						if (predicate.apply(iterator.«type.iteratorNext»())) {
+							n++;
+						} else {
+							break;
+						}
+					}
+				«ELSE»
+					for (final «type.genericName» value : this) {
+						if (predicate.apply(value)) {
+							n++;
+						} else {
+							break;
+						}
+					}
+				«ENDIF»
+				return limit(n);
+			}
+
+			public final «genericName» dropWhile(final «type.boolFName» predicate) {
+				int n = 0;
+				«IF type.javaUnboxedType»
+					final «type.iteratorGenericName» iterator = iterator();
+					while (iterator.hasNext()) {
+						if (predicate.apply(iterator.«type.iteratorNext»())) {
+							n++;
+						} else {
+							break;
+						}
+					}
+				«ELSE»
+					for (final «type.genericName» value : this) {
+						if (predicate.apply(value)) {
+							n++;
+						} else {
+							break;
+						}
+					}
+				«ENDIF»
+				return skip(n);
+			}
 
 			/**
 			 * O(1)
