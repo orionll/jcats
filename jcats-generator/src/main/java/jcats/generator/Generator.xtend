@@ -150,11 +150,7 @@ interface Generator {
 	''' }
 
 	def static iterateWhile(Type type, String paramGenericName, String builderName) { '''
-		«IF type == Type.OBJECT»
-			public static «paramGenericName» iterateWhile(final A start, final «type.boolFName» hasNext, final F<A, A> next) {
-		«ELSE»
-			public static «paramGenericName» iterateWhile(final «type.javaName» start, final «type.boolFName» hasNext, final «type.typeName»«type.typeName»F next) {
-		«ENDIF»
+		public static «paramGenericName» iterateWhile(final «type.genericName» start, final «type.boolFName» hasNext, final «type.endoGenericName» next) {
 			requireNonNull(next);
 			final «builderName» builder = builder();
 			«type.genericName» value = start;

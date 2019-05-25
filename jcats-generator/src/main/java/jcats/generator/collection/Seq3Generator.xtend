@@ -220,7 +220,7 @@ final class Seq3Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «genericName» update(final int index, final «type.updateFunction» f) {
+			public «genericName» update(final int index, final «type.endoGenericName» f) {
 				try {
 					if (index < init.length) {
 						final «type.javaName»[] newInit = «type.updateArray("init", "index")»;

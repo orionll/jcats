@@ -28,6 +28,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 	def skippedShortName() { type.shortName("SkippedOrderedContainerView") }
 	def reverseShortName() { type.shortName("ReverseOrderedContainerView") }
 	def generatedShortName() { type.shortName("GeneratedOrderedContainerView") }
+	def iteratingShortName() { type.shortName("IteratingOrderedContainerView") }
 	def concatenatedShortName() { type.shortName("ConcatenatedOrderedContainerView") }
 
 	override sourceCode() '''
@@ -50,9 +51,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 		import «Constants.FUNCTION».*;
 
 		import static java.util.Objects.requireNonNull;
-		«IF type.javaUnboxedType»
-			import static «Constants.JCATS».«type.optionShortName».*;
-		«ENDIF»
+		import static «Constants.JCATS».«type.optionShortName».*;
 		import static «Constants.FUNCTION».«type.shortName("BooleanF")».*;
 		import static «Constants.COMMON».*;
 		«IF type.primitive»
@@ -873,6 +872,121 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public «type.optionGenericName» lastOption() {
 				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public «genericName» reverse() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public String toString() {
+				return "(Infinite «type.orderedContainerShortName»)";
+			}
+		}
+
+		final class «type.genericName("IteratingOrderedContainerView")» implements «genericName» {
+			private final «type.genericName» start;
+			private final «type.endoGenericName» f;
+
+			«iteratingShortName»(final «type.genericName» start, final «type.endoGenericName» f) {
+				this.start = start;
+				this.f = f;
+			}
+
+			@Override
+			public int size() {
+				throw new SizeOverflowException();
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return false;
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return true;
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return false;
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				requireNonNull(eff);
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public boolean foreachUntil(final «type.boolFName» eff) {
+				«type.genericName» value = this.start;
+				while (eff.apply(value)) {
+					value = «type.requireNonNull("this.f.apply(value)")»;
+				}
+				return false;
+			}
+
+			@Override
+			public «type.genericName» first() {
+				return this.start;
+			}
+
+			@Override
+			public «type.optionGenericName» firstOption() {
+				return «type.someName»(this.start);
+			}
+
+			@Override
+			public «type.genericName» last() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public «type.optionGenericName» lastOption() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public String joinToString(final String separator, final String prefix, final String suffix) {
+				requireNonNull(separator);
+				requireNonNull(prefix);
+				requireNonNull(suffix);
+				throw new UnsupportedOperationException();
+			}
+
+			«IF type == Type.OBJECT»
+				@Override
+				public «type.indexedContainerViewGenericName» sort(final Ord<A> ord) {
+					requireNonNull(ord);
+					throw new UnsupportedOperationException();
+				}
+			«ELSE»
+				@Override
+				public «type.indexedContainerViewGenericName» sortAsc() {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
+				public «type.indexedContainerViewGenericName» sortDesc() {
+					throw new UnsupportedOperationException();
+				}
+			«ENDIF»
+
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				«IF type == Type.OBJECT || type.javaUnboxedType»
+					return new «type.iteratorDiamondName("Iterating")»(this.start, this.f);
+				«ELSE»
+					return new IteratingIterator<>(this.start, this.f::apply);
+				«ENDIF»
 			}
 
 			@Override

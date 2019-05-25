@@ -98,7 +98,7 @@ final class CommonGenerator implements ClassGenerator {
 			}
 
 			«FOR type : Type.values»
-				static «type.javaName»[] update«type.shortName("Array")»(final «type.javaName»[] array, final int index, final «type.updateFunction.replaceAll("<A, A>", "")» f) {
+				static «type.javaName»[] update«type.shortName("Array")»(final «type.javaName»[] array, final int index, final «type.endoGenericName.replaceAll("<A, A>", "")» f) {
 					final «type.javaName»[] result = new «type.javaName»[array.length];
 					System.arraycopy(array, 0, result, 0, array.length);
 					final «type.javaName» oldValue = array[index];
@@ -1175,6 +1175,40 @@ final class CommonGenerator implements ClassGenerator {
 				@Override
 				public «type.iteratorReturnType» «type.iteratorNext»() {
 					return «type.requireNonNull("this.f.apply()")»;
+				}
+
+				@Override
+				public void forEachRemaining(final «type.forEachRemainingGenericActionName» action) {
+					requireNonNull(action);
+					throw new UnsupportedOperationException();
+				}
+			}
+
+		«ENDFOR»
+		«FOR type : Iterables.concat(#[Type.OBJECT], Type.javaUnboxedTypes)»
+			final class «type.genericName("IteratingIterator")» implements «type.iteratorGenericName» {
+				private «type.genericName» value;
+				private boolean startReturned;
+				private final «type.endoGenericName» f;
+
+				«type.shortName("IteratingIterator")»(final «type.genericName» start, final «type.endoGenericName» f) {
+					this.value = start;
+					this.f = f;
+				}
+
+				@Override
+				public boolean hasNext() {
+					return true;
+				}
+
+				@Override
+				public «type.iteratorReturnType» «type.iteratorNext»() {
+					if (this.startReturned) {
+						this.value = «type.requireNonNull("this.f.apply(this.value)")»;
+					} else {
+						this.startReturned = true;
+					}
+					return this.value;
 				}
 
 				@Override

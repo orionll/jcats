@@ -81,7 +81,7 @@ final class Seq1Generator extends SeqGenerator {
 			}
 
 			@Override
-			public «genericName» update(final int index, final «type.updateFunction» f) {
+			public «genericName» update(final int index, final «type.endoGenericName» f) {
 				return new «diamondName(1)»(«type.updateArray("node1", "index")»);
 			}
 

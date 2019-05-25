@@ -131,6 +131,10 @@ public enum Type {
 		return genericName("F0");
 	}
 
+	public String endoGenericName() {
+		return (this == OBJECT) ? "F<A, A>" : typeName() + typeName() + "F";
+	}
+
 	public String maybeShortName() {
 		return shortName("Maybe");
 	}
@@ -537,10 +541,6 @@ public enum Type {
 
 	public String emptyArrayName() {
 		return "EMPTY_" + javaName().toUpperCase() + "_ARRAY";
-	}
-
-	public String updateFunction() {
-		return (this == Type.OBJECT) ? "F<A, A>" : typeName() + typeName() + "F";
 	}
 
 	public String requireNonNull(final String expr) {

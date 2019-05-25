@@ -113,7 +113,7 @@ class SeqGenerator implements ClassGenerator {
 			/**
 			 * O(log(size))
 			 */
-			public abstract «genericName» update(int index, «type.updateFunction» f) throws IndexOutOfBoundsException;
+			public abstract «genericName» update(int index, «type.endoGenericName» f) throws IndexOutOfBoundsException;
 
 			@Override
 			public IntOption lastIndexWhere(final «type.boolFName» predicate) {

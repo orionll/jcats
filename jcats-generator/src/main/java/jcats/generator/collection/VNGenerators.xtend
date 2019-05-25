@@ -117,13 +117,13 @@ final class VNGenerators {
 					}
 
 					«FOR i : 1 .. arity»
-						public «genericName» update«i»(final «type.updateFunction» f) {
+						public «genericName» update«i»(final «type.endoGenericName» f) {
 							final «type.genericName» a = f.apply(this.a«i»);
 							return new «diamondName»(«(1 .. arity).map[if (it == i) '''«IF type == Type.OBJECT»requireNonNull(a)«ELSE»a«ENDIF»''' else "this.a" + it].join(", ")»);
 						}
 
 					«ENDFOR»
-					public «genericName» update(final int index, final «type.updateFunction» f) throws IndexOutOfBoundsException {
+					public «genericName» update(final int index, final «type.endoGenericName» f) throws IndexOutOfBoundsException {
 						switch (index) {
 							«FOR i : 1 .. arity»
 								case «i-1»: {

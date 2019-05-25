@@ -117,7 +117,7 @@ final class ArrayGenerator implements ClassGenerator {
 			/**
 			 * O(size)
 			 */
-			public «genericName» update(final int index, final «type.updateFunction» f) throws IndexOutOfBoundsException {
+			public «genericName» update(final int index, final «type.endoGenericName» f) throws IndexOutOfBoundsException {
 				return new «diamondName»(«type.updateArray("this.array", "index")»);
 			}
 
