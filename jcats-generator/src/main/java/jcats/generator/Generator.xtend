@@ -149,11 +149,28 @@ interface Generator {
 		}
 	''' }
 
-	def static iterate(Type type, String paramGenericName, String builderName) { '''
+	def static iterateWhile(Type type, String paramGenericName, String builderName) { '''
 		«IF type == Type.OBJECT»
-			public static «paramGenericName» iterate(final A start, final F<A, Option<A>> f) {
+			public static «paramGenericName» iterateWhile(final A start, final «type.boolFName» hasNext, final F<A, A> next) {
 		«ELSE»
-			public static «paramGenericName» iterate(final «type.javaName» start, final «type.typeName»ObjectF<«type.optionShortName»> f) {
+			public static «paramGenericName» iterateWhile(final «type.javaName» start, final «type.boolFName» hasNext, final «type.typeName»«type.typeName»F next) {
+		«ENDIF»
+			requireNonNull(next);
+			final «builderName» builder = builder();
+			«type.genericName» value = start;
+			while (hasNext.apply(value)) {
+				builder.append(value);
+				value = «type.requireNonNull("next.apply(value)")»;
+			}
+			return builder.build();
+		}
+	''' }
+
+	def static iterateUntil(Type type, String paramGenericName, String builderName) { '''
+		«IF type == Type.OBJECT»
+			public static «paramGenericName» iterateUntil(final A start, final F<A, Option<A>> f) {
+		«ELSE»
+			public static «paramGenericName» iterateUntil(final «type.javaName» start, final «type.typeName»ObjectF<«type.optionShortName»> f) {
 		«ENDIF»
 			final «builderName» builder = builder();
 			builder.append(start);

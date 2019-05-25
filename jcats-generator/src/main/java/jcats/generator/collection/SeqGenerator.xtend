@@ -570,7 +570,9 @@ class SeqGenerator implements ClassGenerator {
 				}
 			}
 
-			«iterate(type, paramGenericName, seqBuilderName)»
+			«iterateWhile(type, paramGenericName, seqBuilderName)»
+
+			«iterateUntil(type, paramGenericName, seqBuilderName)»
 
 			static «IF type == Type.OBJECT»<A> «ENDIF»void fillArray(final «type.javaName»[] array, final int startIndex, final «type.iteratorGenericName» iterator) {
 				for (int i = startIndex; i < array.length; i++) {

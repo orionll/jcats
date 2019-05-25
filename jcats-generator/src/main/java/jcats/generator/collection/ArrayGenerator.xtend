@@ -867,7 +867,9 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
-			«iterate(type, paramGenericName, arrayBuilderName)»
+			«iterateWhile(type, paramGenericName, arrayBuilderName)»
+
+			«iterateUntil(type, paramGenericName, arrayBuilderName)»
 
 			private static «paramGenericName» sizedToArray(final Iterable<«type.genericBoxedName»> iterable, final int size) {
 				if (size == 0) {
