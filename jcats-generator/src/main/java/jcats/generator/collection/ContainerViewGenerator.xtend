@@ -26,6 +26,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 	def filteredContainerViewShortName() { type.shortName("FilteredContainerView") }
 	def limitedContainerViewShortName() { type.shortName("LimitedContainerView") }
 	def skippedContainerViewShortName() { type.shortName("SkippedContainerView") }
+	def generatedShortName() { type.shortName("GeneratedContainerView") }
 	def concatenatedShortName() { type.shortName("ConcatenatedContainerView") }
 
 	override sourceCode() '''
@@ -1644,6 +1645,103 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			«toStr(type, "this.sorted.apply()")»
+		}
+
+		«IF type == Type.OBJECT»
+			class «generatedShortName»<A, C extends «type.containerGenericName»> implements ContainerView<A> {
+		«ELSE»
+			class «generatedShortName»<C extends «type.containerGenericName»> implements «type.containerViewGenericName» {
+		«ENDIF»
+			private final «type.f0GenericName» f;
+
+			«generatedShortName»(final «type.f0GenericName» f) {
+				this.f = f;
+			}
+
+			@Override
+			public int size() {
+				throw new SizeOverflowException();
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return false;
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return true;
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return false;
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				requireNonNull(eff);
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public boolean foreachUntil(final «type.boolFName» eff) {
+				«type.genericName» value = «type.requireNonNull("this.f.apply()")»;
+				while (eff.apply(value)) {
+					value = «type.requireNonNull("this.f.apply()")»;
+				}
+				return false;
+			}
+
+			@Override
+			public «type.genericName» first() {
+				return «type.requireNonNull("this.f.apply()")»;
+			}
+
+			@Override
+			public «type.optionGenericName» firstOption() {
+				return «type.someName»(this.f.apply());
+			}
+
+			@Override
+			public String joinToString(final String separator, final String prefix, final String suffix) {
+				requireNonNull(separator);
+				requireNonNull(prefix);
+				requireNonNull(suffix);
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				«IF type == Type.OBJECT || type.javaUnboxedType»
+					return new «type.iteratorDiamondName("Generating")»(this.f);
+				«ELSE»
+					return new GeneratingIterator<>(this.f::apply);
+				«ENDIF»
+			}
+
+			«IF type == Type.OBJECT»
+				@Override
+				public «type.indexedContainerViewGenericName» sort(final Ord<A> ord) {
+					requireNonNull(ord);
+					throw new UnsupportedOperationException();
+				}
+			«ELSE»
+				@Override
+				public «type.indexedContainerViewGenericName» sortAsc() {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
+				public «type.indexedContainerViewGenericName» sortDesc() {
+					throw new UnsupportedOperationException();
+				}
+			«ENDIF»
+
+			@Override
+			public String toString() {
+				return "(Infinite «type.containerShortName»)";
+			}
 		}
 
 		class «concatenatedShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «type.containerGenericName»> implements «genericName» {

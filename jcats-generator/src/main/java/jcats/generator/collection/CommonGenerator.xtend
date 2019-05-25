@@ -1159,6 +1159,32 @@ final class CommonGenerator implements ClassGenerator {
 			}
 
 		«ENDFOR»
+		«FOR type : Iterables.concat(#[Type.OBJECT], Type.javaUnboxedTypes)»
+			final class «type.genericName("GeneratingIterator")» implements «type.iteratorGenericName» {
+				private final «type.f0GenericName» f;
+
+				«type.shortName("GeneratingIterator")»(final «type.f0GenericName» f) {
+					this.f = f;
+				}
+
+				@Override
+				public boolean hasNext() {
+					return true;
+				}
+
+				@Override
+				public «type.iteratorReturnType» «type.iteratorNext»() {
+					return «type.requireNonNull("this.f.apply()")»;
+				}
+
+				@Override
+				public void forEachRemaining(final «type.forEachRemainingGenericActionName» action) {
+					requireNonNull(action);
+					throw new UnsupportedOperationException();
+				}
+			}
+
+		«ENDFOR»
 		final class ConcatenatedIterator<A> implements Iterator<A> {
 			final Iterator<A> prefix;
 			final Iterator<A> suffix;

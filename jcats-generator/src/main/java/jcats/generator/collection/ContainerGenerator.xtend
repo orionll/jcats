@@ -570,6 +570,11 @@ final class ContainerGenerator implements InterfaceGenerator {
 				return new «type.stream2DiamondName»(StreamSupport.«type.streamFunction»(spliterator(), true));
 			}
 
+			static «type.paramGenericName("ContainerView")» generate(final «type.f0GenericName» f) {
+				requireNonNull(f);
+				return new «type.shortName("GeneratedContainerView")»<>(f);
+			}
+
 			static «type.paramGenericName("ContainerView")» concat(final «genericName» prefix, final «genericName» suffix) {
 				requireNonNull(prefix);
 				requireNonNull(suffix);

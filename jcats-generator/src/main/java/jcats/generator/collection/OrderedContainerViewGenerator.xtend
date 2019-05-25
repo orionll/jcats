@@ -27,6 +27,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 	def limitedShortName() { type.shortName("LimitedOrderedContainerView") }
 	def skippedShortName() { type.shortName("SkippedOrderedContainerView") }
 	def reverseShortName() { type.shortName("ReverseOrderedContainerView") }
+	def generatedShortName() { type.shortName("GeneratedOrderedContainerView") }
 	def concatenatedShortName() { type.shortName("ConcatenatedOrderedContainerView") }
 
 	override sourceCode() '''
@@ -853,6 +854,41 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			«ENDIF»
 
 			«toStr(type)»
+		}
+
+		«IF type == Type.OBJECT»
+			final class «generatedShortName»<A> extends GeneratedContainerView<A, OrderedContainer<A>> implements OrderedContainerView<A> {
+		«ELSE»
+			final class «generatedShortName» extends «type.typeName»GeneratedContainerView<«type.orderedContainerGenericName»> implements «type.orderedContainerViewGenericName» {
+		«ENDIF»
+			«generatedShortName»(final «type.f0GenericName» f) {
+				super(f);
+			}
+
+			@Override
+			public «type.genericName» last() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public «type.optionGenericName» lastOption() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public «type.iteratorGenericName» reverseIterator() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public «genericName» reverse() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public String toString() {
+				return "(Infinite «type.orderedContainerShortName»)";
+			}
 		}
 
 		«IF type == Type.OBJECT»
