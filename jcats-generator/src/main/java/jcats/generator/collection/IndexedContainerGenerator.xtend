@@ -240,7 +240,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			boolean equals(Object other);
 
 			«IF type == Type.INT»
-				static IntIndexedContainer range(final int lowInclusive, final int highExclusive) {
+				static IntIndexedContainerView range(final int lowInclusive, final int highExclusive) {
 					if (lowInclusive >= highExclusive) {
 						return emptyIntIndexedContainerView();
 					} else {
@@ -248,7 +248,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 					}
 				}
 
-				static IntIndexedContainer rangeClosed(final int lowInclusive, final int highInclusive) {
+				static IntIndexedContainerView rangeClosed(final int lowInclusive, final int highInclusive) {
 					if (lowInclusive > highInclusive) {
 						return emptyIntIndexedContainerView();
 					} else {
@@ -257,7 +257,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				}
 
 			«ENDIF»
-			static «type.paramGenericName("IndexedContainer")» repeat(final int size, final «type.genericName» value) {
+			static «type.paramGenericName("IndexedContainerView")» repeat(final int size, final «type.genericName» value) {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
@@ -270,7 +270,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
-			static «type.paramGenericName("IndexedContainer")» tabulate(final int size, final Int«type.typeName»F«IF type == Type.OBJECT»<A>«ENDIF» f) {
+			static «type.paramGenericName("IndexedContainerView")» tabulate(final int size, final Int«type.typeName»F«IF type == Type.OBJECT»<A>«ENDIF» f) {
 				«IF type == Type.OBJECT»
 					requireNonNull(f);
 				«ENDIF»
