@@ -400,6 +400,9 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			default String joinToString(final String separator, final String prefix, final String suffix) {
+				requireNonNull(separator);
+				requireNonNull(prefix);
+				requireNonNull(suffix);
 				final «type.iteratorGenericName» iterator = iterator();
 				if (iterator.hasNext()) {
 					final StringBuilder builder = new StringBuilder();
