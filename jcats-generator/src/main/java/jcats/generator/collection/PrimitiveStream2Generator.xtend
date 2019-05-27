@@ -167,7 +167,7 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 			}
 
 			«IF type == Type.INT»
-				public long sumToLong() {
+				public long longSum() {
 					return this.stream.sum();
 				}
 

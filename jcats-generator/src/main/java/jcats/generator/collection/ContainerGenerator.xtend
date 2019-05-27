@@ -322,8 +322,8 @@ final class ContainerGenerator implements InterfaceGenerator {
 
 			«ENDIF»
 			«IF type == Type.INT»
-				default long sumToLong() {
-					return foldToLong(0L, (final long sum, final int i) -> sum + i);
+				default long longSum() {
+					return foldToLong(0, Long::sum);
 				}
 
 			«ENDIF»

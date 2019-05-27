@@ -305,8 +305,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«ENDIF»
 			«IF type == Type.INT»
 				@Override
-				public long sumToLong() {
-					return this.container.sumToLong();
+				public long longSum() {
+					return this.container.longSum();
 				}
 
 			«ENDIF»
@@ -1378,8 +1378,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«ENDIF»
 			«IF type == Type.INT»
 				@Override
-				public long sumToLong() {
-					return this.sorted.apply().sumToLong();
+				public long longSum() {
+					return this.sorted.apply().longSum();
 				}
 
 			«ENDIF»
@@ -1849,8 +1849,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			«ENDIF»
 			«IF type == Type.INT»
 				@Override
-				public long sumToLong() {
-					return this.prefix.sumToLong() + this.suffix.sumToLong();
+				public long longSum() {
+					return this.prefix.longSum() + this.suffix.longSum();
 				}
 
 			«ENDIF»
