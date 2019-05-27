@@ -946,7 +946,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT || type.javaUnboxedType»
 					return new «type.diamondName("FilteredIterator")»(this.container.iterator(), this.predicate);
 				«ELSE»
-					return new FilteredIterator<>(this.container.iterator(), this.predicate::apply);
+					return new FilteredIterator<>(this.container.iterator(), this.predicate.to«type.typeName»F());
 				«ENDIF»
 			}
 
@@ -1716,7 +1716,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT || type.javaUnboxedType»
 					return new «type.iteratorDiamondName("Generating")»(this.f);
 				«ELSE»
-					return new GeneratingIterator<>(this.f::apply);
+					return new GeneratingIterator<>(this.f.toF0());
 				«ENDIF»
 			}
 

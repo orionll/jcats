@@ -1219,6 +1219,47 @@ final class CommonGenerator implements ClassGenerator {
 			}
 
 		«ENDFOR»
+		«FOR type : Iterables.concat(#[Type.OBJECT], Type.javaUnboxedTypes)»
+			final class «type.genericName("IteratingWhileIterator")» implements «type.iteratorGenericName» {
+				private «type.genericName» value;
+				private boolean valueChecked;
+				private boolean valueOk;
+				private final «type.boolFName» hasNext;
+				private final «type.endoGenericName» next;
+
+				«type.shortName("IteratingWhileIterator")»(final «type.genericName» start, final «type.boolFName» hasNext, final «type.endoGenericName» next) {
+					this.value = start;
+					this.hasNext = hasNext;
+					this.next = next;
+				}
+
+				@Override
+				public boolean hasNext() {
+					if (!this.valueChecked) {
+						this.valueOk = this.hasNext.apply(this.value);
+						this.valueChecked = true;
+					}
+					return this.valueOk;
+				}
+
+				@Override
+				public «type.iteratorReturnType» «type.iteratorNext»() {
+					if (!this.valueChecked) {
+						this.valueOk = this.hasNext.apply(this.value);
+						this.valueChecked = true;
+					}
+					if (this.valueOk) {
+						final «type.genericName» returnValue = this.value;
+						this.value = «type.requireNonNull("this.next.apply(this.value)")»;
+						this.valueChecked = false;
+						return returnValue;
+					} else {
+						throw new NoSuchElementException();
+					}
+				}
+			}
+
+		«ENDFOR»
 		final class ConcatenatedIterator<A> implements Iterator<A> {
 			final Iterator<A> prefix;
 			final Iterator<A> suffix;

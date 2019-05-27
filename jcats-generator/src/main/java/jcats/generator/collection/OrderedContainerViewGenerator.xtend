@@ -29,6 +29,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 	def reverseShortName() { type.shortName("ReverseOrderedContainerView") }
 	def generatedShortName() { type.shortName("GeneratedOrderedContainerView") }
 	def iteratingShortName() { type.shortName("IteratingOrderedContainerView") }
+	def iteratingWhileShortName() { type.shortName("IteratingWhileOrderedContainerView") }
 	def concatenatedShortName() { type.shortName("ConcatenatedOrderedContainerView") }
 
 	override sourceCode() '''
@@ -455,7 +456,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 					«IF type == Type.OBJECT || type.javaUnboxedType»
 						return new «type.diamondName("FilteredIterator")»(this.container.reverseIterator(), this.predicate);
 					«ELSE»
-						return new FilteredIterator<>(this.container.reverseIterator(), this.predicate::apply);
+						return new FilteredIterator<>(this.container.reverseIterator(), this.predicate.to«type.typeName»F());
 					«ENDIF»
 				} else {
 					return «shortName».super.reverseIterator();
@@ -596,7 +597,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT || type.javaUnboxedType»
 					return new «type.iteratorDiamondName("TakenWhile")»(this.container.iterator(), this.predicate);
 				«ELSE»
-					return new TakenWhileIterator<>(this.container.iterator(), this.predicate::apply);
+					return new TakenWhileIterator<>(this.container.iterator(), this.predicate.to«type.typeName»F());
 				«ENDIF»
 			}
 
@@ -628,7 +629,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT || type.javaUnboxedType»
 					return new «type.iteratorDiamondName("DroppedWhile")»(this.container.iterator(), this.predicate);
 				«ELSE»
-					return new DroppedWhileIterator<>(this.container.iterator(), this.predicate::apply);
+					return new DroppedWhileIterator<>(this.container.iterator(), this.predicate.to«type.typeName»F());
 				«ENDIF»
 			}
 
@@ -985,7 +986,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT || type.javaUnboxedType»
 					return new «type.iteratorDiamondName("Iterating")»(this.start, this.f);
 				«ELSE»
-					return new IteratingIterator<>(this.start, this.f::apply);
+					return new IteratingIterator<>(this.start, this.f.toF());
 				«ENDIF»
 			}
 
@@ -1003,6 +1004,72 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			public String toString() {
 				return "(Infinite «type.orderedContainerShortName»)";
 			}
+		}
+
+		final class «type.genericName("IteratingWhileOrderedContainerView")» implements «genericName» {
+			private final «type.genericName» start;
+			private final «type.boolFName» hasNext;
+			private final «type.endoGenericName» next;
+
+			«iteratingWhileShortName»(final «type.genericName» start, final «type.boolFName» hasNext, final «type.endoGenericName» next) {
+				this.start = start;
+				this.hasNext = hasNext;
+				this.next = next;
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return false;
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return this.hasNext.apply(this.start);
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return !this.hasNext.apply(this.start);
+			}
+
+			@Override
+			public void foreach(final «type.effGenericName» eff) {
+				requireNonNull(eff);
+				«type.genericName» value = this.start;
+				while (this.hasNext.apply(value)) {
+					eff.apply(value);
+					value = «type.requireNonNull("this.next.apply(value)")»;
+				}
+			}
+
+			@Override
+			public boolean foreachUntil(final «type.boolFName» eff) {
+				requireNonNull(eff);
+				«type.genericName» value = this.start;
+				while (this.hasNext.apply(value)) {
+					if (!eff.apply(value)) {
+						return false;
+					}
+					value = «type.requireNonNull("this.next.apply(value)")»;
+				}
+				return true;
+			}
+
+			@Override
+			public «type.iteratorGenericName» iterator() {
+				«IF type == Type.OBJECT || type.javaUnboxedType»
+					return new «type.iteratorDiamondName("IteratingWhile")»(this.start, this.hasNext, this.next);
+				«ELSE»
+					return new IteratingWhileIterator<>(this.start, this.hasNext.to«type.typeName»F(), this.next.toF());
+				«ENDIF»
+			}
+
+			@Override
+			public «genericName» takeWhile(final «type.boolFName» predicate) {
+				return new «type.diamondName("IteratingWhileOrderedContainerView")»(this.start, and(this.hasNext, predicate), this.next);
+			}
+
+			«toStr(type)»
 		}
 
 		«IF type == Type.OBJECT»
