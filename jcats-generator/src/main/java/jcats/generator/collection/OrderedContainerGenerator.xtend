@@ -77,14 +77,30 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 
 			default «type.optionGenericName» lastMatch(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
-				final «type.iteratorGenericName» iterator = reverseIterator();
-				while (iterator.hasNext()) {
-					final «type.genericName» value = iterator.«type.iteratorNext»();
-					if (predicate.apply(value)) {
-						return «type.someName»(value);
+				if (isReverseQuick()) {
+					final «type.iteratorGenericName» iterator = reverseIterator();
+					while (iterator.hasNext()) {
+						final «type.genericName» value = iterator.«type.iteratorNext»();
+						if (predicate.apply(value)) {
+							return «type.someName»(value);
+						}
+					}
+					return «type.noneName»();
+				} else {
+					final «type.javaName»[] result = { «type.defaultValue» };
+					final boolean[] found = { false };
+					foreach(value -> {
+						if (predicate.apply(value)) {
+							result[0] = value;
+							found[0] = true;
+						}
+					});
+					if (found[0]) {
+						return «type.someName»(«type.genericCast»result[0]);
+					} else {
+						return «type.noneName»();
 					}
 				}
-				return «type.noneName»();
 			}
 
 			«IF type.primitive»
