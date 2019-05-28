@@ -735,13 +735,6 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				}
 
 			«ENDIF»
-			«IF type == Type.INT»
-				@Override
-				public long longSum() {
-					return this.container.longSum();
-				}
-
-			«ENDIF»
 			«IF type == Type.OBJECT»
 				@Override
 				public «type.optionGenericName» max(final «type.ordGenericName» ord) {

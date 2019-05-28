@@ -166,12 +166,6 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 				return this.stream.sum();
 			}
 
-			«IF type == Type.INT»
-				public long longSum() {
-					return this.stream.sum();
-				}
-
-			«ENDIF»
 			@Override
 			public Optional«type.typeName» max() {
 				return this.stream.max();
