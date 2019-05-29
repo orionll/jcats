@@ -272,6 +272,14 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public int sum() {
+				final long a1 = this.low;
+				final long a2 = this.closed ? this.high : this.high - 1;
+				final long n = a2 - a1 + 1;
+				return (int) ((a1 + a2) * n / 2);
+			}
+
+			@Override
 			public int spliteratorCharacteristics() {
 				return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE;
 			}
