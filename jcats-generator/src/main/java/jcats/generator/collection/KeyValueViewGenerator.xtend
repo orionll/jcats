@@ -48,6 +48,11 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 				return iterator().hasNext();
 			}
 
+			default <B> KeyValueView<K, B> mapValues(final F<A, B> f) {
+				requireNonNull(f);
+				return new MappedKeyValueView<>(unview(), f);
+			}
+
 			default KeyValueView<K, A> filterKeys(final BooleanF<K> predicate) {
 				return new FilteredKeyValueView<>(unview(), predicate);
 			}
@@ -262,6 +267,106 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			public KeyValue<K, A> unview() {
 				return this.keyValue;
 			}
+		}
+
+		class MappedKeyValueView<K, A, B, KV extends KeyValue<K, A>> implements KeyValueView<K, B> {
+			final KV keyValue;
+			final F<A, B> f;
+
+			MappedKeyValueView(final KV keyValue, final F<A, B> f) {
+				this.keyValue = keyValue;
+				this.f = f;
+			}
+
+			@Override
+			public int size() {
+				return this.keyValue.size();
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return this.keyValue.isEmpty();
+			}
+
+			@Override
+			public boolean isNotEmpty() {
+				return this.keyValue.isNotEmpty();
+			}
+
+			@Override
+			public boolean hasKnownFixedSize() {
+				return this.keyValue.hasKnownFixedSize();
+			}
+
+			@Override
+			public B getOrNull(final K key) {
+				final A value = this.keyValue.getOrNull(key);
+				if (value == null) {
+					return null;
+				} else {
+					return requireNonNull(this.f.apply(value));
+				}
+			}
+
+			@Override
+			public boolean containsKey(final K key) {
+				return this.keyValue.containsKey(key);
+			}
+
+			@Override
+			public void ifNotContainsKey(final K key, final Eff0 eff) {
+				this.keyValue.ifNotContainsKey(key, eff);
+			}
+
+			@Override
+			public P<K, B> first() {
+				return this.keyValue.first().map2(this.f);
+			}
+
+			@Override
+			public Option<P<K, B>> firstOption() {
+				return this.keyValue.firstOption().map((final P<K, A> p) -> p.map2(this.f));
+			}
+
+			@Override
+			public K firstKey() {
+				return this.keyValue.firstKey();
+			}
+
+			@Override
+			public Option<K> firstKeyOption() {
+				return this.keyValue.firstKeyOption();
+			}
+
+			@Override
+			public Iterator<P<K, B>> iterator() {
+				return new MappedIterator<>(this.keyValue.iterator(), (final P<K, A> entry) -> entry.map2(this.f));
+			}
+
+			@Override
+			public void foreach(final Eff2<K, B> eff) {
+				requireNonNull(eff);
+				this.keyValue.foreach((final K key, final A value) ->
+						eff.apply(key, requireNonNull(this.f.apply(value))));
+			}
+
+			@Override
+			public void forEach(final Consumer<? super P<K, B>> action) {
+				requireNonNull(action);
+				this.keyValue.forEach((final P<K, A> entry) ->
+						action.accept(entry.map2(this.f)));
+			}
+
+			@Override
+			public UniqueContainerView<K> keys() {
+				return this.keyValue.keys();
+			}
+
+			«keyValueEquals»
+
+			«keyValueHashCode»
+
+			«keyValueToString»
 		}
 
 		final class FilteredKeyValueView<K, A> implements KeyValueView<K, A> {

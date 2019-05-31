@@ -51,6 +51,12 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 				return new ReverseSortedKeyValueView<>(unview());
 			}
 
+			@Override
+			default <B> SortedKeyValueView<K, B> mapValues(final F<A, B> f) {
+				requireNonNull(f);
+				return new MappedSortedKeyValueView<>(unview(), f);
+			}
+
 			static <K extends Comparable<K>, A> SortedKeyValueView<K, A> emptySortedKeyValueView() {
 				return (SortedKeyValueView<K, A>) SortedDictView.EMPTY;
 			}
@@ -131,6 +137,58 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			@Override
 			public SortedKeyValue<K, A> unview() {
 				return this.keyValue;
+			}
+		}
+
+		final class MappedSortedKeyValueView<K, A, B> extends MappedKeyValueView<K, A, B, SortedKeyValue<K, A>> implements SortedKeyValueView<K, B> {
+
+			MappedSortedKeyValueView(final SortedKeyValue<K, A> keyValue, final F<A, B> f) {
+				super(keyValue, f);
+			}
+
+			@Override
+			public Ord<K> ord() {
+				return this.keyValue.ord();
+			}
+
+			@Override
+			public P<K, B> last() {
+				return this.keyValue.last().map2(this.f);
+			}
+
+			@Override
+			public Option<P<K, B>> lastOption() {
+				return this.keyValue.lastOption().map((final P<K, A> p) -> p.map2(this.f));
+			}
+
+			@Override
+			public K lastKey() {
+				return this.keyValue.lastKey();
+			}
+
+			@Override
+			public Option<K> lastKeyOption() {
+				return this.keyValue.lastKeyOption();
+			}
+
+			@Override
+			public SortedUniqueContainerView<K> keys() {
+				return this.keyValue.keys();
+			}
+
+			@Override
+			public SortedKeyValueView<K, B> slice(final K from, final boolean fromInclusive, final K to, final boolean toInclusive) {
+				return this.keyValue.view().slice(from, fromInclusive, to, toInclusive).mapValues(this.f);
+			}
+
+			@Override
+			public SortedKeyValueView<K, B> sliceFrom(final K from, final boolean inclusive) {
+				return this.keyValue.view().sliceFrom(from, inclusive).mapValues(this.f);
+			}
+
+			@Override
+			public SortedKeyValueView<K, B> sliceTo(final K to, final boolean inclusive) {
+				return this.keyValue.view().sliceTo(to, inclusive).mapValues(this.f);
 			}
 		}
 
