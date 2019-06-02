@@ -491,7 +491,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 				default <K> Dict<K, Seq<A>> groupBy(final F<A, K> f) {
 					final DictBuilder<K, Seq<A>> builder = Dict.builder();
 					foreach((final A value) ->
-						builder.updateOrPut(f.apply(value), singleSeq(value), (final Seq<A> seq) -> seq.append(value)));
+						builder.updateValueOrPut(f.apply(value), singleSeq(value), (final Seq<A> seq) -> seq.append(value)));
 					return builder.build();
 				}
 

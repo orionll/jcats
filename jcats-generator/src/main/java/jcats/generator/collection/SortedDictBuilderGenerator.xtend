@@ -15,6 +15,7 @@ final class SortedDictBuilderGenerator implements ClassGenerator {
 		import java.util.stream.Stream;
 
 		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
 		import static «Constants.COLLECTION».SortedDict.*;
 		import static «Constants.COMMON».*;
@@ -37,6 +38,11 @@ final class SortedDictBuilderGenerator implements ClassGenerator {
 
 			public SortedDictBuilder<K, A> put(final K key, final A value) {
 				this.dict = this.dict.put(key, value);
+				return this;
+			}
+
+			SortedDictBuilder<K, A> updateValueOrPut(final K key, final A defaultValue, final F<A, A> f) {
+				this.dict = this.dict.updateValueOrPut(key, defaultValue, f);
 				return this;
 			}
 

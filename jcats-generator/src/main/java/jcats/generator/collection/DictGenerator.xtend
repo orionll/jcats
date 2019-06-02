@@ -69,7 +69,7 @@ class DictGenerator implements ClassGenerator {
 				return update(entry.get1(), entry.get1().hashCode(), entry.get2(), entry, 0);
 			}
 
-			public «genericName» update(final K key, final F<A, A> f) {
+			public «genericName» updateValue(final K key, final F<A, A> f) {
 				requireNonNull(f);
 				final int keyHash = key.hashCode();
 				final A value = get(key, keyHash, 0);
@@ -81,7 +81,7 @@ class DictGenerator implements ClassGenerator {
 				}
 			}
 
-			public «genericName» updateOrPut(final K key, final A defaultValue, final F<A, A> f) {
+			public «genericName» updateValueOrPut(final K key, final A defaultValue, final F<A, A> f) {
 				requireNonNull(defaultValue);
 				requireNonNull(f);
 				final int keyHash = key.hashCode();

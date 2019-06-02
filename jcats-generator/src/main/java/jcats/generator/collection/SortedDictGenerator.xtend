@@ -129,6 +129,31 @@ final class SortedDictGenerator implements ClassGenerator {
 				}
 			}
 
+			public SortedDict<K, A> updateValue(final K key, final F<A, A> f) {
+				requireNonNull(key);
+				requireNonNull(f);
+
+				if (this.entry == null) {
+					return this;
+				} else {
+					return replaceValue(key, f);
+				}
+			}
+
+			public SortedDict<K, A> updateValueOrPut(final K key, final A defaultValue, final F<A, A> f) {
+				requireNonNull(key);
+				requireNonNull(defaultValue);
+				requireNonNull(f);
+
+				if (this.entry == null) {
+					return new SortedDict<>(p(key, defaultValue), null, null, this.ord, 0);
+				} else if (containsKey(key)) {
+					return replaceValue(key, f);
+				} else {
+					return update(key, defaultValue, null, new InsertResult());
+				}
+			}
+
 			private «genericName» update(final K key, final A value, final P<K, A> entry, final InsertResult result) {
 				«AVLCommonGenerator.update(genericName, diamondName, "key", "entry.get1()", "(entry == null) ? p(key, value) : entry",
 					"key == this.entry.get1() && value == this.entry.get2()", "key, value, entry")»
@@ -137,6 +162,42 @@ final class SortedDictGenerator implements ClassGenerator {
 			«AVLCommonGenerator.insertAndRotateRight(genericName, diamondName)»
 
 			«AVLCommonGenerator.insertAndRotateLeft(genericName, diamondName)»
+
+			private SortedDict<K, A> replaceValue(final K key, final F<A, A> f) {
+				final Order order = this.ord.order(key, this.entry.get1());
+				if (order == EQ) {
+					final A newValue = requireNonNull(f.apply(this.entry.get2()));
+					if (newValue == this.entry.get2()) {
+						return this;
+					} else {
+						return new SortedDict<>(p(key, newValue), this.left, this.right, this.ord, this.balance);
+					}
+				} else if (order == LT) {
+					if (this.left == null) {
+						return this;
+					} else {
+						final SortedDict<K, A> newLeft = this.left.replaceValue(key, f);
+						if (newLeft == this.left) {
+							return this;
+						} else {
+							return new SortedDict<>(this.entry, newLeft, this.right, this.ord, this.balance);
+						}
+					}
+				} else if (order == GT) {
+					if (this.right == null) {
+						return this;
+					} else {
+						final SortedDict<K, A> newRight = this.right.replaceValue(key, f);
+						if (newRight == this.right) {
+							return this;
+						} else {
+							return new SortedDict<>(this.entry, this.left, newRight, this.ord, this.balance);
+						}
+					}
+				} else {
+					throw nullOrder(order);
+				}
+			}
 
 			public SortedDict<K, A> remove(final K key) {
 				requireNonNull(key);

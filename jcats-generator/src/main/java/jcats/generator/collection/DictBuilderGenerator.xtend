@@ -37,8 +37,8 @@ final class DictBuilderGenerator implements ClassGenerator {
 				return this;
 			}
 
-			DictBuilder<K, A> updateOrPut(final K key, final A defaultValue, final F<A, A> f) {
-				this.dict = this.dict.updateOrPut(key, defaultValue, f);
+			DictBuilder<K, A> updateValueOrPut(final K key, final A defaultValue, final F<A, A> f) {
+				this.dict = this.dict.updateValueOrPut(key, defaultValue, f);
 				return this;
 			}
 
