@@ -475,13 +475,13 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			public static <K extends Comparable<K>, A> SortedDict<K, A> sortedDict(final K key, final A value) {
-				return SortedDict.<K, A> emptySortedDict().put(key, value);
+				return new SortedDict<>(p(key, value), null, null, asc(), 0);
 			}
 
 			«FOR i : 2 .. Constants.DICT_FACTORY_METHODS_COUNT»
 				public static <K extends Comparable<K>, A> SortedDict<K, A> sortedDict(«(1..i).map["final K key" + it + ", final A value" + it].join(", ")») {
-					return SortedDict.<K, A> emptySortedDict()
-						«FOR j : 1 .. i»
+					return sortedDict(key1, value1)
+						«FOR j : 2 .. i»
 							.put(key«j», value«j»)«IF j == i»;«ENDIF»
 						«ENDFOR»
 				}
