@@ -3,8 +3,10 @@ package jcats.collection;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import jcats.P;
+import jcats.function.F;
 import org.junit.Test;
 
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
@@ -12,6 +14,7 @@ import static jcats.Option.none;
 import static jcats.Option.some;
 import static jcats.P.p;
 import static jcats.collection.Dict.*;
+import static jcats.function.F.id;
 import static org.junit.Assert.*;
 
 
@@ -236,6 +239,69 @@ public class TestDict {
 	@Test(expected = NullPointerException.class)
 	public void nullKey() {
 		dict(null, 1);
+	}
+
+	@Test
+	public void putEntry() {
+		Dict<String, Integer> dict = emptyDict();
+		final P<String, Integer> entry1 = p("a", 1);
+		final P<String, Integer> entry2 = p("b", 2);
+		final P<String, Integer> entry3 = p("Aa", 3);
+		final P<String, Integer> entry4 = p("BB", 4);
+		dict = dict.putEntry(entry1).putEntry(entry2).putEntry(entry3).putEntry(entry4);
+		final Iterator<P<String, Integer>> iterator = dict.iterator();
+		assertSame(entry4, iterator.next());
+		assertSame(entry3, iterator.next());
+		assertSame(entry1, iterator.next());
+		assertSame(entry2, iterator.next());
+	}
+
+	@Test
+	public void updateValue() {
+		assertEquals(emptyDict(), emptyDict().updateValue("a", id()));
+
+		final F<Integer, Integer> f = i -> i + 1;
+		assertEquals(dict("a", 2), dict("a", 1).updateValue("a", f));
+		assertEquals(dict("a", 1, "b", 3), dict("a", 1, "b", 2).updateValue("b", f));
+		assertEquals(dict("a", 1, "b", 2), dict("a", 1, "b", 2).updateValue("c", f));
+
+		final Dict<String, Integer> dict1 = Dict.ofAll(IndexedContainer.tabulate(LARGE_MAP_SIZE, i ->
+				p(Integer.toString(i), i)));
+		final Dict<String, Integer> dict2 = Dict.ofAll(IndexedContainer.tabulate(LARGE_MAP_SIZE, i ->
+				p(Integer.toString(i), (i == 17) ? i + 1 : i)));
+		assertEquals(dict2, dict1.updateValue("17", f));
+
+		final Dict<String, Integer> dict3 = dict("a", 1, "b", 2, "c", 3, "Aa", 4, "BB", 5);
+		final Dict<String, Integer> dict4 = dict("a", 1, "b", 2, "c", 3, "Aa", 5, "BB", 5);
+		assertEquals(dict4, dict3.updateValue("Aa", f));
+	}
+
+	@Test
+	public void updateValueOrPut() {
+		assertEquals(dict("a", 1), emptyDict().updateValueOrPut("a", 1, id()));
+
+		final F<Integer, Integer> f = i -> i + 1;
+		assertEquals(dict("a", 2), dict("a", 1).updateValueOrPut("a", 0, f));
+		assertEquals(dict("a", 1, "b", 3), dict("a", 1, "b", 2).updateValueOrPut("b", 0, f));
+		assertEquals(dict("a", 1, "b", 2, "c", 0), dict("a", 1, "b", 2).updateValueOrPut("c", 0, f));
+
+		final Dict<String, Integer> dict1 = Dict.ofAll(IndexedContainer.tabulate(LARGE_MAP_SIZE, i ->
+				p(Integer.toString(i), i)));
+		final Dict<String, Integer> dict2 = Dict.ofAll(IndexedContainer.tabulate(LARGE_MAP_SIZE, i ->
+				p(Integer.toString(i), (i == 17) ? i + 1 : i)));
+		assertEquals(dict2, dict1.updateValueOrPut("17", 0, f));
+
+		final Dict<String, Integer> dict3 = dict("a", 1, "b", 2, "c", 3, "Aa", 4);
+		final Dict<String, Integer> dict4 = dict("a", 1, "b", 2, "c", 3, "Aa", 4, "BB", 0);
+		assertEquals(dict4, dict3.updateValueOrPut("BB", 0, f));
+
+		final Dict<String, Integer> dict5 = dict("a", 1, "b", 2, "c", 3, "Aa", 4, "BB", 5);
+		final Dict<String, Integer> dict6 = dict("a", 1, "b", 2, "c", 3, "Aa", 5, "BB", 5);
+		assertEquals(dict6, dict5.updateValueOrPut("Aa", 0, f));
+
+		final Dict<String, Integer> dict7 = dict("a", 1, "b", 2, "c", 3, "AaAa", 4, "BBBB", 5);
+		final Dict<String, Integer> dict8 = dict("a", 1, "b", 2, "c", 3, "AaAa", 4, "BBBB", 5, "AaBB", 0);
+		assertEquals(dict8, dict7.updateValueOrPut("AaBB", 0, f));
 	}
 
 	@Test

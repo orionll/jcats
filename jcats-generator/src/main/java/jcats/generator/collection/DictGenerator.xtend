@@ -14,6 +14,86 @@ class DictGenerator implements ClassGenerator {
 	def diamondName() { "Dict<>" }
 	def wildcardName() { "Dict<?, ?>" }
 
+	def update(String entryFunc, String defaultEntryFunc, String createNewValue, String getValue, String recursiveCall, String updateCollision) '''
+		final int branch = branch(keyHash, shift);
+
+		switch (slotType(branch, this.treeMap, this.leafMap)) {
+			case VOID:
+				return remap(this.treeMap, this.leafMap | branch, this.size + 1).setEntry(branch, «defaultEntryFunc»);
+
+			case LEAF:
+				final P<K, A> leaf = getEntry(branch);
+				final K leafKey = leaf.get1();
+				final int leafKeyHash = leafKey.hashCode();
+				if (keyHash == leafKeyHash) {
+					if (key.equals(leafKey)) {
+						«IF !createNewValue.empty»
+							«createNewValue»
+						«ENDIF»
+						if («getValue» == leaf.get2()) {
+							return this;
+						} else {
+							return remap(this.treeMap, this.leafMap, this.size).setEntry(branch, «entryFunc»);
+						}
+					} else {
+						final P[] collision = { «defaultEntryFunc», leaf };
+						return remap(this.treeMap | branch, this.leafMap, this.size + 1).setCollision(branch, collision);
+					}
+				} else {
+					final «genericName» tree = merge(leaf, leafKeyHash, «defaultEntryFunc», keyHash, shift + 5);
+					return remap(this.treeMap | branch, this.leafMap ^ branch, this.size + 1).setTree(branch, tree);
+				}
+
+			case TREE:
+				final «genericName» oldTree = getTree(branch);
+				final «genericName» newTree = oldTree.«recursiveCall»;
+				if (newTree == oldTree) {
+					return this;
+				} else {
+					return remap(this.treeMap, this.leafMap, this.size + newTree.size - oldTree.size).setTree(branch, newTree);
+				}
+
+			case COLLISION:
+				final P[] oldCollision = getCollision(branch);
+				final P[] newCollision = «updateCollision»;
+				if (newCollision == oldCollision) {
+					return this;
+				} else if (newCollision.length > oldCollision.length) {
+					return remap(this.treeMap, this.leafMap, this.size + 1).setCollision(branch, newCollision);
+				} else {
+					return remap(this.treeMap, this.leafMap, this.size).setCollision(branch, newCollision);
+				}
+
+			default:
+				throw new AssertionError();
+		}
+	'''
+
+	def updateCollision(String entryFunc, String createNewValue, String getValue) '''
+		for (int i = 0; i < collision.length; i++) {
+			if (collision[i].get1().equals(key)) {
+				«IF !createNewValue.empty»
+					«createNewValue»
+				«ENDIF»
+				if (collision[i].get2() == «getValue») {
+					return collision;
+				} else {
+					final P[] newCollision = new P[collision.length];
+					System.arraycopy(collision, 0, newCollision, 0, collision.length);
+					newCollision[i] = «entryFunc»;
+					return newCollision;
+				}
+			}
+		}
+	'''
+
+	def prependToCollision(String defaultEntryFunc) '''
+		final P[] newCollision = new P[collision.length + 1];
+		System.arraycopy(collision, 0, newCollision, 1, collision.length);
+		newCollision[0] = «defaultEntryFunc»;
+		return newCollision;
+	'''
+
 	override sourceCode() { '''
 		package «Constants.COLLECTION»;
 
@@ -61,37 +141,25 @@ class DictGenerator implements ClassGenerator {
 
 			public «genericName» put(final K key, final A value) {
 				requireNonNull(value);
-				return update(key, key.hashCode(), value, null, 0);
+				return put(key, key.hashCode(), value, 0);
 			}
 
 			public «genericName» putEntry(final P<K, A> entry) {
 				requireNonNull(entry);
-				return update(entry.get1(), entry.get1().hashCode(), entry.get2(), entry, 0);
+				return putEntry(entry.get1(), entry.get1().hashCode(), entry, 0);
 			}
 
 			public «genericName» updateValue(final K key, final F<A, A> f) {
 				requireNonNull(f);
 				final int keyHash = key.hashCode();
-				final A value = get(key, keyHash, 0);
-				if (value == null) {
-					return this;
-				} else {
-					final A newValue = requireNonNull(f.apply(value));
-					return update(key, keyHash, newValue, null, 0);
-				}
+				return updateValue(key, keyHash, f, 0);
 			}
 
 			public «genericName» updateValueOrPut(final K key, final A defaultValue, final F<A, A> f) {
 				requireNonNull(defaultValue);
 				requireNonNull(f);
 				final int keyHash = key.hashCode();
-				final A value = get(key, keyHash, 0);
-				if (value == null) {
-					return update(key, keyHash, defaultValue, null, 0);
-				} else {
-					final A newValue = requireNonNull(f.apply(value));
-					return update(key, keyHash, newValue, null, 0);
-				}
+				return updateValueOrPut(key, keyHash, defaultValue, f, 0);
 			}
 
 			public «genericName» remove(final K key) {
@@ -189,56 +257,60 @@ class DictGenerator implements ClassGenerator {
 
 			«HashTableCommonGenerator.remap(shortName, genericName, diamondName)»
 
-			private «genericName» update(final K key, final int keyHash, final A value, final P<K, A> entry, final int shift) {
+			private «genericName» put(final K key, final int keyHash, final A value, final int shift) {
+				«update("p(key, value)", "p(key, value)", "", "value", "put(key, keyHash, value, shift + 5)", "putToCollision(oldCollision, key, value)")»
+			}
+
+			private «genericName» putEntry(final K key, final int keyHash, final P<K, A> entry, final int shift) {
+				«update("entry", "entry", "", "entry.get2()", "putEntry(key, keyHash, entry, shift + 5)", "putEntryToCollision(oldCollision, key, entry)")»
+			}
+
+			private Dict<K, A> updateValue(final K key, final int keyHash, final F<A, A> f, final int shift) {
 				final int branch = branch(keyHash, shift);
 
 				switch (slotType(branch, this.treeMap, this.leafMap)) {
 					case VOID:
-						return remap(this.treeMap, this.leafMap | branch, this.size + 1).setEntry(branch, (entry == null) ? p(key, value) : entry);
+						return this;
 
 					case LEAF:
 						final P<K, A> leaf = getEntry(branch);
-						final K leafKey = leaf.get1();
-						final int leafKeyHash = leafKey.hashCode();
-						if (keyHash == leafKeyHash) {
-							if (key.equals(leafKey)) {
-								if (value == leaf.get2()) {
-									return this;
-								} else {
-									return remap(this.treeMap, this.leafMap, this.size).setEntry(branch, (entry == null) ? p(key, value) : entry);
-								}
+						if (key.equals(leaf.get1())) {
+							final A newValue = requireNonNull(f.apply(leaf.get2()));
+							if (newValue == leaf.get2()) {
+								return this;
 							} else {
-								final P[] collision = { (entry == null) ? p(key, value) : entry, leaf };
-								return remap(this.treeMap | branch, this.leafMap, this.size + 1).setCollision(branch, collision);
+								return new Dict<K, A>(this.treeMap, this.leafMap, this.slots.clone(), this.size).setEntry(branch, p(key, newValue));
 							}
 						} else {
-							final «genericName» tree = merge(leaf, leafKeyHash, (entry == null) ? p(key, value) : entry, keyHash, shift + 5);
-							return remap(this.treeMap | branch, this.leafMap ^ branch, this.size + 1).setTree(branch, tree);
+							return this;
 						}
 
 					case TREE:
-						final «genericName» oldTree = getTree(branch);
-						final «genericName» newTree = oldTree.update(key, keyHash, value, entry, shift + 5);
+						final Dict<K, A> oldTree = getTree(branch);
+						final Dict<K, A> newTree = oldTree.updateValue(key, keyHash, f, shift + 5);
 						if (newTree == oldTree) {
 							return this;
 						} else {
-							return remap(this.treeMap, this.leafMap, this.size + newTree.size - oldTree.size).setTree(branch, newTree);
+							return new Dict<K, A>(this.treeMap, this.leafMap, this.slots.clone(), this.size).setTree(branch, newTree);
 						}
 
 					case COLLISION:
 						final P[] oldCollision = getCollision(branch);
-						final P[] newCollision = updateCollision(oldCollision, key, value, entry);
+						final P[] newCollision = updateValueOrPutToCollision(oldCollision, key, null, f);
 						if (newCollision == oldCollision) {
 							return this;
-						} else if (newCollision.length > oldCollision.length) {
-							return remap(this.treeMap, this.leafMap, this.size + 1).setCollision(branch, newCollision);
 						} else {
-							return remap(this.treeMap, this.leafMap, this.size).setCollision(branch, newCollision);
+							return new Dict<K, A>(this.treeMap, this.leafMap, this.slots.clone(), this.size).setCollision(branch, newCollision);
 						}
 
 					default:
 						throw new AssertionError();
 				}
+			}
+
+			private «genericName» updateValueOrPut(final K key, final int keyHash, final A defaultValue, final F<A, A> f, final int shift) {
+				«update("p(key, newValue)", "p(key, defaultValue)", "final A newValue = requireNonNull(f.apply(leaf.get2()));",
+					"newValue", "updateValueOrPut(key, keyHash, defaultValue, f, shift + 5)", "updateValueOrPutToCollision(oldCollision, key, defaultValue, f)")»
 			}
 
 			«HashTableCommonGenerator.remove(genericName, "K", "key", "P<K, A>", "entry.get1().equals(key)", "P", false)»
@@ -254,24 +326,26 @@ class DictGenerator implements ClassGenerator {
 				return null;
 			}
 
-			private P[] updateCollision(final P[] collision, final K key, final A value, final P<K, A> entry) {
-				for (int i = 0; i < collision.length; i++) {
-					if (collision[i].get1().equals(key)) {
-						if (collision[i].get2() == value) {
-							return collision;
-						} else {
-							final P[] newCollision = new P[collision.length];
-							System.arraycopy(collision, 0, newCollision, 0, collision.length);
-							newCollision[i] = (entry == null) ? p(key, value) : entry;
-							return newCollision;
-						}
-					}
-				}
+			private P[] putToCollision(final P[] collision, final K key, final A value) {
+				«updateCollision("p(key, value)", "", "value")»
 
-				final P[] newCollision = new P[collision.length + 1];
-				System.arraycopy(collision, 0, newCollision, 1, collision.length);
-				newCollision[0] = (entry == null) ? p(key, value) : entry;
-				return newCollision;
+				«prependToCollision("p(key, value)")»
+			}
+
+			private P[] putEntryToCollision(final P[] collision, final K key, final P<K, A> entry) {
+				«updateCollision("entry", "", "entry.get2()")»
+
+				«prependToCollision("entry")»
+			}
+
+			private P[] updateValueOrPutToCollision(final P[] collision, final K key, final A defaultValue, final F<A, A> f) {
+				«updateCollision("p(key, newValue)", "final A newValue = requireNonNull(f.apply((A) collision[i].get2()));", "newValue")»
+
+				if (defaultValue == null) {
+					return collision;
+				} else {
+					«prependToCollision("p(key, defaultValue)")»
+				}
 			}
 
 			private P[] removeFromCollision(final P[] collision, final K key) {
