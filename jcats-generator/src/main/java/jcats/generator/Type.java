@@ -547,10 +547,6 @@ public enum Type {
 		return (this == Type.OBJECT) ? "requireNonNull(" + expr + ")" : expr;
 	}
 
-	public String updateArray(final String array, final String index) {
-		return "update" + shortName("Array") + "(" + array + ", " + index + ", f)";
-	}
-
 	public String boolFName() {
 		return (this == Type.OBJECT) ? "BooleanF<A>" : typeName() + "BooleanF";
 	}

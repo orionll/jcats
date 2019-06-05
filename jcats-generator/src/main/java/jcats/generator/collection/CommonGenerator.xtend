@@ -100,7 +100,21 @@ final class CommonGenerator implements ClassGenerator {
 			}
 
 			«FOR type : Type.values»
-				static «type.javaName»[] update«type.shortName("Array")»(final «type.javaName»[] array, final int index, final «type.endoGenericName.replaceAll("<A, A>", "")» f) {
+				static «type.javaName»[] concatArrays(final «type.javaName»[] prefix, final «type.javaName»[] suffix) {
+					final int length = prefix.length + suffix.length;
+					if (length >= 0) {
+						final «type.javaName»[] result = new «type.javaName»[length];
+						System.arraycopy(prefix, 0, result, 0, prefix.length);
+						System.arraycopy(suffix, 0, result, prefix.length, suffix.length);
+						return result;
+					} else {
+						throw new SizeOverflowException();
+					}
+				}
+
+			«ENDFOR»
+			«FOR type : Type.values»
+				static «type.javaName»[] updateArray(final «type.javaName»[] array, final int index, final «type.endoGenericName.replaceAll("<A, A>", "")» f) {
 					final «type.javaName»[] result = new «type.javaName»[array.length];
 					System.arraycopy(array, 0, result, 0, array.length);
 					final «type.javaName» oldValue = array[index];

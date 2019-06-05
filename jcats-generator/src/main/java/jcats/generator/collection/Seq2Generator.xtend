@@ -145,11 +145,11 @@ class Seq2Generator extends SeqGenerator {
 			public «genericName» update(final int index, final «type.endoGenericName» f) {
 				try {
 					if (index < init.length) {
-						final «type.javaName»[] newInit = «type.updateArray("init", "index")»;
+						final «type.javaName»[] newInit = updateArray(init, index, f);
 						return new «diamondName(2)»(node2, newInit, tail, size);
 					} else if (index >= size - tail.length) {
 						final int tailIndex = index + tail.length - size;
-						final «type.javaName»[] newTail = «type.updateArray("tail", "tailIndex")»;
+						final «type.javaName»[] newTail = updateArray(tail, tailIndex, f);
 						return new «diamondName(2)»(node2, init, newTail, size);
 					} else {
 						final int idx = index + 32 - init.length;
@@ -159,7 +159,7 @@ class Seq2Generator extends SeqGenerator {
 
 						final «type.javaName»[][] newNode2 = new «type.javaName»[node2.length][];
 						System.arraycopy(node2, 0, newNode2, 0, node2.length);
-						final «type.javaName»[] newNode1 = «type.updateArray("node1", "index1")»;
+						final «type.javaName»[] newNode1 = updateArray(node1, index1, f);
 						newNode2[index2] = newNode1;
 						return new «diamondName(2)»(newNode2, init, tail, size);
 					}

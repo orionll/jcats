@@ -118,7 +118,7 @@ final class ArrayGenerator implements ClassGenerator {
 			 * O(size)
 			 */
 			public «genericName» update(final int index, final «type.endoGenericName» f) throws IndexOutOfBoundsException {
-				return new «diamondName»(«type.updateArray("this.array", "index")»);
+				return new «diamondName»(updateArray(this.array, index, f));
 			}
 
 			/**
@@ -217,18 +217,6 @@ final class ArrayGenerator implements ClassGenerator {
 					System.arraycopy(this.array, 0, result, 0, index);
 					System.arraycopy(this.array, index + 1, result, index, this.array.length - index - 1);
 					return new «diamondName»(result);
-				}
-			}
-
-			private static «type.javaName»[] concatArrays(final «type.javaName»[] prefix, final «type.javaName»[] suffix) {
-				final int length = prefix.length + suffix.length;
-				if (length >= 0) {
-					final «type.javaName»[] result = new «type.javaName»[length];
-					System.arraycopy(prefix, 0, result, 0, prefix.length);
-					System.arraycopy(suffix, 0, result, prefix.length, suffix.length);
-					return result;
-				} else {
-					throw new SizeOverflowException();
 				}
 			}
 
@@ -963,7 +951,7 @@ final class ArrayGenerator implements ClassGenerator {
 			/**
 			 * O(prefix.size + suffix.size)
 			 */
-			public static «paramGenericName» concat(final «genericName» prefix, final «genericName» suffix) throws SizeOverflowException {
+			private static «paramGenericName» concat(final «genericName» prefix, final «genericName» suffix) {
 				requireNonNull(prefix);
 				requireNonNull(suffix);
 				if (prefix.isEmpty()) {
@@ -972,6 +960,38 @@ final class ArrayGenerator implements ClassGenerator {
 					return prefix;
 				} else {
 					return new «diamondName»(concatArrays(prefix.array, suffix.array));
+				}
+			}
+
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			public static «paramGenericName» concat(final «genericName»... arrays) throws SizeOverflowException {
+				if (arrays.length == 0) {
+					return empty«shortName»();
+				} else if (arrays.length == 1) {
+					return requireNonNull(arrays[0]);
+				} else if (arrays.length == 2) {
+					return concat(arrays[0], arrays[1]);
+				} else {
+					int size = 0;
+					for (final «genericName» array : arrays) {
+						size += array.array.length;
+						if (size < 0) {
+							throw new SizeOverflowException();
+						}
+					}
+					if (size == 0) {
+						return empty«shortName»();
+					} else {
+						final «type.javaName»[] result = new «type.javaName»[size];
+						int pos = 0;
+						for (final «genericName» array : arrays) {
+							System.arraycopy(array.array, 0, result, pos, array.array.length);
+							pos += array.array.length;
+						}
+						return new «diamondName»(result);
+					}
 				}
 			}
 

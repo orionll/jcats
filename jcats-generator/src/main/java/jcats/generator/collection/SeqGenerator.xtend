@@ -1331,7 +1331,7 @@ class SeqGenerator implements ClassGenerator {
 			/**
 			 * O(min(prefix.size, suffix.size))
 			 */
-			public static «paramGenericName» concat(final «genericName» prefix, final «genericName» suffix) throws SizeOverflowException {
+			private static «paramGenericName» concat(final «genericName» prefix, final «genericName» suffix) {
 				requireNonNull(prefix);
 				requireNonNull(suffix);
 				if (prefix.isEmpty()) {
@@ -1347,15 +1347,31 @@ class SeqGenerator implements ClassGenerator {
 					} else if (size <= 32) {
 						final «type.javaName»[] prefixArray = ((«genericName(1)») prefix).node1;
 						final «type.javaName»[] suffixArray = ((«genericName(1)») suffix).node1;
-						final «type.javaName»[] array = new «type.javaName»[size];
-						System.arraycopy(prefixArray, 0, array, 0, prefixSize);
-						System.arraycopy(suffixArray, 0, array, prefixSize, suffixSize);
-						return new «diamondName(1)»(array);
+						return new «diamondName(1)»(concatArrays(prefixArray, suffixArray));
 					} else if (prefixSize >= suffixSize) {
 						return prefix.appendSized(suffix.iterator(), suffixSize);
 					} else {
 						return suffix.prependSized(prefix.iterator(), prefixSize);
 					}
+				}
+			}
+
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			public static «paramGenericName» concat(final «genericName»... seqs) throws SizeOverflowException {
+				if (seqs.length == 0) {
+					return empty«shortName»();
+				} else if (seqs.length == 1) {
+					return requireNonNull(seqs[0]);
+				} else {
+					«genericName» seq = concat(seqs[0], seqs[1]);
+					if (seqs.length > 2) {
+						for (int i = 2; i < seqs.length; i++) {
+							seq = concat(seq, seqs[i]);
+						}
+					}
+					return seq;
 				}
 			}
 

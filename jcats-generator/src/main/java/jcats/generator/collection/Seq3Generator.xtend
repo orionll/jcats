@@ -223,11 +223,11 @@ final class Seq3Generator extends SeqGenerator {
 			public «genericName» update(final int index, final «type.endoGenericName» f) {
 				try {
 					if (index < init.length) {
-						final «type.javaName»[] newInit = «type.updateArray("init", "index")»;
+						final «type.javaName»[] newInit = updateArray(init, index, f);
 						return new «diamondName(3)»(node3, newInit, tail, startIndex, size);
 					} else if (index >= size - tail.length) {
 						final int tailIndex = index + tail.length - size;
-						final «type.javaName»[] newTail = «type.updateArray("tail", "tailIndex")»;
+						final «type.javaName»[] newTail = updateArray(tail, tailIndex, f);
 						return new «diamondName(3)»(node3, init, newTail, startIndex, size);
 					} else {
 						final int idx = index + startIndex;
@@ -241,7 +241,7 @@ final class Seq3Generator extends SeqGenerator {
 						System.arraycopy(node3, 0, newNode3, 0, node3.length);
 						final «type.javaName»[][] newNode2 = new «type.javaName»[node2.length][];
 						System.arraycopy(node2, 0, newNode2, 0, node2.length);
-						final «type.javaName»[] newNode1 = «type.updateArray("node1", "index1")»;
+						final «type.javaName»[] newNode1 = updateArray(node1, index1, f);
 						newNode3[index3] = newNode2;
 						newNode2[index2] = newNode1;
 						return new «diamondName(3)»(newNode3, init, tail, startIndex, size);
