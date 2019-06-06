@@ -237,6 +237,33 @@ class SeqGenerator implements ClassGenerator {
 				return concat(prefix, suffix);
 			}
 
+			/**
+			 * O(min(prefix.size, suffix.size))
+			 */
+			private «genericName» concat(final «genericName» suffix) {
+				requireNonNull(suffix);
+				if (isEmpty()) {
+					return suffix;
+				} else if (suffix.isEmpty()) {
+					return this;
+				} else {
+					final int prefixSize = size();
+					final int suffixSize = suffix.size();
+					final int size = prefixSize + suffixSize;
+					if (size < 0) {
+						throw new SizeOverflowException();
+					} else if (size <= 32) {
+						final «type.javaName»[] prefixArray = ((«genericName(1)») this).node1;
+						final «type.javaName»[] suffixArray = ((«genericName(1)») suffix).node1;
+						return new «diamondName(1)»(concatArrays(prefixArray, suffixArray));
+					} else if (prefixSize >= suffixSize) {
+						return appendSized(suffix.iterator(), suffixSize);
+					} else {
+						return suffix.prependSized(iterator(), prefixSize);
+					}
+				}
+			}
+
 			// Assume suffixSize > 0
 			abstract «genericName» appendSized(«type.iteratorGenericName» suffix, int suffixSize);
 
@@ -247,7 +274,7 @@ class SeqGenerator implements ClassGenerator {
 				if (isEmpty()) {
 					return ofAll(suffix);
 				} else if (suffix instanceof «type.seqWildcardName») {
-					return concat(this, («genericName») suffix);
+					return concat((«genericName») suffix);
 				} else if (suffix instanceof Sized && ((Sized) suffix).hasKnownFixedSize()) {
 					final int suffixSize = ((Sized) suffix).size();
 					if (suffixSize == 0) {
@@ -268,7 +295,7 @@ class SeqGenerator implements ClassGenerator {
 				if (isEmpty()) {
 					return ofAll(prefix);
 				} else if (prefix instanceof «type.seqWildcardName») {
-					return concat((«genericName») prefix, this);
+					return ((«genericName») prefix).concat(this);
 				} else if (prefix instanceof Sized && ((Sized) prefix).hasKnownFixedSize()) {
 					final int prefixSize = ((Sized) prefix).size();
 					if (prefixSize == 0) {
@@ -281,7 +308,7 @@ class SeqGenerator implements ClassGenerator {
 				} else {
 					final «seqBuilderName» builder = new «seqBuilderDiamondName»();
 					prefix.forEach(builder::append);
-					return concat(builder.build(), this);
+					return builder.build().concat(this);
 				}
 			}
 
@@ -1326,55 +1353,6 @@ class SeqGenerator implements ClassGenerator {
 
 			abstract void initSeqBuilder(«seqBuilderName» builder);
 
-			«flattenCollection(type, genericName, type.seqBuilderGenericName)»
-
-			/**
-			 * O(min(prefix.size, suffix.size))
-			 */
-			private static «paramGenericName» concat(final «genericName» prefix, final «genericName» suffix) {
-				requireNonNull(prefix);
-				requireNonNull(suffix);
-				if (prefix.isEmpty()) {
-					return suffix;
-				} else if (suffix.isEmpty()) {
-					return prefix;
-				} else {
-					final int prefixSize = prefix.size();
-					final int suffixSize = suffix.size();
-					final int size = prefixSize + suffixSize;
-					if (size < 0) {
-						throw new SizeOverflowException();
-					} else if (size <= 32) {
-						final «type.javaName»[] prefixArray = ((«genericName(1)») prefix).node1;
-						final «type.javaName»[] suffixArray = ((«genericName(1)») suffix).node1;
-						return new «diamondName(1)»(concatArrays(prefixArray, suffixArray));
-					} else if (prefixSize >= suffixSize) {
-						return prefix.appendSized(suffix.iterator(), suffixSize);
-					} else {
-						return suffix.prependSized(prefix.iterator(), prefixSize);
-					}
-				}
-			}
-
-			«IF type == Type.OBJECT»
-				@SafeVarargs
-			«ENDIF»
-			public static «paramGenericName» concat(final «genericName»... seqs) throws SizeOverflowException {
-				if (seqs.length == 0) {
-					return empty«shortName»();
-				} else if (seqs.length == 1) {
-					return requireNonNull(seqs[0]);
-				} else {
-					«genericName» seq = concat(seqs[0], seqs[1]);
-					if (seqs.length > 2) {
-						for (int i = 2; i < seqs.length; i++) {
-							seq = concat(seq, seqs[i]);
-						}
-					}
-					return seq;
-				}
-			}
-
 			«IF type.javaUnboxedType»
 				@Override
 				public abstract «type.iteratorGenericName» iterator();
@@ -1429,6 +1407,27 @@ class SeqGenerator implements ClassGenerator {
 				}
 
 			«ENDIF»
+			«flattenCollection(type, genericName, type.seqBuilderGenericName)»
+
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			public static «paramGenericName» concat(final «genericName»... seqs) throws SizeOverflowException {
+				if (seqs.length == 0) {
+					return empty«shortName»();
+				} else if (seqs.length == 1) {
+					return requireNonNull(seqs[0]);
+				} else {
+					«genericName» seq = seqs[0].concat(seqs[1]);
+					if (seqs.length > 2) {
+						for (int i = 2; i < seqs.length; i++) {
+							seq = seq.concat(seqs[i]);
+						}
+					}
+					return seq;
+				}
+			}
+
 			«IF type == Type.OBJECT»
 				«FOR arity : 2 .. Constants.MAX_PRODUCT_ARITY»
 					public static <«(1..arity).map['''A«it», '''].join»B> Seq<B> map«arity»(«(1..arity).map['''final Seq<A«it»> seq«it», '''].join»final F«arity»<«(1..arity).map['''A«it», '''].join»B> f) {

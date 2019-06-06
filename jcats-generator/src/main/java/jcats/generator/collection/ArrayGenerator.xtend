@@ -220,6 +220,20 @@ final class ArrayGenerator implements ClassGenerator {
 				}
 			}
 
+			/**
+			 * O(prefix.size + suffix.size)
+			 */
+			private «genericName» concat(final «genericName» suffix) {
+				requireNonNull(suffix);
+				if (isEmpty()) {
+					return suffix;
+				} else if (suffix.isEmpty()) {
+					return this;
+				} else {
+					return new «diamondName»(concatArrays(this.array, suffix.array));
+				}
+			}
+
 			private static «IF type == Type.OBJECT»<A> «ENDIF»void fillArray(final «type.javaName»[] array, final int startIndex, final Iterable<«type.genericBoxedName»> iterable) {
 				int i = startIndex;
 				«IF type.javaUnboxedType»
@@ -295,7 +309,7 @@ final class ArrayGenerator implements ClassGenerator {
 				if (this.array.length == 0) {
 					return ofAll(suffix);
 				} else if (suffix instanceof «shortName») {
-					return concat(this, («genericName») suffix);
+					return concat((«genericName») suffix);
 				} else if (suffix instanceof Sized && ((Sized) suffix).hasKnownFixedSize()) {
 					return appendSized(suffix, ((Sized) suffix).size());
 				} else {
@@ -329,7 +343,7 @@ final class ArrayGenerator implements ClassGenerator {
 				if (this.array.length == 0) {
 					return ofAll(prefix);
 				} else if (prefix instanceof «shortName») {
-					return concat((«genericName») prefix, this);
+					return ((«genericName») prefix).concat(this);
 				} else if (prefix instanceof Sized && ((Sized) prefix).hasKnownFixedSize()) {
 					return prependSized(prefix, ((Sized) prefix).size());
 				} else {
@@ -948,21 +962,6 @@ final class ArrayGenerator implements ClassGenerator {
 			«ENDIF»
 			«flattenCollection(type, genericName, type.arrayBuilderGenericName)»
 
-			/**
-			 * O(prefix.size + suffix.size)
-			 */
-			private static «paramGenericName» concat(final «genericName» prefix, final «genericName» suffix) {
-				requireNonNull(prefix);
-				requireNonNull(suffix);
-				if (prefix.isEmpty()) {
-					return suffix;
-				} else if (suffix.isEmpty()) {
-					return prefix;
-				} else {
-					return new «diamondName»(concatArrays(prefix.array, suffix.array));
-				}
-			}
-
 			«IF type == Type.OBJECT»
 				@SafeVarargs
 			«ENDIF»
@@ -972,7 +971,7 @@ final class ArrayGenerator implements ClassGenerator {
 				} else if (arrays.length == 1) {
 					return requireNonNull(arrays[0]);
 				} else if (arrays.length == 2) {
-					return concat(arrays[0], arrays[1]);
+					return arrays[0].concat(arrays[1]);
 				} else {
 					int size = 0;
 					for (final «genericName» array : arrays) {

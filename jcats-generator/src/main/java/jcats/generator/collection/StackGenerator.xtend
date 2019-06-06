@@ -495,6 +495,36 @@ final class StackGenerator implements ClassGenerator {
 
 			«flattenCollection(type, genericName, type.stackBuilderGenericName)»
 
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			public static «paramGenericName» concat(final «genericName»... stacks) {
+				if (stacks.length == 0) {
+					return empty«shortName»();
+				} else if (stacks.length == 1) {
+					return requireNonNull(stacks[0]);
+				} else if (stacks.length == 2) {
+					return stacks[0].concat(stacks[1]);
+				} else {
+					// Index of last non-empty stack
+					int lastIndex = -1;
+					for (int i = 0; i < stacks.length; i++) {
+						if (stacks[i].isNotEmpty()) {
+							lastIndex = i;
+						}
+					}
+					if (lastIndex >= 0) {
+						final «builderGenericName» builder = builder();
+						for (int i = 0; i < lastIndex; i++) {
+							stacks[i].foreach(builder::append);
+						}
+						return builder.prependToStack(stacks[lastIndex]);
+					} else {
+						return empty«shortName»();
+					}
+				}
+			}
+
 			public static «IF type == Type.OBJECT»<A> «ENDIF»Collector<«type.genericBoxedName», ?, «genericName»> collector() {
 				«IF type == Type.OBJECT»
 					return Collector.<«type.genericBoxedName», «type.stackBuilderGenericName», «genericName»> of(
