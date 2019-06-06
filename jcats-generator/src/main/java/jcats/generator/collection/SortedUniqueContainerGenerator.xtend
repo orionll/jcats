@@ -51,7 +51,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			default «type.optionGenericName» lastOption() {
+			default «type.optionGenericName» findLast() {
 				final «type.iteratorGenericName» iterator = reverseIterator();
 				if (iterator.hasNext()) {
 					return «type.someName»(iterator.«type.iteratorNext»());
@@ -64,7 +64,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 				@Override
 				default «type.optionGenericName» max(final «type.ordGenericName» ord) {
 					if (ord == ord()) {
-						return lastOption();
+						return findLast();
 					} else {
 						return «type.uniqueContainerShortName».super.max(ord);
 					}
@@ -73,7 +73,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 				@Override
 				default «type.optionGenericName» min(final «type.ordGenericName» ord) {
 					if (ord == ord()) {
-						return firstOption();
+						return findFirst();
 					} else {
 						return «type.uniqueContainerShortName».super.min(ord);
 					}
@@ -81,18 +81,18 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 			«ELSE»
 				@Override
 				default «type.optionGenericName» max() {
-					return lastOption();
+					return findLast();
 				}
 
 				@Override
 				default «type.optionGenericName» min() {
-					return firstOption();
+					return findFirst();
 				}
 
 				@Override
 				default «type.optionGenericName» maxByOrd(final «type.ordGenericName» ord) {
 					if (ord == ord()) {
-						return lastOption();
+						return findLast();
 					} else {
 						return «type.uniqueContainerShortName».super.maxByOrd(ord);
 					}
@@ -101,7 +101,7 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 				@Override
 				default «type.optionGenericName» minByOrd(final «type.ordGenericName» ord) {
 					if (ord == ord()) {
-						return firstOption();
+						return findFirst();
 					} else {
 						return «type.uniqueContainerShortName».super.minByOrd(ord);
 					}
@@ -163,8 +163,8 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public Option<«type.boxedName»> lastOption() {
-					return this.container.lastOption().toOption();
+				public Option<«type.boxedName»> findLast() {
+					return this.container.findLast().toOption();
 				}
 
 				@Override

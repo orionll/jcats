@@ -207,8 +207,8 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» lastOption() {
-				return this.container.lastOption();
+			public «type.optionGenericName» findLast() {
+				return this.container.findLast();
 			}
 
 			@Override
@@ -271,8 +271,8 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<«mapTargetType»> lastOption() {
-				return this.container.lastOption().map(this.f);
+			public Option<«mapTargetType»> findLast() {
+				return this.container.findLast().map(this.f);
 			}
 
 			@Override
@@ -341,8 +341,8 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public «toType.optionGenericName» lastOption() {
-					return this.container.lastOption().mapTo«toType.typeName»(this.f);
+				public «toType.optionGenericName» findLast() {
+					return this.container.findLast().mapTo«toType.typeName»(this.f);
 				}
 
 				@Override
@@ -568,8 +568,8 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» firstOption() {
-				return this.container.firstOption().filter(this.predicate);
+			public «type.optionGenericName» findFirst() {
+				return this.container.findFirst().filter(this.predicate);
 			}
 
 			@Override
@@ -669,8 +669,8 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» firstOption() {
-				return this.container.lastOption();
+			public «type.optionGenericName» findFirst() {
+				return this.container.findLast();
 			}
 
 			@Override
@@ -679,8 +679,8 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» lastOption() {
-				return this.container.firstOption();
+			public «type.optionGenericName» findLast() {
+				return this.container.findFirst();
 			}
 
 			@Override
@@ -864,7 +864,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» lastOption() {
+			public «type.optionGenericName» findLast() {
 				throw new UnsupportedOperationException();
 			}
 
@@ -934,7 +934,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» firstOption() {
+			public «type.optionGenericName» findFirst() {
 				return «type.someName»(this.start);
 			}
 
@@ -944,7 +944,7 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» lastOption() {
+			public «type.optionGenericName» findLast() {
 				throw new UnsupportedOperationException();
 			}
 
@@ -1088,10 +1088,10 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» lastOption() {
-				final «type.optionGenericName» last = this.suffix.lastOption();
+			public «type.optionGenericName» findLast() {
+				final «type.optionGenericName» last = this.suffix.findLast();
 				if (last.isEmpty()) {
-					return this.prefix.lastOption();
+					return this.prefix.findLast();
 				} else {
 					return last;
 				}

@@ -175,7 +175,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 				return iterator().«type.iteratorNext»();
 			}
 
-			default «type.optionGenericName» firstOption() {
+			default «type.optionGenericName» findFirst() {
 				if (hasKnownFixedSize()) {
 					if (isEmpty()) {
 						return «type.noneName»();
@@ -617,8 +617,8 @@ final class ContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public Option<«type.boxedName»> firstOption() {
-					return this.container.firstOption().toOption();
+				public Option<«type.boxedName»> findFirst() {
+					return this.container.findFirst().toOption();
 				}
 
 				@Override

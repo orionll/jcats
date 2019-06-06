@@ -54,7 +54,7 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
-			default «type.optionGenericName» lastOption() {
+			default «type.optionGenericName» findLast() {
 				if (hasKnownFixedSize()) {
 					if (isEmpty()) {
 						return «type.noneName»();
@@ -211,8 +211,8 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public Option<«type.boxedName»> lastOption() {
-					return this.container.lastOption().toOption();
+				public Option<«type.boxedName»> findLast() {
+					return this.container.findLast().toOption();
 				}
 
 				@Override

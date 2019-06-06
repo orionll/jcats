@@ -74,7 +74,7 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» firstOption() {
+			public «type.optionGenericName» findFirst() {
 				return «type.someName»(this.f.apply(0));
 			}
 
@@ -84,7 +84,7 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» lastOption() {
+			public «type.optionGenericName» findLast() {
 				return «type.someName»(this.f.apply(this.size - 1));
 			}
 

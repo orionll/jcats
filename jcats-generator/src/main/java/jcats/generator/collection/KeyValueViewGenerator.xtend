@@ -163,8 +163,8 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<P<K, A>> firstOption() {
-				return this.keyValue.firstOption();
+			public Option<P<K, A>> findFirst() {
+				return this.keyValue.findFirst();
 			}
 
 			@Override
@@ -173,8 +173,8 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<K> firstKeyOption() {
-				return this.keyValue.firstKeyOption();
+			public Option<K> findFirstKey() {
+				return this.keyValue.findFirstKey();
 			}
 
 			@Override
@@ -324,8 +324,8 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<P<K, B>> firstOption() {
-				return this.keyValue.firstOption().map((final P<K, A> p) -> p.map2(this.f));
+			public Option<P<K, B>> findFirst() {
+				return this.keyValue.findFirst().map((final P<K, A> p) -> p.map2(this.f));
 			}
 
 			@Override
@@ -334,8 +334,8 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<K> firstKeyOption() {
-				return this.keyValue.firstKeyOption();
+			public Option<K> findFirstKey() {
+				return this.keyValue.findFirstKey();
 			}
 
 			@Override
@@ -483,7 +483,7 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<P<K, A>> firstOption() {
+			public Option<P<K, A>> findFirst() {
 				final Iterator<Entry<K, A>> iterator = this.map.entrySet().iterator();
 				if (iterator.hasNext()) {
 					return some(P.fromEntry(iterator.next()));
@@ -498,7 +498,7 @@ final class KeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<K> firstKeyOption() {
+			public Option<K> findFirstKey() {
 				final Iterator<K> iterator = this.map.keySet().iterator();
 				if (iterator.hasNext()) {
 					return some(iterator.next());

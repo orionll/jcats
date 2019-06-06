@@ -95,7 +95,7 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public IntOption firstOption() {
+			public IntOption findFirst() {
 				return intSome(this.low);
 			}
 
@@ -109,7 +109,7 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public IntOption lastOption() {
+			public IntOption findLast() {
 				if (this.closed) {
 					return intSome(this.high);
 				} else {

@@ -114,7 +114,7 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				return iterator().next();
 			}
 
-			default Option<P<K, A>> firstOption() {
+			default Option<P<K, A>> findFirst() {
 				final Iterator<P<K, A>> iterator = iterator();
 				if (iterator.hasNext()) {
 					return some(iterator.next());
@@ -127,8 +127,8 @@ final class KeyValueGenerator implements InterfaceGenerator {
 				return first().get1();
 			}
 
-			default Option<K> firstKeyOption() {
-				return firstOption().map(P::get1);
+			default Option<K> findFirstKey() {
+				return findFirst().map(P::get1);
 			}
 
 			default void foreach(final Eff2<K, A> eff) {
@@ -243,8 +243,8 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<A> firstOption() {
-				return this.keyValue.firstOption().map(P::get2);
+			public Option<A> findFirst() {
+				return this.keyValue.findFirst().map(P::get2);
 			}
 
 			@Override
@@ -308,8 +308,8 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<K> firstOption() {
-				return this.keyValue.firstKeyOption();
+			public Option<K> findFirst() {
+				return this.keyValue.findFirstKey();
 			}
 
 			@Override
@@ -378,8 +378,8 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<P<K, A>> firstOption() {
-				return this.keyValue.firstOption();
+			public Option<P<K, A>> findFirst() {
+				return this.keyValue.findFirst();
 			}
 
 			@Override

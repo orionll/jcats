@@ -196,7 +196,7 @@ class DictGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public Option<P<K, A>> firstOption() {
+			public Option<P<K, A>> findFirst() {
 				if (isEmpty()) {
 					return none();
 				} else {

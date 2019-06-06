@@ -132,7 +132,7 @@ final class StackGenerator implements ClassGenerator {
 			 * O(1)
 			 */
 			@Override
-			public «type.optionGenericName» firstOption() {
+			public «type.optionGenericName» findFirst() {
 				return isEmpty() ? «type.noneName»() : «type.someName»(this.head);
 			}
 

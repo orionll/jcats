@@ -125,8 +125,8 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» lastOption() {
-				return this.container.lastOption();
+			public «type.optionGenericName» findLast() {
+				return this.container.findLast();
 			}
 
 			@Override

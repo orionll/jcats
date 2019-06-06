@@ -30,7 +30,7 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 				return reverseIterator().next();
 			}
 
-			default Option<P<K, A>> lastOption() {
+			default Option<P<K, A>> findLast() {
 				final Iterator<P<K, A>> iterator = reverseIterator();
 				if (iterator.hasNext()) {
 					return some(iterator.next());
@@ -43,8 +43,8 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 				return last().get1();
 			}
 
-			default Option<K> lastKeyOption() {
-				return lastOption().map(P::get1);
+			default Option<K> findLastKey() {
+				return findLast().map(P::get1);
 			}
 
 			@Override
@@ -102,8 +102,8 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<A> lastOption() {
-				return this.keyValue.lastOption().map(P::get2);
+			public Option<A> findLast() {
+				return this.keyValue.findLast().map(P::get2);
 			}
 
 			@Override
@@ -139,8 +139,8 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<K> lastOption() {
-				return this.keyValue.lastKeyOption();
+			public Option<K> findLast() {
+				return this.keyValue.findLastKey();
 			}
 
 			@Override
@@ -191,8 +191,8 @@ final class SortedKeyValueGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<P<K, A>> lastOption() {
-				return this.keyValue.lastOption();
+			public Option<P<K, A>> findLast() {
+				return this.keyValue.findLast();
 			}
 
 			@Override

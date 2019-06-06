@@ -90,8 +90,8 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<P<K, A>> lastOption() {
-				return this.keyValue.lastOption();
+			public Option<P<K, A>> findLast() {
+				return this.keyValue.findLast();
 			}
 
 			@Override
@@ -100,8 +100,8 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<K> lastKeyOption() {
-				return this.keyValue.lastKeyOption();
+			public Option<K> findLastKey() {
+				return this.keyValue.findLastKey();
 			}
 
 			@Override
@@ -157,8 +157,8 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<P<K, B>> lastOption() {
-				return this.keyValue.lastOption().map((final P<K, A> p) -> p.map2(this.f));
+			public Option<P<K, B>> findLast() {
+				return this.keyValue.findLast().map((final P<K, A> p) -> p.map2(this.f));
 			}
 
 			@Override
@@ -167,8 +167,8 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<K> lastKeyOption() {
-				return this.keyValue.lastKeyOption();
+			public Option<K> findLastKey() {
+				return this.keyValue.findLastKey();
 			}
 
 			@Override
@@ -285,8 +285,8 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<P<K, A>> firstOption() {
-				return this.keyValue.lastOption();
+			public Option<P<K, A>> findFirst() {
+				return this.keyValue.findLast();
 			}
 
 			@Override
@@ -295,8 +295,8 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<P<K, A>> lastOption() {
-				return this.keyValue.firstOption();
+			public Option<P<K, A>> findLast() {
+				return this.keyValue.findFirst();
 			}
 
 			@Override
@@ -305,8 +305,8 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<K> firstKeyOption() {
-				return this.keyValue.lastKeyOption();
+			public Option<K> findFirstKey() {
+				return this.keyValue.findLastKey();
 			}
 
 			@Override
@@ -315,8 +315,8 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<K> lastKeyOption() {
-				return this.keyValue.firstKeyOption();
+			public Option<K> findLastKey() {
+				return this.keyValue.findFirstKey();
 			}
 
 			@Override
@@ -389,7 +389,7 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<P<K, A>> firstOption() {
+			public Option<P<K, A>> findFirst() {
 				if (this.map.isEmpty()) {
 					return none();
 				} else {
@@ -405,7 +405,7 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<P<K, A>> lastOption() {
+			public Option<P<K, A>> findLast() {
 				if (this.map.isEmpty()) {
 					return none();
 				} else {
@@ -419,7 +419,7 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<K> firstKeyOption() {
+			public Option<K> findFirstKey() {
 				if (this.map.isEmpty()) {
 					return none();
 				} else {
@@ -433,7 +433,7 @@ final class SortedKeyValueViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<K> lastKeyOption() {
+			public Option<K> findLastKey() {
 				if (this.map.isEmpty()) {
 					return none();
 				} else {

@@ -238,8 +238,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» firstOption() {
-				return this.container.firstOption();
+			public «type.optionGenericName» findFirst() {
+				return this.container.findFirst();
 			}
 
 			@Override
@@ -545,8 +545,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<«mapTargetType»> firstOption() {
-				return this.container.firstOption().map(this.f);
+			public Option<«mapTargetType»> findFirst() {
+				return this.container.findFirst().map(this.f);
 			}
 
 			@Override
@@ -676,8 +676,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public «toType.optionGenericName» firstOption() {
-					return this.container.firstOption().mapTo«toType.typeName»(this.f);
+				public «toType.optionGenericName» findFirst() {
+					return this.container.findFirst().mapTo«toType.typeName»(this.f);
 				}
 
 				@Override
@@ -1028,11 +1028,11 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» firstOption() {
+			public «type.optionGenericName» findFirst() {
 				if (this.limit == 0) {
 					return «type.noneName»();
 				} else {
-					return this.container.firstOption();
+					return this.container.findFirst();
 				}
 			}
 
@@ -1244,8 +1244,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» firstOption() {
-				return this.sorted.apply().firstOption();
+			public «type.optionGenericName» findFirst() {
+				return this.sorted.apply().findFirst();
 			}
 
 			@Override
@@ -1254,8 +1254,8 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» lastOption() {
-				return this.sorted.apply().lastOption();
+			public «type.optionGenericName» findLast() {
+				return this.sorted.apply().findLast();
 			}
 
 			@Override
@@ -1417,7 +1417,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				@Override
 				public «type.optionGenericName» min(final «type.ordGenericName» ord) {
 					if (this.ord == ord) {
-						return this.sorted.apply().firstOption();
+						return this.sorted.apply().findFirst();
 					} else {
 						return this.sorted.apply().min(ord);
 					}
@@ -1426,7 +1426,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				@Override
 				public «type.optionGenericName» max(final «type.ordGenericName» ord) {
 					if (this.ord == ord) {
-						return this.sorted.apply().lastOption();
+						return this.sorted.apply().findLast();
 					} else {
 						return this.sorted.apply().max(ord);
 					}
@@ -1435,18 +1435,18 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				@Override
 				public «type.optionGenericName» min() {
 					if (this.asc) {
-						return this.sorted.apply().firstOption();
+						return this.sorted.apply().findFirst();
 					} else {
-						return this.sorted.apply().lastOption();
+						return this.sorted.apply().findLast();
 					}
 				}
 
 				@Override
 				public «type.optionGenericName» max() {
 					if (this.asc) {
-						return this.sorted.apply().lastOption();
+						return this.sorted.apply().findLast();
 					} else {
-						return this.sorted.apply().firstOption();
+						return this.sorted.apply().findFirst();
 					}
 				}
 
@@ -1685,7 +1685,7 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» firstOption() {
+			public «type.optionGenericName» findFirst() {
 				return «type.someName»(this.f.apply());
 			}
 
@@ -1780,10 +1780,10 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» firstOption() {
-				final «type.optionGenericName» first = this.prefix.firstOption();
+			public «type.optionGenericName» findFirst() {
+				final «type.optionGenericName» first = this.prefix.findFirst();
 				if (first.isEmpty()) {
-					return this.suffix.firstOption();
+					return this.suffix.findFirst();
 				} else {
 					return first;
 				}

@@ -235,7 +235,7 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public Option<P<K, A>> firstOption() {
+			public Option<P<K, A>> findFirst() {
 				if (isEmpty()) {
 					return none();
 				} else {
@@ -253,7 +253,7 @@ final class SortedDictGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public Option<P<K, A>> lastOption() {
+			public Option<P<K, A>> findLast() {
 				if (isEmpty()) {
 					return none();
 				} else {

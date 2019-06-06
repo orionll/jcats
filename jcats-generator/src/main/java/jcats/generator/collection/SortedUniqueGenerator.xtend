@@ -247,7 +247,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» firstOption() {
+			public «type.optionGenericName» findFirst() {
 				if (isEmpty()) {
 					return «type.noneName»();
 				} else {
@@ -265,7 +265,7 @@ final class SortedUniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» lastOption() {
+			public «type.optionGenericName» findLast() {
 				if (isEmpty()) {
 					return «type.noneName»();
 				} else {

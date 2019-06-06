@@ -86,7 +86,7 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» firstOption() {
+			public «type.optionGenericName» findFirst() {
 				return «type.someName»(this.value);
 			}
 
@@ -96,7 +96,7 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» lastOption() {
+			public «type.optionGenericName» findLast() {
 				return «type.someName»(this.value);
 			}
 

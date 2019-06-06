@@ -275,7 +275,7 @@ final class MaybeGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» firstOption() {
+			public «type.optionGenericName» findFirst() {
 				return this.maybe.to«type.optionShortName»();
 			}
 

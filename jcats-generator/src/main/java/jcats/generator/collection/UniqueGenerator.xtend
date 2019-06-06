@@ -114,7 +114,7 @@ final class UniqueGenerator implements ClassGenerator {
 			}
 
 			@Override
-			public «type.optionGenericName» firstOption() {
+			public «type.optionGenericName» findFirst() {
 				if (isEmpty()) {
 					return «type.noneName»();
 				} else {

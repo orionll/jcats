@@ -312,8 +312,8 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 				}
 
 				@Override
-				public «toType.optionGenericName» lastOption() {
-					return this.container.lastOption().mapTo«toType.typeName»(this.f);
+				public «toType.optionGenericName» findLast() {
+					return this.container.findLast().mapTo«toType.typeName»(this.f);
 				}
 
 				@Override
@@ -398,8 +398,8 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public Option<«mapTargetType»> firstOption() {
-				return this.container.firstOption().map(value -> this.f.apply(0, value));
+			public Option<«mapTargetType»> findFirst() {
+				return this.container.findFirst().map(value -> this.f.apply(0, value));
 			}
 
 			@Override
