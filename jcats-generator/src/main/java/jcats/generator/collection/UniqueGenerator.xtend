@@ -333,7 +333,7 @@ final class UniqueGenerator implements ClassGenerator {
 				return collision;
 			}
 
-			public «genericName» merge(final «genericName» other) {
+			«genericName» merge(final «genericName» other) {
 				requireNonNull(other);
 				if (isEmpty()) {
 					return other;
@@ -478,6 +478,25 @@ final class UniqueGenerator implements ClassGenerator {
 				final «type.uniqueBuilderGenericName» builder = builder();
 				builder.put«type.streamName»(stream);
 				return builder.build();
+			}
+
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			public static «paramGenericName» merge(final «genericName»... uniques) {
+				if (uniques.length == 0) {
+					return empty«shortName»();
+				} else if (uniques.length == 1) {
+					return requireNonNull(uniques[0]);
+				} else {
+					«genericName» unique = uniques[0].merge(uniques[1]);
+					if (uniques.length > 2) {
+						for (int i = 2; i < uniques.length; i++) {
+							unique = unique.merge(uniques[i]);
+						}
+					}
+					return unique;
+				}
 			}
 
 			public static «type.paramGenericName("UniqueBuilder")» builder() {
