@@ -196,8 +196,8 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			«AVLCommonGenerator.deleteAndRotateRight(genericName, diamondName, deleteResultGenericName)»
 
-			public «genericName» merge(final «genericName» other) {
-				requireNonNull(other);
+			«genericName» merge(final «genericName» other) {
+				// Assume this.ord == other.ord
 				if (isEmpty()) {
 					return other;
 				} else if (other.isEmpty()) {
@@ -221,12 +221,14 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			public «genericName» putAll(final Iterable<«type.genericBoxedName»> iterable) {
 				if (iterable instanceof «wildcardName») {
-					return merge((«genericName») iterable);
-				} else {
-					final «type.sortedUniqueBuilderGenericName» builder = new «type.sortedUniqueBuilderDiamondName»(this);
-					builder.putAll(iterable);
-					return builder.build();
+					final «genericName» unique = («genericName») iterable;
+					if (unique.ord == this.ord) {
+						return merge(unique);
+					}
 				}
+				final «type.sortedUniqueBuilderGenericName» builder = new «type.sortedUniqueBuilderDiamondName»(this);
+				builder.putAll(iterable);
+				return builder.build();
 			}
 
 			public «genericName» putValues(final «type.genericName»... values) {
@@ -483,6 +485,27 @@ final class SortedUniqueGenerator implements ClassGenerator {
 				final «type.sortedUniqueBuilderGenericName» builder = builder();
 				builder.put«type.streamName»(stream);
 				return builder.build();
+			}
+
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			public static «paramGenericName» merge(final «genericName» unique, final «genericName»... uniques) {
+				requireNonNull(unique);
+				if (uniques.length == 0) {
+					return unique;
+				} else {
+					for (final «genericName» u : uniques) {
+						if (unique.ord != u.ord) {
+							throw new IllegalArgumentException("All instances of «shortName» must have the same «type.ordShortName»");
+						}
+					}
+					«genericName» result = unique;
+					for (final «genericName» u : uniques) {
+						result = result.merge(u);
+					}
+					return result;
+				}
 			}
 
 			public static «IF type == Type.OBJECT»<A extends Comparable<A>> «ENDIF»«type.sortedUniqueBuilderGenericName» builder() {
