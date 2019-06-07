@@ -489,11 +489,9 @@ final class UniqueGenerator implements ClassGenerator {
 				} else if (uniques.length == 1) {
 					return requireNonNull(uniques[0]);
 				} else {
-					«genericName» unique = uniques[0].merge(uniques[1]);
-					if (uniques.length > 2) {
-						for (int i = 2; i < uniques.length; i++) {
-							unique = unique.merge(uniques[i]);
-						}
+					«genericName» unique = uniques[0];
+					for (int i = 1; i < uniques.length; i++) {
+						unique = unique.merge(uniques[i]);
 					}
 					return unique;
 				}

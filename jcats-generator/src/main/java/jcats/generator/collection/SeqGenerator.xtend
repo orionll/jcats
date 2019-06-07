@@ -1418,11 +1418,9 @@ class SeqGenerator implements ClassGenerator {
 				} else if (seqs.length == 1) {
 					return requireNonNull(seqs[0]);
 				} else {
-					«genericName» seq = seqs[0].concat(seqs[1]);
-					if (seqs.length > 2) {
-						for (int i = 2; i < seqs.length; i++) {
-							seq = seq.concat(seqs[i]);
-						}
+					«genericName» seq = seqs[0];
+					for (int i = 1; i < seqs.length; i++) {
+						seq = seq.concat(seqs[i]);
 					}
 					return seq;
 				}
