@@ -361,6 +361,31 @@ class DictGenerator implements ClassGenerator {
 				return collision;
 			}
 
+			Dict<K, A> merge(final Dict<K, A> other, final F3<K, A, A, A> mergeFunction) {
+				requireNonNull(other);
+				if (isEmpty()) {
+					return other;
+				} else if (other.isEmpty()) {
+					return this;
+				} else if (size() >= other.size()) {
+					Dict<K, A> result = this;
+					for (final P<K, A> entry : other) {
+						final K key = entry.get1();
+						final A value2 = entry.get2();
+						result = result.updateValueOrPut(key, value2, value1 -> mergeFunction.apply(key, value1, value2));
+					}
+					return result;
+				} else {
+					Dict<K, A> result = other;
+					for (final P<K, A> entry : this) {
+						final K key = entry.get1();
+						final A value1 = entry.get2();
+						result = result.updateValueOrPut(key, value1, value2 -> mergeFunction.apply(key, value1, value2));
+					}
+					return result;
+				}
+			}
+
 			@Override
 			@Deprecated
 			public Dict<K, A> toDict() {
@@ -455,6 +480,30 @@ class DictGenerator implements ClassGenerator {
 				final DictBuilder<K, A> builder = builder();
 				builder.putMap(map);
 				return builder.build();
+			}
+
+			@SafeVarargs
+			public static «paramGenericName» merge(final F3<K, A, A, A> mergeFunction, final «genericName»... dicts) {
+				requireNonNull(mergeFunction);
+				if (dicts.length == 0) {
+					return empty«shortName»();
+				} else if (dicts.length == 1) {
+					return requireNonNull(dicts[0]);
+				} else {
+					«genericName» dict = dicts[0];
+					for (int i = 1; i < dicts.length; i++) {
+						dict = dict.merge(dicts[i], mergeFunction);
+					}
+					return dict;
+				}
+			}
+
+			@SafeVarargs
+			public static «paramGenericName» mergeUnique(final «genericName»... dicts) throws IllegalStateException {
+				return merge((final K key, final A value1, final A value2) -> {
+					final String msg = String.format("Duplicate key %s (attempted merging values %s and %s)", key, value1, value2);
+					throw new IllegalStateException(msg);
+				}, dicts);
 			}
 
 			public static <K, A> DictBuilder<K, A> builder() {
