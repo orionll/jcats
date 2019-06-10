@@ -9,6 +9,7 @@ final class SortedDictGenerator implements ClassGenerator {
 
 	def shortName() { "SortedDict" }
 	def genericName() { "SortedDict<K, A>" }
+	def paramGenericName() { "<K, A> SortedDict<K, A>" }
 	def diamondName() { "SortedDict<>" }
 
 	override sourceCode() { '''
@@ -302,6 +303,31 @@ final class SortedDictGenerator implements ClassGenerator {
 				return builder.build();
 			}
 
+			private «genericName» merge(final «genericName» other, final F3<K, A, A, A> mergeFunction) {
+				requireNonNull(other);
+				if (isEmpty()) {
+					return other;
+				} else if (other.isEmpty()) {
+					return this;
+				} else if (size() >= other.size()) {
+					«genericName» result = this;
+					for (final P<K, A> p : other) {
+						final K key = p.get1();
+						final A value2 = p.get2();
+						result = result.updateValueOrPut(key, value2, value1 -> mergeFunction.apply(key, value1, value2));
+					}
+					return result;
+				} else {
+					«genericName» result = other;
+					for (final P<K, A> p : this) {
+						final K key = p.get1();
+						final A value1 = p.get2();
+						result = result.updateValueOrPut(key, value1, value2 -> mergeFunction.apply(key, value1, value2));
+					}
+					return result;
+				}
+			}
+
 			@Override
 			@Deprecated
 			public SortedDict<K, A> toSortedDict() {
@@ -545,6 +571,34 @@ final class SortedDictGenerator implements ClassGenerator {
 				}
 				builder.putMap(map);
 				return builder.build();
+			}
+
+			@SafeVarargs
+			public static «paramGenericName» merge(final F3<K, A, A, A> mergeFunction, final «genericName» dict, final «genericName»... dicts) {
+				requireNonNull(mergeFunction);
+				requireNonNull(dict);
+				if (dicts.length == 0) {
+					return dict;
+				} else {
+					for (final «genericName» d : dicts) {
+						if (dict.ord != d.ord) {
+							throw new IllegalArgumentException("All instances of «shortName» must have the same Ord");
+						}
+					}
+					«genericName» result = dict;
+					for (final «genericName» d : dicts) {
+						result = result.merge(d, mergeFunction);
+					}
+					return result;
+				}
+			}
+
+			@SafeVarargs
+			public static «paramGenericName» mergeUnique(final «genericName» dict, final «genericName»... dicts) throws IllegalStateException {
+				return merge((final K key, final A value1, final A value2) -> {
+					final String msg = String.format("Duplicate key %s (attempted merging values %s and %s)", key, value1, value2);
+					throw new IllegalStateException(msg);
+				}, dict, dicts);
 			}
 
 			public static <K extends Comparable<K>, A> SortedDictBuilder<K, A> builder() {

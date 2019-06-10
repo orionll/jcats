@@ -361,25 +361,25 @@ class DictGenerator implements ClassGenerator {
 				return collision;
 			}
 
-			Dict<K, A> merge(final Dict<K, A> other, final F3<K, A, A, A> mergeFunction) {
+			private «genericName» merge(final «genericName» other, final F3<K, A, A, A> mergeFunction) {
 				requireNonNull(other);
 				if (isEmpty()) {
 					return other;
 				} else if (other.isEmpty()) {
 					return this;
 				} else if (size() >= other.size()) {
-					Dict<K, A> result = this;
-					for (final P<K, A> entry : other) {
-						final K key = entry.get1();
-						final A value2 = entry.get2();
+					«genericName» result = this;
+					for (final P<K, A> p : other) {
+						final K key = p.get1();
+						final A value2 = p.get2();
 						result = result.updateValueOrPut(key, value2, value1 -> mergeFunction.apply(key, value1, value2));
 					}
 					return result;
 				} else {
-					Dict<K, A> result = other;
-					for (final P<K, A> entry : this) {
-						final K key = entry.get1();
-						final A value1 = entry.get2();
+					«genericName» result = other;
+					for (final P<K, A> p : this) {
+						final K key = p.get1();
+						final A value1 = p.get2();
 						result = result.updateValueOrPut(key, value1, value2 -> mergeFunction.apply(key, value1, value2));
 					}
 					return result;
