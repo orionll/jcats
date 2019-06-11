@@ -240,6 +240,26 @@ final class ControlGenerator implements ClassGenerator {
 				}
 			}
 
+			public static void doNTimes(final int n, final Eff0 eff) {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				}
+				requireNonNull(eff);
+				for (int i = 0; i < n; i++) {
+					eff.apply();
+				}
+			}
+
+			public static <X extends Throwable> void doNTimesX(final int n, final Eff0X<X> eff) throws X {
+				if (n < 0) {
+					throw new IllegalArgumentException(Integer.toString(n));
+				}
+				requireNonNull(eff);
+				for (int i = 0; i < n; i++) {
+					eff.apply();
+				}
+			}
+
 			static <X extends Throwable> X sneakyThrow(final Throwable t) throws X {
 				throw (X) t;
 			}
