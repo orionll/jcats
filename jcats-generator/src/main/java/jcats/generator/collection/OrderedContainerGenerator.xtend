@@ -40,7 +40,7 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 		public interface «type.covariantName("OrderedContainer")» extends «type.containerGenericName» {
 
 			default «type.genericName» last() throws NoSuchElementException {
-				if (hasKnownFixedSize()) {
+				if (isReverseQuick()) {
 					return reverseIterator().«type.iteratorNext»();
 				} else {
 					final «type.iteratorGenericName» iterator = iterator();
@@ -55,12 +55,10 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 			}
 
 			default «type.optionGenericName» findLast() {
-				if (hasKnownFixedSize()) {
-					if (isEmpty()) {
-						return «type.noneName»();
-					} else {
-						return «type.someName»(last());
-					}
+				if (hasKnownFixedSize() && isEmpty()) {
+					return «type.noneName»();
+				} else if (isReverseQuick()) {
+					return «type.someName»(last());
 				} else {
 					final «type.iteratorGenericName» iterator = iterator();
 					if (iterator.hasNext()) {
