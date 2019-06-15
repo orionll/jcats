@@ -258,6 +258,11 @@ final class RangeGenerator implements ClassGenerator {
 			}
 
 			@Override
+			public boolean isReverseQuick() {
+				return true;
+			}
+
+			@Override
 			public IntOption max() {
 				if (this.closed) {
 					return intSome(this.high);
