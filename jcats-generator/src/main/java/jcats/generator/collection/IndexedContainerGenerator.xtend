@@ -440,6 +440,11 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
 				this.container.forEach(action);
 			}
+
+			@Override
+			public String toString() {
+				return this.container.toString();
+			}
 		}
 
 		final class «type.genericName("IndexFinder")» implements «type.boolFName» {

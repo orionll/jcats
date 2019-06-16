@@ -489,6 +489,11 @@ final class KeyValueGenerator implements InterfaceGenerator {
 			public void forEach(final BiConsumer<? super K, ? super A> action) {
 				this.keyValue.forEach((final P<K, A> entry) -> action.accept(entry.get1(), entry.get2()));
 			}
+
+			@Override
+			public String toString() {
+				return this.keyValue.toString();
+			}
 		}
 
 		final class KeyValueEntrySet<K, A> extends AbstractImmutableSet<Entry<K, A>> {

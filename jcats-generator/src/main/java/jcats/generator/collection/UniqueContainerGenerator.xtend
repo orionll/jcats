@@ -154,6 +154,11 @@ class UniqueContainerGenerator implements InterfaceGenerator {
 			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
 				this.container.forEach(action);
 			}
+
+			@Override
+			public String toString() {
+				return this.container.toString();
+			}
 		}
 	'''
 }
