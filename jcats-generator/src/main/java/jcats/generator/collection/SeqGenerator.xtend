@@ -307,7 +307,7 @@ class SeqGenerator implements ClassGenerator {
 					}
 				} else {
 					final «seqBuilderName» builder = new «seqBuilderDiamondName»();
-					prefix.forEach(builder::append);
+					builder.appendAll(prefix);
 					return builder.build().concat(this);
 				}
 			}

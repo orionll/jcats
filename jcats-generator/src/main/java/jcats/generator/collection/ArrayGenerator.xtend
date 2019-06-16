@@ -308,7 +308,7 @@ final class ArrayGenerator implements ClassGenerator {
 			public «genericName» appendAll(final Iterable<«type.genericBoxedName»> suffix) throws SizeOverflowException {
 				if (this.array.length == 0) {
 					return ofAll(suffix);
-				} else if (suffix instanceof «shortName») {
+				} else if (suffix instanceof «wildcardName») {
 					return concat((«genericName») suffix);
 				} else if (suffix instanceof Sized && ((Sized) suffix).hasKnownFixedSize()) {
 					return appendSized(suffix, ((Sized) suffix).size());
@@ -331,7 +331,11 @@ final class ArrayGenerator implements ClassGenerator {
 					} else {
 						builder = new «arrayBuilderDiamondName»(this.array, this.array.length);
 					}
-					suffix.forEach(builder::append);
+					if (suffix instanceof «type.containerWildcardName») {
+						((«type.containerGenericName») suffix).foreach(builder::append);
+					} else {
+						suffix.forEach(builder::append);
+					}
 					return builder.build();
 				}
 			}
@@ -342,7 +346,7 @@ final class ArrayGenerator implements ClassGenerator {
 			public «genericName» prependAll(final Iterable<«type.genericBoxedName»> prefix) throws SizeOverflowException {
 				if (this.array.length == 0) {
 					return ofAll(prefix);
-				} else if (prefix instanceof «shortName») {
+				} else if (prefix instanceof «wildcardName») {
 					return ((«genericName») prefix).concat(this);
 				} else if (prefix instanceof Sized && ((Sized) prefix).hasKnownFixedSize()) {
 					return prependSized(prefix, ((Sized) prefix).size());
@@ -364,7 +368,11 @@ final class ArrayGenerator implements ClassGenerator {
 					} else {
 						builder = builder();
 					}
-					prefix.forEach(builder::append);
+					if (prefix instanceof «type.containerWildcardName») {
+						((«type.containerGenericName») prefix).foreach(builder::append);
+					} else {
+						prefix.forEach(builder::append);
+					}
 					builder.appendArray(this.array);
 					return builder.build();
 				}
@@ -897,7 +905,7 @@ final class ArrayGenerator implements ClassGenerator {
 				} else if (iterable instanceof Sized && ((Sized) iterable).hasKnownFixedSize()) {
 					return sizedToArray(iterable, ((Sized) iterable).size());
 				«IF type == Type.OBJECT»
-					} else if (iterable instanceof Collection) {
+					} else if (iterable instanceof Collection<?>) {
 						final Object[] array = ((Collection<?>) iterable).toArray();
 						if (array.length == 0) {
 							return emptyArray();
