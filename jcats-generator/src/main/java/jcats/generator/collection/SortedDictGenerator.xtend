@@ -485,6 +485,8 @@ final class SortedDictGenerator implements ClassGenerator {
 
 			«keyValueToString»
 
+			«transform(genericName)»
+
 			public static <K extends Comparable<K>, A> SortedDict<K, A> emptySortedDict() {
 				return (SortedDict<K, A>) EMPTY;
 			}

@@ -17,6 +17,7 @@ final class DictBuilderGenerator implements ClassGenerator {
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
 
+		import static java.util.Objects.requireNonNull;
 		import static «Constants.COLLECTION».Dict.emptyDict;
 		import static «Constants.COMMON».*;
 
@@ -94,6 +95,8 @@ final class DictBuilderGenerator implements ClassGenerator {
 			}
 
 			«keyValueToString("this.dict")»
+
+			«transform("DictBuilder<K, A>")»
 		}
 	''' }
 }

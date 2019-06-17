@@ -8,7 +8,11 @@ final class String1Generator implements ClassGenerator {
 
 		import java.io.Serializable;
 		import java.util.Locale;
+
 		import «Constants.COLLECTION».IntStream2;
+		import «Constants.FUNCTION».*;
+
+		import static java.util.Objects.requireNonNull;
 
 		/**
 		 * Nonempty string
@@ -155,6 +159,8 @@ final class String1Generator implements ClassGenerator {
 			public String toString() {
 				return this.str;
 			}
+
+			«transform("String1")»
 
 			«javadocSynonym("string1")»
 			public static String1 of(final String str) throws IllegalArgumentException {

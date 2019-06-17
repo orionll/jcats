@@ -355,6 +355,8 @@ class PGenerator implements ClassGenerator {
 				return "(" + this.a1 + ", " + this.a2 + ")";
 			}
 
+			«transform(genericName)»
+
 			public static «paramGenericName» «shortName.firstToLowerCase»(final «type1Name» a1, final «type2Name» a2) {
 				«IF type1 == Type.OBJECT»
 					requireNonNull(a1);

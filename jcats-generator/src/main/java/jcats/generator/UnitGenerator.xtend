@@ -8,6 +8,10 @@ final class UnitGenerator implements ClassGenerator {
 
 		import java.io.Serializable;
 
+		import «Constants.FUNCTION».*;
+
+		import static java.util.Objects.requireNonNull;
+
 		public final class Unit implements Equatable<Unit>, Serializable {
 
 			private static final Unit UNIT = new Unit();
@@ -32,6 +36,8 @@ final class UnitGenerator implements ClassGenerator {
 			public String toString() {
 				return "()";
 			}
+
+			«transform("Unit")»
 		}
 	''' }
 }

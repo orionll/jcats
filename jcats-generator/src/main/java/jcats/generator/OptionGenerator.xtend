@@ -302,6 +302,8 @@ final class OptionGenerator implements ClassGenerator {
 				return isEmpty() ? "«type.shortName("None")»" : "«type.shortName("Some")»(" + this.value + ")";
 			}
 
+			«transform(genericName)»
+
 			public static «paramGenericName» «type.noneName»() {
 				«IF type == Type.OBJECT»
 					return (Option<A>) NONE;

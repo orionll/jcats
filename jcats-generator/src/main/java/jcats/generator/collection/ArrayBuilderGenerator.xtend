@@ -263,6 +263,8 @@ final class ArrayBuilderGenerator implements ClassGenerator {
 				builder.append(")");
 				return builder.toString();
 			}
+
+			«transform(genericName)»
 		}
 	''' }
 }

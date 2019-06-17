@@ -31,7 +31,9 @@ final class SortedUniqueBuilderGenerator implements ClassGenerator {
 
 		import «Constants.SIZED»;
 		import «Constants.JCATS».«type.ordShortName»;
+		import «Constants.FUNCTION».*;
 
+		import static java.util.Objects.requireNonNull;
 		import static «Constants.COLLECTION».«type.sortedUniqueShortName».empty«type.sortedUniqueShortName»By;
 		import static «Constants.COMMON».*;
 
@@ -117,6 +119,8 @@ final class SortedUniqueBuilderGenerator implements ClassGenerator {
 			}
 
 			«toStr(type, "this.unique")»
+
+			«transform(genericName)»
 		}
 	''' }
 }

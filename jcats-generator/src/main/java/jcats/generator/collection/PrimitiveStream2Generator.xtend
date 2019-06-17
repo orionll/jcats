@@ -337,6 +337,8 @@ final class PrimitiveStream2Generator implements ClassGenerator {
 				return this.stream.collect(«type.arrayShortName»::builder, «type.arrayShortName»Builder::append, «type.arrayShortName»Builder::appendArrayBuilder).build();
 			}
 
+			«transform(shortName)»
+
 			public static «shortName» from(final «type.streamName» stream) {
 				requireNonNull(stream);
 				return new «shortName»(stream);

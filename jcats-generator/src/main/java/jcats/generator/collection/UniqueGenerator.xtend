@@ -427,6 +427,8 @@ final class UniqueGenerator implements ClassGenerator {
 
 			«toStr(type)»
 
+			«transform(genericName)»
+
 			public static «paramGenericName» empty«shortName»() {
 				return «IF type == Type.OBJECT»(«genericName») «ENDIF»EMPTY;
 			}

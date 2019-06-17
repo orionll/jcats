@@ -29,6 +29,9 @@ final class StackBuilderGenerator implements ClassGenerator {
 		«ENDIF»
 		import java.util.stream.«type.streamName»;
 
+		import «Constants.FUNCTION».*;
+
+		import static java.util.Objects.requireNonNull;
 		import static «Constants.COLLECTION».«type.stackShortName».*;
 
 		public final class «genericName» {
@@ -158,6 +161,8 @@ final class StackBuilderGenerator implements ClassGenerator {
 				builder.append(")");
 				return builder.toString();
 			}
+
+			«transform(genericName)»
 		}
 	''' }
 }

@@ -531,6 +531,8 @@ final class EitherGenerator implements ClassGenerator {
 				return isLeft() ? "«shortName.replace("Either", "")»Left(" + this.left + ")" : "«shortName.replace("Either", "")»Right(" + this.right + ")";
 			}
 
+			«transform(genericName)»
+
 			public static «paramGenericName» «leftName»(final «leftTypeGenericName» left) {
 				«IF leftType == Type.OBJECT»
 					requireNonNull(left);

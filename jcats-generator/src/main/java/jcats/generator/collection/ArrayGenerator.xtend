@@ -780,6 +780,8 @@ final class ArrayGenerator implements ClassGenerator {
 				return Arrays.toString(this.array);
 			}
 
+			«transform(genericName)»
+
 			public static «paramGenericName» empty«shortName»() {
 				«IF type == Type.OBJECT»
 					return («genericName») EMPTY;

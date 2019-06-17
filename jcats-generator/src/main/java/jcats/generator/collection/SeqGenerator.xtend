@@ -1381,6 +1381,8 @@ class SeqGenerator implements ClassGenerator {
 
 			«toStr(type)»
 
+			«transform(genericName, true)»
+
 			«IF type == Type.OBJECT»
 				static int index1(final int index) {
 					return (index & 0x1F);

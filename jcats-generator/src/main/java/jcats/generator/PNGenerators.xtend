@@ -115,6 +115,8 @@ final class PNGenerators {
 						return "(" + «(1 .. arity).map["this.a" + it].join(''' + ", " + ''')» + ")";
 					}
 
+					«transform(shortName + parameters(arity))»
+
 					«cast((1 .. arity).map["A" + it], #[], (1 .. arity).map["A" + it])»
 				}
 			''' }

@@ -34,10 +34,9 @@ final class SeqBuilderGenerator implements ClassGenerator {
 		import java.util.stream.«type.streamName»;
 
 		import «Constants.JCATS».*;
+		import «Constants.FUNCTION».*;
 
-		«IF type == Type.OBJECT»
-			import static java.util.Objects.requireNonNull;
-		«ENDIF»
+		import static java.util.Objects.requireNonNull;
 		import static «Constants.COLLECTION».«shortSeqName».empty«shortSeqName»;
 		import static «Constants.COMMON».*;
 
@@ -379,6 +378,8 @@ final class SeqBuilderGenerator implements ClassGenerator {
 			}
 
 			«toStr(type, "build()")»
+
+			«transform(genericName)»
 		}
 	''' }
 }

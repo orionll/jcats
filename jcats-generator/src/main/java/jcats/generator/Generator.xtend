@@ -276,6 +276,14 @@ interface Generator {
 	def indexOutOfBounds(String shortName) {
 		'''throw new IndexOutOfBoundsException("Index " + index + " is out of range («shortName» length = " + this.size() + ")");'''
 	}
+
+	def transform(String genericName) { transform(genericName, false) }
+
+	def transform(String genericName, boolean isFinal) '''
+		public «IF isFinal»final «ENDIF»<R> R transform(final F<«genericName», R> f) {
+			return requireNonNull(f.apply(this));
+		}
+	'''
 }
 
 interface InterfaceGenerator extends Generator {

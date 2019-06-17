@@ -17,6 +17,7 @@ final class SortedDictBuilderGenerator implements ClassGenerator {
 		import «Constants.JCATS».*;
 		import «Constants.FUNCTION».*;
 
+		import static java.util.Objects.requireNonNull;
 		import static «Constants.COLLECTION».SortedDict.*;
 		import static «Constants.COMMON».*;
 
@@ -98,6 +99,8 @@ final class SortedDictBuilderGenerator implements ClassGenerator {
 			}
 
 			«keyValueToString("this.dict")»
+
+			«transform("SortedDictBuilder<K, A>")»
 		}
 	''' }
 }

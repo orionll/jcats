@@ -426,6 +426,8 @@ final class StackGenerator implements ClassGenerator {
 
 			«toStr»
 
+			«transform(genericName)»
+
 			public static «paramGenericName» empty«shortName»() {
 				return «IF type == Type.OBJECT»(Stack<A>) «ENDIF»EMPTY;
 			}

@@ -409,6 +409,8 @@ final class SortedUniqueGenerator implements ClassGenerator {
 
 			«toStr(type)»
 
+			«transform(genericName)»
+
 			public static «paramComparableGenericName» empty«shortName»() {
 				return «IF type == Type.OBJECT»(«genericName») «ENDIF»EMPTY;
 			}

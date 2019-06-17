@@ -6,6 +6,10 @@ final class OrderGenerator implements ClassGenerator {
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
+		import «Constants.FUNCTION».*;
+
+		import static java.util.Objects.requireNonNull;
+
 		public enum Order implements Ordered<Order>, Equatable<Order> {
 			/**
 			 * Less than
@@ -46,6 +50,8 @@ final class OrderGenerator implements ClassGenerator {
 			public int toInt() {
 				return ordinal() - 1 ;
 			}
+
+			«transform("Order")»
 
 			public static Order fromInt(final int cmp) {
 				return (cmp == 0) ? EQ : (cmp > 0) ? GT : LT;

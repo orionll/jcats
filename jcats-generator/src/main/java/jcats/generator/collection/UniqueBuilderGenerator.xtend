@@ -30,7 +30,9 @@ final class UniqueBuilderGenerator implements ClassGenerator {
 		import java.util.stream.«type.streamName»;
 
 		import «Constants.SIZED»;
+		import «Constants.FUNCTION».*;
 
+		import static java.util.Objects.requireNonNull;
 		import static «Constants.COLLECTION».«type.uniqueShortName».empty«type.uniqueShortName»;
 		import static «Constants.COMMON».*;
 
@@ -112,6 +114,8 @@ final class UniqueBuilderGenerator implements ClassGenerator {
 			}
 
 			«toStr(type, "this.unique")»
+
+			«transform(genericName)»
 		}
 	''' }
 }

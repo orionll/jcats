@@ -315,6 +315,8 @@ final class VNGenerators {
 						return "[" + «(1 .. arity).map["this.a" + it].join(''' + ", " + ''')» + "]";
 					}
 
+					«transform(genericName)»
+
 					public static «type.paramGenericName(baseName)» «factoryMethodName»(«(1 .. arity).map['''final «type.genericName» a«it»'''].join(", ")») {
 						«IF type == Type.OBJECT»
 							«FOR i : 1 .. arity»

@@ -326,6 +326,8 @@ final class Stream2Generator implements ClassGenerator {
 				return this.stream.collect(Array.collector());
 			}
 
+			«transform("Stream2<A>")»
+
 			public static <A> Stream2<A> from(final Stream<A> stream) {
 				requireNonNull(stream);
 				return new Stream2<>(stream);

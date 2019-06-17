@@ -506,6 +506,8 @@ class DictGenerator implements ClassGenerator {
 				}, dicts);
 			}
 
+			«transform(genericName)»
+
 			public static <K, A> DictBuilder<K, A> builder() {
 				return new DictBuilder<>();
 			}
