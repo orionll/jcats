@@ -190,6 +190,11 @@ final class SortedUniqueContainerGenerator implements InterfaceGenerator {
 				}
 
 				@Override
+				public boolean isReverseQuick() {
+					return this.container.isReverseQuick();
+				}
+
+				@Override
 				public Ord<«type.boxedName»> ord() {
 					return this.container.ord().toOrd();
 				}
