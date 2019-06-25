@@ -160,6 +160,11 @@ final class SortedUniqueContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public boolean isReverseQuick() {
+				return this.container.isReverseQuick();
+			}
+
+			@Override
 			public «type.sortedUniqueGenericName» to«type.sortedUniqueShortName»() {
 				return this.container.to«type.sortedUniqueShortName»();
 			}

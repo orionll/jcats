@@ -1118,6 +1118,11 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
+			public boolean isReverseQuick() {
+				return this.prefix.isReverseQuick() && this.suffix.isReverseQuick();
+			}
+
+			@Override
 			public <«mapTargetType»> OrderedContainerView<«mapTargetType»> map(final «type.fGenericName» f) {
 				requireNonNull(f);
 				return new ConcatenatedOrderedContainerView<>(this.prefix.view().map(f), this.suffix.view().map(f));
