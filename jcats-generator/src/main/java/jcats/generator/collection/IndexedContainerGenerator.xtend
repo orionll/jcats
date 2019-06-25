@@ -71,7 +71,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 
 			@Override
 			default «type.iteratorGenericName» reverseIterator() {
-				if (hasKnownFixedSize()) {
+				if (isReverseQuick()) {
 					if (isEmpty()) {
 						return «type.emptyIterator»;
 					} else {
