@@ -185,10 +185,20 @@ final class OrderedContainerGenerator implements InterfaceGenerator {
 				return new «type.diamondName("IteratingWhileOrderedContainerView")»(start, hasNext, next);
 			}
 
-			static «type.paramGenericName("OrderedContainerView")» concat(final «genericName» prefix, final «genericName» suffix) {
-				requireNonNull(prefix);
-				requireNonNull(suffix);
-				return new «type.shortName("ConcatenatedOrderedContainerView")»<>(prefix, suffix);
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			static «type.paramGenericName("OrderedContainerView")» concat(final «genericName»... containers) {
+				if (containers.length == 0) {
+					return empty«type.orderedContainerViewShortName»();
+				} else if (containers.length == 1) {
+					return requireNonNull(containers[0].view());
+				} else {
+					for (final «genericName» container : containers) {
+						requireNonNull(container);
+					}
+					return new «type.shortName("ConcatenatedOrderedContainerView")»<>(containers);
+				}
 			}
 			«IF type == Type.OBJECT»
 

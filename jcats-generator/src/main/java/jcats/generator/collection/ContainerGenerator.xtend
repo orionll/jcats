@@ -572,10 +572,20 @@ final class ContainerGenerator implements InterfaceGenerator {
 				return new «type.shortName("GeneratedContainerView")»<>(f);
 			}
 
-			static «type.paramGenericName("ContainerView")» concat(final «genericName» prefix, final «genericName» suffix) {
-				requireNonNull(prefix);
-				requireNonNull(suffix);
-				return new «type.shortName("ConcatenatedContainerView")»<>(prefix, suffix);
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			static «type.paramGenericName("ContainerView")» concat(final «genericName»... containers) {
+				if (containers.length == 0) {
+					return empty«type.containerViewShortName»();
+				} else if (containers.length == 1) {
+					return requireNonNull(containers[0].view());
+				} else {
+					for (final «genericName» container : containers) {
+						requireNonNull(container);
+					}
+					return new «type.shortName("ConcatenatedContainerView")»<>(containers);
+				}
 			}
 			«IF type == Type.OBJECT»
 

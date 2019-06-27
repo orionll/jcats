@@ -1277,65 +1277,91 @@ final class CommonGenerator implements ClassGenerator {
 
 		«ENDFOR»
 		final class ConcatenatedIterator<A> implements Iterator<A> {
-			final Iterator<A> prefix;
-			final Iterator<A> suffix;
+			private final Iterator<A>[] iterators;
+			private int i;
 
-			ConcatenatedIterator(final Iterator<A> prefix, final Iterator<A> suffix) {
-				this.prefix = prefix;
-				this.suffix = suffix;
+			ConcatenatedIterator(final Iterator<A>[] iterators) {
+				«IF ea»
+					assert iterators.length > 1;
+				«ENDIF»
+				this.iterators = iterators;
 			}
 
 			@Override
 			public boolean hasNext() {
-				return this.prefix.hasNext() || this.suffix.hasNext();
+				while (this.i < this.iterators.length) {
+					if (this.iterators[this.i].hasNext()) {
+						return true;
+					}
+					this.i++;
+				}
+				return false;
 			}
 
 			@Override
 			public A next() {
-				if (this.prefix.hasNext()) {
-					return requireNonNull(this.prefix.next());
-				} else {
-					return requireNonNull(this.suffix.next());
+				while (this.i < this.iterators.length) {
+					final Iterator<A> iterator = this.iterators[this.i];
+					if (iterator.hasNext()) {
+						return requireNonNull(iterator.next());
+					}
+					this.i++;
 				}
+				throw new NoSuchElementException();
 			}
 
 			@Override
 			public void forEachRemaining(final Consumer<? super A> action) {
 				requireNonNull(action);
-				this.prefix.forEachRemaining(action);
-				this.suffix.forEachRemaining(action);
+				while (this.i < this.iterators.length) {
+					this.iterators[this.i].forEachRemaining(action);
+					this.i++;
+				}
 			}
 		}
 
 		«FOR type : Type.javaUnboxedTypes»
 			final class «type.typeName»ConcatenatedIterator implements «type.iteratorGenericName» {
-				final «type.iteratorGenericName» prefix;
-				final «type.iteratorGenericName» suffix;
+				private final «type.iteratorGenericName»[] iterators;
+				private int i;
 
-				«type.typeName»ConcatenatedIterator(final «type.iteratorGenericName» prefix, final «type.iteratorGenericName» suffix) {
-					this.prefix = prefix;
-					this.suffix = suffix;
+				«type.typeName»ConcatenatedIterator(final «type.iteratorGenericName»[] iterators) {
+					«IF ea»
+						assert iterators.length > 1;
+					«ENDIF»
+					this.iterators = iterators;
 				}
 
 				@Override
 				public boolean hasNext() {
-					return this.prefix.hasNext() || this.suffix.hasNext();
+					while (this.i < this.iterators.length) {
+						if (this.iterators[this.i].hasNext()) {
+							return true;
+						}
+						this.i++;
+					}
+					return false;
 				}
 
 				@Override
 				public «type.iteratorReturnType» «type.iteratorNext»() {
-					if (this.prefix.hasNext()) {
-						return this.prefix.«type.iteratorNext»();
-					} else {
-						return this.suffix.«type.iteratorNext»();
+					while (this.i < this.iterators.length) {
+						final «type.iteratorGenericName» iterator = this.iterators[this.i];
+						if (iterator.hasNext()) {
+							return «type.requireNonNull('''iterator.«type.iteratorNext»()''')»;
+						}
+						this.i++;
 					}
+					throw new NoSuchElementException();
 				}
 
 				@Override
 				public void forEachRemaining(final «type.forEachRemainingGenericActionName» action) {
 					requireNonNull(action);
-					this.prefix.forEachRemaining(action);
-					this.suffix.forEachRemaining(action);
+					while (this.i < this.iterators.length) {
+						this.iterators[this.i].forEachRemaining(action);
+						this.i++;
+					}
 				}
 			}
 

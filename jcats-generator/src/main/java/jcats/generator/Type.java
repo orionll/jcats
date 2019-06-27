@@ -423,6 +423,14 @@ public enum Type {
 		return shortName(baseName + "Iterator");
 	}
 
+	public String iteratorShortName() {
+		if (isJavaUnboxedType()) {
+			return "PrimitiveIterator.Of" + typeName();
+		} else {
+			return "Iterator";
+		}
+	}
+
 	public String iteratorGenericName() {
 		if (isJavaUnboxedType()) {
 			return "PrimitiveIterator.Of" + typeName();

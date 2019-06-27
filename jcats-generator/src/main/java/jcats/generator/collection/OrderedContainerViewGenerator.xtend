@@ -1070,85 +1070,40 @@ final class OrderedContainerViewGenerator implements InterfaceGenerator {
 		«ELSE»
 			class «concatenatedShortName»<C extends «type.orderedContainerGenericName»> extends «type.typeName»ConcatenatedContainerView<C> implements «type.orderedContainerViewGenericName» {
 		«ENDIF»
-			«concatenatedShortName»(final C prefix, final C suffix) {
-				super(prefix, suffix);
-			}
-
-			@Override
-			public «type.genericName» last() {
-				if (this.suffix.hasKnownFixedSize()) {
-					if (this.suffix.isEmpty()) {
-						return this.prefix.last();
-					} else {
-						return this.suffix.last();
-					}
-				} else {
-					return «shortName».super.last();
-				}
-			}
-
-			@Override
-			public «type.optionGenericName» findLast() {
-				final «type.optionGenericName» last = this.suffix.findLast();
-				if (last.isEmpty()) {
-					return this.prefix.findLast();
-				} else {
-					return last;
-				}
-			}
-
-			@Override
-			public «type.optionGenericName» lastMatch(final «type.boolFName» predicate) {
-				requireNonNull(predicate);
-				final «type.optionGenericName» last = this.suffix.lastMatch(predicate);
-				if (last.isEmpty()) {
-					return this.prefix.lastMatch(predicate);
-				} else {
-					return last;
-				}
+			«concatenatedShortName»(final C[] containers) {
+				super(containers);
 			}
 
 			@Override
 			public «type.iteratorGenericName» reverseIterator() {
+				final «type.iteratorGenericName»[] reverseIterators = new «type.iteratorShortName»[this.containers.length];
+				for (int i = 0; i < this.containers.length; i++) {
+					reverseIterators[i] = this.containers[this.containers.length - i - 1].reverseIterator();
+				}
 				«IF type.javaUnboxedType»
-					return new «type.iteratorDiamondName("Concatenated")»(this.suffix.reverseIterator(), this.prefix.reverseIterator());
+					return new «type.iteratorDiamondName("Concatenated")»(reverseIterators);
 				«ELSE»
-					return new ConcatenatedIterator<>(this.suffix.reverseIterator(), this.prefix.reverseIterator());
+					return new ConcatenatedIterator<>(reverseIterators);
 				«ENDIF»
 			}
 
 			@Override
 			public boolean isReverseQuick() {
-				return this.prefix.isReverseQuick() && this.suffix.isReverseQuick();
-			}
-
-			@Override
-			public <«mapTargetType»> OrderedContainerView<«mapTargetType»> map(final «type.fGenericName» f) {
-				requireNonNull(f);
-				return new ConcatenatedOrderedContainerView<>(this.prefix.view().map(f), this.suffix.view().map(f));
-			}
-
-			«FOR toType : Type.primitives»
-				@Override
-				«IF type == Type.OBJECT»
-					public «toType.orderedContainerViewGenericName» mapTo«toType.typeName»(final «toType.typeName»F<A> f) {
-				«ELSE»
-					public «toType.orderedContainerViewGenericName» mapTo«toType.typeName»(final «type.typeName»«toType.typeName»F f) {
-				«ENDIF»
-					requireNonNull(f);
-					return new «toType.shortName("ConcatenatedOrderedContainerView")»<>(this.prefix.view().mapTo«toType.typeName»(f), this.suffix.view().mapTo«toType.typeName»(f));
+				for (final C container : this.containers) {
+					if (!container.isReverseQuick()) {
+						return false;
+					}
 				}
-
-			«ENDFOR»
-			@Override
-			public «genericName» filter(final «type.boolFName» predicate) {
-				requireNonNull(predicate);
-				return new «concatenatedShortName»<>(this.prefix.view().filter(predicate), this.suffix.view().filter(predicate));
+				return true;
 			}
 
 			@Override
 			public «genericName» reverse() {
-				return new «concatenatedShortName»<>(this.suffix.view().reverse().unview(), this.prefix.view().reverse().unview());
+				final «type.orderedContainerGenericName»[] reverse = new «type.orderedContainerShortName»[this.containers.length];
+				for (int i = 0; i < this.containers.length; i++) {
+					reverse[i] = this.containers[this.containers.length - i - 1].view().reverse().unview();
+				}
+				return new «concatenatedShortName»<>(reverse);
 			}
 		}
 

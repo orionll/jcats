@@ -755,41 +755,33 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 		«ELSE»
 			final class «concatenatedShortName» extends «type.typeName»ConcatenatedOrderedContainerView<«type.indexedContainerGenericName»> implements «type.indexedContainerViewGenericName» {
 		«ENDIF»
-			«concatenatedShortName»(final «type.indexedContainerGenericName» prefix, final «type.indexedContainerGenericName» suffix) {
-				super(prefix, suffix);
+			«concatenatedShortName»(final «type.indexedContainerGenericName»[] containers) {
+				super(containers);
 			}
 
 			@Override
 			public «type.genericName» get(final int index)  {
-				final int prefixSize = this.prefix.size();
-				if (index < prefixSize) {
-					return this.prefix.get(index);
-				} else {
-					return this.suffix.get(index - prefixSize);
+				if (index < 0) {
+					throw new IllegalArgumentException(Integer.toString(index));
 				}
+				int size = 0;
+				for (final «type.indexedContainerGenericName» container : this.containers) {
+					final int nextSize = size + container.size();
+					if (index < nextSize || nextSize < 0) {
+						return container.get(index - size);
+					}
+					size = nextSize;
+				}
+				«indexOutOfBounds(shortName)»
 			}
 
-			@Override
-			public <«mapTargetType»> IndexedContainerView<«mapTargetType»> map(final «type.fGenericName» f) {
-				requireNonNull(f);
-				return new ConcatenatedIndexedContainerView<>(this.prefix.view().map(f), this.suffix.view().map(f));
-			}
-
-			«FOR toType : Type.primitives»
-				@Override
-				«IF type == Type.OBJECT»
-					public «toType.indexedContainerViewGenericName» mapTo«toType.typeName»(final «toType.typeName»F<A> f) {
-				«ELSE»
-					public «toType.indexedContainerViewGenericName» mapTo«toType.typeName»(final «type.typeName»«toType.typeName»F f) {
-				«ENDIF»
-					requireNonNull(f);
-					return new «toType.diamondName("ConcatenatedIndexedContainerView")»(this.prefix.view().mapTo«toType.typeName»(f), this.suffix.view().mapTo«toType.typeName»(f));
-				}
-
-			«ENDFOR»
 			@Override
 			public «genericName» reverse() {
-				return new «type.diamondName("ConcatenatedIndexedContainerView")»(this.suffix.view().reverse().unview(), this.prefix.view().reverse().unview());
+				final «type.indexedContainerGenericName»[] reverse = new «type.indexedContainerShortName»[this.containers.length];
+				for (int i = 0; i < this.containers.length; i++) {
+					reverse[i] = this.containers[this.containers.length - i - 1].view().reverse().unview();
+				}
+				return new «type.diamondName("ConcatenatedIndexedContainerView")»(reverse);
 			}
 
 			«orderedHashCode(type)»

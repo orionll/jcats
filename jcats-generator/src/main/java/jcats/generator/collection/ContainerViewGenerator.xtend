@@ -1731,62 +1731,55 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 		}
 
 		class «concatenatedShortName»<«IF type == Type.OBJECT»A, «ENDIF»C extends «type.containerGenericName»> implements «genericName» {
-			final C prefix;
-			final C suffix;
+			final C[] containers;
 
-			«concatenatedShortName»(final C prefix, final C suffix) {
-				this.prefix = prefix;
-				this.suffix = suffix;
+			«concatenatedShortName»(final C[] containers) {
+				«IF ea»
+					assert containers.length > 1;
+				«ENDIF»
+				this.containers = containers;
 			}
 
 			@Override
 			public int size() {
-				final int size = this.prefix.size() + this.suffix.size();
-				if (size < 0) {
-					throw new SizeOverflowException();
-				} else {
-					return size;
+				int size = 0;
+				for (final C container : this.containers) {
+					size += container.size();
+					if (size < 0) {
+						throw new SizeOverflowException();
+					}
 				}
+				return size;
 			}
 
 			@Override
 			public boolean hasKnownFixedSize() {
-				return this.prefix.hasKnownFixedSize()
-						&& this.suffix.hasKnownFixedSize()
-						&& this.prefix.size() + this.suffix.size() >= 0;
+				int size = 0;
+				for (final C container : this.containers) {
+					if (!container.hasKnownFixedSize()) {
+						return false;
+					}
+					size += container.size();
+					if (size < 0) {
+						return false;
+					}
+				}
+				return true;
 			}
 
 			@Override
 			public boolean isEmpty() {
-				return this.prefix.isEmpty() && this.suffix.isEmpty();
+				for (final C container : this.containers) {
+					if (container.isNotEmpty()) {
+						return false;
+					}
+				}
+				return true;
 			}
 
 			@Override
 			public boolean isNotEmpty() {
-				return this.prefix.isNotEmpty() || this.suffix.isNotEmpty();
-			}
-
-			@Override
-			public «type.genericName» first() {
-				if (this.prefix.hasKnownFixedSize()) {
-					if (this.prefix.isEmpty()) {
-						return this.suffix.first();
-					} else {
-						return this.prefix.first();
-					}
-				} else {
-					return «shortName».super.first();
-				}
-			}
-
-			@Override
-			public «type.optionGenericName» findFirst() {
-				final «type.optionGenericName» first = this.prefix.findFirst();
-				if (first.isEmpty()) {
-					return this.suffix.findFirst();
-				} else {
-					return first;
-				}
+				return !isEmpty();
 			}
 
 			@Override
@@ -1794,147 +1787,101 @@ final class ContainerViewGenerator implements InterfaceGenerator {
 				«IF type == Type.OBJECT»
 					requireNonNull(value);
 				«ENDIF»
-				return this.prefix.contains(value) || this.suffix.contains(value);
+				for (final C container : this.containers) {
+					if (container.contains(value)) {
+						return true;
+					}
+				}
+				return false;
 			}
 
 			@Override
-			public «type.optionGenericName» firstMatch(final «type.boolFName» predicate) {
-				requireNonNull(predicate);
-				final «type.optionGenericName» first = this.prefix.firstMatch(predicate);
-				if (first.isEmpty()) {
-					return this.suffix.firstMatch(predicate);
-				} else {
-					return first;
-				}
-			}
-		
-			@Override
 			public boolean anyMatch(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
-				return this.prefix.anyMatch(predicate) || this.suffix.anyMatch(predicate);
+				for (final C container : this.containers) {
+					if (container.anyMatch(predicate)) {
+						return true;
+					}
+				}
+				return false;
 			}
-		
+
 			@Override
 			public boolean allMatch(final «type.boolFName» predicate) {
 				requireNonNull(predicate);
-				return this.prefix.allMatch(predicate) && this.suffix.allMatch(predicate);
+				for (final C container : this.containers) {
+					if (!container.allMatch(predicate)) {
+						return false;
+					}
+				}
+				return true;
 			}
-		
+
 			@Override
 			public boolean noneMatch(final «type.boolFName» predicate) {
-				requireNonNull(predicate);
-				return this.prefix.noneMatch(predicate) && this.suffix.noneMatch(predicate);
+				return !anyMatch(predicate);
 			}
 
 			«IF type.javaUnboxedType»
 				@Override
 				public «type.javaName» sum() {
-					return this.prefix.sum() + this.suffix.sum();
+					«IF type.floatingPoint»
+						return Arrays.stream(this.containers).mapTo«type.typeName»(«type.containerShortName»::sum).sum();
+					«ELSE»
+						«type.javaName» sum = 0;
+						for (final C container : this.containers) {
+							sum += container.sum();
+						}
+						return sum;
+					«ENDIF»
 				}
 
 			«ENDIF»
 			@Override
 			public «type.iteratorGenericName» iterator() {
+				final «type.iteratorGenericName»[] iterators = new «type.iteratorShortName»[this.containers.length];
+				for (int i = 0; i < this.containers.length; i++) {
+					iterators[i] = this.containers[i].iterator();
+				}
 				«IF type.javaUnboxedType»
-					return new «type.iteratorDiamondName("Concatenated")»(this.prefix.iterator(), this.suffix.iterator());
+					return new «type.iteratorDiamondName("Concatenated")»(iterators);
 				«ELSE»
-					return new ConcatenatedIterator<>(this.prefix.iterator(), this.suffix.iterator());
+					return new ConcatenatedIterator<>(iterators);
 				«ENDIF»
 			}
 
 			@Override
 			public void foreach(final «type.effGenericName» eff) {
 				requireNonNull(eff);
-				this.prefix.foreach(eff);
-				this.suffix.foreach(eff);
+				for (final C container : this.containers) {
+					container.foreach(eff);
+				}
 			}
 
 			@Override
 			public boolean foreachUntil(final «type.boolFName» eff) {
 				requireNonNull(eff);
-				return this.prefix.foreachUntil(eff) && this.suffix.foreachUntil(eff);
+				for (final C container : this.containers) {
+					if (!container.foreachUntil(eff)) {
+						return false;
+					}
+				}
+				return true;
 			}
 
 			@Override
 			public void forEach(final Consumer<? super «type.genericBoxedName»> action) {
 				requireNonNull(action);
-				this.prefix.forEach(action);
-				this.suffix.forEach(action);
+				for (final C container : this.containers) {
+					container.forEach(action);
+				}
 			}
 
 			@Override
 			public void printAll() {
-				this.prefix.printAll();
-				this.suffix.printAll();
-			}
-
-			@Override
-			public «type.arrayGenericName» to«type.arrayShortName»() {
-				if (this.prefix.hasKnownFixedSize() && this.prefix.isEmpty()) {
-					return this.suffix.to«type.arrayShortName»();
-				} else if (this.suffix.hasKnownFixedSize() && this.suffix.isEmpty()) {
-					return this.prefix.to«type.arrayShortName»();
-				} else {
-					return «shortName».super.to«type.arrayShortName»();
+				for (final C container : this.containers) {
+					container.printAll();
 				}
-			}
-
-			@Override
-			public «type.seqGenericName» to«type.seqShortName»() {
-				if (this.prefix.hasKnownFixedSize() && this.prefix.isEmpty()) {
-					return this.suffix.to«type.seqShortName»();
-				} else if (this.suffix.hasKnownFixedSize() && this.suffix.isEmpty()) {
-					return this.prefix.to«type.seqShortName»();
-				} else {
-					return «shortName».super.to«type.seqShortName»();
-				}
-			}
-
-			«IF type != Type.BOOLEAN»
-				@Override
-				public «type.uniqueGenericName» to«type.uniqueShortName»() {
-					if (this.prefix.hasKnownFixedSize() && this.prefix.isEmpty()) {
-						return this.suffix.to«type.uniqueShortName»();
-					} else if (this.suffix.hasKnownFixedSize() && this.suffix.isEmpty()) {
-						return this.prefix.to«type.uniqueShortName»();
-					} else {
-						return «shortName».super.to«type.uniqueShortName»();
-					}
-				}
-
-			«ENDIF»
-			@Override
-			public «type.stream2GenericName» stream() {
-				return new «type.stream2DiamondName»(«type.streamName».concat(this.prefix.stream(), this.suffix.stream()));
-			}
-
-			@Override
-			public «type.stream2GenericName» parallelStream() {
-				return new «type.stream2DiamondName»(«type.streamName».concat(this.prefix.parallelStream(), this.suffix.parallelStream()));
-			}
-
-			@Override
-			public <«mapTargetType»> ContainerView<«mapTargetType»> map(final «type.fGenericName» f) {
-				requireNonNull(f);
-				return new ConcatenatedContainerView<>(this.prefix.view().map(f), this.suffix.view().map(f));
-			}
-
-			«FOR toType : Type.primitives»
-				@Override
-				«IF type == Type.OBJECT»
-					public «toType.containerViewGenericName» mapTo«toType.typeName»(final «toType.typeName»F<A> f) {
-				«ELSE»
-					public «toType.containerViewGenericName» mapTo«toType.typeName»(final «type.typeName»«toType.typeName»F f) {
-				«ENDIF»
-					requireNonNull(f);
-					return new «toType.shortName("ConcatenatedContainerView")»<>(this.prefix.view().mapTo«toType.typeName»(f), this.suffix.view().mapTo«toType.typeName»(f));
-				}
-
-			«ENDFOR»
-			@Override
-			public «genericName» filter(final «type.boolFName» predicate) {
-				requireNonNull(predicate);
-				return new «concatenatedShortName»<>(this.prefix.view().filter(predicate), this.suffix.view().filter(predicate));
 			}
 
 			«toStr(type)»

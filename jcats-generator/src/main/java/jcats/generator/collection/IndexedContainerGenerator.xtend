@@ -283,10 +283,20 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
-			static «type.paramGenericName("IndexedContainerView")» concat(final «genericName» prefix, final «genericName» suffix) {
-				requireNonNull(prefix);
-				requireNonNull(suffix);
-				return new «type.diamondName("ConcatenatedIndexedContainerView")»(prefix, suffix);
+			«IF type == Type.OBJECT»
+				@SafeVarargs
+			«ENDIF»
+			static «type.paramGenericName("IndexedContainerView")» concat(final «genericName»... containers) {
+				if (containers.length == 0) {
+					return empty«type.indexedContainerViewShortName»();
+				} else if (containers.length == 1) {
+					return requireNonNull(containers[0].view());
+				} else {
+					for (final «genericName» container : containers) {
+						requireNonNull(container);
+					}
+					return new «type.diamondName("ConcatenatedIndexedContainerView")»(containers);
+				}
 			}
 			«IF type == Type.OBJECT»
 
