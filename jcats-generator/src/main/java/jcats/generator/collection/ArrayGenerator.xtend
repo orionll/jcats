@@ -169,7 +169,7 @@ final class ArrayGenerator implements ClassGenerator {
 
 			public «genericName» removeAt(final int index) throws IndexOutOfBoundsException {
 				if (index < 0 || index >= this.array.length) {
-					throw new IndexOutOfBoundsException(Integer.toString(index));
+					«indexOutOfBounds»
 				} else {
 					return remove(index);
 				}

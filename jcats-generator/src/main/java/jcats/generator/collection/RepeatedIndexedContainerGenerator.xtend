@@ -268,7 +268,7 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 			@Override
 			public «type.indexedContainerViewGenericName» limit(final int n) {
 				if (n < 0) {
-					throw new IndexOutOfBoundsException(Integer.toString(n));
+					throw new IllegalArgumentException(Integer.toString(n));
 				} else if (n == 0) {
 					return empty«type.indexedContainerViewShortName»();
 				} else if (n >= this.size) {

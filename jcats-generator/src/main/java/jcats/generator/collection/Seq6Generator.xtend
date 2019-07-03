@@ -523,7 +523,7 @@ final class Seq6Generator extends SeqGenerator {
 						return new «diamondName(6)»(newNode6, init, tail, startIndex, size);
 					}
 				} catch (final ArrayIndexOutOfBoundsException __) {
-					throw new IndexOutOfBoundsException(Integer.toString(index));
+					«indexOutOfBounds»
 				}
 			}
 

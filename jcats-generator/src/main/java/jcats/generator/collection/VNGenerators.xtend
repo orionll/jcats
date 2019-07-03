@@ -131,7 +131,7 @@ final class VNGenerators {
 									return new «diamondName»(«(1 .. arity).map[if (it == i) '''«IF type == Type.OBJECT»requireNonNull(a)«ELSE»a«ENDIF»''' else "this.a" + it].join(", ")»);
 								}
 							«ENDFOR»
-							default: throw new IndexOutOfBoundsException(Integer.toString(index));
+							default: «indexOutOfBounds»
 						}
 					}
 

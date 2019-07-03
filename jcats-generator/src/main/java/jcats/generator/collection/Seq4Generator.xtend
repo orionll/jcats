@@ -326,7 +326,7 @@ final class Seq4Generator extends SeqGenerator {
 						return new «diamondName(4)»(newNode4, init, tail, startIndex, size);
 					}
 				} catch (final ArrayIndexOutOfBoundsException __) {
-					throw new IndexOutOfBoundsException(Integer.toString(index));
+					«indexOutOfBounds»
 				}
 			}
 

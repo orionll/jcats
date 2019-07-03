@@ -191,7 +191,7 @@ class SeqGenerator implements ClassGenerator {
 			public final «genericName» removeAt(final int index) throws IndexOutOfBoundsException {
 				final int size = size();
 				if (index < 0 || index >= size) {
-					throw new IndexOutOfBoundsException(Integer.toString(index));
+					«indexOutOfBounds»
 				} else {
 					return remove(index);
 				}
