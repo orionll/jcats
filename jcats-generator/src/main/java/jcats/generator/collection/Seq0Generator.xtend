@@ -60,7 +60,7 @@ class Seq0Generator extends SeqGenerator {
 
 			@Override
 			public «type.genericName» get(final int index) {
-				«indexOutOfBounds(shortName)»
+				«indexOutOfBounds»
 			}
 
 			@Override

@@ -137,7 +137,7 @@ class Seq2Generator extends SeqGenerator {
 						return «type.genericCast»node2[index2(idx) - 1][index1(idx)];
 					}
 				} catch (final ArrayIndexOutOfBoundsException __) {
-					«indexOutOfBounds(shortName)»
+					«indexOutOfBounds»
 				}
 			}
 

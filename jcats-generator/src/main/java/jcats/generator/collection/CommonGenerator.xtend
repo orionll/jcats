@@ -332,10 +332,10 @@ final class CommonGenerator implements ClassGenerator {
 				}
 			}
 
-			static String getIndexOutOfBoundsMessage(final int index, final Sized sized, final String name) {
+			static String getIndexOutOfBoundsMessage(final int index, final Sized sized) {
 				final String message = "Index " + index + " is out of range";
 				if (sized.hasKnownFixedSize()) {
-					return message + " (" + name + " length = " + sized.size() + ")";
+					return message + " (size = " + sized.size() + ")";
 				} else {
 					return message;
 				}

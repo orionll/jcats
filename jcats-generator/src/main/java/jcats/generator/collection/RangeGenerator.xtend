@@ -76,7 +76,7 @@ final class RangeGenerator implements ClassGenerator {
 			@Override
 			public int get(final int index) throws IndexOutOfBoundsException {
 				if (index < 0) {
-					throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "Range"));
+					«indexOutOfBounds»
 				} else {
 					final int result = this.low + index;
 					if (result >= this.low &&
@@ -84,7 +84,7 @@ final class RangeGenerator implements ClassGenerator {
 							!this.closed && result < this.high)) {
 						return result;
 					} else {
-						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "Range"));
+						«indexOutOfBounds»
 					}
 				}
 			}

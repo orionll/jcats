@@ -99,7 +99,7 @@ final class ArrayGenerator implements ClassGenerator {
 				try {
 					return «type.genericCast»this.array[index];
 				} catch (final ArrayIndexOutOfBoundsException __) {
-					«indexOutOfBounds(shortName)»
+					«indexOutOfBounds»
 				}
 			}
 

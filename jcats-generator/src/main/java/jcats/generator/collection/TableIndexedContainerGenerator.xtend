@@ -97,7 +97,7 @@ final class TableIndexedContainerGenerator implements ClassGenerator {
 						return this.f.apply(index);
 					«ENDIF»
 				} else {
-					«indexOutOfBounds(shortName)»
+					«indexOutOfBounds»
 				}
 			}
 

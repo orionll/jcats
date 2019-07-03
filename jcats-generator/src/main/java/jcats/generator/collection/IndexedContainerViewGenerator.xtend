@@ -491,12 +491,12 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public «type.genericName» get(final int index) {
 				if (index < 0 || index >= this.limit) {
-					throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«limitedShortName»"));
+					«indexOutOfBounds»
 				} else {
 					try {
 						return this.container.get(index);
 					} catch (final IndexOutOfBoundsException __) {
-						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«limitedShortName»"));
+						«indexOutOfBounds»
 					}
 				}
 			}
@@ -578,16 +578,16 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			@Override
 			public «type.genericName» get(final int index) {
 				if (index < 0) {
-					throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«skippedShortName»"));
+					«indexOutOfBounds»
 				} else {
 					final int newIndex = this.skip + index;
 					if (newIndex < 0) {
-						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«skippedShortName»"));
+						«indexOutOfBounds»
 					}
 					try {
 						return this.container.get(newIndex);
 					} catch (final IndexOutOfBoundsException __) {
-						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«skippedShortName»"));
+						«indexOutOfBounds»
 					}
 				}
 			}
@@ -693,7 +693,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					try {
 						return this.container.get(size() - index - 1);
 					} catch (final IndexOutOfBoundsException __) {
-						throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this, "«reverseShortName»"));
+						«indexOutOfBounds»
 					}
 				} else {
 					throw new UnsupportedOperationException("get() is unsupported if hasKnownFixedSize() == false");
@@ -772,7 +772,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 					}
 					size = nextSize;
 				}
-				«indexOutOfBounds(shortName)»
+				«indexOutOfBounds»
 			}
 
 			@Override

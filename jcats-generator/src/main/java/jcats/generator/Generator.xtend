@@ -273,9 +273,7 @@ interface Generator {
 		'''
 	}
 
-	def indexOutOfBounds(String shortName) {
-		'''throw new IndexOutOfBoundsException("Index " + index + " is out of range («shortName» length = " + this.size() + ")");'''
-	}
+	def indexOutOfBounds() '''throw new IndexOutOfBoundsException(getIndexOutOfBoundsMessage(index, this));'''
 
 	def transform(String genericName) { transform(genericName, false) }
 

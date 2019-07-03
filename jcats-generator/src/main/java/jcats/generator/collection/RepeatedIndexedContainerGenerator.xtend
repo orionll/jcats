@@ -105,7 +105,7 @@ final class RepeatedIndexedContainerGenerator implements ClassGenerator {
 				if (index >= 0 && index < this.size) {
 					return this.value;
 				} else {
-					«indexOutOfBounds(shortName)»
+					«indexOutOfBounds»
 				}
 			}
 

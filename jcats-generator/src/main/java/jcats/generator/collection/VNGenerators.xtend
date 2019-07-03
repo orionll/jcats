@@ -98,7 +98,7 @@ final class VNGenerators {
 							«FOR i : 1 .. arity»
 								case «i-1»: return this.a«i»;
 							«ENDFOR»
-							default: «indexOutOfBounds(shortName)»
+							default: «indexOutOfBounds»
 						}
 					}
 
