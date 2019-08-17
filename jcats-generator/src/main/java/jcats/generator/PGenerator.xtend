@@ -192,35 +192,36 @@ class PGenerator implements ClassGenerator {
 
 			«ENDFOR»
 			«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
-				public <B> B match(final F2<A1, A2, B>  f) {
+				public <B> B match(final F2<A1, A2, B> f) {
 					final B b = f.apply(this.a1, this.a2);
 					return requireNonNull(b);
 				}
 			«ELSEIF type1 == Type.OBJECT && type2 != Type.OBJECT»
-				public <B> B match(final Object«type2.typeName»ObjectF2<A, B>  f) {
+				public <B> B match(final Object«type2.typeName»ObjectF2<A, B> f) {
 					final B b = f.apply(this.a1, this.a2);
 					return requireNonNull(b);
 				}
 			«ELSEIF type1 != Type.OBJECT && type2 == Type.OBJECT»
-				public <B> B match(final «type1.typeName»ObjectObjectF2<A, B>  f) {
+				public <B> B match(final «type1.typeName»ObjectObjectF2<A, B> f) {
 					final B b = f.apply(this.a1, this.a2);
 					return requireNonNull(b);
 				}
 			«ELSE»
-				public <A> A match(final «type1.typeName»«type2.typeName»ObjectF2<A>  f) {
+				public <A> A match(final «type1.typeName»«type2.typeName»ObjectF2<A> f) {
 					final A a = f.apply(this.a1, this.a2);
 					return requireNonNull(a);
 				}
 			«ENDIF»
+
 			«FOR to : Type.primitives»
 				«IF type1 == Type.OBJECT && type2 == Type.OBJECT»
-					public «to.genericName» matchTo«to.typeName»(final «to.typeName»F2<A1, A2>  f) {
+					public «to.genericName» matchTo«to.typeName»(final «to.typeName»F2<A1, A2> f) {
 				«ELSEIF type1 == Type.OBJECT && type2 != Type.OBJECT»
-					public «to.genericName» matchTo«to.typeName»(final Object«type2.typeName»«to.typeName»F2<A>  f) {
+					public «to.genericName» matchTo«to.typeName»(final Object«type2.typeName»«to.typeName»F2<A> f) {
 				«ELSEIF type1 != Type.OBJECT && type2 == Type.OBJECT»
-					public «to.genericName» matchTo«to.typeName»(final «type1.typeName»Object«to.typeName»F2<A>  f) {
+					public «to.genericName» matchTo«to.typeName»(final «type1.typeName»Object«to.typeName»F2<A> f) {
 				«ELSE»
-					public «to.genericName» matchTo«to.typeName»(final «type1.typeName»«type2.typeName»«to.typeName»F2  f) {
+					public «to.genericName» matchTo«to.typeName»(final «type1.typeName»«type2.typeName»«to.typeName»F2 f) {
 				«ENDIF»
 					return f.apply(this.a1, this.a2);
 				}
