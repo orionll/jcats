@@ -233,6 +233,7 @@ final class ContainerGenerator implements InterfaceGenerator {
 			}
 
 			default boolean noneMatch(final «type.boolFName» predicate) {
+				requireNonNull(predicate);
 				return foreachUntil((final «type.genericName» a) -> !predicate.apply(a));
 			}
 
