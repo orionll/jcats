@@ -932,6 +932,13 @@ final class CommonGenerator implements ClassGenerator {
 					return this.iterator.«type.iteratorNext»();
 				}
 
+				@Override
+				public void forEachRemaining(final «type.forEachRemainingGenericActionName» action) {
+					requireNonNull(action);
+					advance();
+					this.iterator.forEachRemaining(action);
+				}
+
 				private void advance() {
 					while (this.skip > 0 && this.iterator.hasNext()) {
 						this.skip--;
