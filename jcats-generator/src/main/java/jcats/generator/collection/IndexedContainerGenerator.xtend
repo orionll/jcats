@@ -207,7 +207,7 @@ class IndexedContainerGenerator implements InterfaceGenerator {
 				}
 			}
 
-			default IntIndexedContainer indices() throws SizeOverflowException {
+			default IntIndexedContainerView indices() throws SizeOverflowException {
 				return range(0, size());
 			}
 

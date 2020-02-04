@@ -193,7 +193,7 @@ final class IndexedContainerViewGenerator implements InterfaceGenerator {
 			}
 
 			@Override
-			public IntIndexedContainer indices() {
+			public IntIndexedContainerView indices() {
 				return this.container.indices();
 			}
 
