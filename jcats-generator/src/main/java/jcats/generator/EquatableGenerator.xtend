@@ -6,6 +6,8 @@ final class EquatableGenerator implements InterfaceGenerator {
 	override sourceCode() { '''
 		package «Constants.JCATS»;
 
+		import java.util.Objects;
+
 		import static java.util.Objects.requireNonNull;
 
 		public interface Equatable<A> {
@@ -49,6 +51,32 @@ final class EquatableGenerator implements InterfaceGenerator {
 					}
 				}
 				return false;
+			}
+
+			static <A extends Equatable<A>> boolean equal(final A value1, final A value2) {
+				requireNonNull(value2);
+				return value1.equals(value2);
+			}
+
+			static <A extends Equatable<A>> boolean nullableEqual(final A value1, final A value2) {
+				return Objects.equals(value1, value2);
+			}
+
+			@SafeVarargs
+			static <A extends Equatable<A>> boolean allEqual(final A... values) {
+				if (values.length == 0) {
+					return true;
+				}
+				for (final A value : values) {
+					requireNonNull(value);
+				}
+				final Equatable<A> first = values[0];
+				for (int i = 1; i < values.length; i++) {
+					if (!first.equals(values[i])) {
+						return false;
+					}
+				}
+				return true;
 			}
 		}
 	''' }
